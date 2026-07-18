@@ -48,14 +48,14 @@ export interface JourneyStep {
 
 export function createDefaultJourneySteps(): JourneyStep[] {
   return [
-    { id: "encounter", catalogStageId: "S02", label: "Encounter a relevant official starting path", status: "in-path" },
-    { id: "decide", catalogStageId: "S02", label: "Decide it is worth trying for their job", status: "in-path" },
-    { id: "sign-up", catalogStageId: "S03", label: "Sign up or sign in", status: "in-path" },
-    { id: "access", catalogStageId: "S03", label: "Gain the required access and authority", status: "in-path" },
-    { id: "setup", catalogStageId: "S04", label: "Prepare the project or environment", status: "in-path" },
-    { id: "execute", catalogStageId: "S05", label: "Execute the first representative operation", status: "in-path" },
-    { id: "signal", catalogStageId: "S06", label: "Receive a platform response, output, or side effect", status: "in-path" },
-    { id: "verify", catalogStageId: "S06", label: "Independently verify the intended result", status: "in-path" },
+    { id: "encounter", catalogStageId: "S02", label: "Find the right starting point", status: "in-path" },
+    { id: "decide", catalogStageId: "S02", label: "Decide the product fits their job", status: "in-path" },
+    { id: "sign-up", catalogStageId: "S03", label: "Create or access an account", status: "in-path" },
+    { id: "access", catalogStageId: "S03", label: "Get the permissions or approval they need", status: "in-path" },
+    { id: "setup", catalogStageId: "S04", label: "Set up their project", status: "in-path" },
+    { id: "execute", catalogStageId: "S05", label: "Make the first real product action", status: "in-path" },
+    { id: "signal", catalogStageId: "S06", label: "Receive a response or result", status: "in-path" },
+    { id: "verify", catalogStageId: "S06", label: "Confirm it solved their problem", status: "in-path" },
   ];
 }
 

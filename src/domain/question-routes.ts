@@ -182,7 +182,7 @@ export const discriminatorQuestions: DiscriminatorQuestion[] = [
   {
     id: "DQ_MEASUREMENT",
     objectiveId: "D8",
-    prompt: "What evidence would locate the earliest point where this journey stops?",
+    prompt: "What is the smallest next observation?",
     support: "When the stopping point is unknown, asking for a cause only produces a better-sounding guess.",
     answerMode: "single",
     valueCode: "repair_measurement_boundary",

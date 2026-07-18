@@ -1,18 +1,14 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   ChoiceGroup,
   QuestionShell,
   TextArea,
   TextField,
-  WhyThisQuestion,
 } from "./components";
 import {
-  actorTypeChoices,
   breakEvidenceChoices,
   friendlyCopy,
-  journeyTypeChoices,
   phaseLabels,
-  platformSurfaceChoices,
   roleChoices,
 } from "./copy";
 import {
@@ -20,12 +16,7 @@ import {
   deleteAdaptiveSession,
   loadAdaptiveCredential,
 } from "./adaptive-client";
-import {
-  catalog,
-  getFamiliesForStage,
-  getReasonsForParent,
-} from "./domain/catalog";
-import { getPlatformResearchGroups } from "./domain/knowledge-graph";
+import { catalog } from "./domain/catalog";
 import { explainSelection, selectDiscriminatorQuestion } from "./domain/question-routes";
 import {
   createPortableCase,
@@ -48,7 +39,6 @@ import {
 const activeScreenOrder: ActiveScreenId[] = [
   "welcome",
   "profile",
-  "platform-context",
   "developer",
   "journey-map",
   "break-point",
@@ -56,9 +46,7 @@ const activeScreenOrder: ActiveScreenId[] = [
   "summary",
 ];
 
-const stageChoices = catalog.nodes
-  .filter((node) => node.kind === "stage" && !["S00", "S08"].includes(node.id))
-  .map((node) => ({ id: node.id, label: node.label }));
+const insufficientEvidenceConclusion = "We need better evidence before naming the issue.";
 
 function isActiveScreen(screen: ScreenId): screen is ActiveScreenId {
   return activeScreenOrder.includes(screen as ActiveScreenId);
@@ -66,12 +54,13 @@ function isActiveScreen(screen: ScreenId): screen is ActiveScreenId {
 
 function normalizeScreen(screen: ScreenId): ActiveScreenId {
   if (screen === "first-mile") return "developer";
+  if (screen === "platform-context") return "profile";
   if (isActiveScreen(screen)) return screen;
   return "profile";
 }
 
 function phaseForScreen(screen: ActiveScreenId): PhaseId {
-  if (["profile", "platform-context"].includes(screen)) return "profile";
+  if (screen === "profile") return "profile";
   if (screen === "developer") return "frame";
   if (screen === "journey-map") return "map";
   if (screen === "break-point") return "locate";
@@ -164,22 +153,14 @@ function downloadText(filename: string, content: string, type: string) {
 
 function validationMessage(screen: ActiveScreenId, answers: CaseAnswers): string | null {
   if (screen === "profile") {
-    if (!answers.name.trim() || !answers.company.trim() || !answers.role.trim()) {
-      return "Add a name or alias, a company or project boundary, and your role.";
+    if (!answers.name.trim() || !answers.company.trim() || !answers.platform.trim() || !answers.role.trim()) {
+      return "Add your name or alias, company, platform, and role.";
     }
     if (answers.role === "Something else" && !answers.roleOther.trim()) return "Describe your role in a few words.";
   }
-  if (screen === "platform-context") {
-    if (!answers.platform.trim() || answers.platformSurfaces.length === 0) {
-      return "Name the platform and choose one or two surfaces developers touch.";
-    }
-    if (answers.platformSurfaces.includes("Something else") && !answers.platformSurfaceOther.trim()) {
-      return "Describe the developer surface so the research does not force it into the wrong type.";
-    }
-  }
   if (screen === "developer") {
-    if (!answers.developer.trim() || !answers.developerJob.trim() || !answers.journeyType || !answers.actorType || !answers.meaningfulAction.trim() || !answers.verificationSignal.trim()) {
-      return "Name one developer group, their real job, the journey, the first representative operation, and how they verify it.";
+    if (!answers.developer.trim() || !answers.developerJob.trim() || !answers.meaningfulAction.trim() || !answers.verificationSignal.trim()) {
+      return "Add the developer, their goal, the first real product action, and what tells them it worked.";
     }
   }
   if (screen === "journey-map") {
@@ -188,12 +169,12 @@ function validationMessage(screen: ActiveScreenId, answers: CaseAnswers): string
   }
   if (screen === "break-point") {
     if (!answers.furthestReachedStepId || !answers.breakStepId || !answers.breakEvidenceType) {
-      return "Mark the furthest stage you can defend, the first unresolved point, and the evidence behind it.";
+      return "Choose where the developer stopped and how you know.";
     }
   }
   if (screen === "blocker") {
     if (answers.discriminatorAnswerIds.length !== 1) return "Choose the closest observed answer.";
-    if (!answers.issueStatement.trim()) return "Name what you think is happening, or choose the evidence-gap option.";
+    if (!answers.issueStatement.trim()) return "Choose not enough evidence, or add a working explanation.";
   }
   return null;
 }
@@ -228,6 +209,7 @@ export function App() {
   }));
   const [error, setError] = useState("");
   const [showReset, setShowReset] = useState(false);
+  const [showIssueStatement, setShowIssueStatement] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [pendingImport, setPendingImport] = useState<PortableCase | null>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -235,9 +217,6 @@ export function App() {
   const activeSteps = answers.journeySteps.filter((step) => step.status === "in-path");
   const furthestIndex = activeSteps.findIndex((step) => step.id === answers.furthestReachedStepId);
   const selectedBreakStep = activeSteps.find((step) => step.id === answers.breakStepId) ?? null;
-  const availableBreakSteps = answers.furthestReachedStepId === "none"
-    ? activeSteps
-    : activeSteps.filter((_step, index) => index > furthestIndex);
   const lastStage = selectedBreakStep
     ? lastStageForCatalogStage(selectedBreakStep.catalogStageId)
     : "We cannot locate the stop yet";
@@ -249,28 +228,15 @@ export function App() {
   const selectedDiscriminatorOption = discriminator.options.find(
     (option) => option.id === answers.discriminatorAnswerIds[0],
   ) ?? null;
-  const researchFamilies = useMemo(() => {
-    const stageIds = selectedBreakStep ? [selectedBreakStep.catalogStageId] : ["S01", "S02", "S03", "S04", "S05", "S06"];
-    const seen = new Set<string>();
-    return stageIds.flatMap((stageId) => getFamiliesForStage(stageId)).filter((family) => {
-      if (seen.has(family.id)) return false;
-      seen.add(family.id);
-      return true;
-    });
-  }, [selectedBreakStep]);
-  const platformResearchGroups = useMemo(
-    () => getPlatformResearchGroups(answers.platformSurfaces),
-    [answers.platformSurfaces],
-  );
-  const resultStateLabel = (() => {
-    if (answers.breakStepId === "completed") return "First mile completed";
-    if (answers.breakStepId === "cannot-tell" || selectedDiscriminatorOption?.specialState === "needs_external_evidence") return "Needs evidence";
-    if (selectedDiscriminatorOption?.specialState === "legitimate_gate") return "Legitimate gate";
-    if (selectedDiscriminatorOption?.specialState === "deliberate_non_fit") return "Deliberate non-fit";
-    if (selectedDiscriminatorOption?.specialState === "compound_blockers") return "Several breaks observed";
-    return "Working hypothesis";
+  const summaryTitle = (() => {
+    if (answers.breakStepId === "completed") return "This journey does not show a drop-off.";
+    if (answers.breakStepId === "cannot-tell") return "You need better evidence to locate the drop-off.";
+    if (selectedDiscriminatorOption?.specialState === "needs_external_evidence") return "You found the first unconfirmed step, but not its cause.";
+    if (selectedDiscriminatorOption?.specialState === "legitimate_gate") return "The first stop is an expected gate.";
+    if (selectedDiscriminatorOption?.specialState === "deliberate_non_fit") return "The developer chose not to continue.";
+    if (selectedDiscriminatorOption?.specialState === "compound_blockers") return "More than one thing blocked this journey.";
+    return "Here is where the journey becomes unclear.";
   })();
-
   useEffect(() => {
     if (screen === "welcome") return;
     const session = {
@@ -288,6 +254,7 @@ export function App() {
   useEffect(() => {
     document.querySelector<HTMLElement>("#question-title, #summary-title")?.focus();
     window.scrollTo({ top: 0, behavior: "instant" });
+    if (screen !== "blocker") setShowIssueStatement(false);
   }, [screen]);
 
   useEffect(() => {
@@ -300,6 +267,12 @@ export function App() {
       issueStatement: "",
     }));
   }, [answers.discriminatorQuestionId, discriminator.id, screen]);
+
+  useEffect(() => {
+    if (screen !== "blocker" || discriminator.id !== "DQ_MEASUREMENT" || answers.discriminatorAnswerIds.length === 0) return;
+    if (answers.issueStatement === insufficientEvidenceConclusion) return;
+    setAnswers((current) => ({ ...current, issueStatement: insufficientEvidenceConclusion }));
+  }, [answers.discriminatorAnswerIds.length, answers.issueStatement, discriminator.id, screen]);
 
   function updateAnswer<K extends keyof CaseAnswers>(key: K, value: CaseAnswers[K]) {
     setAnswers((current) => ({ ...current, [key]: value }));
@@ -318,21 +291,6 @@ export function App() {
         discriminatorQuestionId: removedFromPath && current.breakStepId === id ? "" : current.discriminatorQuestionId,
         discriminatorAnswerIds: removedFromPath && current.breakStepId === id ? [] : current.discriminatorAnswerIds,
         issueStatement: removedFromPath && current.breakStepId === id ? "" : current.issueStatement,
-      };
-    });
-    setError("");
-  }
-
-  function updatePlatformSurface(index: number, value: string) {
-    setAnswers((current) => {
-      const next = [...current.platformSurfaces];
-      if (value) next[index] = value;
-      else next.splice(index, 1);
-      const platformSurfaces = next.filter((surface, surfaceIndex) => surface && next.indexOf(surface) === surfaceIndex).slice(0, 2);
-      return {
-        ...current,
-        platformSurfaces,
-        platformSurfaceOther: platformSurfaces.includes("Something else") ? current.platformSurfaceOther : "",
       };
     });
     setError("");
@@ -393,8 +351,8 @@ export function App() {
         outcome: `${current.meaningfulAction}. Verification: ${current.verificationSignal}`,
         outcomeCheck: "A result the developer can verify",
         journeySteps: current.journeySteps.map((step) => {
-          if (step.id === "execute") return { ...step, label: `Execute: ${current.meaningfulAction}` };
-          if (step.id === "verify") return { ...step, label: `Verify: ${current.verificationSignal}` };
+          if (step.id === "execute") return { ...step, label: `Try: ${current.meaningfulAction}` };
+          if (step.id === "verify") return { ...step, label: `Confirm: ${current.verificationSignal}` };
           return step;
         }),
       }));
@@ -459,6 +417,7 @@ export function App() {
     clearSession();
     setSavedSession(null);
     setAnswers({ ...emptyAnswers, journeySteps: createDefaultJourneySteps() });
+    setShowIssueStatement(false);
     setHistory([]);
     setScreen("welcome");
     setShowReset(false);
@@ -505,7 +464,7 @@ export function App() {
   }
 
   function firstMileSentence(): string {
-    return `For ${answers.developer || "the intended developer"}, the first mile ends when they can independently ${answers.meaningfulAction || "complete the first representative operation"} and verify ${answers.verificationSignal || "the intended result"}.`;
+    return `First product action: ${answers.meaningfulAction || "Not recorded"}. Proof it worked: ${answers.verificationSignal || "Not recorded"}.`;
   }
 
   function markdownExport(): string {
@@ -517,9 +476,11 @@ export function App() {
       `- Participant: ${escapeMarkdown(answers.name || "Not named")}`,
       `- Company or project: ${escapeMarkdown(answers.company || "Not named")}`,
       `- Platform: ${escapeMarkdown(answers.platform || "Not named")}`,
-      `- Developer journey: ${escapeMarkdown(answers.journeyType || "Not classified")}`,
+      `- Participant role: ${escapeMarkdown(answers.role === "Something else" ? answers.roleOther : answers.role || "Not named")}`,
+      `- Developer: ${escapeMarkdown(answers.developer || "Not named")}`,
+      `- Developer goal: ${escapeMarkdown(answers.developerJob || "Not recorded")}`,
       "",
-      "## First-mile endpoint",
+      "## First success",
       "",
       escapeMarkdown(firstMileSentence()),
       "",
@@ -569,12 +530,11 @@ export function App() {
   }
 
   const primaryLabel = ({
-    profile: "Continue to the platform",
-    "platform-context": "Define the developer",
-    developer: "Build the journey",
-    "journey-map": "Use this path",
-    "break-point": "Explore this break",
-    blocker: "See my journey map",
+    profile: "Describe the developer",
+    developer: "See the journey",
+    "journey-map": "This journey is right",
+    "break-point": "Look at this step",
+    blocker: "See the result",
   } as Partial<Record<ActiveScreenId, string>>)[screen] ?? "Continue";
 
   return (
@@ -595,17 +555,12 @@ export function App() {
         {screen === "welcome" ? (
           <section className="welcome" aria-labelledby="welcome-title">
             <div className="welcome-mark" aria-hidden="true"><span /><span /><span /></div>
-            <p className="eyebrow">A guided journey map</p>
-            <h1 id="welcome-title" aria-label={friendlyCopy.welcomeTitle}><span aria-hidden="true">Map the journey.</span><span aria-hidden="true">Find the break.</span></h1>
+            <h1 id="welcome-title">{friendlyCopy.welcomeTitle}</h1>
             <p className="welcome-body">{friendlyCopy.welcomeBody}</p>
-            <p className="welcome-time">{friendlyCopy.welcomeTime}</p>
-            <div className="welcome-value" aria-label="What you will make">
-              <span>Access</span><span>Setup</span><span>First operation</span><span>Verified result</span>
-            </div>
             <div className="welcome-actions">
-              <button className="primary-button" type="button" onClick={() => goTo("profile")}>Map a journey</button>
+              <button className="primary-button" type="button" onClick={() => goTo("profile")}>Start mapping</button>
               {savedSession ? <button className="secondary-button" type="button" onClick={resume}>Resume saved map</button> : null}
-              <button className="secondary-button" type="button" onClick={() => importInputRef.current?.click()}>Import a saved map</button>
+              <button className="welcome-import" type="button" onClick={() => importInputRef.current?.click()}>Open a saved map</button>
               <input
                 className="visually-hidden"
                 ref={importInputRef}
@@ -618,21 +573,19 @@ export function App() {
                 }}
               />
             </div>
-            <div className="trust-note">
-              <strong>Your map stays in this browser.</strong>
-              <p>{friendlyCopy.privacy}</p>
-            </div>
+            <p className="trust-note">{friendlyCopy.privacy}</p>
           </section>
         ) : null}
 
         {screen === "profile" ? (
           <QuestionShell
-            eyebrow="Set the scene · 1 of 2"
-            title="Who is mapping this journey?"
-            support="Use an alias if you prefer. This information only labels your local map."
+            eyebrow="Start here"
+            title="Set the context."
+            support="These details label your workshop export. They do not affect the result."
           >
             <TextField id="name" label="Your name or alias" value={answers.name} onChange={(value) => updateAnswer("name", value)} autoComplete="given-name" />
-            <TextField id="company" label="Company, team, or project" value={answers.company} onChange={(value) => updateAnswer("company", value)} autoComplete="organization" />
+            <TextField id="company" label="Company" value={answers.company} onChange={(value) => updateAnswer("company", value)} autoComplete="organization" />
+            <TextField id="platform" label="Platform or product" value={answers.platform} onChange={(value) => updateAnswer("platform", value)} />
             <div className="field">
               <label htmlFor="participant-role">Your role</label>
               <select id="participant-role" value={answers.role} onChange={(event) => updateAnswer("role", event.target.value)}>
@@ -644,92 +597,39 @@ export function App() {
           </QuestionShell>
         ) : null}
 
-        {screen === "platform-context" ? (
-          <QuestionShell
-            eyebrow="Set the scene · 2 of 2"
-            title={`Which developer platform are we mapping${answers.name ? `, ${answers.name}` : ""}?`}
-            support="Pick one journey through one product. A company can have several developer surfaces."
-          >
-            <TextField id="platform" label="Platform or product" value={answers.platform} onChange={(value) => updateAnswer("platform", value)} />
-            <div className="compact-selects platform-selects">
-              <div className="field">
-                <label htmlFor="primary-surface">Primary developer surface</label>
-                <select id="primary-surface" value={answers.platformSurfaces[0] ?? ""} onChange={(event) => updatePlatformSurface(0, event.target.value)}>
-                  <option value="">Choose the closest surface</option>
-                  {platformSurfaceChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="secondary-surface">Secondary surface, if the path crosses one</label>
-                <select id="secondary-surface" value={answers.platformSurfaces[1] ?? ""} disabled={!answers.platformSurfaces[0]} onChange={(event) => updatePlatformSurface(1, event.target.value)}>
-                  <option value="">No secondary surface</option>
-                  {platformSurfaceChoices.filter((choice) => choice !== answers.platformSurfaces[0]).map((choice) => <option key={choice} value={choice}>{choice}</option>)}
-                </select>
-              </div>
-            </div>
-            <p className="inline-help">These choices only filter the research prompts shown after you mark a break.</p>
-            {answers.platformSurfaces.includes("Something else") ? (
-              <TextField id="platform-surface-other" label="Describe the developer surface" value={answers.platformSurfaceOther} onChange={(value) => updateAnswer("platformSurfaceOther", value)} />
-            ) : null}
-          </QuestionShell>
-        ) : null}
-
         {screen === "developer" ? (
           <QuestionShell
-            eyebrow="Define the journey"
-            title="Who is trying to do what, and what counts as success?"
-            support="This gives the map its developer, real job, first representative operation, and verified endpoint."
+            eyebrow="One journey"
+            title="What is the developer trying to do?"
           >
             <div className="developer-definition">
-              <TextArea
+              <TextField
                 id="developer"
-                label="Which developer is trying to accomplish what?"
+                label="Who is the developer?"
                 value={answers.developer}
-                onChange={(value) => {
-                  setAnswers((current) => ({ ...current, developer: value, developerJob: value }));
-                  setError("");
-                }}
-                hint="For example: Backend engineers who need meeting events in an internal service. Describe their job, not your feature."
+                onChange={(value) => updateAnswer("developer", value)}
+              />
+              <TextArea
+                id="developer-job"
+                label="What are they trying to accomplish?"
+                value={answers.developerJob}
+                onChange={(value) => updateAnswer("developerJob", value)}
                 rows={2}
               />
-              <div className="compact-selects">
-                <div className="field">
-                  <label htmlFor="journey-type">What kind of journey is this?</label>
-                  <select id="journey-type" value={answers.journeyType} onChange={(event) => updateAnswer("journeyType", event.target.value)}>
-                    <option value="">Choose the closest journey</option>
-                    {journeyTypeChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
-                  </select>
-                </div>
-                <div className="field">
-                  <label htmlFor="actor-type">Who performs the path?</label>
-                  <select id="actor-type" value={answers.actorType} onChange={(event) => updateAnswer("actorType", event.target.value)}>
-                    <option value="">Choose the actor</option>
-                    {actorTypeChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
-                  </select>
-                </div>
-              </div>
-              {answers.developer.trim() ? (
-                <div className="endpoint-fields">
-                  <p className="section-kicker">Now set the finish line</p>
-                  <p className="section-note">A signup, key, request, or 200 response is only a step unless the developer can verify the result they needed.</p>
-                  <TextArea
-                    id="meaningful-action"
-                    label="What first representative operation must they complete?"
-                    value={answers.meaningfulAction}
-                    onChange={(value) => updateAnswer("meaningfulAction", value)}
-                    hint="For example: Subscribe a real test account to meeting-start events and trigger one event."
-                    rows={2}
-                  />
-                  <TextArea
-                    id="verification-signal"
-                    label="How can they independently verify it worked?"
-                    value={answers.verificationSignal}
-                    onChange={(value) => updateAnswer("verificationSignal", value)}
-                    hint="Name a result the developer can see, explain, and reproduce."
-                    rows={2}
-                  />
-                </div>
-              ) : null}
+              <TextArea
+                id="meaningful-action"
+                label="What product action do they try first?"
+                value={answers.meaningfulAction}
+                onChange={(value) => updateAnswer("meaningfulAction", value)}
+                rows={2}
+              />
+              <TextArea
+                id="verification-signal"
+                label="What will the developer see when it works?"
+                value={answers.verificationSignal}
+                onChange={(value) => updateAnswer("verificationSignal", value)}
+                rows={2}
+              />
             </div>
           </QuestionShell>
         ) : null}
@@ -738,7 +638,7 @@ export function App() {
           <QuestionShell
             eyebrow="Map the path"
             title="Does this look like the journey?"
-            support="The map is already drafted. Open only the steps that are wrong, missing, or not required."
+            support="Fix anything that does not match what the developer actually does."
           >
             <ol className="journey-editor">
               {answers.journeySteps.map((step, index) => (
@@ -747,20 +647,14 @@ export function App() {
                   <details>
                     <summary>{step.label}</summary>
                     <div className="journey-edit-fields">
-                      <TextField id={`step-${step.id}`} label="Developer step" value={step.label} onChange={(value) => updateJourneyStep(step.id, { label: value })} />
-                      <div className="field">
-                        <label htmlFor={`stage-${step.id}`}>Research stage</label>
-                        <select id={`stage-${step.id}`} value={step.catalogStageId} onChange={(event) => updateJourneyStep(step.id, { catalogStageId: event.target.value })}>
-                          {stageChoices.map((choice) => <option key={choice.id} value={choice.id}>{choice.label}</option>)}
-                        </select>
-                      </div>
+                      <TextField id={`step-${step.id}`} label="Rename this step" value={step.label} onChange={(value) => updateJourneyStep(step.id, { label: value })} />
                       <button className="secondary-button" type="button" onClick={() => updateJourneyStep(step.id, { status: step.status === "in-path" ? "not-needed" : "in-path" })}>
-                        {step.status === "in-path" ? "Not required in this journey" : "Put this step back"}
+                        {step.status === "in-path" ? "This step is not part of the journey" : "Put this step back"}
                       </button>
                       {step.id.startsWith("custom-") ? <button className="text-button" type="button" onClick={() => removeJourneyStep(step.id)}>Remove this step</button> : null}
                     </div>
                   </details>
-                  <span className="journey-step-state">{step.status === "in-path" ? "In path" : "Not required"}</span>
+                  <span className="journey-step-state">{step.status === "in-path" ? "In this journey" : "Not part of journey"}</span>
                 </li>
               ))}
             </ol>
@@ -770,154 +664,204 @@ export function App() {
 
         {screen === "break-point" ? (
           <QuestionShell
-            eyebrow="Mark the break"
-            title="Where does the journey stop being clear?"
-            support="First mark what you can defend. Then mark the earliest transition that is unresolved."
+            eyebrow="Find the drop-off"
+            title="What is the first step you cannot confirm?"
+            support="Choose the earliest step your evidence does not show as completed."
           >
-            <fieldset className="map-choice-group">
-              <legend>Furthest stage definitely reached</legend>
-              <div className="map-choice-list">
-                <button type="button" className={answers.furthestReachedStepId === "none" ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.furthestReachedStepId === "none"} onClick={() => {
-                  setAnswers((current) => ({ ...current, furthestReachedStepId: "none", breakStepId: "", discriminatorAnswerIds: [], issueStatement: "" }));
-                  setError("");
-                }}>No stage is confirmed</button>
-                {activeSteps.map((step, index) => (
-                  <button type="button" className={answers.furthestReachedStepId === step.id ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.furthestReachedStepId === step.id} key={step.id} onClick={() => {
-                    setAnswers((current) => ({ ...current, furthestReachedStepId: step.id, breakStepId: "", discriminatorAnswerIds: [], issueStatement: "" }));
-                    setError("");
-                  }}><span>{index + 1}</span>{step.label}</button>
-                ))}
-              </div>
-            </fieldset>
-
-            {answers.furthestReachedStepId ? (
+            {!answers.breakStepId ? (
               <fieldset className="map-choice-group">
-                <legend>Earliest unresolved or broken point</legend>
+                <legend>First step not confirmed</legend>
                 <div className="map-choice-list">
-                  {availableBreakSteps.map((step) => (
-                    <button type="button" className={answers.breakStepId === step.id ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.breakStepId === step.id} key={step.id} onClick={() => updateAnswer("breakStepId", step.id)}>{step.label}</button>
+                  {activeSteps.map((step, index) => (
+                    <button type="button" className="map-choice" aria-pressed="false" key={step.id} onClick={() => {
+                      setAnswers((current) => ({
+                        ...current,
+                        furthestReachedStepId: index === 0 ? "none" : activeSteps[index - 1].id,
+                        breakStepId: step.id,
+                        breakEvidenceType: "",
+                        breakEvidenceDetail: "",
+                        discriminatorAnswerIds: [],
+                        issueStatement: "",
+                      }));
+                      setError("");
+                    }}><span>{index + 1}</span>{step.label}</button>
                   ))}
-                  <button type="button" className={answers.breakStepId === "cannot-tell" ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.breakStepId === "cannot-tell"} onClick={() => updateAnswer("breakStepId", "cannot-tell")}>We cannot locate it from our data</button>
-                  <button type="button" className={answers.breakStepId === "completed" ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.breakStepId === "completed"} onClick={() => updateAnswer("breakStepId", "completed")}>No break before verified first success</button>
+                  <button type="button" className="map-choice" aria-pressed="false" onClick={() => {
+                    setAnswers((current) => ({ ...current, furthestReachedStepId: "none", breakStepId: "cannot-tell", breakEvidenceType: "", breakEvidenceDetail: "", discriminatorAnswerIds: [], issueStatement: "" }));
+                    setError("");
+                  }}>We do not know</button>
+                  <button type="button" className="map-choice" aria-pressed="false" onClick={() => {
+                    setAnswers((current) => ({ ...current, furthestReachedStepId: activeSteps.at(-1)?.id ?? "none", breakStepId: "completed", breakEvidenceType: "", breakEvidenceDetail: "", discriminatorAnswerIds: [], issueStatement: "" }));
+                    setError("");
+                  }}>They reached first success</button>
                 </div>
               </fieldset>
-            ) : null}
+            ) : (
+              <div className="selected-answer">
+                <span>{answers.breakStepId === "completed" ? "Journey status" : answers.breakStepId === "cannot-tell" ? "Drop-off status" : "First step not confirmed"}</span>
+                <p>{selectedBreakStep?.label || (answers.breakStepId === "completed" ? "First success confirmed." : "We do not know.")}</p>
+                <button className="text-button" type="button" onClick={() => {
+                  setAnswers((current) => ({ ...current, furthestReachedStepId: "", breakStepId: "", breakEvidenceType: "", breakEvidenceDetail: "", discriminatorAnswerIds: [], issueStatement: "" }));
+                  setError("");
+                }}>Change</button>
+              </div>
+            )}
 
             {answers.breakStepId ? (
               <>
-                <ChoiceGroup legend="What supports that placement?" value={answers.breakEvidenceType} choices={breakEvidenceChoices} onChange={(value) => updateAnswer("breakEvidenceType", value)} />
-                <TextArea id="break-evidence" label="Evidence receipt" value={answers.breakEvidenceDetail} onChange={(value) => updateAnswer("breakEvidenceDetail", value)} hint="One event, observation, interview finding, or honest statement that the data stops here." rows={3} />
+                <div className="field">
+                  <label htmlFor="break-evidence-type">{answers.breakStepId === "completed" ? "How do you know first success was reached?" : "How do you know?"}</label>
+                  <select id="break-evidence-type" value={answers.breakEvidenceType} onChange={(event) => updateAnswer("breakEvidenceType", event.target.value)}>
+                    <option value="">{answers.breakStepId === "completed" ? "Choose evidence that confirms success" : "Choose the closest answer"}</option>
+                    {breakEvidenceChoices
+                      .filter((choice) => answers.breakStepId !== "completed" || (choice !== "This is a team assumption or anecdote" && choice !== "We do not have stage-level evidence"))
+                      .map((choice) => <option key={choice} value={choice}>{choice}</option>)}
+                  </select>
+                </div>
+                <TextArea id="break-evidence" label={answers.breakStepId === "completed" ? "What evidence confirms it?" : "What did you see or hear?"} value={answers.breakEvidenceDetail} onChange={(value) => updateAnswer("breakEvidenceDetail", value)} rows={3} />
               </>
-            ) : null}
-
-            {answers.furthestReachedStepId && answers.breakStepId ? (
-              <div className="map-insight" aria-live="polite">
-                <span>What the map says so far</span>
-                <p><strong>Last stage you can defend:</strong> {activeSteps.find((step) => step.id === answers.furthestReachedStepId)?.label || "No stage confirmed"}</p>
-                <p><strong>Earliest unresolved transition:</strong> {selectedBreakStep?.label || (answers.breakStepId === "completed" ? "None before verified success" : "Cannot tell from current evidence")}</p>
-              </div>
             ) : null}
           </QuestionShell>
         ) : null}
 
         {screen === "blocker" ? (
-          <QuestionShell eyebrow="Name the issue" title={discriminator.prompt} support={discriminator.support}>
-            <ChoiceGroup
-              legend="Closest observed answer"
-              value={answers.discriminatorAnswerIds[0] ?? ""}
-              choices={discriminator.options.map((option) => option.label)}
-              onChange={(label) => {
-                const option = discriminator.options.find((candidate) => candidate.label === label);
-                if (!option) return;
-                setAnswers((current) => ({
-                  ...current,
-                  discriminatorQuestionId: discriminator.id,
-                  discriminatorAnswerIds: [option.id],
-                  issueStatement: "",
-                }));
-                setError("");
-              }}
-            />
+          <QuestionShell eyebrow="Look closer" title={discriminator.prompt}>
+            {!selectedDiscriminatorOption ? (
+              <ChoiceGroup
+                legend={discriminator.id === "DQ_MEASUREMENT" ? "Choose one next evidence step" : "What did you observe?"}
+                value=""
+                choices={discriminator.options.map((option) => option.label)}
+                onChange={(label) => {
+                  const option = discriminator.options.find((candidate) => candidate.label === label);
+                  if (!option) return;
+                  setAnswers((current) => ({
+                    ...current,
+                    discriminatorQuestionId: discriminator.id,
+                    discriminatorAnswerIds: [option.id],
+                    issueStatement: discriminator.id === "DQ_MEASUREMENT" ? insufficientEvidenceConclusion : "",
+                  }));
+                  setShowIssueStatement(false);
+                  setError("");
+                  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+                }}
+              />
+            ) : (
+              <div className="selected-answer">
+                <span>{discriminator.id === "DQ_MEASUREMENT" ? "Your next evidence step" : "Your observation"}</span>
+                <p>{selectedDiscriminatorOption.label}</p>
+                <button className="text-button" type="button" onClick={() => {
+                  setAnswers((current) => ({ ...current, discriminatorAnswerIds: [], issueStatement: "" }));
+                  setShowIssueStatement(false);
+                  setError("");
+                }}>Change</button>
+              </div>
+            )}
             {selectedDiscriminatorOption ? (
               <div className="research-prompt" aria-live="polite">
-                <span>What this choice changes</span>
+                <span>Check this next</span>
                 <p>{selectedDiscriminatorOption.nextObservation}</p>
-                {discriminatorResult?.liveLabels.length ? <p className="research-labels">Research prompts still in play: {discriminatorResult.liveLabels.join("; ")}</p> : null}
               </div>
             ) : null}
-            <TextArea
-              id="issue-statement"
-              label="In your words, what seems to be getting in the way?"
-              value={answers.issueStatement}
-              onChange={(value) => updateAnswer("issueStatement", value)}
-              hint="This is your working conclusion, not the app's diagnosis."
-              rows={3}
-            />
-            <button className="text-button" type="button" onClick={() => updateAnswer("issueStatement", "We need better evidence before naming the issue.")}>We need more evidence before naming it</button>
-            <WhyThisQuestion>This question comes from the exact stage you marked. It narrows alternatives without treating the stage itself as the cause.</WhyThisQuestion>
+            {selectedDiscriminatorOption && discriminator.id !== "DQ_MEASUREMENT" ? (
+              <div className="conclusion-choice" aria-label="Choose how to conclude">
+                <button
+                  className={answers.issueStatement === insufficientEvidenceConclusion ? "secondary-button is-selected" : "secondary-button"}
+                  type="button"
+                  onClick={() => {
+                    updateAnswer("issueStatement", insufficientEvidenceConclusion);
+                    setShowIssueStatement(false);
+                  }}
+                >Not enough evidence to name an issue</button>
+                <button
+                  className={showIssueStatement || (answers.issueStatement.trim() && answers.issueStatement !== insufficientEvidenceConclusion) ? "secondary-button is-selected" : "secondary-button"}
+                  type="button"
+                  onClick={() => {
+                    updateAnswer("issueStatement", "");
+                    setShowIssueStatement(true);
+                  }}
+                >Add a working explanation</button>
+              </div>
+            ) : null}
+            {discriminator.id !== "DQ_MEASUREMENT" && (showIssueStatement || (answers.issueStatement.trim() && answers.issueStatement !== insufficientEvidenceConclusion)) ? (
+              <TextArea
+                id="issue-statement"
+                label="Working explanation"
+                value={answers.issueStatement}
+                onChange={(value) => updateAnswer("issueStatement", value)}
+                rows={3}
+              />
+            ) : null}
           </QuestionShell>
         ) : null}
 
         {screen === "summary" ? (
           <section className="summary" aria-labelledby="summary-title">
-            <p className="eyebrow">Your first-mile map</p>
-            <h1 id="summary-title" tabIndex={-1}>{answers.breakStepId === "completed" ? "This path reaches first success." : "You found the transition to investigate."}</h1>
-            <p className="summary-intro">The map records what you can defend and keeps the unresolved part visible. A selected stage is not a cause.</p>
+            <p className="eyebrow">Your result</p>
+            <h1 id="summary-title" tabIndex={-1}>{summaryTitle}</h1>
+            <p className="summary-intro">{answers.breakStepId === "completed"
+              ? "You marked every required step as completed."
+              : selectedBreakStep
+                ? `${selectedBreakStep.label} is the first step you could not confirm.`
+                : "The current evidence does not show where the journey stops."}</p>
 
-            <div className="endpoint-card"><span>First-mile endpoint</span><p>{firstMileSentence()}</p></div>
+            <div className="summary-decision">
+              <strong>{answers.breakStepId === "completed" ? "Still seeing low adoption?" : "Your working explanation"}</strong>
+              <p>{answers.breakStepId === "completed"
+                ? "Change where the journey stops, or map a different developer."
+                : answers.issueStatement || "You need more evidence before naming the issue."}</p>
+              {answers.breakStepId !== "completed" ? <p><strong>What you saw:</strong> {answers.breakEvidenceDetail || "Nothing recorded yet."}</p> : null}
+              {answers.breakStepId !== "completed" && selectedDiscriminatorOption ? <p><strong>Check next:</strong> {selectedDiscriminatorOption.nextObservation}</p> : null}
+              <div className="summary-decision-actions">
+                <button className="primary-button" type="button" onClick={() => goTo("break-point")}>Change where the journey stops</button>
+                {answers.breakStepId === "completed"
+                  ? <button className="secondary-button" type="button" onClick={() => setShowReset(true)}>Map a different developer</button>
+                  : <button className="secondary-button" type="button" onClick={() => goTo("journey-map")}>Edit the journey</button>}
+              </div>
+            </div>
 
-            <ol className="journey-result" aria-label="Annotated developer journey">
-              {answers.journeySteps.map((step) => {
-                const activeIndex = activeSteps.findIndex((activeStep) => activeStep.id === step.id);
-                const status = journeyStatus(step, activeIndex);
-                return (
-                  <li className={`status-${status.toLowerCase().replaceAll(" ", "-")}`} key={step.id}>
-                    <span className="journey-result-marker" aria-hidden="true" />
-                    <div><strong>{step.label}</strong><small>{status}</small></div>
-                  </li>
-                );
-              })}
-            </ol>
+            <div className="endpoint-card">
+              <span>What first success means</span>
+              <dl>
+                <div><dt>Developer goal</dt><dd>{answers.developerJob || "Not recorded"}</dd></div>
+                <div><dt>First product action</dt><dd>{answers.meaningfulAction || "Not recorded"}</dd></div>
+                <div><dt>Proof it worked</dt><dd>{answers.verificationSignal || "Not recorded"}</dd></div>
+              </dl>
+            </div>
 
-            <dl className="brief-list journey-brief">
-              <div><dt>Result state</dt><dd><span className="state-pill">{resultStateLabel}</span></dd></div>
-              <div><dt>Developer and job</dt><dd>{answers.developer || "Not recorded"}</dd></div>
-              <div><dt>Last stage supported</dt><dd>{activeSteps.find((step) => step.id === answers.furthestReachedStepId)?.label || (answers.furthestReachedStepId === "none" ? "No stage confirmed" : "Not located")}</dd></div>
-              <div><dt>Earliest unresolved point</dt><dd>{selectedBreakStep?.label || (answers.breakStepId === "completed" ? "No break before verified first success" : "Cannot tell from current evidence")}</dd><dd className="brief-meta">Evidence: {answers.breakEvidenceType || "not recorded"}. {answers.breakEvidenceDetail || "No detail recorded."}</dd></div>
-              <div><dt>Your working conclusion</dt><dd>{answers.issueStatement || (answers.breakStepId === "completed" ? "The mapped journey reaches verified first success." : "The issue is not identified yet.")}</dd></div>
-              {selectedDiscriminatorOption ? <div><dt>Next observation</dt><dd>{selectedDiscriminatorOption.nextObservation}</dd></div> : null}
-            </dl>
+            <details className="summary-map" open={answers.breakStepId !== "completed"}>
+              <summary>Journey you mapped</summary>
+              <ol className="journey-result" aria-label="Developer journey and drop-off">
+                {answers.journeySteps.map((step) => {
+                  const activeIndex = activeSteps.findIndex((activeStep) => activeStep.id === step.id);
+                  const status = journeyStatus(step, activeIndex);
+                  return (
+                    <li className={`status-${status.toLowerCase().replaceAll(" ", "-")}`} key={step.id}>
+                      <span className="journey-result-marker" aria-hidden="true" />
+                      <div><strong>{step.label}</strong><small>{status}</small></div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </details>
 
-            {discriminatorResult?.liveLabels.length ? (
+            {discriminatorResult?.liveLabels.length && selectedDiscriminatorOption?.specialState !== "needs_external_evidence" && answers.breakStepId !== "cannot-tell" ? (
               <div className="research-summary">
-                <span>Research prompts, not diagnoses</span>
+                <span>Possible reasons to check</span>
+                <p>Based on what you selected. These are not findings.</p>
                 <ul>{discriminatorResult.liveLabels.map((label) => <li key={label}>{label}</li>)}</ul>
+              </div>
+            ) : selectedDiscriminatorOption?.specialState === "needs_external_evidence" || answers.breakStepId === "cannot-tell" ? (
+              <div className="research-summary">
+                <span>No reason supported yet</span>
+                <p>Use the next observation above before naming a cause.</p>
               </div>
             ) : null}
 
-            <details className="research-details research-library">
-              <summary>Inspect research relevant to this stage</summary>
-              <p>The catalog contains {catalog.counts.reasons} possible blockers. These are prompts for inspection. None is a diagnosis without evidence from this journey.</p>
-              {researchFamilies.map((family) => (
-                <section key={family.id}>
-                  <h2>{family.label}</h2>
-                  <ul>{getReasonsForParent(family.id).map((reason) => <li key={reason.id}>{reason.label}</li>)}</ul>
-                </section>
-              ))}
-              {platformResearchGroups.map((group) => (
-                <section key={group.archetypeId}>
-                  <h2>{group.label}</h2>
-                  <ul>{group.reasons.map((reason) => <li key={reason.id}>{reason.label}</li>)}</ul>
-                </section>
-              ))}
-            </details>
-
             <div className="summary-callout">
-              <strong>No intervention justified remains a valid result.</strong>
-              <p>If the evidence cannot separate the live explanations, the next move is to observe, not to guess. An intentional access, safety, billing, or compliance gate is not automatically a defect.</p>
+              <strong>No change may be the right result.</strong>
+              <p>If the evidence is weak, observe before changing the product.</p>
             </div>
             <div className="summary-actions">
-              <button className="primary-button" type="button" onClick={() => goTo("journey-map")}>Edit the map</button>
               <button className="secondary-button" type="button" onClick={exportMarkdown}>Download Markdown</button>
               <button className="secondary-button" type="button" onClick={exportJson}>Export portable JSON</button>
               <button className="secondary-button" type="button" onClick={() => window.print()}>Print or save as PDF</button>

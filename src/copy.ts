@@ -1,11 +1,11 @@
 import type { PhaseId } from "./types";
 
 export const phaseLabels: Array<{ id: PhaseId; label: string }> = [
-  { id: "profile", label: "Set the scene" },
-  { id: "frame", label: "Define success" },
-  { id: "map", label: "Map the path" },
-  { id: "locate", label: "Mark the break" },
-  { id: "test", label: "Name the issue" },
+  { id: "profile", label: "Context" },
+  { id: "frame", label: "Developer" },
+  { id: "map", label: "Journey" },
+  { id: "locate", label: "Drop-off" },
+  { id: "test", label: "Reason" },
 ];
 
 export const roleChoices = [
@@ -120,12 +120,9 @@ export const reviewDecisionChoices = [
 
 export const friendlyCopy = {
   title: "First Mile",
-  welcomeTitle: "Map the journey. Find the break.",
-  welcomeBody:
-    "Bring one developer journey. Start with access, trace the path to a verified first result, then mark the step that needs attention.",
-  welcomeTime: "About 5 minutes. You will leave with a journey map, not a diagnosis from a black box.",
-  privacy:
-    "Use aliases for people, companies, teams, or projects when needed. Don’t paste secrets, customer data, or private incident details. This prototype saves your work in this browser.",
+  welcomeTitle: "Where are developers getting stuck?",
+  welcomeBody: "Map one developer’s path from sign-up to first success.",
+  privacy: "Saved in this browser. Use aliases. Don’t include secrets or customer data.",
   uncertainty:
     "You do not need to have the answer. A clear evidence gap is a useful result.",
 };

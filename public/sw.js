@@ -1,4 +1,4 @@
-const CACHE_NAME = "first-mile-shell-v2";
+const CACHE_NAME = "first-mile-shell-v3";
 const SHELL_URLS = ["/", "/index.html", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
