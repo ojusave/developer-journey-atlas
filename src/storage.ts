@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { SavedSession } from "./types";
+import { createDefaultJourneySteps, type SavedSession } from "./types";
 
 const STORAGE_KEY = "first-mile-scanner/session/v1";
 
@@ -40,10 +40,31 @@ const answerSchema = z.object({
     evidenceState: z.enum(["live", "weakened", "contradicted", "needs_observation"]),
   })).default([]),
   adaptiveTerminalState: z.string().default(""),
+  journeyType: z.string().default(""),
+  meaningfulAction: z.string().default(""),
+  representativeInput: z.string().default(""),
+  verificationSignal: z.string().default(""),
+  journeySteps: z.array(z.object({
+    id: z.string(),
+    catalogStageId: z.string(),
+    label: z.string(),
+    status: z.enum(["in-path", "not-needed"]),
+  })).default(createDefaultJourneySteps()),
+  furthestReachedStepId: z.string().default(""),
+  breakStepId: z.string().default(""),
+  breakEvidenceType: z.string().default(""),
+  breakEvidenceDetail: z.string().default(""),
+  issueStatement: z.string().default(""),
 });
 
 const screenSchema = z.enum([
   "welcome",
+  "profile",
+  "platform-context",
+  "first-mile",
+  "journey-map",
+  "break-point",
+  "blocker",
   "name",
   "company",
   "platform",

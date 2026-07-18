@@ -9,7 +9,15 @@ import {
 
 describe("portable case", () => {
   it("round-trips without changing answers", () => {
-    const answers = { ...emptyAnswers, company: "A team", concern: "No attempts" };
+    const answers = {
+      ...emptyAnswers,
+      company: "A team",
+      meaningfulAction: "send one representative request",
+      verificationSignal: "see the intended state change",
+      furthestReachedStepId: "sign-up",
+      breakStepId: "access",
+      issueStatement: "Credentials require an approval the developer cannot request",
+    };
     const portable = createPortableCase(answers, "source-test", new Date("2026-07-17T12:00:00.000Z"));
     const restored = parsePortableCase(serializePortableCase(portable));
 

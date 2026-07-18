@@ -36,6 +36,20 @@ render workflows dev -- npm run dev
 render workflows tasks list --local
 ```
 
-Render setup remains manual because Blueprints do not currently create or manage Workflow services. Create a Node Workflow with root directory `workflows`, build command `npm ci --include=dev && npm run build`, and start command `npm start`. Attach the same environment group that supplies `INTERNAL_WORKFLOW_SECRET` to the web service, then set the private web-service URL.
+Blueprints do not create or manage Workflow services. Create the Workflow with the current Render CLI:
+
+```sh
+render workflows create --confirm \
+  --name first-mile-scanner-workflows \
+  --repo https://github.com/ojusave/devrelcon-first-mile-scanner \
+  --branch main \
+  --root-directory workflows \
+  --build-command 'npm ci --include=dev && npm run build' \
+  --runtime node \
+  --run-command 'npm start' \
+  --region oregon
+```
+
+Set `SCANNER_INTERNAL_BASE_URL` and the same `INTERNAL_WORKFLOW_SECRET` on both resources during creation. The current Workflow is `wfl-d9dpkutaeets739p4m50`, and `diagnosticTurn` is registered in version `wfv-d9dpp5v41pts73dlmj30`.
 
 Keep the Workflow and web service in the same region. Render currently documents that a Workflow in a network-isolated project environment cannot use that environment's private network, so do not enable network isolation for this pair until that limitation changes.

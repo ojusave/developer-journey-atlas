@@ -1,18 +1,19 @@
 # First-Mile Scanner
 
-This repository contains the experimental adaptive scanner for the DevRelCon first-mile workshop side quest. The private product and architecture record remains the canonical decision log. This repository is the canonical source for the deployable application.
+This repository contains the map-first scanner for the DevRelCon first-mile workshop side quest. The private product and architecture record remains the canonical decision log. This repository is the canonical source for the deployable application.
 
 ## What is implemented
 
 - A friendly mobile-first React interface with deterministic name, company or project, platform, and role intake.
-- A visible choice between adaptive help and a browser-only guided path.
-- A bounded D1 to D10 diagnostic engine with one focused question at a time, corrections, explicit uncertainty, evidence validation, valid non-intervention endings, an explicit choice after 12 diagnostic prompts, and a hard stop at 15.
+- An editable eight-stage developer journey from encounter and access through a representative operation and independently verified success.
+- Two evidence-placement decisions, the furthest stage definitely reached and the earliest unresolved transition, followed by exactly one stage-specific discriminator.
+- Immediate map feedback before any cause question, participant-owned conclusions, explicit uncertainty, and valid non-intervention, legitimate-gate, deliberate-non-fit, and evidence-gap endings.
 - A compiled versioned research graph built from the repository's [first-mile blocker universe](research/first-mile-blocker-universe.md), containing 790 preserved blocker reasons across 28 universal families and 16 platform archetypes.
-- Browser resume, retry recovery that survives reload, validated JSON import and export, Markdown Action Brief export, correction retraction, clear-case deletion, seven-day evidence notes, and an offline application shell.
+- Browser resume, validated JSON import and export, Markdown journey-map export, correction retraction, clear-map deletion, and an offline application shell.
 - An anonymous Node service with Postgres persistence, revision checks, idempotency, short-lived encrypted answer envelopes, and no name or company fields.
 - An optional single-call Mastra reasoner through a pinned OpenRouter model. Deterministic reasoning is the safe default.
 - A feature-gated Render Workflow task that receives opaque IDs only. Direct processing is the safe default.
-- A friendly short route when a participant is bored or wants to stop. Interruption text is not retained as case evidence.
+- The earlier 16-screen adaptive interview remains in Git history for audit, but it is no longer the participant-facing path because it delayed value until the final screen.
 - Optional Arize OpenTelemetry export containing operational metadata only. Raw answers, prompts, reflections, names, companies, and Action Brief content are not exported.
 
 ## Local run
@@ -25,7 +26,7 @@ Install and verify:
 npm ci
 npm run test:run
 npm run typecheck
-VITE_ADAPTIVE_ENABLED=true npm run build
+npm run build
 npm --prefix workflows run typecheck
 npm --prefix workflows run build
 ```
@@ -33,7 +34,7 @@ npm --prefix workflows run build
 Run the production-shaped deterministic service without external credentials:
 
 ```sh
-VITE_ADAPTIVE_ENABLED=true npm run build
+npm run build
 ALLOW_IN_MEMORY_STORE=true REASONING_MODE=deterministic npm start
 ```
 
@@ -43,7 +44,7 @@ For live frontend development, run the service and Vite separately:
 
 ```sh
 npm run dev:server
-VITE_ADAPTIVE_ENABLED=true npm run dev
+npm run dev
 ```
 
 Vite proxies `/api` to the service on port 10000.
@@ -99,11 +100,19 @@ Observability is outside the diagnostic authority boundary. It cannot make a can
 - one paid Postgres database; and
 - one shared environment group for the Workflow callback secret.
 
-The Blueprint deliberately starts with `REASONING_MODE=deterministic`, `EXECUTION_MODE=direct`, and Arize disabled. Render Workflows must be created manually because Blueprints do not manage them. Follow [the Workflow operator notes](workflows/README.md) only after the live per-turn benchmark passes.
+The Blueprint deliberately starts with `REASONING_MODE=deterministic`, `EXECUTION_MODE=direct`, and Arize disabled. Render Workflows are separate resources because Blueprints do not manage them.
 
 Optional provider credentials are not declared with `sync: false` in the initial Blueprint because Render would require every placeholder during creation even though those features are disabled. Add the relevant keys from `.env.example` in the Dashboard only when enabling that feature.
 
-No Render resources have been created. This folder is not currently connected to a Git remote, so there is no safe deploy source yet.
+The deployed source is the private [GitHub repository](https://github.com/ojusave/devrelcon-first-mile-scanner). The live resources in Render's `First Mile Scanner` project are:
+
+- web service `first-mile-scanner` (`srv-d9dpkedaeets739p3m40`): <https://first-mile-scanner.onrender.com>;
+- private-only Postgres `first-mile-scanner-db` (`dpg-d9dpjpbrjlhs73b42epg-a`); and
+- Workflow `first-mile-scanner-workflows` (`wfl-d9dpkutaeets739p4m50`) with the registered `diagnosticTurn` task.
+
+These live resources were created directly through the Render CLI and API, so they are not managed by a Blueprint instance. Do not apply `render.yaml` to the same workspace without first reconciling it with these resource IDs, or Render can create a second set.
+
+The deployed web service remains in the safe `EXECUTION_MODE=direct`. The Workflow is released and its opaque callback completed successfully against the live web service. Automatic web-to-Workflow dispatch still requires a new long-lived Render API key and the deployed task slug. Do not substitute the expiring CLI login token.
 
 ## Rollback switches
 
@@ -115,19 +124,22 @@ No Render resources have been created. This folder is not currently connected to
 
 ## Current release gate
 
-The implementation is **artifact verified**, not **outcome validated** and not approved for workshop traffic.
+The implementation and live technical path are **artifact verified**, not **outcome validated** and not yet approved for workshop traffic.
+
+The first live participant-flow review failed: the app behaved like a long diagnostic interview, required 15 transitions before synthesis, and did not make the purpose of its questions clear. The current map-first frontend is the corrective release candidate. It must be redeployed and tested by Ojus and representative practitioners before replacing that failure with a workshop-readiness claim.
 
 The remaining gates are external or research-quality gates:
 
 - zero individual reason cards are currently diagnosis eligible, so the app may narrow families and prescribe evidence but must not claim an individual cause;
+- the participant-facing map currently uses deterministic research routing and does not invoke the optional OpenRouter and Mastra path;
 - the live OpenRouter and Mastra path has not been exercised with a rotated restricted key;
 - the Arize export has not been observed in a real project;
-- the Render Web Service, Postgres, and per-turn Workflow path have not been load-tested together;
+- automatic web-to-Workflow dispatch remains disabled until a long-lived Render API key is added and that path passes the same live checks;
 - the actual room concurrency, shared-network behavior, provider cost cap, and abuse controls have not been verified; and
 - five representative practitioners have not yet completed a moderated pilot showing that the flow is useful, understandable, and not boring.
 
-The final local release candidate passed 114 application and server tests plus four Workflow tests. Its production-shaped browser smoke covers adaptive and guided completion, accessibility, boredom recovery, retry persistence, expired-retry recovery, correction retraction through Markdown export, resume, deletion, offline shell, and layouts from 320px through 1280px. A 100-session local concurrency smoke completed all 100 with zero failures, 103ms p95, and 121ms maximum session time. The locally running Workflow adapter also accepted and completed an opaque per-turn dispatch, and the Blueprint validates as three actions.
+The release candidate passed 114 application and server tests plus four Workflow tests. The local browser smoke covers the map-first mobile flow, value before diagnosis, stage-specific research routing, accessibility, correction retraction, Markdown and JSON export, resume, deletion, offline shell, and layouts from 320px through 1280px. The previous live technical checks remain valid for the unchanged backend: a 100-session concurrency smoke completed all 100 with zero failures, an opaque Workflow run completed the protected callback, and the Blueprint validates as three actions. The new frontend still needs the same checks after deployment.
 
-The production bundle is 144.33KB gzip. Vite reports the uncompressed 700.31KB client chunk as large, so test first load on the actual event network before public use. `npm audit` reports no critical, high, or moderate findings. Three low-severity findings remain in Mastra's nested legacy AI SDK utility chain. The current Mastra release is already installed and an audit-fix dry run proposes no safe package change, so track the upstream fix instead of forcing an incompatible override.
+The current production build is 133.12KB gzip. Vite reports the uncompressed 661.21KB client chunk as large, primarily because the complete research catalog is available offline, so test first load on the actual event network before public use. `npm audit` reports no critical, high, or moderate findings. Low-severity findings remain in Mastra's nested legacy AI SDK utility chain. Track the upstream fix instead of forcing an incompatible override.
 
 Keep the QR code and public workshop claim blocked until those gates pass.

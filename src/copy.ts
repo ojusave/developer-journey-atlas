@@ -2,10 +2,10 @@ import type { PhaseId } from "./types";
 
 export const phaseLabels: Array<{ id: PhaseId; label: string }> = [
   { id: "profile", label: "Set the scene" },
-  { id: "frame", label: "Frame the case" },
-  { id: "locate", label: "Locate the stop" },
-  { id: "test", label: "Test explanations" },
-  { id: "move", label: "Choose a move" },
+  { id: "frame", label: "Define success" },
+  { id: "map", label: "Map the path" },
+  { id: "locate", label: "Mark the break" },
+  { id: "test", label: "Name the issue" },
 ];
 
 export const roleChoices = [
@@ -47,6 +47,26 @@ export const actorTypeChoices = [
   "An AI or coding agent",
   "A person and agent handing work back and forth",
   "We do not know",
+];
+
+export const journeyTypeChoices = [
+  "Evaluate whether it fits",
+  "Learn enough to use it safely",
+  "Make the core capability work once",
+  "Connect it to an existing system",
+  "Ship it in a production-like environment",
+  "Operate and recover it",
+  "Contribute a change",
+  "Publish an integration or extension",
+];
+
+export const breakEvidenceChoices = [
+  "I observed a real attempt",
+  "Product or platform data shows it",
+  "Developers told us in interviews or support",
+  "The stage was completed with employee, partner, or support help",
+  "This is a team assumption or anecdote",
+  "We do not have stage-level evidence",
 ];
 
 export const outcomeCheckChoices = [
@@ -100,12 +120,12 @@ export const reviewDecisionChoices = [
 
 export const friendlyCopy = {
   title: "First Mile",
-  welcomeTitle: "Find where the first mile actually breaks.",
+  welcomeTitle: "Map the journey. Find the break.",
   welcomeBody:
-    "Bring one developer journey. We’ll help you separate what you know, what you’re guessing, and what to check next.",
-  welcomeTime: "About 8 minutes. The useful questions change with your case.",
+    "Bring one developer journey. Start with access, trace the path to a verified first result, then mark the step that needs attention.",
+  welcomeTime: "About 5 minutes. You will leave with a journey map, not a diagnosis from a black box.",
   privacy:
-    "Use roles or aliases. Don’t paste names, secrets, customer data, or private incident details. This prototype saves your work in this browser.",
+    "Use aliases for people, companies, teams, or projects when needed. Don’t paste secrets, customer data, or private incident details. This prototype saves your work in this browser.",
   uncertainty:
     "You do not need to have the answer. A clear evidence gap is a useful result.",
 };

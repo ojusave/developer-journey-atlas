@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChoiceGroup,
-  MultiChoiceGroup,
   QuestionShell,
   TextArea,
   TextField,
@@ -9,45 +8,24 @@ import {
 } from "./components";
 import {
   actorTypeChoices,
-  concernPatternChoices,
-  evidenceChoices,
+  breakEvidenceChoices,
   friendlyCopy,
-  lastStageChoices,
-  moveTypeChoices,
-  outcomeCheckChoices,
-  ownershipChoices,
+  journeyTypeChoices,
   phaseLabels,
   platformSurfaceChoices,
-  reviewDecisionChoices,
   roleChoices,
 } from "./copy";
 import {
   clearAdaptiveCredential,
-  createAdaptiveSession,
   deleteAdaptiveSession,
-  getAdaptiveSession,
-  getAdaptiveTurn,
   loadAdaptiveCredential,
-  retryAdaptiveTurn,
-  saveAdaptiveCredential,
-  submitAdaptiveTurn,
-  AdaptiveRequestError,
-  type AdaptiveAnswer,
-  type AdaptiveCredential,
-  type AdaptiveNextQuestion,
-  type AdaptiveRecovery,
-  type AdaptiveTurnResponse,
 } from "./adaptive-client";
-import { actionBriefToMarkdown, compileActionBrief } from "./action-brief";
-import { catalog } from "./domain/catalog";
-import { guidedAnswerQualityMessage } from "./domain/answer-quality";
 import {
-  caseAnswersToDiagnosticCase,
-  deriveDiagnosticState,
-  evaluateStopCondition,
-  type ObjectiveId,
-} from "./domain/diagnostic-engine";
-import { getPlatformResearchGroups, resolvePlatformArchetypeIds } from "./domain/knowledge-graph";
+  catalog,
+  getFamiliesForStage,
+  getReasonsForParent,
+} from "./domain/catalog";
+import { getPlatformResearchGroups } from "./domain/knowledge-graph";
 import { explainSelection, selectDiscriminatorQuestion } from "./domain/question-routes";
 import {
   createPortableCase,
@@ -57,142 +35,120 @@ import {
   type PortableCase,
 } from "./session-portability";
 import { clearSession, loadSession, saveSession } from "./storage";
-import { emptyAnswers, type CaseAnswers, type PhaseId, type ScreenId } from "./types";
+import {
+  createDefaultJourneySteps,
+  emptyAnswers,
+  type ActiveScreenId,
+  type CaseAnswers,
+  type JourneyStep,
+  type PhaseId,
+  type ScreenId,
+} from "./types";
 
-const screenOrder: ScreenId[] = [
+const activeScreenOrder: ActiveScreenId[] = [
   "welcome",
-  "name",
-  "company",
-  "platform",
-  "role",
-  "concern",
+  "profile",
+  "platform-context",
   "developer",
-  "developer-job",
-  "outcome",
-  "last-truth",
-  "explanation",
-  "evidence",
-  "discriminator",
-  "ownership",
-  "next-move",
+  "journey-map",
+  "break-point",
+  "blocker",
   "summary",
-  "seven-day",
 ];
 
-const adaptiveEnabled = import.meta.env.VITE_ADAPTIVE_ENABLED === "true";
-const boredomOrIrritation = /\b(?:this\s+is\s+(?:really\s+)?boring|i(?:'m|\s+am)\s+bored|too\s+many\s+questions|this\s+is\s+taking\s+too\s+long|can\s+we\s+(?:stop|finish|speed\s+this\s+up)|just\s+finish)\b/i;
-const objectiveIds = new Set<ObjectiveId>(["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10"]);
-const diagnosticObjectiveOrder: ObjectiveId[] = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10"];
-const answerObjective: Partial<Record<keyof CaseAnswers, ObjectiveId>> = {
-  platform: "D2",
-  platformSurfaces: "D2",
-  platformSurfaceOther: "D2",
-  concern: "D1",
-  concernPattern: "D1",
-  developer: "D3",
-  actorType: "D3",
-  developerJob: "D3",
-  outcome: "D4",
-  outcomeCheck: "D4",
-  lastStage: "D5",
-  lastTruth: "D6",
-  explanation: "D7",
-  evidenceTypes: "D7",
-  evidenceDetail: "D7",
-  alternative: "D7",
-  discriminatorQuestionId: "D8",
-  discriminatorAnswerIds: "D8",
-  ownershipMode: "D9",
-  ownership: "D9",
-  moveType: "D10",
-  nextMove: "D10",
-  expectedSignal: "D10",
-};
+const stageChoices = catalog.nodes
+  .filter((node) => node.kind === "stage" && !["S00", "S08"].includes(node.id))
+  .map((node) => ({ id: node.id, label: node.label }));
 
-function isObjectiveId(value: string): value is ObjectiveId {
-  return objectiveIds.has(value as ObjectiveId);
+function isActiveScreen(screen: ScreenId): screen is ActiveScreenId {
+  return activeScreenOrder.includes(screen as ActiveScreenId);
 }
 
-function recordObjectiveTurn(
-  turnIds: Record<string, string>,
-  objectiveId: ObjectiveId,
-  turnId: string,
-): Record<string, string> {
-  const objectiveIndex = diagnosticObjectiveOrder.indexOf(objectiveId);
-  return {
-    ...Object.fromEntries(Object.entries(turnIds).filter(([candidateObjectiveId]) => (
-      isObjectiveId(candidateObjectiveId)
-      && diagnosticObjectiveOrder.indexOf(candidateObjectiveId) < objectiveIndex
-    ))),
-    [objectiveId]: turnId,
-  };
-}
-
-function currentGuidedText(screen: ScreenId, answers: CaseAnswers): string {
-  return ({
-    concern: answers.concern,
-    developer: answers.developer,
-    "developer-job": answers.developerJob,
-    outcome: answers.outcome,
-    "last-truth": answers.lastTruth,
-    explanation: answers.explanation,
-    evidence: answers.evidenceDetail,
-    ownership: answers.ownership,
-    "next-move": `${answers.nextMove}\n${answers.expectedSignal}`,
-    "seven-day": answers.reviewNotes,
-  } as Partial<Record<ScreenId, string>>)[screen] ?? "";
-}
-
-function screenForObjective(objectiveId: ObjectiveId): ScreenId {
-  return ({
-    D1: "concern",
-    D2: "platform",
-    D3: "developer",
-    D4: "outcome",
-    D5: "last-truth",
-    D6: "last-truth",
-    D7: "explanation",
-    D8: "discriminator",
-    D9: "ownership",
-    D10: "next-move",
-  } satisfies Record<ObjectiveId, ScreenId>)[objectiveId];
-}
-
-function fallbackScreenAfterObjective(objectiveId: ObjectiveId): ScreenId {
-  return ({
-    D1: "developer",
-    D2: "concern",
-    D3: "outcome",
-    D4: "last-truth",
-    D5: "last-truth",
-    D6: "explanation",
-    D7: "discriminator",
-    D8: "ownership",
-    D9: "next-move",
-    D10: "summary",
-  } satisfies Record<ObjectiveId, ScreenId>)[objectiveId];
-}
-
-function phaseForObjective(objectiveId: ObjectiveId): PhaseId {
-  if (["D1", "D2", "D3", "D4"].includes(objectiveId)) return "frame";
-  if (["D5", "D6"].includes(objectiveId)) return "locate";
-  if (["D7", "D8"].includes(objectiveId)) return "test";
-  return "move";
-}
-
-function phaseForScreen(screen: ScreenId): PhaseId {
-  if (["name", "company", "platform", "role"].includes(screen)) return "profile";
-  if (["concern", "developer", "developer-job", "outcome"].includes(screen)) return "frame";
-  if (screen === "last-truth") return "locate";
-  if (["explanation", "evidence", "discriminator"].includes(screen)) return "test";
-  if (["ownership", "next-move"].includes(screen)) return "move";
-  if (screen === "adaptive") return "test";
-  if (["summary", "seven-day"].includes(screen)) return "complete";
+function normalizeScreen(screen: ScreenId): ActiveScreenId {
+  if (screen === "first-mile") return "developer";
+  if (isActiveScreen(screen)) return screen;
   return "profile";
 }
 
-function nextScreen(screen: ScreenId): ScreenId {
-  return screenOrder[Math.min(screenOrder.indexOf(screen) + 1, screenOrder.length - 1)];
+function phaseForScreen(screen: ActiveScreenId): PhaseId {
+  if (["profile", "platform-context"].includes(screen)) return "profile";
+  if (screen === "developer") return "frame";
+  if (screen === "journey-map") return "map";
+  if (screen === "break-point") return "locate";
+  if (screen === "blocker") return "test";
+  return "complete";
+}
+
+function nextScreen(screen: ActiveScreenId): ActiveScreenId {
+  return activeScreenOrder[Math.min(activeScreenOrder.indexOf(screen) + 1, activeScreenOrder.length - 1)];
+}
+
+function evidenceLabelToLegacy(label: string): string {
+  return ({
+    "I observed a real attempt": "Direct observation",
+    "Product or platform data shows it": "Product or platform data",
+    "Developers told us in interviews or support": "Developer interview",
+    "The stage was completed with employee, partner, or support help": "Direct observation",
+    "This is a team assumption or anecdote": "Assumption",
+    "We do not have stage-level evidence": "No evidence yet",
+  } as Record<string, string>)[label] ?? "No evidence yet";
+}
+
+function lastStageForCatalogStage(stageId: string): string {
+  return ({
+    S01: "No attempt observed",
+    S02: "They found or evaluated the platform",
+    S03: "They tried to get access or approval",
+    S04: "They started setup or implementation",
+    S05: "They started setup or implementation",
+    S06: "They produced a first result",
+    S07: "They verified a meaningful result",
+  } as Record<string, string>)[stageId] ?? "We cannot locate the stop yet";
+}
+
+function legacyBreakStepId(lastStage: string): string {
+  return ({
+    "They found or evaluated the platform": "encounter",
+    "They tried to get access or approval": "access",
+    "They started setup or implementation": "setup",
+    "They produced a first result": "signal",
+    "They verified a meaningful result": "verify",
+  } as Record<string, string>)[lastStage] ?? (lastStage === "No attempt observed" ? "encounter" : "cannot-tell");
+}
+
+function migrateAnswers(input: CaseAnswers): CaseAnswers {
+  const journeySteps = input.journeySteps.length > 0
+    ? input.journeySteps.map((step) => ({ ...step }))
+    : createDefaultJourneySteps();
+  return {
+    ...emptyAnswers,
+    ...input,
+    journeySteps,
+    journeyType: input.journeyType || "Make the core capability work once",
+    meaningfulAction: input.meaningfulAction || input.outcome,
+    verificationSignal: input.verificationSignal || input.expectedSignal || input.outcome,
+    furthestReachedStepId: input.furthestReachedStepId || "",
+    breakStepId: input.breakStepId || (input.lastStage ? legacyBreakStepId(input.lastStage) : ""),
+    breakEvidenceType: input.breakEvidenceType || (
+      input.evidenceTypes.includes("Product or platform data")
+        ? "Product or platform data shows it"
+        : input.evidenceTypes.includes("Direct observation")
+          ? "I observed a real attempt"
+          : input.evidenceTypes.includes("Developer interview")
+            ? "Developers told us in interviews or support"
+            : input.evidenceTypes.includes("Assumption")
+              ? "This is a team assumption or anecdote"
+              : input.evidenceTypes.includes("No evidence yet")
+                ? "We do not have stage-level evidence"
+                : ""
+    ),
+    breakEvidenceDetail: input.breakEvidenceDetail || input.lastTruth || input.evidenceDetail,
+    issueStatement: input.issueStatement || input.explanation,
+  };
+}
+
+function escapeMarkdown(value: string): string {
+  return value.replaceAll("\\", "\\\\").replaceAll("*", "\\*").replaceAll("_", "\\_");
 }
 
 function downloadText(filename: string, content: string, type: string) {
@@ -206,72 +162,46 @@ function downloadText(filename: string, content: string, type: string) {
   URL.revokeObjectURL(url);
 }
 
-function localDateValue(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function validationMessage(screen: ScreenId, answers: CaseAnswers, checkSemanticQuality = true): string | null {
-  const requiredText: Partial<Record<ScreenId, keyof CaseAnswers>> = {
-    name: "name",
-    company: "company",
-    role: "role",
-    concern: "concern",
-    developer: "developer",
-    "developer-job": "developerJob",
-    outcome: "outcome",
-    explanation: "explanation",
-    ownership: "ownershipMode",
-    "next-move": "moveType",
-    "seven-day": "reviewDecision",
-  };
-  const field = requiredText[screen];
-  if (field && typeof answers[field] === "string" && !answers[field].trim()) {
-    return "Add a short answer, or choose the unsure option when one is available.";
+function validationMessage(screen: ActiveScreenId, answers: CaseAnswers): string | null {
+  if (screen === "profile") {
+    if (!answers.name.trim() || !answers.company.trim() || !answers.role.trim()) {
+      return "Add a name or alias, a company or project boundary, and your role.";
+    }
+    if (answers.role === "Something else" && !answers.roleOther.trim()) return "Describe your role in a few words.";
   }
-  if (screen === "platform" && (
-    !answers.platform.trim()
-    || answers.platformSurfaces.length === 0
-    || (answers.platformSurfaces.includes("Something else") && !answers.platformSurfaceOther.trim())
-  )) {
-    return "Name the platform and choose one or two surfaces that best match it.";
+  if (screen === "platform-context") {
+    if (!answers.platform.trim() || answers.platformSurfaces.length === 0) {
+      return "Name the platform and choose one or two surfaces developers touch.";
+    }
+    if (answers.platformSurfaces.includes("Something else") && !answers.platformSurfaceOther.trim()) {
+      return "Describe the developer surface so the research does not force it into the wrong type.";
+    }
   }
-  if (screen === "role" && answers.role === "Something else" && !answers.roleOther.trim()) {
-    return "Describe your role in a few words.";
+  if (screen === "developer") {
+    if (!answers.developer.trim() || !answers.developerJob.trim() || !answers.journeyType || !answers.actorType || !answers.meaningfulAction.trim() || !answers.verificationSignal.trim()) {
+      return "Name one developer group, their real job, the journey, the first representative operation, and how they verify it.";
+    }
   }
-  if (screen === "concern" && !answers.concernPattern) {
-    return "Choose the pattern that is closest to what you see.";
+  if (screen === "journey-map") {
+    const activeSteps = answers.journeySteps.filter((step) => step.status === "in-path" && step.label.trim());
+    if (activeSteps.length < 3) return "Keep at least three steps in this journey.";
   }
-  if (screen === "developer" && !answers.actorType) {
-    return "Choose who performed the path, including unknown when that is the honest answer.";
+  if (screen === "break-point") {
+    if (!answers.furthestReachedStepId || !answers.breakStepId || !answers.breakEvidenceType) {
+      return "Mark the furthest stage you can defend, the first unresolved point, and the evidence behind it.";
+    }
   }
-  if (screen === "outcome" && !answers.outcomeCheck) {
-    return "Choose what kind of milestone your answer describes.";
+  if (screen === "blocker") {
+    if (answers.discriminatorAnswerIds.length !== 1) return "Choose the closest observed answer.";
+    if (!answers.issueStatement.trim()) return "Name what you think is happening, or choose the evidence-gap option.";
   }
-  if (screen === "last-truth" && !answers.lastStage) {
-    return "Choose where your direct observation ends.";
-  }
-  if (screen === "evidence" && answers.evidenceTypes.length === 0) {
-    return "Choose every evidence source that actually supports the explanation, including no evidence yet.";
-  }
-  if (screen === "discriminator" && answers.discriminatorAnswerIds.length === 0) {
-    return "Choose the answer that is closest to what was actually observed.";
-  }
-  if (screen === "next-move" && !answers.nextMove.trim()) {
-    return "Describe the smallest next move, even if the move is to gather evidence or wait.";
-  }
-  if (screen === "seven-day" && !answers.reviewDate) {
-    return "Choose the date when you will compare the evidence and decide what changed.";
-  }
-  return checkSemanticQuality ? guidedAnswerQualityMessage(screen, answers) : null;
+  return null;
 }
 
 function Progress({ phase }: { phase: PhaseId }) {
   const activeIndex = phaseLabels.findIndex((item) => item.id === phase);
   return (
-    <nav className="phase-progress" aria-label="Case progress">
+    <nav className="phase-progress" aria-label="Journey progress">
       <ol>
         {phaseLabels.map((item, index) => (
           <li
@@ -290,87 +220,70 @@ function Progress({ phase }: { phase: PhaseId }) {
 
 export function App() {
   const [savedSession, setSavedSession] = useState(() => loadSession());
-  const initialGuidanceMode = savedSession?.guidanceMode ?? "guided";
-  const adaptiveCredentialAtStart = useMemo(
-    () => adaptiveEnabled ? loadAdaptiveCredential() : null,
-    [],
-  );
-  const [screen, setScreen] = useState<ScreenId>("welcome");
-  const [history, setHistory] = useState<ScreenId[]>([]);
-  const [answers, setAnswers] = useState<CaseAnswers>(emptyAnswers);
+  const [screen, setScreen] = useState<ActiveScreenId>("welcome");
+  const [history, setHistory] = useState<ActiveScreenId[]>([]);
+  const [answers, setAnswers] = useState<CaseAnswers>(() => ({
+    ...emptyAnswers,
+    journeySteps: createDefaultJourneySteps(),
+  }));
   const [error, setError] = useState("");
   const [showReset, setShowReset] = useState(false);
-  const [showShortRoute, setShowShortRoute] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [pendingImport, setPendingImport] = useState<PortableCase | null>(null);
-  const [adaptiveCredential, setAdaptiveCredential] = useState<AdaptiveCredential | null>(adaptiveCredentialAtStart);
-  const [guidanceMode, setGuidanceMode] = useState<"adaptive" | "guided">(
-    initialGuidanceMode,
-  );
-  const adaptiveCredentialRef = useRef<AdaptiveCredential | null>(adaptiveCredentialAtStart);
-  const [adaptivePrompt, setAdaptivePrompt] = useState<AdaptiveNextQuestion | null>(null);
-  const [adaptivePromptText, setAdaptivePromptText] = useState("");
-  const [adaptivePromptOptions, setAdaptivePromptOptions] = useState<string[]>([]);
-  const [adaptiveReflection, setAdaptiveReflection] = useState("");
-  const [adaptiveRecovery, setAdaptiveRecovery] = useState<AdaptiveRecovery | null>(
-    adaptiveCredentialAtStart?.recovery ?? null,
-  );
-  const [adaptiveStatus, setAdaptiveStatus] = useState<"off" | "ready" | "working" | "fallback" | "deleting">(
-    adaptiveEnabled && initialGuidanceMode === "adaptive" ? "ready" : "off",
-  );
-  const resetTriggerRef = useRef<HTMLButtonElement>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const modalReturnFocusRef = useRef<HTMLElement | null>(null);
-  const phase = screen === "adaptive" && adaptivePrompt
-    ? phaseForObjective(adaptivePrompt.objectiveId)
-    : phaseForScreen(screen);
-  const discriminator = selectDiscriminatorQuestion(answers);
-  const discriminatorResult = explainSelection(answers.discriminatorQuestionId, answers.discriminatorAnswerIds);
-  const actionBrief = compileActionBrief(answers);
-  const diagnosticCase = useMemo(() => caseAnswersToDiagnosticCase(answers), [answers]);
-  const diagnosticState = useMemo(() => deriveDiagnosticState(diagnosticCase), [diagnosticCase]);
-  const stopDecision = useMemo(
-    () => evaluateStopCondition(diagnosticCase, diagnosticState),
-    [diagnosticCase, diagnosticState],
-  );
-  const liveResearchFamilies = diagnosticState.candidateFamilies
-    .filter((candidate) => ["live", "needs_observation"].includes(candidate.evidenceState))
-    .map((candidate) => candidate.label);
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const activeSteps = answers.journeySteps.filter((step) => step.status === "in-path");
+  const furthestIndex = activeSteps.findIndex((step) => step.id === answers.furthestReachedStepId);
+  const selectedBreakStep = activeSteps.find((step) => step.id === answers.breakStepId) ?? null;
+  const availableBreakSteps = answers.furthestReachedStepId === "none"
+    ? activeSteps
+    : activeSteps.filter((_step, index) => index > furthestIndex);
+  const lastStage = selectedBreakStep
+    ? lastStageForCatalogStage(selectedBreakStep.catalogStageId)
+    : "We cannot locate the stop yet";
+  const discriminator = selectDiscriminatorQuestion({ ...answers, lastStage });
+  const discriminatorResult = explainSelection(
+    answers.discriminatorQuestionId,
+    answers.discriminatorAnswerIds,
+  )[0] ?? null;
+  const selectedDiscriminatorOption = discriminator.options.find(
+    (option) => option.id === answers.discriminatorAnswerIds[0],
+  ) ?? null;
+  const researchFamilies = useMemo(() => {
+    const stageIds = selectedBreakStep ? [selectedBreakStep.catalogStageId] : ["S01", "S02", "S03", "S04", "S05", "S06"];
+    const seen = new Set<string>();
+    return stageIds.flatMap((stageId) => getFamiliesForStage(stageId)).filter((family) => {
+      if (seen.has(family.id)) return false;
+      seen.add(family.id);
+      return true;
+    });
+  }, [selectedBreakStep]);
   const platformResearchGroups = useMemo(
     () => getPlatformResearchGroups(answers.platformSurfaces),
     [answers.platformSurfaces],
   );
-  const platformResearchReasonCount = platformResearchGroups.reduce((total, group) => total + group.reasons.length, 0);
-  const adaptiveClarificationEntries = Object.entries(answers.adaptiveClarifications);
-
-  function rememberAdaptiveCredential(credential: AdaptiveCredential | null) {
-    adaptiveCredentialRef.current = credential;
-    setAdaptiveCredential(credential);
-    setAdaptiveRecovery(credential?.recovery ?? null);
-    if (credential) saveAdaptiveCredential(credential);
-    else clearAdaptiveCredential();
-  }
-
-  function rememberAdaptiveRecovery(recovery: AdaptiveRecovery | null) {
-    const credential = adaptiveCredentialRef.current;
-    if (!credential) {
-      setAdaptiveRecovery(recovery);
-      return;
-    }
-    const { recovery: _previousRecovery, ...baseCredential } = credential;
-    rememberAdaptiveCredential(recovery ? { ...baseCredential, recovery } : baseCredential);
-  }
+  const resultStateLabel = (() => {
+    if (answers.breakStepId === "completed") return "First mile completed";
+    if (answers.breakStepId === "cannot-tell" || selectedDiscriminatorOption?.specialState === "needs_external_evidence") return "Needs evidence";
+    if (selectedDiscriminatorOption?.specialState === "legitimate_gate") return "Legitimate gate";
+    if (selectedDiscriminatorOption?.specialState === "deliberate_non_fit") return "Deliberate non-fit";
+    if (selectedDiscriminatorOption?.specialState === "compound_blockers") return "Several breaks observed";
+    return "Working hypothesis";
+  })();
 
   useEffect(() => {
-    if (screen === "welcome" && history.length === 0 && answers === emptyAnswers) return;
-    saveSession({
-      version: 1,
-      guidanceMode,
+    if (screen === "welcome") return;
+    const session = {
+      version: 1 as const,
+      guidanceMode: "guided" as const,
       screen,
       history,
       answers,
       updatedAt: new Date().toISOString(),
-    });
-  }, [answers, guidanceMode, history, screen]);
+    };
+    saveSession(session);
+    setSavedSession(session);
+  }, [answers, history, screen]);
 
   useEffect(() => {
     document.querySelector<HTMLElement>("#question-title, #summary-title")?.focus();
@@ -378,95 +291,83 @@ export function App() {
   }, [screen]);
 
   useEffect(() => {
-    if (screen !== "discriminator") return;
+    if (screen !== "blocker") return;
     if (answers.discriminatorQuestionId === discriminator.id) return;
     setAnswers((current) => ({
       ...current,
       discriminatorQuestionId: discriminator.id,
       discriminatorAnswerIds: [],
+      issueStatement: "",
     }));
   }, [answers.discriminatorQuestionId, discriminator.id, screen]);
 
-  useEffect(() => {
-    if (!showReset && !pendingImport) return;
-    function handleModalKeys(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        if (showReset) setShowReset(false);
-        if (pendingImport) setPendingImport(null);
-        requestAnimationFrame(() => modalReturnFocusRef.current?.focus());
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const focusable = [...(dialogRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      ) ?? [])];
-      const first = focusable[0];
-      const last = focusable.at(-1);
-      if (!first || !last) return;
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-    document.addEventListener("keydown", handleModalKeys);
-    return () => document.removeEventListener("keydown", handleModalKeys);
-  }, [pendingImport, showReset]);
-
   function updateAnswer<K extends keyof CaseAnswers>(key: K, value: CaseAnswers[K]) {
-    setAnswers((current) => {
-      const invalidatesResearchSelection: Array<keyof CaseAnswers> = [
-        "platformSurfaces",
-        "platformSurfaceOther",
-        "concern",
-        "concernPattern",
-        "developer",
-        "actorType",
-        "developerJob",
-        "outcome",
-        "outcomeCheck",
-        "lastStage",
-        "lastTruth",
-        "explanation",
-        "evidenceTypes",
-        "evidenceDetail",
-        "alternative",
-      ];
-      const changed = current[key] !== value;
-      const correctedObjective = changed ? answerObjective[key] : undefined;
-      const adaptiveClarifications = correctedObjective
-        ? Object.fromEntries(Object.entries(current.adaptiveClarifications).filter(([objectiveId]) => (
-            diagnosticObjectiveOrder.indexOf(objectiveId as ObjectiveId) < diagnosticObjectiveOrder.indexOf(correctedObjective)
-          )))
-        : current.adaptiveClarifications;
-      if (invalidatesResearchSelection.includes(key) && changed) {
-        return {
-          ...current,
-          [key]: value,
-          adaptiveClarifications,
-          adaptiveCandidates: [],
-          adaptiveTerminalState: "",
-          discriminatorQuestionId: "",
-          discriminatorAnswerIds: [],
-        };
-      }
-      return {
-        ...current,
-        [key]: value,
-        adaptiveClarifications,
-        ...(correctedObjective ? { adaptiveCandidates: [], adaptiveTerminalState: "" } : {}),
-      };
-    });
-    setShowShortRoute(false);
+    setAnswers((current) => ({ ...current, [key]: value }));
     setError("");
   }
 
-  function goTo(next: ScreenId) {
+  function updateJourneyStep(id: string, changes: Partial<JourneyStep>) {
+    setAnswers((current) => {
+      const journeySteps = current.journeySteps.map((step) => step.id === id ? { ...step, ...changes } : step);
+      const removedFromPath = changes.status === "not-needed";
+      return {
+        ...current,
+        journeySteps,
+        furthestReachedStepId: removedFromPath && current.furthestReachedStepId === id ? "" : current.furthestReachedStepId,
+        breakStepId: removedFromPath && current.breakStepId === id ? "" : current.breakStepId,
+        discriminatorQuestionId: removedFromPath && current.breakStepId === id ? "" : current.discriminatorQuestionId,
+        discriminatorAnswerIds: removedFromPath && current.breakStepId === id ? [] : current.discriminatorAnswerIds,
+        issueStatement: removedFromPath && current.breakStepId === id ? "" : current.issueStatement,
+      };
+    });
+    setError("");
+  }
+
+  function updatePlatformSurface(index: number, value: string) {
+    setAnswers((current) => {
+      const next = [...current.platformSurfaces];
+      if (value) next[index] = value;
+      else next.splice(index, 1);
+      const platformSurfaces = next.filter((surface, surfaceIndex) => surface && next.indexOf(surface) === surfaceIndex).slice(0, 2);
+      return {
+        ...current,
+        platformSurfaces,
+        platformSurfaceOther: platformSurfaces.includes("Something else") ? current.platformSurfaceOther : "",
+      };
+    });
+    setError("");
+  }
+
+  function addJourneyStep() {
+    setAnswers((current) => ({
+      ...current,
+      journeySteps: [
+        ...current.journeySteps,
+        {
+          id: `custom-${crypto.randomUUID()}`,
+          catalogStageId: "S05",
+          label: "Another step in this journey",
+          status: "in-path",
+        },
+      ],
+    }));
+  }
+
+  function removeJourneyStep(id: string) {
+    setAnswers((current) => ({
+      ...current,
+      journeySteps: current.journeySteps.filter((step) => step.id !== id),
+      furthestReachedStepId: current.furthestReachedStepId === id ? "" : current.furthestReachedStepId,
+      breakStepId: current.breakStepId === id ? "" : current.breakStepId,
+      discriminatorQuestionId: current.breakStepId === id ? "" : current.discriminatorQuestionId,
+      discriminatorAnswerIds: current.breakStepId === id ? [] : current.discriminatorAnswerIds,
+      issueStatement: current.breakStepId === id ? "" : current.issueStatement,
+    }));
+  }
+
+  function goTo(next: ActiveScreenId) {
     setHistory((current) => [...current, screen]);
     setScreen(next);
-    setShowShortRoute(false);
     setError("");
   }
 
@@ -475,564 +376,206 @@ export function App() {
     if (!previous) return;
     setHistory((current) => current.slice(0, -1));
     setScreen(previous);
-    setShowShortRoute(false);
     setError("");
   }
 
-  async function ensureAdaptiveSession(): Promise<AdaptiveCredential | null> {
-    if (!adaptiveEnabled || guidanceMode === "guided" || adaptiveStatus === "fallback") return null;
-    if (adaptiveCredentialRef.current) return adaptiveCredentialRef.current;
-    try {
-      const created = await createAdaptiveSession({
-        platformArchetypeIds: resolvePlatformArchetypeIds(answers.platformSurfaces),
-      }, AbortSignal.timeout(8_000));
-      const credential: AdaptiveCredential = {
-        sessionId: created.session.id,
-        sessionToken: created.sessionToken,
-        revision: created.session.revision,
-        turnIds: {},
-      };
-      rememberAdaptiveCredential(credential);
-      return credential;
-    } catch {
-      setAdaptiveStatus("fallback");
-      return null;
-    }
-  }
-
-  async function awaitAdaptiveCompletion(
-    credential: AdaptiveCredential,
-    response: AdaptiveTurnResponse,
-  ): Promise<AdaptiveTurnResponse> {
-    if (response.turn.status === "completed") return response;
-    for (let attempt = 0; attempt < 8; attempt += 1) {
-      await new Promise((resolve) => window.setTimeout(resolve, 750));
-      const turn = await getAdaptiveTurn(credential, response.turn.id, AbortSignal.timeout(4_000));
-      if (turn.status === "failed") return { ...response, turn };
-      if (turn.status === "completed") {
-        const session = await getAdaptiveSession(credential, AbortSignal.timeout(4_000));
-        return { ...response, session, turn };
-      }
-    }
-    return response;
-  }
-
-  async function submitAdaptiveObjective(
-    objectiveId: ObjectiveId,
-    answer: AdaptiveAnswer,
-  ): Promise<AdaptiveTurnResponse | null> {
-    const credential = await ensureAdaptiveSession();
-    if (!credential) return null;
-    setAdaptiveStatus("working");
-    try {
-      const initial = await submitAdaptiveTurn({
-        credential,
-        idempotencyKey: crypto.randomUUID(),
-        objectiveId,
-        answer,
-        correctionOfTurnId: screen === "adaptive" ? undefined : credential.turnIds[objectiveId],
-        signal: AbortSignal.timeout(25_000),
-      });
-      const completed = await awaitAdaptiveCompletion(credential, initial);
-      if (completed.turn.status !== "completed") {
-        if (completed.turn.status === "failed" && completed.turn.retryable) {
-          rememberAdaptiveRecovery({ turnId: completed.turn.id, objectiveId, action: "retry" });
-        } else if (["accepted", "processing"].includes(completed.turn.status)) {
-          rememberAdaptiveRecovery({ turnId: completed.turn.id, objectiveId, action: "check" });
-        } else {
-          setAdaptiveStatus("fallback");
-          return null;
-        }
-        setAdaptiveStatus("ready");
-        return null;
-      }
-      const { recovery: _recovery, ...credentialWithoutRecovery } = credential;
-      const nextCredential: AdaptiveCredential = {
-        ...credentialWithoutRecovery,
-        revision: completed.session.revision,
-        turnIds: recordObjectiveTurn(credential.turnIds, objectiveId, completed.turn.id),
-      };
-      rememberAdaptiveCredential(nextCredential);
-      setAdaptiveReflection(completed.turn.result?.reflection ?? completed.session.state.lastReflection ?? "");
-      setAdaptiveStatus("ready");
-      return completed;
-    } catch (caught) {
-      if (caught instanceof AdaptiveRequestError && caught.code === "turn_retryable") {
-        const details = caught.details as { turnId?: unknown } | undefined;
-        if (typeof details?.turnId === "string") {
-          rememberAdaptiveRecovery({ turnId: details.turnId, objectiveId, action: "retry" });
-          setAdaptiveStatus("ready");
-          return null;
-        }
-      }
-      setAdaptiveStatus("fallback");
-      return null;
-    }
-  }
-
-  function resetAdaptivePrompt() {
-    setAdaptivePrompt(null);
-    setAdaptivePromptText("");
-    setAdaptivePromptOptions([]);
-  }
-
-  function routeAdaptiveResponse(response: AdaptiveTurnResponse | null, submittedObjective: ObjectiveId): ScreenId | null {
-    if (!response) return null;
-    const nextQuestion = response.turn.result?.nextQuestion ?? response.session.state.nextQuestion;
-    const terminalState = response.turn.result?.terminalState ?? response.session.state.terminalState;
-    setAnswers((current) => ({
-      ...current,
-      adaptiveCandidates: (response.turn.result?.candidates ?? []).map((candidate) => ({
-        catalogId: candidate.catalogId,
-        evidenceState: candidate.evidenceState,
-      })),
-      adaptiveTerminalState: terminalState ?? "",
-    }));
-    if (terminalState || !nextQuestion) {
-      resetAdaptivePrompt();
-      return "summary";
-    }
-    if (nextQuestion.objectiveId === submittedObjective) {
-      setAdaptivePrompt(nextQuestion);
-      setAdaptivePromptText("");
-      setAdaptivePromptOptions([]);
-      return "adaptive";
-    }
-    resetAdaptivePrompt();
-    return screenForObjective(nextQuestion.objectiveId);
-  }
-
-  async function recoverAdaptiveTurn() {
-    const credential = adaptiveCredentialRef.current;
-    const recovery = adaptiveRecovery;
-    if (!credential || !recovery) {
-      setAdaptiveStatus("fallback");
-      return;
-    }
-    setAdaptiveStatus("working");
-    setError("");
-    try {
-      let response: AdaptiveTurnResponse;
-      if (recovery.action === "retry") {
-        const existingTurn = await getAdaptiveTurn(credential, recovery.turnId, AbortSignal.timeout(8_000));
-        if (existingTurn.status === "completed") {
-          const session = await getAdaptiveSession(credential, AbortSignal.timeout(8_000));
-          response = { session, turn: existingTurn, dispatchMode: "late_completion" };
-        } else {
-          response = await retryAdaptiveTurn(credential, recovery.turnId, AbortSignal.timeout(25_000));
-        }
-      } else {
-        const turn = await getAdaptiveTurn(credential, recovery.turnId, AbortSignal.timeout(8_000));
-        const session = await getAdaptiveSession(credential, AbortSignal.timeout(8_000));
-        response = { session, turn, dispatchMode: "recovery_check" };
-      }
-      const completed = await awaitAdaptiveCompletion(credential, response);
-      if (completed.turn.status === "failed" && completed.turn.retryable) {
-        rememberAdaptiveRecovery({ ...recovery, action: "retry" });
-        setAdaptiveStatus("ready");
-        return;
-      }
-      if (completed.turn.status === "failed") {
-        rememberAdaptiveRecovery(null);
-        setAdaptiveReflection("The short-lived server copy of that answer expired. Your browser copy is still here, so you can submit it again or continue with the guided path.");
-        setAdaptiveStatus("ready");
-        return;
-      }
-      if (completed.turn.status !== "completed") {
-        rememberAdaptiveRecovery({ ...recovery, action: "check" });
-        setAdaptiveStatus("ready");
-        return;
-      }
-      const { recovery: _recovery, ...credentialWithoutRecovery } = credential;
-      const nextCredential: AdaptiveCredential = {
-        ...credentialWithoutRecovery,
-        revision: completed.session.revision,
-        turnIds: recordObjectiveTurn(credential.turnIds, recovery.objectiveId, completed.turn.id),
-      };
-      rememberAdaptiveCredential(nextCredential);
-      setAdaptiveReflection(completed.turn.result?.reflection ?? completed.session.state.lastReflection ?? "");
-      setAdaptiveStatus("ready");
-      const route = routeAdaptiveResponse(completed, recovery.objectiveId);
-      if (route) goTo(route);
-    } catch (caught) {
-      if (caught instanceof AdaptiveRequestError && caught.code === "turn_retryable") {
-        rememberAdaptiveRecovery({ ...recovery, action: "retry" });
-        setAdaptiveStatus("ready");
-        return;
-      }
-      setAdaptiveStatus("fallback");
-    }
-  }
-
-  async function submitCurrentScreenToAdaptiveRuntime(): Promise<ScreenId | null> {
-    switch (screen) {
-      case "concern": {
-        const response = await submitAdaptiveObjective("D1", {
-          kind: "text",
-          text: `${answers.concern}\nObserved pattern: ${answers.concernPattern}`,
-        });
-        return routeAdaptiveResponse(response, "D1");
-      }
-      case "developer-job": {
-        const response = await submitAdaptiveObjective("D3", {
-          kind: "text",
-          text: `Developer: ${answers.developer}\nActor: ${answers.actorType}\nJob: ${answers.developerJob}`,
-        });
-        return routeAdaptiveResponse(response, "D3");
-      }
-      case "outcome": {
-        const response = await submitAdaptiveObjective("D4", {
-          kind: "text",
-          text: `${answers.outcome}\nMilestone check: ${answers.outcomeCheck}`,
-        });
-        return routeAdaptiveResponse(response, "D4");
-      }
-      case "last-truth": {
-        const stageResponse = await submitAdaptiveObjective("D5", { kind: "text", text: answers.lastStage });
-        if (!stageResponse) return null;
-        const stageRoute = routeAdaptiveResponse(stageResponse, "D5");
-        if (stageRoute === "adaptive") return stageRoute;
-        const eventResponse = await submitAdaptiveObjective("D6", {
-          kind: answers.lastTruth.trim() ? "text" : "unknown",
-          ...(answers.lastTruth.trim() ? { text: answers.lastTruth } : {}),
-        } as AdaptiveAnswer);
-        return routeAdaptiveResponse(eventResponse, "D6");
-      }
-      case "evidence": {
-        const response = await submitAdaptiveObjective("D7", {
-          kind: "text",
-          text: `Current explanation: ${answers.explanation}\nEvidence types: ${answers.evidenceTypes.join(", ")}\nStrongest evidence: ${answers.evidenceDetail || "not stated"}`,
-        });
-        return routeAdaptiveResponse(response, "D7");
-      }
-      case "discriminator": {
-        const selected = answers.discriminatorAnswerIds[0];
-        const selectedOption = discriminator.options.find((option) => option.id === selected);
-        const response = await submitAdaptiveObjective("D8", selected
-          ? {
-              kind: "single_choice",
-              optionIds: [selected],
-              text: selectedOption
-                ? `Observed answer: ${selectedOption.label}\nNext distinguishing observation: ${selectedOption.nextObservation}`
-                : undefined,
-            }
-          : { kind: "unknown" });
-        return routeAdaptiveResponse(response, "D8");
-      }
-      case "ownership": {
-        const response = await submitAdaptiveObjective("D9", {
-          kind: "text",
-          text: `${answers.ownershipMode}\n${answers.ownership}`,
-        });
-        return routeAdaptiveResponse(response, "D9");
-      }
-      case "next-move": {
-        const response = await submitAdaptiveObjective("D10", {
-          kind: "text",
-          text: `${answers.moveType}\nMove: ${answers.nextMove}\nExpected signal: ${answers.expectedSignal || "not defined"}`,
-        });
-        return routeAdaptiveResponse(response, "D10");
-      }
-      default:
-        return null;
-    }
-  }
-
-  async function submitAdaptivePromptAnswer(): Promise<ScreenId | null> {
-    if (!adaptivePrompt) return null;
-    let answer: AdaptiveAnswer;
-    let clarification = "";
-    if (adaptivePrompt.inputMode === "text") {
-      clarification = adaptivePromptText.trim();
-      answer = clarification ? { kind: "text", text: clarification } : { kind: "unknown" };
-    } else if (adaptivePrompt.inputMode === "single_choice") {
-      clarification = adaptivePrompt.options.find((option) => option.id === adaptivePromptOptions[0])?.label ?? "";
-      answer = adaptivePromptOptions[0]
-        ? {
-            kind: "single_choice",
-            optionIds: [adaptivePromptOptions[0]],
-            text: clarification,
-          }
-        : { kind: "unknown" };
-    } else {
-      clarification = adaptivePrompt.options
-        .filter((option) => adaptivePromptOptions.includes(option.id))
-        .map((option) => option.label)
-        .join("; ");
-      answer = adaptivePromptOptions.length > 0
-        ? {
-            kind: "multi_choice",
-            optionIds: adaptivePromptOptions,
-            text: clarification,
-          }
-        : { kind: "unknown" };
-    }
-    const objectiveId = adaptivePrompt.objectiveId;
-    if (clarification) {
-      setAnswers((current) => {
-        const previous = current.adaptiveClarifications[objectiveId];
-        const combined = previous && previous !== clarification
-          ? `${previous}\n${clarification}`
-          : clarification;
-        return {
-          ...current,
-          adaptiveClarifications: {
-            ...current.adaptiveClarifications,
-            [objectiveId]: combined,
-          },
-        };
-      });
-    }
-    const response = await submitAdaptiveObjective(objectiveId, answer);
-    return routeAdaptiveResponse(response, objectiveId);
-  }
-
-  async function continueFromCurrent(event?: FormEvent) {
-    event?.preventDefault();
-    if (screen === "adaptive" && adaptivePrompt) {
-      const hasAnswer = adaptivePrompt.inputMode === "text"
-        ? adaptivePromptText.trim().length > 0
-        : adaptivePromptOptions.length > 0;
-      if (!hasAnswer) {
-        setError("Add a short answer, or choose the closest option.");
-        return;
-      }
-      const route = await submitAdaptivePromptAnswer();
-      if (adaptiveCredentialRef.current?.recovery) return;
-      goTo(route ?? fallbackScreenAfterObjective(adaptivePrompt.objectiveId));
-      return;
-    }
-    const usingAdaptiveHelp = adaptiveEnabled && guidanceMode === "adaptive" && adaptiveStatus !== "fallback";
-    if (!usingAdaptiveHelp && boredomOrIrritation.test(currentGuidedText(screen, answers))) {
-      setShowShortRoute(true);
-      setError("");
-      return;
-    }
-    const message = validationMessage(screen, answers, !usingAdaptiveHelp);
+  function continueFromCurrent(event: FormEvent) {
+    event.preventDefault();
+    const message = validationMessage(screen, answers);
     if (message) {
       setError(message);
       return;
     }
-    const adaptiveRoute = await submitCurrentScreenToAdaptiveRuntime();
-    if (adaptiveCredentialRef.current?.recovery) return;
-    if (!adaptiveRoute && usingAdaptiveHelp) {
-      const guidedFallbackMessage = guidedAnswerQualityMessage(screen, answers);
-      if (guidedFallbackMessage) {
-        setError(guidedFallbackMessage);
-        return;
-      }
+
+    if (screen === "developer") {
+      setAnswers((current) => ({
+        ...current,
+        outcome: `${current.meaningfulAction}. Verification: ${current.verificationSignal}`,
+        outcomeCheck: "A result the developer can verify",
+        journeySteps: current.journeySteps.map((step) => {
+          if (step.id === "execute") return { ...step, label: `Execute: ${current.meaningfulAction}` };
+          if (step.id === "verify") return { ...step, label: `Verify: ${current.verificationSignal}` };
+          return step;
+        }),
+      }));
     }
-    goTo(adaptiveRoute ?? (screen === "seven-day" ? "summary" : nextScreen(screen)));
+
+    if (screen === "break-point") {
+      const breakStep = activeSteps.find((step) => step.id === answers.breakStepId);
+      setAnswers((current) => ({
+        ...current,
+        lastStage: breakStep ? lastStageForCatalogStage(breakStep.catalogStageId) : "We cannot locate the stop yet",
+        lastTruth: current.breakEvidenceDetail,
+        evidenceTypes: [evidenceLabelToLegacy(current.breakEvidenceType)],
+        evidenceDetail: current.breakEvidenceDetail,
+        discriminatorQuestionId: selectDiscriminatorQuestion({
+          ...current,
+          lastStage: breakStep ? lastStageForCatalogStage(breakStep.catalogStageId) : "We cannot locate the stop yet",
+        }).id,
+        discriminatorAnswerIds: [],
+        issueStatement: "",
+      }));
+      goTo(answers.breakStepId === "completed" ? "summary" : "blocker");
+      return;
+    }
+
+    if (screen === "blocker") {
+      setAnswers((current) => ({
+        ...current,
+        explanation: current.issueStatement,
+        nextMove: selectedDiscriminatorOption?.nextObservation ?? "",
+        moveType: selectedDiscriminatorOption?.specialState === "needs_external_evidence"
+          ? "Gather better evidence"
+          : "No intervention is justified yet",
+      }));
+    }
+    goTo(nextScreen(screen));
   }
 
-  function finishWithCurrentEvidence() {
-    goTo("summary");
-  }
-
-  function removeInterruptionText() {
-    setAnswers((current) => {
-      switch (screen) {
-        case "concern": return { ...current, concern: "" };
-        case "developer": return { ...current, developer: "" };
-        case "developer-job": return { ...current, developerJob: "" };
-        case "outcome": return { ...current, outcome: "" };
-        case "last-truth": return { ...current, lastTruth: "" };
-        case "explanation": return { ...current, explanation: "" };
-        case "evidence": return { ...current, evidenceDetail: "" };
-        case "ownership": return { ...current, ownership: "" };
-        case "next-move": return { ...current, nextMove: "", expectedSignal: "" };
-        case "seven-day": return { ...current, reviewNotes: "" };
-        default: return current;
-      }
-    });
-  }
-
-  function finishAfterInterruption() {
-    removeInterruptionText();
-    setShowShortRoute(false);
-    goTo("summary");
-  }
-
-  function correctAfterInterruption() {
-    removeInterruptionText();
-    setShowShortRoute(false);
-    requestAnimationFrame(() => document.querySelector<HTMLElement>("main textarea, main input:not([type='radio']):not([type='checkbox'])")?.focus());
-  }
-
-  async function resume() {
+  function resume() {
     if (!savedSession) return;
-    setAnswers(savedSession.answers);
-    setHistory(savedSession.history);
-    setGuidanceMode(savedSession.guidanceMode);
-    if (adaptiveCredentialRef.current) {
-      try {
-        const session = await getAdaptiveSession(adaptiveCredentialRef.current, AbortSignal.timeout(8_000));
-        const nextCredential = { ...adaptiveCredentialRef.current, revision: session.revision };
-        rememberAdaptiveCredential(nextCredential);
-        if (nextCredential.recovery) {
-          const turn = await getAdaptiveTurn(nextCredential, nextCredential.recovery.turnId, AbortSignal.timeout(8_000));
-          if (isObjectiveId(turn.objectiveId) && turn.status === "failed" && !turn.retryable) {
-            rememberAdaptiveRecovery(null);
-            setAdaptiveReflection("The short-lived server copy of that answer expired. Your browser copy is still here, so you can submit it again or continue with the guided path.");
-            setAdaptiveStatus("ready");
-            setScreen(savedSession.screen === "adaptive"
-              ? fallbackScreenAfterObjective(turn.objectiveId)
-              : savedSession.screen);
-            return;
-          }
-          if (isObjectiveId(turn.objectiveId) && ["accepted", "processing", "failed", "completed"].includes(turn.status)) {
-            rememberAdaptiveRecovery({
-              turnId: turn.id,
-              objectiveId: turn.objectiveId,
-              action: turn.status === "failed" && turn.retryable ? "retry" : "check",
-            });
-            setAdaptiveStatus("ready");
-            setScreen(savedSession.screen === "adaptive"
-              ? fallbackScreenAfterObjective(turn.objectiveId)
-              : savedSession.screen);
-            return;
-          }
-          rememberAdaptiveRecovery(null);
-        }
-        if (session.pendingTurnId) {
-          const turn = await getAdaptiveTurn(nextCredential, session.pendingTurnId, AbortSignal.timeout(8_000));
-          if (isObjectiveId(turn.objectiveId) && turn.status === "failed" && !turn.retryable) {
-            rememberAdaptiveRecovery(null);
-            setAdaptiveReflection("The short-lived server copy of that answer expired. Your browser copy is still here, so you can submit it again or continue with the guided path.");
-            setAdaptiveStatus("ready");
-            setScreen(savedSession.screen === "adaptive"
-              ? fallbackScreenAfterObjective(turn.objectiveId)
-              : savedSession.screen);
-            return;
-          }
-          if (isObjectiveId(turn.objectiveId) && ["accepted", "processing", "failed"].includes(turn.status)) {
-            rememberAdaptiveRecovery({
-              turnId: turn.id,
-              objectiveId: turn.objectiveId,
-              action: turn.status === "failed" && turn.retryable ? "retry" : "check",
-            });
-            setAdaptiveStatus("ready");
-            setScreen(savedSession.screen === "adaptive"
-              ? fallbackScreenAfterObjective(turn.objectiveId)
-              : savedSession.screen);
-            return;
-          }
-        }
-        if (savedSession.screen === "adaptive" && session.state.nextQuestion) {
-          setAdaptivePrompt(session.state.nextQuestion);
-          setScreen("adaptive");
-          return;
-        }
-        if (savedSession.screen === "adaptive" || session.status === "complete") {
-          setScreen(session.status === "complete" ? "summary" : "name");
-          return;
-        }
-      } catch {
-        setAdaptiveStatus("fallback");
-      }
-    }
-    setScreen(savedSession.screen === "welcome" || savedSession.screen === "adaptive" ? "name" : savedSession.screen);
-  }
-
-  function closeReset() {
-    setShowReset(false);
-    requestAnimationFrame(() => modalReturnFocusRef.current?.focus());
-  }
-
-  function closeImport() {
-    setPendingImport(null);
-    requestAnimationFrame(() => modalReturnFocusRef.current?.focus());
+    const migrated = migrateAnswers(savedSession.answers);
+    setAnswers(migrated);
+    setHistory(savedSession.history.map(normalizeScreen).filter((item, index, items) => index === 0 || item !== items[index - 1]));
+    setScreen(normalizeScreen(savedSession.screen));
+    setError("");
   }
 
   async function reset() {
-    if (adaptiveCredential) {
-      setAdaptiveStatus("deleting");
+    setIsDeleting(true);
+    setError("");
+    const credential = loadAdaptiveCredential();
+    if (credential) {
       try {
-        await deleteAdaptiveSession(adaptiveCredential, AbortSignal.timeout(8_000));
+        await deleteAdaptiveSession(credential, AbortSignal.timeout(8_000));
       } catch {
-        setAdaptiveStatus("ready");
+        setIsDeleting(false);
         setShowReset(false);
-        setError("We could not confirm deletion of the short-lived server session. Your browser copy is still here so you can retry.");
+        setError("The older server session could not be deleted yet. Your browser copy is still here so you can retry.");
         return;
       }
+      clearAdaptiveCredential();
     }
     clearSession();
     setSavedSession(null);
-    rememberAdaptiveCredential(null);
-    setAnswers(emptyAnswers);
+    setAnswers({ ...emptyAnswers, journeySteps: createDefaultJourneySteps() });
     setHistory([]);
     setScreen("welcome");
     setShowReset(false);
-    setError("");
-    setAdaptiveReflection("");
-    resetAdaptivePrompt();
-    setAdaptiveStatus("off");
-    setGuidanceMode("guided");
+    setIsDeleting(false);
   }
 
-  async function previewImport(file: File | undefined) {
+  async function previewImport(file?: File) {
     if (!file) return;
     try {
       setPendingImport(parsePortableCase(await file.text()));
       setError("");
     } catch {
-      setPendingImport(null);
       setError("That file is not a valid First Mile case. Your current work has not changed.");
     }
   }
 
-  async function acceptImport() {
+  function acceptImport() {
     if (!pendingImport) return;
-    if (adaptiveCredentialRef.current) {
-      setAdaptiveStatus("deleting");
-      try {
-        await deleteAdaptiveSession(adaptiveCredentialRef.current, AbortSignal.timeout(8_000));
-      } catch {
-        setAdaptiveStatus("ready");
-        setError("We could not close the previous adaptive session. Your current case is unchanged, so you can retry safely.");
-        return;
-      }
-    }
-    rememberAdaptiveCredential(null);
-    setGuidanceMode("guided");
-    setAdaptiveStatus("off");
-    setAdaptiveReflection("");
-    resetAdaptivePrompt();
-    setAnswers(pendingImport.answers);
+    setAnswers(migrateAnswers(pendingImport.answers as CaseAnswers));
     setHistory([]);
     setScreen("summary");
     setPendingImport(null);
     setError("");
   }
 
-  function exportJson() {
-    const filename = `${safeFilename(answers.platform || answers.company, "first-mile-case")}.json`;
+  function journeyStatus(step: JourneyStep, index: number): string {
+    if (step.status === "not-needed") return "Not required";
+    if (answers.breakStepId === "completed") return "Reached";
+    if (step.id === answers.furthestReachedStepId && answers.breakEvidenceType === "The stage was completed with employee, partner, or support help") return "Completed with help";
+    if (step.id === answers.breakStepId) {
+      if (selectedDiscriminatorOption?.specialState === "legitimate_gate") return "Legitimate gate";
+      if (selectedDiscriminatorOption?.specialState === "deliberate_non_fit") return "Deliberate non-fit";
+      if (selectedDiscriminatorOption?.specialState === "needs_external_evidence") return "Needs evidence";
+      if (selectedDiscriminatorOption?.specialState === "compound_blockers") return "Several breaks";
+    }
+    if (answers.furthestReachedStepId === "none") {
+      if (step.id === answers.breakStepId) return "Unresolved";
+      return "Untested";
+    }
+    if (index <= furthestIndex) return "Reached";
+    if (step.id === answers.breakStepId) return "Unresolved";
+    if (answers.breakStepId === "cannot-tell") return "Unknown";
+    return "Untested";
+  }
+
+  function firstMileSentence(): string {
+    return `For ${answers.developer || "the intended developer"}, the first mile ends when they can independently ${answers.meaningfulAction || "complete the first representative operation"} and verify ${answers.verificationSignal || "the intended result"}.`;
+  }
+
+  function markdownExport(): string {
+    const selectedOption = discriminator.options.find((option) => option.id === answers.discriminatorAnswerIds[0]);
+    const researchLabels = discriminatorResult?.liveLabels ?? [];
+    const lines = [
+      "# First-mile journey map",
+      "",
+      `- Participant: ${escapeMarkdown(answers.name || "Not named")}`,
+      `- Company or project: ${escapeMarkdown(answers.company || "Not named")}`,
+      `- Platform: ${escapeMarkdown(answers.platform || "Not named")}`,
+      `- Developer journey: ${escapeMarkdown(answers.journeyType || "Not classified")}`,
+      "",
+      "## First-mile endpoint",
+      "",
+      escapeMarkdown(firstMileSentence()),
+      "",
+      "## Journey",
+      "",
+      ...answers.journeySteps.map((step, index) => `${index + 1}. **${escapeMarkdown(step.label)}**: ${journeyStatus(step, activeSteps.findIndex((activeStep) => activeStep.id === step.id))}`),
+      "",
+      "## Located break",
+      "",
+      `- Furthest stage supported by evidence: ${escapeMarkdown(activeSteps.find((step) => step.id === answers.furthestReachedStepId)?.label || (answers.furthestReachedStepId === "none" ? "No stage reached" : "Unknown"))}`,
+      `- Earliest unresolved point: ${escapeMarkdown(selectedBreakStep?.label || (answers.breakStepId === "completed" ? "No break before verified success" : "Cannot tell"))}`,
+      `- Evidence class: ${escapeMarkdown(answers.breakEvidenceType || "Not recorded")}`,
+      `- Evidence receipt: ${escapeMarkdown(answers.breakEvidenceDetail || "No detail recorded")}`,
+      "",
+      "## Participant conclusion",
+      "",
+      escapeMarkdown(answers.issueStatement || (answers.breakStepId === "completed" ? "The mapped first mile is complete." : "The issue is not identified yet.")),
+      "",
+      "## Research prompts, not diagnoses",
+      "",
+      ...(researchLabels.length > 0 ? researchLabels.map((label) => `- ${escapeMarkdown(label)}`) : ["- No researched cause is supported yet."]),
+      "",
+      `Next distinguishing observation: ${escapeMarkdown(selectedOption?.nextObservation || "No additional observation is required by this map yet.")}`,
+      "",
+      `Research catalog: ${catalog.catalogVersion}`,
+      "",
+      "A selected stage is not a cause. No intervention justified remains a valid result.",
+      "",
+    ];
+    return lines.join("\n");
+  }
+
+  function exportMarkdown() {
     downloadText(
-      filename,
+      `${safeFilename(answers.platform || answers.company, "first-mile-map")}.md`,
+      markdownExport(),
+      "text/markdown;charset=utf-8",
+    );
+  }
+
+  function exportJson() {
+    downloadText(
+      `${safeFilename(answers.platform || answers.company, "first-mile-map")}.json`,
       serializePortableCase(createPortableCase(answers, catalog.catalogVersion)),
       "application/json;charset=utf-8",
     );
   }
 
-  function exportMarkdown() {
-    const filename = `${safeFilename(answers.platform || answers.company, "first-mile-brief")}.md`;
-    downloadText(
-      filename,
-      actionBriefToMarkdown(actionBrief, catalog.catalogVersion),
-      "text/markdown;charset=utf-8",
-    );
-  }
-
-  function startSevenDayCheck() {
-    if (!answers.reviewDate) {
-      const reviewDate = new Date();
-      reviewDate.setDate(reviewDate.getDate() + 7);
-      updateAnswer("reviewDate", localDateValue(reviewDate));
-    }
-    goTo("seven-day");
-  }
-
-  const primaryLabel = screen === "next-move" ? "See what this supports" : "Save and continue";
+  const primaryLabel = ({
+    profile: "Continue to the platform",
+    "platform-context": "Define the developer",
+    developer: "Build the journey",
+    "journey-map": "Use this path",
+    "break-point": "Explore this break",
+    blocker: "See my journey map",
+  } as Partial<Record<ActiveScreenId, string>>)[screen] ?? "Continue";
 
   return (
     <div className="app-frame">
@@ -1042,332 +585,243 @@ export function App() {
           <span>{friendlyCopy.title}</span>
         </div>
         {screen !== "welcome" ? (
-          <button
-            className="quiet-button"
-            type="button"
-            ref={resetTriggerRef}
-            onClick={(event) => {
-              modalReturnFocusRef.current = event.currentTarget;
-              setShowReset(true);
-            }}
-          >
-            Start over
-          </button>
+          <button className="quiet-button" type="button" onClick={() => setShowReset(true)}>Start over</button>
         ) : null}
       </header>
 
-      {screen !== "welcome" && screen !== "summary" ? <Progress phase={phase} /> : null}
+      {screen !== "welcome" && screen !== "summary" ? <Progress phase={phaseForScreen(screen)} /> : null}
 
       <main className={screen === "welcome" ? "main welcome-main" : "main"}>
-        {screen !== "welcome" && screen !== "summary" && adaptiveReflection ? (
-          <aside className="adaptive-reflection" aria-live="polite">
-            <span aria-hidden="true">↳</span>
-            <p>{adaptiveReflection}</p>
-          </aside>
-        ) : null}
-        {screen !== "welcome" && adaptiveRecovery ? (
-          <aside className="adaptive-recovery" role="status">
-            <div>
-              <strong>Your answer is safe.</strong>
-              <p>
-                {adaptiveRecovery.action === "retry"
-                  ? "The follow-up could not finish, but the saved answer can be retried without typing it again."
-                  : "The follow-up is taking longer than expected. You can check it while the guided path stays available."}
-              </p>
-            </div>
-            <button
-              className="secondary-button"
-              type="button"
-              disabled={adaptiveStatus === "working"}
-              onClick={() => void recoverAdaptiveTurn()}
-            >
-              {adaptiveStatus === "working"
-                ? "Checking…"
-                : adaptiveRecovery.action === "retry"
-                  ? "Retry saved answer"
-                  : "Check saved answer"}
-            </button>
-          </aside>
-        ) : null}
-        {screen !== "welcome" && adaptiveStatus === "fallback" ? (
-          <p className="adaptive-fallback" role="status">
-            Adaptive help is unavailable. Your answers are still saved here, and the guided version will keep working.
-          </p>
-        ) : null}
-        {screen !== "welcome" && screen !== "summary" && showShortRoute ? (
-          <aside className="short-route" role="status" aria-labelledby="short-route-title">
-            <div>
-              <h2 id="short-route-title">Let’s make this shorter.</h2>
-              <p>You can finish with the evidence already in this case, or clear this answer and correct it.</p>
-            </div>
-            <div className="short-route-actions">
-              <button className="primary-button" type="button" onClick={finishAfterInterruption}>Finish with what we have</button>
-              <button className="secondary-button" type="button" onClick={correctAfterInterruption}>Let me correct my answer</button>
-            </div>
-          </aside>
-        ) : null}
         {screen === "welcome" ? (
           <section className="welcome" aria-labelledby="welcome-title">
-            <div className="welcome-mark" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-            <p className="eyebrow">A guided first-mile check</p>
-            <h1 id="welcome-title">{friendlyCopy.welcomeTitle}</h1>
+            <div className="welcome-mark" aria-hidden="true"><span /><span /><span /></div>
+            <p className="eyebrow">A guided journey map</p>
+            <h1 id="welcome-title" aria-label={friendlyCopy.welcomeTitle}><span aria-hidden="true">Map the journey.</span><span aria-hidden="true">Find the break.</span></h1>
             <p className="welcome-body">{friendlyCopy.welcomeBody}</p>
             <p className="welcome-time">{friendlyCopy.welcomeTime}</p>
-            {adaptiveEnabled ? (
-              <fieldset className="guidance-choice">
-                <legend>How should this case be guided?</legend>
-                <label>
-                  <input
-                    type="radio"
-                    name="guidance-mode"
-                    value="adaptive"
-                    checked={guidanceMode === "adaptive"}
-                    onChange={() => {
-                      setGuidanceMode("adaptive");
-                      setAdaptiveStatus("ready");
-                    }}
-                  />
-                  <span><strong>Adaptive help</strong><small>Allows short follow-up questions when an answer needs clarification.</small></span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="guidance-mode"
-                    value="guided"
-                    checked={guidanceMode === "guided"}
-                    onChange={() => {
-                      setGuidanceMode("guided");
-                      setAdaptiveStatus("off");
-                    }}
-                  />
-                  <span><strong>Guided only</strong><small>Keeps the full case in this browser and uses the fixed path.</small></span>
-                </label>
-              </fieldset>
-            ) : null}
+            <div className="welcome-value" aria-label="What you will make">
+              <span>Access</span><span>Setup</span><span>First operation</span><span>Verified result</span>
+            </div>
             <div className="welcome-actions">
-              <button className="primary-button" type="button" onClick={() => goTo("name")}>
-                Start a case
-              </button>
-              {savedSession ? (
-                <button className="secondary-button" type="button" onClick={() => void resume()}>
-                  Resume saved case
-                </button>
-              ) : null}
-              <label className="secondary-button file-button">
-                Import a saved case
-                <input
-                  className="visually-hidden"
-                  type="file"
-                  accept="application/json,.json"
-                  onChange={(event) => {
-                    modalReturnFocusRef.current = event.currentTarget;
-                    void previewImport(event.target.files?.[0]);
-                    event.currentTarget.value = "";
-                  }}
-                />
-              </label>
+              <button className="primary-button" type="button" onClick={() => goTo("profile")}>Map a journey</button>
+              {savedSession ? <button className="secondary-button" type="button" onClick={resume}>Resume saved map</button> : null}
+              <button className="secondary-button" type="button" onClick={() => importInputRef.current?.click()}>Import a saved map</button>
+              <input
+                className="visually-hidden"
+                ref={importInputRef}
+                type="file"
+                aria-label="Choose a saved First Mile map"
+                accept="application/json,.json"
+                onChange={(event) => {
+                  void previewImport(event.target.files?.[0]);
+                  event.currentTarget.value = "";
+                }}
+              />
             </div>
             <div className="trust-note">
-              <strong>Your case stays yours.</strong>
-              <p>{adaptiveEnabled && guidanceMode === "adaptive"
-                ? "Use roles or aliases. Your name and company stay in this browser. Diagnostic answers may be processed in a short-lived server session so adaptive help can respond. Do not paste secrets, customer data, or private incident details."
-                : friendlyCopy.privacy}</p>
+              <strong>Your map stays in this browser.</strong>
+              <p>{friendlyCopy.privacy}</p>
             </div>
           </section>
         ) : null}
 
-        {screen === "name" ? (
-          <QuestionShell eyebrow="Set the scene · 1 of 4" title="What should we call you?" support="A first name or nickname is enough.">
-            <TextField id="name" label="Name" value={answers.name} onChange={(value) => updateAnswer("name", value)} autoComplete="given-name" />
-          </QuestionShell>
-        ) : null}
-
-        {screen === "company" ? (
+        {screen === "profile" ? (
           <QuestionShell
-            eyebrow="Set the scene · 2 of 4"
-            title={`Which company, team, or project are we looking at${answers.name ? `, ${answers.name}` : ""}?`}
-            support="This gives the case a boundary. It is not used to look anything up. An alias is fine."
+            eyebrow="Set the scene · 1 of 2"
+            title="Who is mapping this journey?"
+            support="Use an alias if you prefer. This information only labels your local map."
           >
+            <TextField id="name" label="Your name or alias" value={answers.name} onChange={(value) => updateAnswer("name", value)} autoComplete="given-name" />
             <TextField id="company" label="Company, team, or project" value={answers.company} onChange={(value) => updateAnswer("company", value)} autoComplete="organization" />
+            <div className="field">
+              <label htmlFor="participant-role">Your role</label>
+              <select id="participant-role" value={answers.role} onChange={(event) => updateAnswer("role", event.target.value)}>
+                <option value="">Choose the closest role</option>
+                {roleChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
+              </select>
+            </div>
+            {answers.role === "Something else" ? <TextField id="role-other" label="Describe your role" value={answers.roleOther} onChange={(value) => updateAnswer("roleOther", value)} /> : null}
           </QuestionShell>
         ) : null}
 
-        {screen === "platform" ? (
+        {screen === "platform-context" ? (
           <QuestionShell
-            eyebrow="Set the scene · 3 of 4"
-            title="Which developer-facing platform is this about?"
-            support="Name the product, then choose up to two surfaces developers actually touch."
+            eyebrow="Set the scene · 2 of 2"
+            title={`Which developer platform are we mapping${answers.name ? `, ${answers.name}` : ""}?`}
+            support="Pick one journey through one product. A company can have several developer surfaces."
           >
-            <TextField
-              id="platform"
-              label="Platform or product"
-              value={answers.platform}
-              onChange={(value) => updateAnswer("platform", value)}
-              hint="A company can have several developer platforms. Pick the one involved in this journey."
-            />
-            <MultiChoiceGroup
-              legend="What are developers working with?"
-              values={answers.platformSurfaces}
-              choices={platformSurfaceChoices}
-              onChange={(values) => updateAnswer("platformSurfaces", values)}
-              max={2}
-              hint="Choose one or two. This narrows the research without assuming the company has only one platform type."
-            />
+            <TextField id="platform" label="Platform or product" value={answers.platform} onChange={(value) => updateAnswer("platform", value)} />
+            <div className="compact-selects platform-selects">
+              <div className="field">
+                <label htmlFor="primary-surface">Primary developer surface</label>
+                <select id="primary-surface" value={answers.platformSurfaces[0] ?? ""} onChange={(event) => updatePlatformSurface(0, event.target.value)}>
+                  <option value="">Choose the closest surface</option>
+                  {platformSurfaceChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="secondary-surface">Secondary surface, if the path crosses one</label>
+                <select id="secondary-surface" value={answers.platformSurfaces[1] ?? ""} disabled={!answers.platformSurfaces[0]} onChange={(event) => updatePlatformSurface(1, event.target.value)}>
+                  <option value="">No secondary surface</option>
+                  {platformSurfaceChoices.filter((choice) => choice !== answers.platformSurfaces[0]).map((choice) => <option key={choice} value={choice}>{choice}</option>)}
+                </select>
+              </div>
+            </div>
+            <p className="inline-help">These choices only filter the research prompts shown after you mark a break.</p>
             {answers.platformSurfaces.includes("Something else") ? (
-              <TextField
-                id="platform-surface-other"
-                label="Describe the developer surface"
-                value={answers.platformSurfaceOther}
-                onChange={(value) => updateAnswer("platformSurfaceOther", value)}
-                hint="This stays in your browser. The result will mark the catalog boundary instead of forcing it into the wrong platform type."
-              />
+              <TextField id="platform-surface-other" label="Describe the developer surface" value={answers.platformSurfaceOther} onChange={(value) => updateAnswer("platformSurfaceOther", value)} />
             ) : null}
-          </QuestionShell>
-        ) : null}
-
-        {screen === "role" ? (
-          <QuestionShell
-            eyebrow="Set the scene · 4 of 4"
-            title="What is your role in this developer journey?"
-            support="Choose the closest fit. We’ll keep the next move inside your real influence."
-          >
-            <ChoiceGroup legend="Your primary role" value={answers.role} choices={roleChoices} onChange={(value) => updateAnswer("role", value)} />
-            {answers.role === "Something else" ? (
-              <TextField id="role-other" label="Describe your role" value={answers.roleOther} onChange={(value) => updateAnswer("roleOther", value)} />
-            ) : null}
-          </QuestionShell>
-        ) : null}
-
-        {screen === "concern" ? (
-          <QuestionShell
-            eyebrow="Frame the case"
-            title="What are you worried developers are not doing?"
-            support="Describe the behavior you can see, not the reason you think it happens."
-          >
-            <TextArea
-              id="concern"
-              label="The concerning behavior"
-              value={answers.concern}
-              onChange={(value) => updateAnswer("concern", value)}
-              hint="For example: We do not see developers returning after they create a test project."
-            />
-            <ChoiceGroup legend="Which pattern is closest?" value={answers.concernPattern} choices={concernPatternChoices} onChange={(value) => updateAnswer("concernPattern", value)} />
-            <WhyThisQuestion>A product is not the problem by itself. The behavior and rough stopping pattern tell us which explanations can still fit.</WhyThisQuestion>
           </QuestionShell>
         ) : null}
 
         {screen === "developer" ? (
           <QuestionShell
-            eyebrow="Frame the case"
-            title="Which developers are we talking about?"
-            support="Name a role and enough context to distinguish this group from everyone else."
+            eyebrow="Define the journey"
+            title="Who is trying to do what, and what counts as success?"
+            support="This gives the map its developer, real job, first representative operation, and verified endpoint."
           >
-            <TextArea
-              id="developer"
-              label="Developer and context"
-              value={answers.developer}
-              onChange={(value) => updateAnswer("developer", value)}
-              hint="For example: Backend engineers at large companies who manage their organization’s integrations."
-              rows={4}
-            />
-            <ChoiceGroup legend="Who performed the path?" value={answers.actorType} choices={actorTypeChoices} onChange={(value) => updateAnswer("actorType", value)} />
+            <div className="developer-definition">
+              <TextArea
+                id="developer"
+                label="Which developer is trying to accomplish what?"
+                value={answers.developer}
+                onChange={(value) => {
+                  setAnswers((current) => ({ ...current, developer: value, developerJob: value }));
+                  setError("");
+                }}
+                hint="For example: Backend engineers who need meeting events in an internal service. Describe their job, not your feature."
+                rows={2}
+              />
+              <div className="compact-selects">
+                <div className="field">
+                  <label htmlFor="journey-type">What kind of journey is this?</label>
+                  <select id="journey-type" value={answers.journeyType} onChange={(event) => updateAnswer("journeyType", event.target.value)}>
+                    <option value="">Choose the closest journey</option>
+                    {journeyTypeChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="actor-type">Who performs the path?</label>
+                  <select id="actor-type" value={answers.actorType} onChange={(event) => updateAnswer("actorType", event.target.value)}>
+                    <option value="">Choose the actor</option>
+                    {actorTypeChoices.map((choice) => <option key={choice} value={choice}>{choice}</option>)}
+                  </select>
+                </div>
+              </div>
+              {answers.developer.trim() ? (
+                <div className="endpoint-fields">
+                  <p className="section-kicker">Now set the finish line</p>
+                  <p className="section-note">A signup, key, request, or 200 response is only a step unless the developer can verify the result they needed.</p>
+                  <TextArea
+                    id="meaningful-action"
+                    label="What first representative operation must they complete?"
+                    value={answers.meaningfulAction}
+                    onChange={(value) => updateAnswer("meaningfulAction", value)}
+                    hint="For example: Subscribe a real test account to meeting-start events and trigger one event."
+                    rows={2}
+                  />
+                  <TextArea
+                    id="verification-signal"
+                    label="How can they independently verify it worked?"
+                    value={answers.verificationSignal}
+                    onChange={(value) => updateAnswer("verificationSignal", value)}
+                    hint="Name a result the developer can see, explain, and reproduce."
+                    rows={2}
+                  />
+                </div>
+              ) : null}
+            </div>
           </QuestionShell>
         ) : null}
 
-        {screen === "developer-job" ? (
+        {screen === "journey-map" ? (
           <QuestionShell
-            eyebrow="Frame the case"
-            title="What are those developers trying to get done?"
-            support="Describe their job, not the platform feature they must use."
+            eyebrow="Map the path"
+            title="Does this look like the journey?"
+            support="The map is already drafted. Open only the steps that are wrong, missing, or not required."
           >
-            <TextArea
-              id="developer-job"
-              label="The developer’s job"
-              value={answers.developerJob}
-              onChange={(value) => updateAnswer("developerJob", value)}
-              hint="For example: Know when a meeting starts or stops so their system can update employee activity records."
-            />
+            <ol className="journey-editor">
+              {answers.journeySteps.map((step, index) => (
+                <li className={step.status === "not-needed" ? "is-muted" : ""} key={step.id}>
+                  <span className="journey-number">{index + 1}</span>
+                  <details>
+                    <summary>{step.label}</summary>
+                    <div className="journey-edit-fields">
+                      <TextField id={`step-${step.id}`} label="Developer step" value={step.label} onChange={(value) => updateJourneyStep(step.id, { label: value })} />
+                      <div className="field">
+                        <label htmlFor={`stage-${step.id}`}>Research stage</label>
+                        <select id={`stage-${step.id}`} value={step.catalogStageId} onChange={(event) => updateJourneyStep(step.id, { catalogStageId: event.target.value })}>
+                          {stageChoices.map((choice) => <option key={choice.id} value={choice.id}>{choice.label}</option>)}
+                        </select>
+                      </div>
+                      <button className="secondary-button" type="button" onClick={() => updateJourneyStep(step.id, { status: step.status === "in-path" ? "not-needed" : "in-path" })}>
+                        {step.status === "in-path" ? "Not required in this journey" : "Put this step back"}
+                      </button>
+                      {step.id.startsWith("custom-") ? <button className="text-button" type="button" onClick={() => removeJourneyStep(step.id)}>Remove this step</button> : null}
+                    </div>
+                  </details>
+                  <span className="journey-step-state">{step.status === "in-path" ? "In path" : "Not required"}</span>
+                </li>
+              ))}
+            </ol>
+            <button className="secondary-button add-step-button" type="button" onClick={addJourneyStep}>Add a missing step</button>
           </QuestionShell>
         ) : null}
 
-        {screen === "outcome" ? (
+        {screen === "break-point" ? (
           <QuestionShell
-            eyebrow="Frame the case"
-            title="What would count as their first meaningful success?"
-            support="Use a result they can independently see or verify."
+            eyebrow="Mark the break"
+            title="Where does the journey stop being clear?"
+            support="First mark what you can defend. Then mark the earliest transition that is unresolved."
           >
-            <TextArea id="outcome" label="They can independently verify that..." value={answers.outcome} onChange={(value) => updateAnswer("outcome", value)} />
-            <ChoiceGroup legend="What kind of milestone is that?" value={answers.outcomeCheck} choices={outcomeCheckChoices} onChange={(value) => updateAnswer("outcomeCheck", value)} />
+            <fieldset className="map-choice-group">
+              <legend>Furthest stage definitely reached</legend>
+              <div className="map-choice-list">
+                <button type="button" className={answers.furthestReachedStepId === "none" ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.furthestReachedStepId === "none"} onClick={() => {
+                  setAnswers((current) => ({ ...current, furthestReachedStepId: "none", breakStepId: "", discriminatorAnswerIds: [], issueStatement: "" }));
+                  setError("");
+                }}>No stage is confirmed</button>
+                {activeSteps.map((step, index) => (
+                  <button type="button" className={answers.furthestReachedStepId === step.id ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.furthestReachedStepId === step.id} key={step.id} onClick={() => {
+                    setAnswers((current) => ({ ...current, furthestReachedStepId: step.id, breakStepId: "", discriminatorAnswerIds: [], issueStatement: "" }));
+                    setError("");
+                  }}><span>{index + 1}</span>{step.label}</button>
+                ))}
+              </div>
+            </fieldset>
+
+            {answers.furthestReachedStepId ? (
+              <fieldset className="map-choice-group">
+                <legend>Earliest unresolved or broken point</legend>
+                <div className="map-choice-list">
+                  {availableBreakSteps.map((step) => (
+                    <button type="button" className={answers.breakStepId === step.id ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.breakStepId === step.id} key={step.id} onClick={() => updateAnswer("breakStepId", step.id)}>{step.label}</button>
+                  ))}
+                  <button type="button" className={answers.breakStepId === "cannot-tell" ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.breakStepId === "cannot-tell"} onClick={() => updateAnswer("breakStepId", "cannot-tell")}>We cannot locate it from our data</button>
+                  <button type="button" className={answers.breakStepId === "completed" ? "map-choice is-selected" : "map-choice"} aria-pressed={answers.breakStepId === "completed"} onClick={() => updateAnswer("breakStepId", "completed")}>No break before verified first success</button>
+                </div>
+              </fieldset>
+            ) : null}
+
+            {answers.breakStepId ? (
+              <>
+                <ChoiceGroup legend="What supports that placement?" value={answers.breakEvidenceType} choices={breakEvidenceChoices} onChange={(value) => updateAnswer("breakEvidenceType", value)} />
+                <TextArea id="break-evidence" label="Evidence receipt" value={answers.breakEvidenceDetail} onChange={(value) => updateAnswer("breakEvidenceDetail", value)} hint="One event, observation, interview finding, or honest statement that the data stops here." rows={3} />
+              </>
+            ) : null}
+
+            {answers.furthestReachedStepId && answers.breakStepId ? (
+              <div className="map-insight" aria-live="polite">
+                <span>What the map says so far</span>
+                <p><strong>Last stage you can defend:</strong> {activeSteps.find((step) => step.id === answers.furthestReachedStepId)?.label || "No stage confirmed"}</p>
+                <p><strong>Earliest unresolved transition:</strong> {selectedBreakStep?.label || (answers.breakStepId === "completed" ? "None before verified success" : "Cannot tell from current evidence")}</p>
+              </div>
+            ) : null}
           </QuestionShell>
         ) : null}
 
-        {screen === "last-truth" ? (
-          <QuestionShell
-            eyebrow="Locate the stop"
-            title="Where does your direct observation end?"
-            support="Choose the furthest point you can support, then add the useful detail."
-          >
-            <ChoiceGroup legend="Last observed stage" value={answers.lastStage} choices={lastStageChoices} onChange={(value) => updateAnswer("lastStage", value)} />
-            <TextArea
-              id="last-truth"
-              label="What did you actually observe?"
-              value={answers.lastTruth}
-              onChange={(value) => updateAnswer("lastTruth", value)}
-              hint="Leave the reason out for now. If you only have aggregate data, say that."
-              rows={4}
-            />
-            <WhyThisQuestion>This keeps an observation from quietly turning into a cause.</WhyThisQuestion>
-            <button className="finish-link" type="button" onClick={finishWithCurrentEvidence}>Finish with what we have</button>
-          </QuestionShell>
-        ) : null}
-
-        {screen === "explanation" ? (
-          <QuestionShell
-            eyebrow="Test explanations"
-            title="What explanation is your team carrying right now?"
-            support="Give us the current story, even if you suspect it is incomplete."
-          >
-            <TextArea id="explanation" label="Current explanation" value={answers.explanation} onChange={(value) => updateAnswer("explanation", value)} rows={4} />
-            <button className="text-button" type="button" onClick={() => updateAnswer("explanation", "We do not have a clear explanation yet.")}>We do not have one yet</button>
-            <button className="finish-link" type="button" onClick={finishWithCurrentEvidence}>Finish with what we have</button>
-          </QuestionShell>
-        ) : null}
-
-        {screen === "evidence" ? (
-          <QuestionShell
-            eyebrow="Test explanations"
-            title="What actually supports that explanation?"
-            support="Choose every source that applies. Several kinds of evidence can coexist."
-          >
-            <MultiChoiceGroup
-              legend="Evidence sources"
-              values={answers.evidenceTypes}
-              choices={evidenceChoices}
-              exclusiveChoices={["No evidence yet"]}
-              onChange={(values) => updateAnswer("evidenceTypes", values)}
-            />
-            <TextArea
-              id="evidence-detail"
-              label="What is the strongest specific evidence?"
-              value={answers.evidenceDetail}
-              onChange={(value) => updateAnswer("evidenceDetail", value)}
-              hint="If the answer is an assumption or no evidence yet, say what observation would separate the live explanations."
-              rows={4}
-            />
-            <button className="finish-link" type="button" onClick={finishWithCurrentEvidence}>Finish with what we have</button>
-          </QuestionShell>
-        ) : null}
-
-        {screen === "discriminator" ? (
-          <QuestionShell
-            eyebrow="Test explanations"
-            title={discriminator.prompt}
-            support={discriminator.support}
-          >
+        {screen === "blocker" ? (
+          <QuestionShell eyebrow="Name the issue" title={discriminator.prompt} support={discriminator.support}>
             <ChoiceGroup
               legend="Closest observed answer"
               value={answers.discriminatorAnswerIds[0] ?? ""}
@@ -1379,211 +833,96 @@ export function App() {
                   ...current,
                   discriminatorQuestionId: discriminator.id,
                   discriminatorAnswerIds: [option.id],
+                  issueStatement: "",
                 }));
                 setError("");
               }}
             />
-            <WhyThisQuestion>
-              Each answer changes which researched explanations remain live. If none is supported, the result stays underdetermined.
-            </WhyThisQuestion>
-            <button className="finish-link" type="button" onClick={finishWithCurrentEvidence}>Finish with what we have</button>
-          </QuestionShell>
-        ) : null}
-
-        {screen === "ownership" ? (
-          <QuestionShell
-            eyebrow="Choose a move"
-            title="What relationship do you have to the next move?"
-            support="Ownership is about the decision or work, not merely the team name."
-          >
-            <ChoiceGroup legend="Your position" value={answers.ownershipMode} choices={ownershipChoices} onChange={(value) => updateAnswer("ownershipMode", value)} />
+            {selectedDiscriminatorOption ? (
+              <div className="research-prompt" aria-live="polite">
+                <span>What this choice changes</span>
+                <p>{selectedDiscriminatorOption.nextObservation}</p>
+                {discriminatorResult?.liveLabels.length ? <p className="research-labels">Research prompts still in play: {discriminatorResult.liveLabels.join("; ")}</p> : null}
+              </div>
+            ) : null}
             <TextArea
-              id="ownership"
-              label="What can you do, or what exactly do you need from another role?"
-              value={answers.ownership}
-              onChange={(value) => updateAnswer("ownership", value)}
-              rows={4}
-            />
-            <button className="finish-link" type="button" onClick={finishWithCurrentEvidence}>Finish with what we have</button>
-          </QuestionShell>
-        ) : null}
-
-        {screen === "next-move" ? (
-          <QuestionShell
-            eyebrow="Choose a move"
-            title="What is the smallest move that would teach you something useful?"
-            support="An investigation, a handoff, or deliberately leaving the platform unchanged can all be valid."
-          >
-            <ChoiceGroup legend="Move type" value={answers.moveType} choices={moveTypeChoices} onChange={(value) => updateAnswer("moveType", value)} />
-            <TextArea id="next-move" label="Within seven days, we will..." value={answers.nextMove} onChange={(value) => updateAnswer("nextMove", value)} rows={4} />
-            <TextArea
-              id="expected-signal"
-              label="If that helps, what should the developer do differently?"
-              value={answers.expectedSignal}
-              onChange={(value) => updateAnswer("expectedSignal", value)}
+              id="issue-statement"
+              label="In your words, what seems to be getting in the way?"
+              value={answers.issueStatement}
+              onChange={(value) => updateAnswer("issueStatement", value)}
+              hint="This is your working conclusion, not the app's diagnosis."
               rows={3}
             />
-            <p className="inline-note">{friendlyCopy.uncertainty}</p>
-          </QuestionShell>
-        ) : null}
-
-        {screen === "adaptive" && adaptivePrompt ? (
-          <QuestionShell
-            eyebrow="One useful follow-up"
-            title={adaptivePrompt.prompt}
-            support={adaptivePrompt.support}
-          >
-            {adaptivePrompt.inputMode === "text" ? (
-              <TextArea
-                id="adaptive-answer"
-                label="Your answer"
-                value={adaptivePromptText}
-                onChange={(value) => {
-                  setAdaptivePromptText(value);
-                  setError("");
-                }}
-                rows={5}
-              />
-            ) : adaptivePrompt.inputMode === "single_choice" ? (
-              <ChoiceGroup
-                legend="Closest answer"
-                value={adaptivePrompt.options.find((option) => option.id === adaptivePromptOptions[0])?.label ?? ""}
-                choices={adaptivePrompt.options.map((option) => option.label)}
-                onChange={(label) => {
-                  const option = adaptivePrompt.options.find((candidate) => candidate.label === label);
-                  setAdaptivePromptOptions(option ? [option.id] : []);
-                  setError("");
-                }}
-              />
-            ) : (
-              <MultiChoiceGroup
-                legend="Choose every answer that applies"
-                values={adaptivePrompt.options.filter((option) => adaptivePromptOptions.includes(option.id)).map((option) => option.label)}
-                choices={adaptivePrompt.options.map((option) => option.label)}
-                onChange={(labels) => {
-                  setAdaptivePromptOptions(adaptivePrompt.options.filter((option) => labels.includes(option.label)).map((option) => option.id));
-                  setError("");
-                }}
-              />
-            )}
-            <WhyThisQuestion>This follow-up is allowed only because the previous answer did not resolve the current objective. If it still cannot separate the possibilities, the scanner will keep the result uncertain.</WhyThisQuestion>
-            <button className="finish-link" type="button" onClick={finishWithCurrentEvidence}>Finish with what we have</button>
+            <button className="text-button" type="button" onClick={() => updateAnswer("issueStatement", "We need better evidence before naming the issue.")}>We need more evidence before naming it</button>
+            <WhyThisQuestion>This question comes from the exact stage you marked. It narrows alternatives without treating the stage itself as the cause.</WhyThisQuestion>
           </QuestionShell>
         ) : null}
 
         {screen === "summary" ? (
           <section className="summary" aria-labelledby="summary-title">
-            <p className="eyebrow">What your answers support</p>
-            <h1 id="summary-title" tabIndex={-1}>A case you can carry forward.</h1>
-            <p className="summary-intro">This is a working formulation, not a verdict. Edit anything that overstates what you know.</p>
-            <dl className="brief-list">
-              <div><dt>Observed concern</dt><dd>{answers.adaptiveClarifications.D1 || answers.concern || "Not clear yet"}</dd><dd className="brief-meta">Pattern: {answers.concernPattern || "not classified"}</dd></div>
-              <div><dt>Developer</dt><dd>{answers.developer || "Not clear yet"}</dd><dd className="brief-meta">Actor: {answers.actorType || "not known"}</dd></div>
-              <div><dt>Developer’s job</dt><dd>{answers.developerJob || "Not clear yet"}</dd></div>
-              <div><dt>First meaningful success</dt><dd>{answers.outcome || "Not clear yet"}</dd><dd className="brief-meta">Milestone check: {answers.outcomeCheck || "not classified"}</dd></div>
-              <div><dt>Last observed truth</dt><dd>{answers.lastTruth || answers.lastStage || "Not observed yet"}</dd></div>
-              <div><dt>Current explanation</dt><dd>{answers.explanation || "No explanation supported yet"}</dd><dd className="brief-meta">Evidence: {answers.evidenceTypes.join(", ") || "not classified"}</dd></div>
-              <div>
-                <dt>What the research narrows</dt>
-                <dd>{[
-                  ...liveResearchFamilies.slice(0, 5),
-                  ...actionBrief.adaptiveResearchAreas,
-                ].join("; ") || discriminatorResult[0]?.liveLabels.join("; ") || "No catalog explanation is supported yet"}</dd>
-                <dd className="brief-meta">Status: {actionBrief.researchStatus.replaceAll("_", " ")}. This question narrows research areas; it does not establish a cause.</dd>
-                {actionBrief.adaptiveTerminalState ? <dd className="brief-meta">Adaptive stop state: {actionBrief.adaptiveTerminalState.replaceAll("_", " ")}.</dd> : null}
-                <dd className="brief-meta">Next observation: {actionBrief.nextObservation}</dd>
-                <dd className="brief-meta">Why the scanner stopped here: {stopDecision.reason}</dd>
-              </div>
-              <div>
-                <dt>Platform-specific research in scope</dt>
-                <dd>{platformResearchGroups.map((group) => group.label).join("; ") || "The selected surface is not represented in the current catalog"}</dd>
-                <dd className="brief-meta">
-                  {platformResearchReasonCount > 0
-                    ? `${platformResearchReasonCount} platform-specific possibilities are available for inspection. None is treated as supported without evidence.`
-                    : "This is a catalog boundary, not permission to force the case into the nearest platform type."}
-                </dd>
-                {platformResearchGroups.length > 0 ? (
-                  <dd className="research-details-wrap">
-                    <details className="research-details">
-                      <summary>Inspect platform-specific possibilities</summary>
-                      <p>Use these as prompts for observation, not as a checklist of conclusions.</p>
-                      {platformResearchGroups.map((group) => (
-                        <section key={group.archetypeId} aria-labelledby={`research-${group.archetypeId}`}>
-                          <h2 id={`research-${group.archetypeId}`}>{group.label}</h2>
-                          <ul>
-                            {group.reasons.map((reason) => <li key={reason.id}>{reason.label}</li>)}
-                          </ul>
-                        </section>
-                      ))}
-                    </details>
-                  </dd>
-                ) : null}
-              </div>
-              <div><dt>Next evidence-producing move</dt><dd>{answers.nextMove || "Not chosen yet"}</dd><dd className="brief-meta">Move type: {answers.moveType || "not chosen"}</dd></div>
-              {adaptiveClarificationEntries.length > 0 ? (
-                <div>
-                  <dt>Follow-up clarifications</dt>
-                  <dd>
-                    <ul>
-                      {adaptiveClarificationEntries.map(([objectiveId, value]) => (
-                        <li key={objectiveId}><strong>{objectiveId}</strong>: {value}</li>
-                      ))}
-                    </ul>
-                  </dd>
-                </div>
-              ) : null}
-              {answers.reviewDate ? (
-                <div>
-                  <dt>Seven-day check</dt>
-                  <dd>{answers.reviewDecision || "Decision not recorded yet"}</dd>
-                  <dd className="brief-meta">Review date: {answers.reviewDate}. Evidence notes: {answers.reviewNotes || "none yet"}</dd>
-                </div>
-              ) : null}
+            <p className="eyebrow">Your first-mile map</p>
+            <h1 id="summary-title" tabIndex={-1}>{answers.breakStepId === "completed" ? "This path reaches first success." : "You found the transition to investigate."}</h1>
+            <p className="summary-intro">The map records what you can defend and keeps the unresolved part visible. A selected stage is not a cause.</p>
+
+            <div className="endpoint-card"><span>First-mile endpoint</span><p>{firstMileSentence()}</p></div>
+
+            <ol className="journey-result" aria-label="Annotated developer journey">
+              {answers.journeySteps.map((step) => {
+                const activeIndex = activeSteps.findIndex((activeStep) => activeStep.id === step.id);
+                const status = journeyStatus(step, activeIndex);
+                return (
+                  <li className={`status-${status.toLowerCase().replaceAll(" ", "-")}`} key={step.id}>
+                    <span className="journey-result-marker" aria-hidden="true" />
+                    <div><strong>{step.label}</strong><small>{status}</small></div>
+                  </li>
+                );
+              })}
+            </ol>
+
+            <dl className="brief-list journey-brief">
+              <div><dt>Result state</dt><dd><span className="state-pill">{resultStateLabel}</span></dd></div>
+              <div><dt>Developer and job</dt><dd>{answers.developer || "Not recorded"}</dd></div>
+              <div><dt>Last stage supported</dt><dd>{activeSteps.find((step) => step.id === answers.furthestReachedStepId)?.label || (answers.furthestReachedStepId === "none" ? "No stage confirmed" : "Not located")}</dd></div>
+              <div><dt>Earliest unresolved point</dt><dd>{selectedBreakStep?.label || (answers.breakStepId === "completed" ? "No break before verified first success" : "Cannot tell from current evidence")}</dd><dd className="brief-meta">Evidence: {answers.breakEvidenceType || "not recorded"}. {answers.breakEvidenceDetail || "No detail recorded."}</dd></div>
+              <div><dt>Your working conclusion</dt><dd>{answers.issueStatement || (answers.breakStepId === "completed" ? "The mapped journey reaches verified first success." : "The issue is not identified yet.")}</dd></div>
+              {selectedDiscriminatorOption ? <div><dt>Next observation</dt><dd>{selectedDiscriminatorOption.nextObservation}</dd></div> : null}
             </dl>
+
+            {discriminatorResult?.liveLabels.length ? (
+              <div className="research-summary">
+                <span>Research prompts, not diagnoses</span>
+                <ul>{discriminatorResult.liveLabels.map((label) => <li key={label}>{label}</li>)}</ul>
+              </div>
+            ) : null}
+
+            <details className="research-details research-library">
+              <summary>Inspect research relevant to this stage</summary>
+              <p>The catalog contains {catalog.counts.reasons} possible blockers. These are prompts for inspection. None is a diagnosis without evidence from this journey.</p>
+              {researchFamilies.map((family) => (
+                <section key={family.id}>
+                  <h2>{family.label}</h2>
+                  <ul>{getReasonsForParent(family.id).map((reason) => <li key={reason.id}>{reason.label}</li>)}</ul>
+                </section>
+              ))}
+              {platformResearchGroups.map((group) => (
+                <section key={group.archetypeId}>
+                  <h2>{group.label}</h2>
+                  <ul>{group.reasons.map((reason) => <li key={reason.id}>{reason.label}</li>)}</ul>
+                </section>
+              ))}
+            </details>
+
             <div className="summary-callout">
-              <strong>No intervention justified is a valid result.</strong>
-              <p>If the evidence cannot separate the live explanations, the next move is to observe, not to guess.</p>
+              <strong>No intervention justified remains a valid result.</strong>
+              <p>If the evidence cannot separate the live explanations, the next move is to observe, not to guess. An intentional access, safety, billing, or compliance gate is not automatically a defect.</p>
             </div>
             <div className="summary-actions">
-              <button className="primary-button" type="button" onClick={() => goTo("concern")}>Edit this case</button>
+              <button className="primary-button" type="button" onClick={() => goTo("journey-map")}>Edit the map</button>
               <button className="secondary-button" type="button" onClick={exportMarkdown}>Download Markdown</button>
               <button className="secondary-button" type="button" onClick={exportJson}>Export portable JSON</button>
               <button className="secondary-button" type="button" onClick={() => window.print()}>Print or save as PDF</button>
-              <button className="secondary-button" type="button" onClick={startSevenDayCheck}>{answers.reviewDate ? "Review seven-day check" : "Start seven-day check"}</button>
             </div>
           </section>
-        ) : null}
-
-        {screen === "seven-day" ? (
-          <QuestionShell
-            eyebrow="Seven-day check"
-            title="What changed after you gathered evidence?"
-            support="Use this as a small decision checkpoint, not a promise that every case resolves in seven days."
-          >
-            <div className="field">
-              <label htmlFor="review-date">Review date</label>
-              <input
-                id="review-date"
-                type="date"
-                value={answers.reviewDate}
-                onChange={(event) => updateAnswer("reviewDate", event.target.value)}
-              />
-            </div>
-            <TextArea
-              id="review-notes"
-              label="Evidence notes from days 1 to 6"
-              value={answers.reviewNotes}
-              onChange={(value) => updateAnswer("reviewNotes", value)}
-              hint="Record observations, counterevidence, and surprises. Do not rewrite the original case to make the move look successful."
-              rows={6}
-            />
-            <ChoiceGroup
-              legend="On day 7, what does the evidence support?"
-              value={answers.reviewDecision}
-              choices={reviewDecisionChoices}
-              onChange={(value) => updateAnswer("reviewDecision", value)}
-            />
-          </QuestionShell>
         ) : null}
 
         {error ? <p className="form-error" role="alert">{error}</p> : null}
@@ -1593,43 +932,36 @@ export function App() {
         <form className="action-bar" onSubmit={continueFromCurrent}>
           <div className="action-bar-inner">
             <button className="back-button" type="button" onClick={goBack} disabled={history.length === 0}>Back</button>
-            <button className="primary-button" type="submit" disabled={adaptiveStatus === "working" || adaptiveStatus === "deleting"}>
-              {adaptiveStatus === "working" ? "Thinking…" : screen === "seven-day" ? "Save seven-day check" : primaryLabel}
-            </button>
+            <button className="primary-button" type="submit">{primaryLabel}</button>
           </div>
         </form>
       ) : null}
 
       {showReset ? (
-        <div className="dialog-backdrop" role="presentation" onMouseDown={closeReset}>
-          <div ref={dialogRef} className="dialog" role="dialog" aria-modal="true" aria-labelledby="reset-title" onMouseDown={(event) => event.stopPropagation()}>
-            <h2 id="reset-title">Delete this case and start over?</h2>
-            <p>{adaptiveCredential
-              ? "This first asks the server to delete the short-lived adaptive session, then removes the browser copy. If server deletion cannot be confirmed, the browser copy stays so you can retry."
-              : "This removes the saved answers from this browser. It cannot be undone."}</p>
+        <div className="dialog-backdrop" role="presentation" onMouseDown={() => !isDeleting && setShowReset(false)}>
+          <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="reset-title" onMouseDown={(event) => event.stopPropagation()}>
+            <h2 id="reset-title">Delete this map and start over?</h2>
+            <p>This removes the saved map from this browser. If an older adaptive session exists, it is deleted first.</p>
             <div className="dialog-actions">
-              <button className="secondary-button" type="button" onClick={closeReset} autoFocus>Keep my case</button>
-              <button className="danger-button" type="button" onClick={() => void reset()} disabled={adaptiveStatus === "deleting"}>{adaptiveStatus === "deleting" ? "Deleting…" : "Delete and start over"}</button>
+              <button className="secondary-button" type="button" onClick={() => setShowReset(false)} disabled={isDeleting} autoFocus>Keep my map</button>
+              <button className="danger-button" type="button" onClick={() => void reset()} disabled={isDeleting}>{isDeleting ? "Deleting…" : "Delete and start over"}</button>
             </div>
           </div>
         </div>
       ) : null}
 
       {pendingImport ? (
-        <div className="dialog-backdrop" role="presentation" onMouseDown={closeImport}>
-          <div ref={dialogRef} className="dialog" role="dialog" aria-modal="true" aria-labelledby="import-title" onMouseDown={(event) => event.stopPropagation()}>
-            <h2 id="import-title">Replace this browser’s case?</h2>
-            <p>Review the file before replacing anything. Your current case stays unchanged until you confirm.</p>
+        <div className="dialog-backdrop" role="presentation" onMouseDown={() => setPendingImport(null)}>
+          <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="import-title" onMouseDown={(event) => event.stopPropagation()}>
+            <h2 id="import-title">Open this saved map?</h2>
+            <p>Your current map stays unchanged until you confirm.</p>
             <dl className="import-preview">
-              <div><dt>Boundary</dt><dd>{pendingImport.answers.company || "Not named"}</dd></div>
+              <div><dt>Company or project</dt><dd>{pendingImport.answers.company || "Not named"}</dd></div>
               <div><dt>Platform</dt><dd>{pendingImport.answers.platform || "Not named"}</dd></div>
-              <div><dt>Concern</dt><dd>{pendingImport.answers.concern || "Not stated"}</dd></div>
             </dl>
             <div className="dialog-actions">
-              <button className="secondary-button" type="button" onClick={closeImport} autoFocus>Keep current case</button>
-              <button className="primary-button" type="button" onClick={() => void acceptImport()} disabled={adaptiveStatus === "deleting"}>
-                {adaptiveStatus === "deleting" ? "Closing previous session…" : "Open imported case"}
-              </button>
+              <button className="secondary-button" type="button" onClick={() => setPendingImport(null)} autoFocus>Keep current map</button>
+              <button className="primary-button" type="button" onClick={acceptImport}>Open saved map</button>
             </div>
           </div>
         </div>

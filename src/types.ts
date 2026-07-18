@@ -1,11 +1,20 @@
-export type ScreenId =
+export type ActiveScreenId =
   | "welcome"
+  | "profile"
+  | "platform-context"
+  | "developer"
+  | "first-mile"
+  | "journey-map"
+  | "break-point"
+  | "blocker"
+  | "summary";
+
+export type LegacyScreenId =
   | "name"
   | "company"
   | "platform"
   | "role"
   | "concern"
-  | "developer"
   | "developer-job"
   | "outcome"
   | "last-truth"
@@ -15,16 +24,40 @@ export type ScreenId =
   | "ownership"
   | "next-move"
   | "adaptive"
-  | "summary"
   | "seven-day";
+
+export type ScreenId = ActiveScreenId | LegacyScreenId;
 
 export type PhaseId =
   | "profile"
   | "frame"
+  | "map"
   | "locate"
   | "test"
   | "move"
   | "complete";
+
+export type JourneyStepStatus = "in-path" | "not-needed";
+
+export interface JourneyStep {
+  id: string;
+  catalogStageId: string;
+  label: string;
+  status: JourneyStepStatus;
+}
+
+export function createDefaultJourneySteps(): JourneyStep[] {
+  return [
+    { id: "encounter", catalogStageId: "S02", label: "Encounter a relevant official starting path", status: "in-path" },
+    { id: "decide", catalogStageId: "S02", label: "Decide it is worth trying for their job", status: "in-path" },
+    { id: "sign-up", catalogStageId: "S03", label: "Sign up or sign in", status: "in-path" },
+    { id: "access", catalogStageId: "S03", label: "Gain the required access and authority", status: "in-path" },
+    { id: "setup", catalogStageId: "S04", label: "Prepare the project or environment", status: "in-path" },
+    { id: "execute", catalogStageId: "S05", label: "Execute the first representative operation", status: "in-path" },
+    { id: "signal", catalogStageId: "S06", label: "Receive a platform response, output, or side effect", status: "in-path" },
+    { id: "verify", catalogStageId: "S06", label: "Independently verify the intended result", status: "in-path" },
+  ];
+}
 
 export interface CaseAnswers {
   name: string;
@@ -63,6 +96,16 @@ export interface CaseAnswers {
     evidenceState: "live" | "weakened" | "contradicted" | "needs_observation";
   }>;
   adaptiveTerminalState: string;
+  journeyType: string;
+  meaningfulAction: string;
+  representativeInput: string;
+  verificationSignal: string;
+  journeySteps: JourneyStep[];
+  furthestReachedStepId: string;
+  breakStepId: string;
+  breakEvidenceType: string;
+  breakEvidenceDetail: string;
+  issueStatement: string;
 }
 
 export interface SavedSession {
@@ -108,4 +151,14 @@ export const emptyAnswers: CaseAnswers = {
   adaptiveClarifications: {},
   adaptiveCandidates: [],
   adaptiveTerminalState: "",
+  journeyType: "",
+  meaningfulAction: "",
+  representativeInput: "",
+  verificationSignal: "",
+  journeySteps: createDefaultJourneySteps(),
+  furthestReachedStepId: "",
+  breakStepId: "",
+  breakEvidenceType: "",
+  breakEvidenceDetail: "",
+  issueStatement: "",
 };

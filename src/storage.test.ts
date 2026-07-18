@@ -19,11 +19,21 @@ describe("browser session storage", () => {
     expect(loadSession()?.guidanceMode).toBe("adaptive");
   });
 
-  it("migrates a saved case created before the seven-day fields existed", () => {
+  it("migrates a saved case created before the journey-map fields existed", () => {
     const oldAnswers = { ...emptyAnswers } as Partial<typeof emptyAnswers>;
     delete oldAnswers.reviewDate;
     delete oldAnswers.reviewNotes;
     delete oldAnswers.reviewDecision;
+    delete oldAnswers.journeyType;
+    delete oldAnswers.meaningfulAction;
+    delete oldAnswers.representativeInput;
+    delete oldAnswers.verificationSignal;
+    delete oldAnswers.journeySteps;
+    delete oldAnswers.furthestReachedStepId;
+    delete oldAnswers.breakStepId;
+    delete oldAnswers.breakEvidenceType;
+    delete oldAnswers.breakEvidenceDetail;
+    delete oldAnswers.issueStatement;
     window.localStorage.setItem("first-mile-scanner/session/v1", JSON.stringify({
       version: 1,
       screen: "summary",
@@ -36,6 +46,9 @@ describe("browser session storage", () => {
     expect(restored?.answers.reviewDate).toBe("");
     expect(restored?.answers.reviewNotes).toBe("");
     expect(restored?.answers.reviewDecision).toBe("");
+    expect(restored?.answers.journeySteps).toHaveLength(8);
+    expect(restored?.answers.furthestReachedStepId).toBe("");
+    expect(restored?.answers.issueStatement).toBe("");
     expect(restored?.guidanceMode).toBe("guided");
   });
 

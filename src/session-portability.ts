@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { CaseAnswers } from "./types";
+import { createDefaultJourneySteps, type CaseAnswers } from "./types";
 
 const caseAnswersSchema = z.object({
   name: z.string(),
@@ -38,6 +38,21 @@ const caseAnswersSchema = z.object({
     evidenceState: z.enum(["live", "weakened", "contradicted", "needs_observation"]),
   })).default([]),
   adaptiveTerminalState: z.string().default(""),
+  journeyType: z.string().default(""),
+  meaningfulAction: z.string().default(""),
+  representativeInput: z.string().default(""),
+  verificationSignal: z.string().default(""),
+  journeySteps: z.array(z.object({
+    id: z.string(),
+    catalogStageId: z.string(),
+    label: z.string(),
+    status: z.enum(["in-path", "not-needed"]),
+  })).default(createDefaultJourneySteps()),
+  furthestReachedStepId: z.string().default(""),
+  breakStepId: z.string().default(""),
+  breakEvidenceType: z.string().default(""),
+  breakEvidenceDetail: z.string().default(""),
+  issueStatement: z.string().default(""),
 });
 
 const portableCaseSchema = z.object({
