@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appRoot = resolve(here, "..");
-const sourcePath = resolve(appRoot, "../notes/first-mile-blocker-universe.md");
+const sourcePath = resolve(appRoot, "research/first-mile-blocker-universe.md");
 const outputPath = resolve(appRoot, "src/generated/catalog.json");
 const source = await readFile(sourcePath, "utf8");
 
@@ -135,12 +135,21 @@ for (const [key, value] of Object.entries(expected)) {
 }
 
 const sourceHash = createHash("sha256").update(source).digest("hex");
+let existingGeneratedAt;
+try {
+  const existing = JSON.parse(await readFile(outputPath, "utf8"));
+  if (existing.sourceHash === sourceHash && typeof existing.generatedAt === "string") {
+    existingGeneratedAt = existing.generatedAt;
+  }
+} catch {
+  // A missing or invalid generated file is replaced below.
+}
 const output = {
   schemaVersion: 1,
   catalogVersion: `source-${sourceHash.slice(0, 12)}`,
-  source: "../notes/first-mile-blocker-universe.md",
+  source: "research/first-mile-blocker-universe.md",
   sourceHash,
-  generatedAt: new Date().toISOString(),
+  generatedAt: existingGeneratedAt ?? new Date().toISOString(),
   counts,
   nodes,
   edges,

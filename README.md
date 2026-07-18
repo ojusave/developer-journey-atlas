@@ -7,7 +7,7 @@ This repository contains the experimental adaptive scanner for the DevRelCon fir
 - A friendly mobile-first React interface with deterministic name, company or project, platform, and role intake.
 - A visible choice between adaptive help and a browser-only guided path.
 - A bounded D1 to D10 diagnostic engine with one focused question at a time, corrections, explicit uncertainty, evidence validation, valid non-intervention endings, an explicit choice after 12 diagnostic prompts, and a hard stop at 15.
-- A compiled versioned research graph containing 790 preserved blocker reasons across 28 universal families and 16 platform archetypes.
+- A compiled versioned research graph built from the repository's [first-mile blocker universe](research/first-mile-blocker-universe.md), containing 790 preserved blocker reasons across 28 universal families and 16 platform archetypes.
 - Browser resume, retry recovery that survives reload, validated JSON import and export, Markdown Action Brief export, correction retraction, clear-case deletion, seven-day evidence notes, and an offline application shell.
 - An anonymous Node service with Postgres persistence, revision checks, idempotency, short-lived encrypted answer envelopes, and no name or company fields.
 - An optional single-call Mastra reasoner through a pinned OpenRouter model. Deterministic reasoning is the safe default.
@@ -17,7 +17,7 @@ This repository contains the experimental adaptive scanner for the DevRelCon fir
 
 ## Local run
 
-Node 22.13 or newer is required.
+Node 22.22.0 is the verified runtime used by Render and the deployment checks.
 
 Install and verify:
 
