@@ -1,0 +1,817 @@
+{
+  "platform": {
+    "name": "New Relic",
+    "slug": "new-relic",
+    "organization": "New Relic, Inc."
+  },
+  "category": "Observability, testing, and release engineering",
+  "surface": {
+    "name": "New Relic guided-install entry, Node.js manual APM candidate",
+    "selection_basis": "New Relic's general Get started page recommends a region-specific Guided install that detects the environment and asks which systems to monitor. The public docs do not expose that authenticated dynamic action sequence or privilege one telemetry source. The official Node.js manual APM guide is therefore preserved as a complete candidate, while the record remains needs human judgment for the platform-wide source choice.",
+    "alternatives_considered": [
+      {
+        "name": "Region-specific Guided install",
+        "url": "https://docs.newrelic.com/docs/new-relic-solutions/get-started/intro-new-relic/#get-started",
+        "reason_not_primary": "This is New Relic's general recommendation, but it detects the authenticated environment and presents source choices whose exact interactive steps are not exposed in public documentation."
+      },
+      {
+        "name": "Infrastructure, logs, browser, mobile, Kubernetes, cloud, and OpenTelemetry quickstarts",
+        "url": "https://newrelic.com/instant-observability",
+        "reason_not_primary": "These are co-equal data-source routes with different credentials, installers, permissions, waits, and success views; no platform-wide default is established."
+      },
+      {
+        "name": "Metric API first request",
+        "url": "https://docs.newrelic.com/docs/data-apis/ingest-apis/metric-api/report-metrics-metric-api/",
+        "reason_not_primary": "This is a concise API ingestion route, but the general New Relic guide says developers start by adding data through guided install and commonly instrumenting an application or system."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "For the Node.js candidate, instrument an existing server application and see its first traffic data in New Relic APM.",
+    "starting_url": "https://docs.newrelic.com/docs/new-relic-solutions/get-started/intro-new-relic/",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected New Relic, but has not supplied a telemetry source or environment.",
+      "For the researched candidate, the developer has an existing supported Node.js server application that can be edited, restarted, and sent traffic."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Node.js candidate: Generate traffic and see data in the APM UI",
+    "normalized_outcome": "The New Relic Node.js agent loads before the existing application, reports generated request traffic under its configured app name, and the data appears in New Relic APM.",
+    "observable_completion_signal": "A few minutes after the instrumented app receives traffic, the New Relic APM UI displays telemetry for the configured application name.",
+    "boundary_evidence": {
+      "type": "not-established-by-docs",
+      "official_label_or_terminal_state": "The Node.js installation guide explicitly ends its required sequence with generate traffic and wait for data in APM, but the general New Relic docs do not establish Node.js APM as the platform-wide first-mile source.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "This is a fully documented candidate terminal state. A human must first choose a representative data source, or define that the record should follow the authenticated guided installer, before one platform-wide New Relic journey can be canonical.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A free New Relic account; no credit card is required for the documented Node.js installation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "An existing Node.js server application on a supported operating system, with SHA-2 support, a Node.js version matched to a compatible New Relic agent version, npm, and supported versions of any framework or module expected to be auto-instrumented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S11"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "access",
+      "requirement": "Permission to install a dependency, copy and edit configuration in the app root, modify its startup command, restart it, and send request traffic.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "permission",
+      "requirement": "Access to a New Relic account license key; users only see keys they have permission to use unless their role grants broader key access.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the New Relic signup page, enter Company Email and Name, accept the Terms of Service and Services Privacy Notice by submitting Get Started Free, or use Google, GitHub, GitLab, or Bitbucket signup.",
+      "details": [
+        "The signup page offers up to 100 GB monthly, one free user with access to everything, and no credit card required.",
+        "The page is protected by reCAPTCHA."
+      ],
+      "input": "Company email and name, or supported social identity, plus agreement to the linked legal terms",
+      "output": "New Relic organization and initial account",
+      "success_signal": "New Relic sends the new-account confirmation email and creates an initial account with a license key.",
+      "failure_or_wait": "If the confirmation email is missing, check spam and allow lists; password or email problems use the official login troubleshooting path.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S5",
+        "S6",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the New Relic confirmation email and complete account setup, then sign in.",
+      "details": [],
+      "input": "Confirmation email",
+      "output": "Authenticated New Relic session",
+      "success_signal": "The New Relic UI and account data are accessible.",
+      "failure_or_wait": "If the email cannot be found, the login troubleshooting page directs the user to Forgot your password, spam checks, allow-listing, or support.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose the representative Node.js APM manual-install route instead of the general dynamic guided installer.",
+      "details": [
+        "This candidate records an app deployed on a server, not Docker, Kubernetes, Lambda, Azure Windows, browser, infrastructure, logs, mobile, or another language agent."
+      ],
+      "input": "Existing Node.js server app",
+      "output": "Node.js agent installation guide",
+      "success_signal": "The eight-step manual installation procedure is selected.",
+      "failure_or_wait": "Without a human source choice, this selection remains non-canonical at the platform level.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Check the compatibility table for the application's operating system, SHA-2 capability, Node.js and agent-version pairing, and every framework or module expected to be auto-instrumented.",
+      "details": [
+        "The supported operating systems listed are Linux, SmartOS, macOS 10.7 or higher, and Windows Server 2008 or higher.",
+        "The application server must support SHA-2 256-bit; SHA-1 is not supported.",
+        "The compatibility page maps each Node.js release to the agent version that introduced or dropped support and lists minimum supported versions for instrumented modules.",
+        "Unsupported frameworks or libraries require manual instrumentation with the Node.js agent API."
+      ],
+      "input": "Existing application environment",
+      "output": "Compatible Node.js target",
+      "success_signal": "The operating system and security requirements pass, the selected agent supports the Node.js release, and each relied-upon module version is inside its listed support range or has a planned manual instrumentation route.",
+      "failure_or_wait": "An unsupported operating system, missing SHA-2, incompatible Node.js and agent pairing, unsupported module version, or unsupported framework requires an environment change, a compatible agent version, or manual Node.js API instrumentation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S11"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "In the application directory, run npm install newrelic.",
+      "details": [
+        "Install the agent separately in each container if using the Docker branch."
+      ],
+      "input": "Compatible Node.js app and npm",
+      "output": "newrelic dependency in the application",
+      "success_signal": "The newrelic module is installed and present under node_modules.",
+      "failure_or_wait": "npm, network, lockfile, permission, or compatibility errors block instrumentation. If node-gyp reports missing Python, make, or g++, install its prerequisites; on Debian or Ubuntu the official recovery is apt-get install build-essential.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy node_modules/newrelic/newrelic.js into the application root.",
+      "details": [],
+      "input": "Installed newrelic module",
+      "output": "Root newrelic.js configuration file",
+      "success_signal": "newrelic.js is beside the application root files.",
+      "failure_or_wait": "The agent cannot use this file if it is missing or placed in another directory without NEW_RELIC_HOME.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the API keys UI and obtain a full Ingest - License key the developer is permitted to use, creating one if needed and storing it securely when shown.",
+      "details": [
+        "Every initial New Relic account receives an original account license key.",
+        "A new key can be created by selecting Create a key, entering a name, choosing Ingest - License, optionally adding a description, and saving."
+      ],
+      "input": "Authenticated account and key permission",
+      "output": "New Relic license key",
+      "success_signal": "A full 40-character license key is securely available for configuration.",
+      "failure_or_wait": "The UI ordinarily truncates stored keys; insufficient role permission hides keys, and a lost full value can require key retrieval through supported controls or creation of a replacement key.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "In newrelic.js, set license_key to the New Relic license key and app_name to a meaningful unique application name.",
+      "details": [
+        "Both are required for the APM agent; descriptive naming prevents unrelated application data from being merged under the default My Application name."
+      ],
+      "input": "License key and intended app name",
+      "output": "Configured New Relic agent",
+      "success_signal": "newrelic.js contains a valid key and descriptive app name.",
+      "failure_or_wait": "Missing license_key blocks ingestion; duplicate app names merge data in the UI.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Change the application's startup command to load New Relic first with node -r newrelic followed by the actual entry point.",
+      "details": [
+        "For example: node -r newrelic ./dist/server.js."
+      ],
+      "input": "Existing startup command",
+      "output": "Agent-preloaded startup command",
+      "success_signal": "The require flag precedes the application entry point.",
+      "failure_or_wait": "If the agent loads after application modules, instrumentation may be incomplete. If require loading is conditional, move the condition into newrelic.js rather than conditionally requiring the agent.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Start or restart the Node.js application with the modified command.",
+      "details": [],
+      "input": "Installed, configured, and preloaded agent",
+      "output": "Running instrumented application",
+      "success_signal": "The app starts without New Relic configuration or module errors.",
+      "failure_or_wait": "Startup errors, invalid license, network policy, or loading order prevent reporting.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Generate request traffic to the running application.",
+      "details": [
+        "The agent needs application activity to create reportable APM telemetry."
+      ],
+      "input": "Reachable running application",
+      "output": "Instrumented transactions",
+      "success_signal": "The application successfully handles one or more requests.",
+      "failure_or_wait": "No traffic means there may be no transaction data to display.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Wait a few minutes, then open New Relic APM and select the configured application name.",
+      "details": [
+        "The agent reports on an interval; the troubleshooting guide notes that Node data is reported once per minute."
+      ],
+      "input": "Instrumented traffic",
+      "output": "New Relic APM data",
+      "success_signal": "The application's APM page displays incoming performance data for the generated traffic.",
+      "failure_or_wait": "If data does not appear after a few minutes, run New Relic Diagnostics, inspect newrelic_agent.log, confirm the agent loads first, check framework and module support, and generate more traffic. A deleted or renamed app name remains in the collector cache for one hour and must restart to reconnect before data is accepted. During collector outages, the agent keeps retrying and uploads aggregated data after reconnection.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S8",
+        "S9"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "The human selects the general Guided install.",
+      "path": "Choose the US, EU, or Japan guided-install URL matching the account region, let it detect the environment, select the system to monitor, and follow its authenticated generated steps until data appears.",
+      "effect_on_first_success": "Replaces the static Node candidate with an environment-specific installer whose exact public-doc action sequence is not exposed.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The target is another language, infrastructure, browser, logs, mobile, cloud, Kubernetes, OpenTelemetry, or an API.",
+      "path": "Select that data source from Add your data or the quickstart catalog and follow its source-specific credentials, installer, configuration, traffic, and verification path.",
+      "effect_on_first_success": "Replaces most candidate steps and may use a browser key, mobile token, license key, cloud permission, or collector configuration instead.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The Node.js app runs in Docker.",
+      "path": "Install newrelic in each container, add the agent to package.json, ensure it loads first, and supply license key and app name to docker run or the container command.",
+      "effect_on_first_success": "Moves agent installation and configuration into the image and runtime environment.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The Node.js app runs in Kubernetes.",
+      "path": "Use the Kubernetes APM auto-attach installation method linked by the Node.js route selector instead of manually adding the agent to this server deployment.",
+      "effect_on_first_success": "Replaces package, configuration-file, and startup-command actions with the Kubernetes auto-attach workflow.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The server application uses the PM2 process manager.",
+      "path": "Use New Relic's PM2 guided install. For a process manager other than PM2, choose the general guided or manual install route.",
+      "effect_on_first_success": "Replaces the static startup-command sequence with process-manager-specific generated instructions.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The Node.js application is deployed as AWS Lambda functions.",
+      "path": "Use the linked self-guided Lambda steps and their setup script to configure AWS automatically, or select the documented legacy command-line instrumentation route.",
+      "effect_on_first_success": "Replaces the long-running server-agent route with serverless deployment and invocation verification.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The Node.js app is deployed as code in an Azure Windows Web App.",
+      "path": "Install and configure the New Relic Node Agent with the Azure Node Agent Site Extension.",
+      "effect_on_first_success": "Replaces manual npm, config-copy, and preload actions with the Azure Site Extension workflow.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The application uses Apollo Server modules.",
+      "path": "Follow New Relic's Apollo Server plugin installation documentation rather than relying on the generic package-only auto-instrumentation sequence.",
+      "effect_on_first_success": "Adds Apollo-specific plugin installation and configuration before traffic verification.",
+      "source_ids": [
+        "S1",
+        "S11"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The application uses Next.js.",
+      "path": "Follow the Next.js hybrid agent instrumentation guide. Current compatibility documentation says Next.js v16 or later support uses built-in OpenTelemetry instrumentation starting with New Relic Node agent 14.1.0; use the linked example and load the agent with NODE_OPTIONS as directed.",
+      "effect_on_first_success": "Replaces the generic framework instrumentation assumptions and startup command with the version-specific hybrid route.",
+      "source_ids": [
+        "S1",
+        "S11"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The developer cannot modify the startup command with -r newrelic.",
+      "path": "Add require('newrelic') as the first line of the app's main module before any other package import; do not use this fallback with Babel or similar transpilers because the guide warns of instrumentation issues.",
+      "effect_on_first_success": "Moves preload logic into code and adds transpiler compatibility risk.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The app uses NestJS with nest start.",
+      "path": "Use nest start --exec 'node -r newrelic' so the agent loads before NestJS modules.",
+      "effect_on_first_success": "Changes the startup mechanism while preserving the same traffic and APM verification terminal.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The developer prefers environment variables.",
+      "path": "Set NEW_RELIC_LICENSE_KEY and NEW_RELIC_APP_NAME instead of the corresponding newrelic.js values, preserving configuration precedence.",
+      "effect_on_first_success": "Avoids storing the key in the config file and moves configuration into the runtime environment.",
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "No data appears after traffic and the documented wait.",
+      "path": "Run New Relic Diagnostics; confirm the module loads first; move conditional require logic into newrelic.js; inspect newrelic_agent.log; verify the framework and module versions are supported or add manual API instrumentation; keep the process alive long enough to report; generate new traffic; wait; and recheck APM. If the app name was deleted or renamed, stop reports for at least one hour, then restart so the agent reconnects after the collector cache flush. If the collector is unreachable, restore connectivity and allow the agent's automatic retries to reconnect and upload aggregated data.",
+      "effect_on_first_success": "Adds diagnosis, configuration correction, another app restart, more traffic, and another wait.",
+      "source_ids": [
+        "S8",
+        "S9",
+        "S11"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "A New Relic account and email confirmation precede instrumentation; the Node guide says no credit card is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "The general platform requires a telemetry-source and environment choice; guided install dynamically detects the environment and no source is canonical across New Relic.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "environment",
+      "description": "The Node candidate requires a supported operating system, SHA-2, a compatible Node.js and agent-version pair, and supported module versions or manual API instrumentation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S11"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "credential",
+      "description": "Almost all data ingestion requires an account license key, and role permissions determine which keys the developer can see or manage.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "configuration",
+      "description": "The agent must load before other application modules; startup methods differ for plain Node, Docker, Next.js, NestJS, and source-code fallback.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "wait",
+      "description": "The docs require generated traffic and a wait of a few minutes; the Node agent reports data once per minute.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S8",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "environment",
+      "description": "No-data recovery can require inspecting newrelic_agent.log, correcting unsupported framework or module instrumentation, waiting one hour for a deleted app-name cache flush, restarting to reconnect, or waiting for collector connectivity to recover.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S8",
+        "S9",
+        "S11"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "New Relic says data should start appearing within a few minutes after the agent is installed and the application generates traffic; no total account-to-data duration is stated.",
+    "source_ids": [
+      "S8"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Install the Node.js agent",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/installation-configuration/install-nodejs-agent/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install the Node.js agent",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "Complete Node manual candidate",
+        "No-card statement",
+        "Package and config actions",
+        "Startup branches",
+        "Traffic and APM terminal wait"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get started with New Relic",
+      "url": "https://docs.newrelic.com/docs/new-relic-solutions/get-started/intro-new-relic/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How it works",
+        "Get started",
+        "Sign up",
+        "Add your data",
+        "Explore your data"
+      ],
+      "evidence_supported": [
+        "General guided-install recommendation",
+        "Region choice",
+        "Many agent and telemetry alternatives",
+        "Outer signup, add-data, and explore-data journey",
+        "Signup timing wording"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign up for New Relic",
+      "url": "https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/create-your-new-relic-account/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign up for New Relic",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Free account availability",
+        "Transition from signup to Add your data"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Monitor your Node.js application",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/getting-started/monitor-your-nodejs-app/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What do you want to monitor?",
+        "App deployed in a Docker container",
+        "App deployed on a server",
+        "App deployed with AWS Lambda",
+        "Azure web app on Windows"
+      ],
+      "evidence_supported": [
+        "Node deployment choices",
+        "Server manual candidate",
+        "Docker, Kubernetes auto-attach, PM2, AWS Lambda, and Azure Windows Site Extension alternatives"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "New Relic API keys",
+      "url": "https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Our main API keys",
+        "View and manage API keys",
+        "Replace license key",
+        "License key"
+      ],
+      "evidence_supported": [
+        "License key purpose and format",
+        "Default original key",
+        "Key-creation controls",
+        "Visibility permission",
+        "Secure full-value handling"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Login and password issues",
+      "url": "https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/troubleshoot-new-relics-password-email-address-login-problems/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Didn't receive new account confirmation email",
+        "Social login"
+      ],
+      "evidence_supported": [
+        "Account-confirmation email",
+        "Missing-email recovery",
+        "Google and GitHub social login"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Node.js agent configuration",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/installation-configuration/nodejs-agent-configuration/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get started",
+        "Configuration methods and precedence",
+        "app_name",
+        "license_key"
+      ],
+      "evidence_supported": [
+        "Required key and app name",
+        "Config-file placement",
+        "Environment-variable branch",
+        "Naming collision risk"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Not seeing data",
+      "url": "https://docs.newrelic.com/docs/new-relic-solutions/solve-common-issues/troubleshooting/not-seeing-data/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Problem",
+        "Solution",
+        "APM agents",
+        "Deleted or renamed applications in APM",
+        "No connection to collector"
+      ],
+      "evidence_supported": [
+        "Traffic requirement",
+        "Few-minute wait",
+        "Diagnostics recovery",
+        "One-hour deleted-name collector cache",
+        "Restart and collector reconnection recovery"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Troubleshoot your Node.js installation",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/troubleshooting/troubleshoot-your-nodejs-installation/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Not seeing data",
+        "Installation problems",
+        "Conditional logic",
+        "Frameworks",
+        "Log files",
+        "Missing VM metrics"
+      ],
+      "evidence_supported": [
+        "Once-per-minute reporting",
+        "Agent-load-first check",
+        "Conditional-require correction",
+        "Supported-framework check",
+        "newrelic_agent.log",
+        "node-gyp Python, make, and g++ recovery",
+        "Debian and Ubuntu build-essential command"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Create your free account",
+      "url": "https://newrelic.com/signup",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create your free account",
+        "Signup form",
+        "Social signup options",
+        "Terms"
+      ],
+      "evidence_supported": [
+        "Company Email and Name fields",
+        "Terms of Service and Services Privacy Notice agreement",
+        "Google, GitHub, GitLab, and Bitbucket signup",
+        "No-credit-card statement",
+        "reCAPTCHA"
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "Compatibility and requirements for the Node.js agent",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/getting-started/compatibility-requirements-nodejs-agent/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Requirements to install the agent",
+        "Compatible operating systems",
+        "Security requirements",
+        "System requirements",
+        "Instrumented modules",
+        "Hybrid agent instrumentations"
+      ],
+      "evidence_supported": [
+        "Supported operating systems",
+        "SHA-2 requirement",
+        "Node.js and agent-version mapping",
+        "Module version support table",
+        "Manual API instrumentation for unsupported libraries",
+        "Next.js hybrid route"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which telemetry source and environment should represent New Relic in the 100-platform comparison?",
+      "impact": "Accounts are shared, but credential, installer, permissions, traffic generation, wait behavior, and success UI vary radically by source.",
+      "reason_unresolved": "The general guide routes through dynamic guided install and lists many co-equal agents and data sources without establishing one platform-wide default; Node.js is a researched candidate only.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "question": "What authenticated onboarding screens follow submission of the public Company Email and Name signup form for a new password-based account?",
+      "impact": "Confirmation, organization, region, survey, or generated Add your data screens may add actions before the static Node.js route.",
+      "reason_unresolved": "The official public signup enumerates its initial fields and social providers, and login documentation covers confirmation recovery, but the subsequent authenticated transaction is dynamic and not fully enumerated on the public page.",
+      "checked_source_ids": [
+        "S3",
+        "S6",
+        "S10"
+      ]
+    },
+    {
+      "question": "What is the current supported UI method for recovering the full original account license key if it was not stored?",
+      "impact": "Manual agent configuration cannot proceed without a full key.",
+      "reason_unresolved": "The current API-key documentation says stored keys are truncated and describes supported retrieval or replacement behavior, while older lifecycle wording changed UI copying; creating and securely capturing a new Ingest - License key is the deterministic route preserved here.",
+      "checked_source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "NRQL first query",
+    "Custom dashboards",
+    "Alerts",
+    "Logs in context",
+    "Custom instrumentation",
+    "Native metrics package",
+    "Agent upgrades",
+    "Production tuning",
+    "Non-Node telemetry journeys pending human selection"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,832 @@
+{
+  "platform": {
+    "name": "Zendesk",
+    "slug": "zendesk",
+    "organization": "Zendesk, Inc."
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "Sunshine Platform: 10-minute Ticketing API quick start",
+    "selection_basis": "The current Zendesk Developer Documentation home presents two consecutive first-mile calls to action: create a free 14-day developer trial and Create your first ticket through a 10-minute API quickstart. The linked quickstart uses only the signed-in Agent Workspace and the browser JavaScript console, then verifies three created tickets in the console and Zendesk view.",
+    "alternatives_considered": [
+      {
+        "name": "Using the Ticketing API",
+        "url": "https://developer.zendesk.com/documentation/ticketing/getting-started/making-requests-to-the-zendesk-api/",
+        "reason_not_primary": "This longer Python and OAuth tutorial reads groups, updates a ticket, and creates a ticket; the documentation home explicitly promotes the 10-minute browser-console route as Create your first ticket."
+      },
+      {
+        "name": "Zendesk Apps Framework quickstart",
+        "url": "https://developer.zendesk.com/documentation/apps/getting-started/zendesk-app-quick-start/",
+        "reason_not_primary": "The documentation home presents this as a separate 15-minute app-framework path after the general developer-account and first-ticket route."
+      },
+      {
+        "name": "Messaging SDK, Help Center, Voice, Custom Data, Sales CRM, webhooks, and integration paths",
+        "url": "https://developer.zendesk.com/documentation/",
+        "reason_not_primary": "These are equally real product surfaces, but the documentation home explicitly labels the Ticketing API route Create your first ticket and places it directly after developer-account creation."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Zendesk Support development trial, enter Agent Workspace as an admin or agent, execute the promoted browser-console Ticketing API quickstart, and verify the three generated tickets.",
+    "starting_url": "https://developer.zendesk.com/documentation/",
+    "assumed_prior_state": [
+      "The developer has no Zendesk Support account or subdomain.",
+      "The developer has a work email, company context, phone number, and a supported browser but no CLI, SDK, OAuth client, API token, or application code.",
+      "The developer does not have an administrator who can prepare an existing organization account; the new trial owner is expected to receive admin access, but the account form does not document the provisioning transition."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Create your first ticket",
+    "normalized_outcome": "Use the JavaScript console inside a signed-in Zendesk Agent Workspace to execute the official loop of three Create Ticket API POST requests and verify the resulting Test ticket 1, Test ticket 2, and Test ticket 3 records.",
+    "observable_completion_signal": "The browser console lists three returned ticket objects; after reloading Agent Workspace and opening Views > Recently updated tickets, the three new test tickets appear.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The developer-documentation home labels the route Create your first ticket and calls it a 10-minute API quickstart. The quickstart's successful terminal checks are returned JavaScript ticket objects and the tickets visible under Recently updated tickets, before troubleshooting, cleanup, and next steps.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "The first created ticket is the homepage's named platform milestone, while the quickstart deliberately creates three in one snippet and provides two verification surfaces. Deleting test data and exploring other APIs occur after the demonstrated success.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Zendesk Support account with agent or administrator access; Zendesk offers a free 14-day trial for testing.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "identity",
+      "requirement": "For the current nine-step trial form: work email, first name, last name, phone number, company country, company name, job title, company employee-count band, chosen Zendesk subdomain, and password.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "Administrator authority is required to activate first-time API access settings; the quickstart itself permits an admin or agent role for the browser-console request.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "access",
+      "requirement": "The quickstart says API password access must be enabled, but current Zendesk help says team-member password API access is deprecated and unsupported for new accounts; this is a documented contradiction rather than a reliably satisfiable new-trial prerequisite.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "Chrome, Firefox, Safari, or Microsoft Edge with a built-in JavaScript console and scripts not blocked by browser settings or plugins.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "access",
+      "requirement": "Network access to the Zendesk trial, the assigned .zendesk.com subdomain, Agent Workspace, and the same-origin Ticketing API.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Zendesk Developer Documentation home.",
+      "details": [
+        "Identify the consecutive Create a developer account and Create your first ticket calls to action."
+      ],
+      "input": "Intent to begin developing on Zendesk.",
+      "output": "Vendor-selected trial and first-ticket route.",
+      "success_signal": "The free 14-day account and 10-minute API quickstart links are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Create an account and review the free trial terms shown on the registration page.",
+      "details": [
+        "The form states 14 days, 100% free, and no credit card required."
+      ],
+      "input": "Need for a test Support instance.",
+      "output": "Nine-step trial registration form.",
+      "success_signal": "Step 1 of 9 asks for a work email.",
+      "failure_or_wait": "Existing customers or sponsored Marketplace partners can use an existing instance or a separate sponsored-account branch.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a work email in trial step 1.",
+      "details": [
+        "The page says the work email is used to connect customer emails, apps, and invite team members.",
+        "Marketing-related contact consent is presented separately from the work-email field; submitting acknowledges the Privacy Notice."
+      ],
+      "input": "Developer's work email and privacy choice.",
+      "output": "Trial identity email.",
+      "success_signal": "The form advances to personal details.",
+      "failure_or_wait": "Email validation or account-existence errors may block advancement, but their exact messages are not documented on the static form.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter first name and last name.",
+      "details": [
+        "These fields identify the trial user."
+      ],
+      "input": "Developer identity.",
+      "output": "Named account holder.",
+      "success_signal": "The form advances to phone number.",
+      "failure_or_wait": "Validation is not documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a phone number.",
+      "details": [
+        "The current form asks Thanks, what’s your phone number?"
+      ],
+      "input": "Developer phone number.",
+      "output": "Phone field completed.",
+      "success_signal": "The form advances to company country.",
+      "failure_or_wait": "Phone validation or later sales-contact behavior is not documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select where the company is based.",
+      "details": [
+        "Choose a country or region from the form list."
+      ],
+      "input": "Company location.",
+      "output": "Company country selection.",
+      "success_signal": "The form advances to company name.",
+      "failure_or_wait": "Regional availability or data-residency effects are not stated in the registration form.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the company name.",
+      "details": [
+        "The field asks what company the developer works for."
+      ],
+      "input": "Company identity.",
+      "output": "Company name associated with the trial.",
+      "success_signal": "The form advances to job title.",
+      "failure_or_wait": "Validation is not documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the developer's job title.",
+      "details": [
+        "The form collects role context before company size."
+      ],
+      "input": "Developer's role.",
+      "output": "Job title stored for the trial.",
+      "success_signal": "The form advances to employee count.",
+      "failure_or_wait": "Validation is not documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the company employee-count band.",
+      "details": [
+        "Options range from 1-9 through 5000+."
+      ],
+      "input": "Company size.",
+      "output": "Employee band selection.",
+      "success_signal": "The form advances to subdomain selection.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose a Zendesk subdomain.",
+      "details": [
+        "The chosen value forms the account's <subdomain>.zendesk.com address used for Agent Workspace and same-origin API calls."
+      ],
+      "input": "Preferred available subdomain.",
+      "output": "Zendesk instance address.",
+      "success_signal": "The form accepts the subdomain and advances to password creation.",
+      "failure_or_wait": "An unavailable or invalid subdomain requires another choice; exact rules are not displayed in the crawled form.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a password and select Create your Zendesk account.",
+      "details": [
+        "This is the last of the form's nine labeled steps."
+      ],
+      "input": "Completed registration fields and new password.",
+      "output": "Submitted trial-account request.",
+      "success_signal": "Zendesk accepts the registration submission.",
+      "failure_or_wait": "Password policy, anti-abuse, email verification, terms, and provisioning transitions are not fully exposed in the static form or developer account guide.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "access",
+      "actor": "platform",
+      "interface": "email",
+      "action": "Provision the free 14-day Zendesk Support trial and any required identity confirmation.",
+      "details": [
+        "The developer docs establish the trial as the testing account but do not document the post-submit sequence."
+      ],
+      "input": "Accepted registration.",
+      "output": "Reachable Support instance with trial owner access.",
+      "success_signal": "The developer can sign in at the chosen Zendesk subdomain as an administrator or agent.",
+      "failure_or_wait": "Provisioning duration, email confirmation, automated screening, and possible sales or setup interstitials are not documented.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign in to the Zendesk Support instance as the trial admin or an agent and enter Agent Workspace.",
+      "details": [
+        "Run the quickstart from the Agent Workspace page itself so its relative /api/v2/tickets.json requests use the Zendesk origin and signed-in browser session."
+      ],
+      "input": "Provisioned subdomain and account credentials.",
+      "output": "Authenticated Agent Workspace session.",
+      "success_signal": "Agent Workspace is loaded in the browser.",
+      "failure_or_wait": "A 404 from the quickstart script can indicate that the developer is not signed in.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "As administrator, open Admin Center > Apps and integrations > APIs > API configuration for first-time API activation.",
+      "details": [
+        "Current help says first-time API access requires accepting the Zendesk Terms of Service and Application Developer and API Agreement."
+      ],
+      "input": "Administrator session.",
+      "output": "API activation page.",
+      "success_signal": "The terms checkbox and Get started action are available if API access is not already active.",
+      "failure_or_wait": "Agents without admin authority need an administrator to perform this setup.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Read and accept the Zendesk terms and Application Developer and API Agreement, then select Get started.",
+      "details": [
+        "This activates the account's API configuration surface."
+      ],
+      "input": "Authority to accept agreements for the trial account.",
+      "output": "Activated API configuration.",
+      "success_signal": "API access settings become available.",
+      "failure_or_wait": "The developer may lack organizational authority to accept the agreements.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Evaluate the quickstart's stated API password access prerequisite against the current account.",
+      "details": [
+        "The quickstart says API password access must be enabled.",
+        "Current help says team-member password API access is deprecated and unsupported in new accounts, while its remaining password control is for end users.",
+        "The quickstart code provides no email, password, token, or OAuth header and instead runs inside the signed-in Agent Workspace."
+      ],
+      "input": "Current trial API settings and current documentation.",
+      "output": "Unresolved documented prerequisite conflict.",
+      "success_signal": "No authoritative current page explains whether the same-origin browser-session request needs any API access toggle beyond initial terms activation.",
+      "failure_or_wait": "Following the quickstart literally may be impossible on a new account because the named team-member password setting is unavailable.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Open the browser's JavaScript console from Agent Workspace.",
+      "details": [
+        "Chrome: View > Developer > JavaScript Console.",
+        "Firefox: Tools > Browser Tools > Web Developer Tools, then Console.",
+        "Safari: Develop > Show JavaScript Console.",
+        "Microsoft Edge: Tools > Developer > JavaScript Console."
+      ],
+      "input": "Signed-in Agent Workspace in a supported browser.",
+      "output": "JavaScript console attached to Agent Workspace.",
+      "success_signal": "The console prompt is available on the Zendesk page.",
+      "failure_or_wait": "Browser policies may disable developer tools.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Paste the official three-iteration ticket-creation script into the JavaScript console.",
+      "details": [
+        "The loop assigns Test ticket 1 through Test ticket 3 subjects and corresponding bodies.",
+        "Each $.ajax request posts JSON to /api/v2/tickets.json with contentType application/json and logs data.ticket when complete."
+      ],
+      "input": "Official quickstart snippet and Agent Workspace console.",
+      "output": "Prepared three-request script.",
+      "success_signal": "The complete loop appears at the console prompt.",
+      "failure_or_wait": "Pasting altered syntax or running outside Agent Workspace can cause JavaScript or ajax errors.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Press Enter to run the script.",
+      "details": [
+        "The loop issues three HTTP POST requests to the Create Ticket endpoint."
+      ],
+      "input": "Prepared script and authenticated same-origin session.",
+      "output": "Three ticket-creation requests.",
+      "success_signal": "Zendesk accepts each request and creates a ticket.",
+      "failure_or_wait": "404 means confirm sign-in; TypeError $.ajax not a function means run from Agent Workspace; $.ajax undefined means check browser settings or plugins that block scripts.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Verify the console lists the returned tickets as JavaScript objects.",
+      "details": [
+        "Expand each object to inspect its ticket properties."
+      ],
+      "input": "Successful asynchronous POST responses.",
+      "output": "Direct API-response proof for three created tickets.",
+      "success_signal": "Three ticket objects appear in the JavaScript console.",
+      "failure_or_wait": "If any object is absent, inspect console or network errors and apply the documented troubleshooting before rerunning; rerunning can create duplicates.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Reload the Agent Workspace browser tab and open Views > Recently updated tickets.",
+      "details": [
+        "This checks the created resources in the Zendesk product rather than only the API response."
+      ],
+      "input": "Three successful ticket objects.",
+      "output": "Recently updated ticket list.",
+      "success_signal": "Test ticket 1, Test ticket 2, and Test ticket 3 are visible in Agent Workspace.",
+      "failure_or_wait": "View filters, asynchronous refresh, permissions, or failed requests can prevent the expected tickets from appearing.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer already has a Zendesk Support account or sandbox with agent or admin access.",
+      "path": "Skip the 14-day registration and sign into that instance, subject to its administrator's API configuration and permission policies.",
+      "effect_on_first_success": "Eliminates the nine-step trial form and uncertain provisioning transition.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer is creating a Zendesk Marketplace application and needs a durable sponsored test instance.",
+      "path": "Create a Support trial, rename its subdomain with the d3v- prefix, submit the Sponsored Account Request Form, and wait for Zendesk to confirm conversion; sponsored Support permits up to five agents and cannot be used for real support.",
+      "effect_on_first_success": "Adds subdomain change, partner eligibility, external form, manual approval, and an undocumented wait, so it is not the fastest first-ticket route.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "The user has only a non-agent end-user role.",
+      "path": "Obtain agent or administrator access from the account owner before using the selected Ticketing API quickstart.",
+      "effect_on_first_success": "Adds a role-assignment and possible administrator wait gate.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 16,
+      "condition": "The developer switches to an externally authenticated curl, Postman, SDK, or application request rather than the same-origin browser-session quickstart.",
+      "path": "Use OAuth as the durable current route, or temporarily enable and generate API tokens where still supported; Zendesk says password authentication was removed in January 2026 and API tokens begin removal July 28, 2026 with final shutdown April 30, 2027.",
+      "effect_on_first_success": "Adds OAuth client and grant implementation or administrator token enablement, generation, one-time secure copy, credentials, and migration risk.",
+      "source_ids": [
+        "S5",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "The browser is Chrome, Firefox, Safari, or Edge.",
+      "path": "Use the browser-specific developer-tools menu documented in the quickstart.",
+      "effect_on_first_success": "Changes only the route to the JavaScript console.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "The script returns a documented error.",
+      "path": "For 404, sign in; for $.ajax not a function, run from Agent Workspace; for $.ajax undefined, disable or adjust browser settings and plugins that block scripts, then retry carefully.",
+      "effect_on_first_success": "Adds diagnosis and may create duplicate tickets if some asynchronous requests succeeded before retry.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 3,
+      "type": "account",
+      "description": "The documentation-home path requires a work-email-based 14-day Zendesk Support trial when no suitable instance exists.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "policy",
+      "description": "The trial form collects personal and company data across nine steps and submits under Zendesk's Privacy Notice; marketing consent is separately presented.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "choice",
+      "description": "The developer must select an available Zendesk subdomain that becomes the instance origin.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "verification",
+      "description": "The account must be provisioned and usable, but the developer docs and static form do not document the email, verification, screening, or post-submit transition.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "permission",
+      "description": "The quickstart requires an agent or administrator role and a signed-in Agent Workspace session.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "policy",
+      "description": "First-time API activation requires acceptance of Zendesk Terms of Service and the Application Developer and API Agreement.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "configuration",
+      "description": "The quickstart's named password-access prerequisite conflicts with current API settings for new accounts, and no current official page resolves whether the browser-session script needs a substitute toggle.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "policy",
+      "description": "Browser or organizational policy must allow developer tools, console paste, page scripts, and same-origin API POSTs.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "10-minute quick start for the Ticketing API tutorial itself; account acquisition, provisioning, role, and API activation prerequisites are outside that labeled quickstart time.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "excluded_after_success": [
+    "Deleting the three test tickets from the list after experimentation; this is documented cleanup after the successful creation and verification boundary.",
+    "Trying other requests, the API reference, Postman, curl, API clients, common Ticketing API tasks, and community support.",
+    "Building a production application with OAuth, rotating or migrating credentials, pagination, rate-limit handling, security controls, error handling, observability, and data governance.",
+    "Apps Framework, Marketplace submission, Messaging SDKs, Help Center, Voice, Sales CRM, Live Chat, Custom Data, Profiles, Events, webhooks, and integration services.",
+    "Trial conversion, billing, paid subscription, production Support configuration, inviting team members, email channels, customer data, and live ticket operations."
+  ],
+  "uncertainties": [
+    {
+      "question": "What replaces the quickstart's API password access prerequisite for a new July 2026 trial?",
+      "impact": "The stated prerequisite is unavailable to new team-member accounts, so a literal reader cannot establish whether to activate API terms only, enable API tokens, create OAuth, enable end-user password access, or do nothing beyond the signed-in browser session.",
+      "reason_unresolved": "The quickstart still requires and links password access, while current help says team-member password access is deprecated and unsupported for new accounts. The script supplies no explicit credentials and runs same-origin inside Agent Workspace.",
+      "checked_source_ids": [
+        "S2",
+        "S5",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "question": "What exact post-submit actions occur before a new trial owner reaches Agent Workspace?",
+      "impact": "Email confirmation, anti-abuse review, launch setup, product selection, data-region choice, or guided onboarding could add pages and waits before the quickstart.",
+      "reason_unresolved": "The registration page exposes nine input stages but the developer account guide only links to the live form and does not document provisioning or the first signed-in transition.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "question": "Does the advertised 10-minute duration include any account or API-access preparation?",
+      "impact": "A new developer's actual time to first ticket can be much longer than the homepage label.",
+      "reason_unresolved": "The quickstart label is 10 minutes, but its What you'll need section treats account, role, API access, and browser as pre-existing prerequisites.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "question": "Is creating three test tickets in a real Support instance acceptable to the developer's organization?",
+      "impact": "The quickstart mutates ticket data and can trigger business rules, notifications, routing, reporting, or compliance workflows in a configured account.",
+      "reason_unresolved": "The docs recommend a trial or sponsored test account and later deletion but do not inventory instance-specific automation side effects.",
+      "checked_source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Zendesk Developer Documentation Home",
+      "url": "https://developer.zendesk.com/documentation/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a developer account",
+        "Create your first ticket",
+        "Explore the Zendesk APIs",
+        "Build apps with any tech"
+      ],
+      "evidence_supported": [
+        "Vendor selection of the 14-day developer account and 10-minute first-ticket route, plus alternative platform surfaces"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Ticketing API quick start",
+      "url": "https://developer.zendesk.com/documentation/ticketing/getting-started/zendesk-api-quick-start/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What you'll need",
+        "Creating tickets",
+        "Troubleshooting tips",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "10-minute claim, role, password-access statement, browser choices, full script, execution, API and UI verification, cleanup, and error recovery"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Getting a trial or sponsored account for development",
+      "url": "https://developer.zendesk.com/documentation/api-basics/getting-started/getting-a-trial-or-sponsored-account-for-development/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Getting a trial account",
+        "Requesting a sponsored test account"
+      ],
+      "evidence_supported": [
+        "Free 14-day Support trial, sponsored eligibility, five-agent limit, d3v- subdomain, request and manual wait, and no-real-support policy"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Start your free 14-day trial",
+      "url": "https://www.zendesk.com/register/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Step 1 of 9",
+        "Trial registration fields",
+        "Create your Zendesk account"
+      ],
+      "evidence_supported": [
+        "No-credit-card claim and current nine-stage work email, identity, phone, country, company, role, size, subdomain, password, privacy, and marketing fields"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Turning on and off API access",
+      "url": "https://support.zendesk.com/hc/en-us/articles/8662004958746-Turning-on-and-off-API-access",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-04-17",
+      "sections_used": [
+        "Activating API access",
+        "Turning on and off API token access",
+        "Turning on and off API password access for end users"
+      ],
+      "evidence_supported": [
+        "Admin location, first-time terms, API-token toggle, end-user password toggle, and new-account team-member password deprecation"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Important update: Password access for APIs will soon be removed",
+      "url": "https://support.zendesk.com/hc/en-us/articles/8843683464346-Important-update-Password-access-for-APIs-will-soon-be-removed",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-01-21",
+      "sections_used": [
+        "Removal schedule",
+        "Are any alternatives available?",
+        "Using API Tokens",
+        "Using OAuth access tokens"
+      ],
+      "evidence_supported": [
+        "January 2026 password-authentication removal and API token or OAuth alternatives"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Managing API token access to the Zendesk API",
+      "url": "https://support.zendesk.com/hc/en-us/articles/4408889192858-Managing-API-token-access-to-the-Zendesk-API",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "API token removal notice",
+        "Generating API tokens"
+      ],
+      "evidence_supported": [
+        "Administrator and enabled-access gate, generation and one-time copy, July 2026 inactivity cleanup, and April 2027 API-token shutdown"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

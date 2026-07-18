@@ -1,0 +1,828 @@
+{
+  "platform": {
+    "name": "Okta",
+    "slug": "okta",
+    "organization": "Okta, Inc."
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Unresolved at application type and language selection in Okta Quickstart",
+    "selection_basis": "Okta's Quickstart asks the developer to choose server-side web, front-end web, mobile/native, or API protection and then a framework/language. Redirect authentication is recommended as quickest and most secure, but the docs do not select one application platform for all developers.",
+    "alternatives_considered": [
+      {
+        "name": "Server-side web app redirect quickstart",
+        "url": "https://developer.okta.com/docs/guides/sign-into-web-app-redirect/main/",
+        "reason_not_primary": "Requires a framework choice among ASP.NET Core, Node.js, Java, Go, Python, and others."
+      },
+      {
+        "name": "SPA redirect quickstart",
+        "url": "https://developer.okta.com/docs/guides/sign-into-spa-redirect/main/",
+        "reason_not_primary": "A peer front-end type with public-client and PKCE configuration."
+      },
+      {
+        "name": "Mobile/native redirect quickstart",
+        "url": "https://developer.okta.com/docs/guides/sign-into-mobile-redirect/main/",
+        "reason_not_primary": "A peer type with device-specific SDK steps."
+      },
+      {
+        "name": "Protect your API",
+        "url": "https://developer.okta.com/docs/guides/protect-your-api/main/",
+        "reason_not_primary": "Verifies API access rather than an end-user sign-in."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Obtain an Okta Integrator Free Plan org and choose the app/runtime whose redirect-authentication or API-protection journey should be measured.",
+    "starting_url": "https://developer.okta.com/docs/guides/quickstart/main/",
+    "assumed_prior_state": [
+      "The developer does not yet have an Okta Integrator Free Plan org.",
+      "No application type, language, or authentication target is supplied."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "No single cross-platform first-success milestone is established by the Okta Quickstart.",
+    "normalized_outcome": "Unresolved: success could be a signed-in user in a server web app, SPA, or mobile app, or an authorized request to a protected API.",
+    "observable_completion_signal": "Each selected quickstart has its own final sign-in, claims, token, or API-response check.",
+    "boundary_evidence": {
+      "type": "not-established-by-docs",
+      "official_label_or_terminal_state": "The Quickstart says to select a server-side web app, front-end web app, mobile/native app, or protected API and then choose a language or framework.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "Redirect authentication is a vendor recommendation, but it does not resolve the application/runtime choice. Selecting one changes integration type, credentials, redirect URIs, SDK, code, and verification.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A free Okta Integrator Free Plan org with an administrator account, created with a unique eligible business email. The org does not expire, but deactivates after 180 consecutive days with no user sign-in unless an app is submitted to the OIN, and it permits 10 active users.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "knowledge",
+      "requirement": "A declared application type, runtime/framework, and intended outcome.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Okta Quickstart.",
+      "details": [
+        "The page organizes rapid integration paths by application type."
+      ],
+      "input": "Intent to integrate Okta.",
+      "output": "Quickstart choice matrix.",
+      "success_signal": "Sign users in and Protect your API are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Okta Sign up and select the Okta Workforce Identity tile's Sign up for Integrator Free Plan route.",
+      "details": [
+        "The current signup surface distinguishes Auth0, a 30-day Okta Platform trial, and the free Okta Integrator Free Plan.",
+        "The Integrator Free Plan is the developer route for building, testing, and managing workforce integrations."
+      ],
+      "input": "Intent to build and test an Okta integration.",
+      "output": "Integrator Free Plan registration form.",
+      "success_signal": "First Name, Last Name, Work Email, and Country/Region fields are visible.",
+      "failure_or_wait": "Selecting the 30-day Okta Platform trial or Auth0 creates a different account and product path.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter first name, last name, location, and a unique business email address.",
+      "details": [
+        "The live form labels the email Work Email and location Country/Region.",
+        "The same business email cannot create multiple Integrator Free Plan organizations.",
+        "Some email addresses can be rejected based on location and security considerations."
+      ],
+      "input": "Eligible unique business identity.",
+      "output": "Completed Integrator Free Plan identity fields.",
+      "success_signal": "All required fields pass form validation.",
+      "failure_or_wait": "A reused, ineligible, or security-restricted business email blocks org creation.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the Integrator Free Plan Agreement and Privacy Policy, confirm authority to bind the organization, choose the optional marketing consent, and submit Sign up.",
+      "details": [
+        "The signup states that clicking Sign up binds the developer or represented entity to the Integrator Free Plan Agreement and Privacy Policy.",
+        "Okta's current subscription agreement says a person accepting on behalf of a customer must have authority and may not use a free trial if they do not agree."
+      ],
+      "input": "Completed form and authority to accept the applicable terms.",
+      "output": "Submitted org request.",
+      "success_signal": "Okta accepts the submission and sends the verification email.",
+      "failure_or_wait": "Lack of authority or refusal of required terms blocks signup; marketing consent is optional.",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "platform",
+      "interface": "email",
+      "action": "Send the Integrator Free Plan verification email.",
+      "details": [
+        "The email includes the new Okta org domain and an account-activation link."
+      ],
+      "input": "Accepted signup submission.",
+      "output": "Verification email with org domain and activation link.",
+      "success_signal": "The developer receives the message and can identify the org domain.",
+      "failure_or_wait": "Email delivery or business-email eligibility can delay or block activation; no delivery time is documented.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the activation link and set the administrator password and other authenticators.",
+      "details": [
+        "The verification email is the documented transition to password and authenticator setup."
+      ],
+      "input": "Verification email and activation link.",
+      "output": "Activated administrator identity.",
+      "success_signal": "Password and required authenticators are configured and the org can be opened.",
+      "failure_or_wait": "Expired, missing, or already-used activation state requires account recovery, which the signup reference does not decompose.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the new Okta org's Admin Console and retain its org domain.",
+      "details": [
+        "The Integrator Free Plan includes SSO, Universal Directory, adaptive MFA, Lifecycle Management, API Access Management, and Workflows, subject to its documented limits.",
+        "The org is free and does not expire, but 180 days without any user sign-in deactivates it unless an app has been submitted to the OIN."
+      ],
+      "input": "Activated administrator account and org domain.",
+      "output": "Usable Integrator Free Plan org with administrator access.",
+      "success_signal": "The Admin Console opens and the org domain is known.",
+      "failure_or_wait": "The plan supports no more than 10 active users, and an inactive org can deactivate after 180 days.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose sign-in or API protection, then the application type.",
+      "details": [
+        "Sign-in types are server-side web, front-end web, and mobile/native.",
+        "API protection is separate."
+      ],
+      "input": "Actual application architecture.",
+      "output": "One Okta guide family.",
+      "success_signal": "The guide family matches the app.",
+      "failure_or_wait": "The roster entry supplies no app architecture.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose the documented language or framework implementation.",
+      "details": [
+        "Each app family offers its own runtime variants."
+      ],
+      "input": "Project runtime.",
+      "output": "One executable quickstart.",
+      "success_signal": "A guide with concrete integration and verification steps is selected.",
+      "failure_or_wait": "Research stops rather than imposing a runtime.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 8,
+      "condition": "The intent is end-user sign-in.",
+      "path": "Use the recommended Okta-hosted redirect model, then choose server-side, SPA, or mobile and a framework.",
+      "effect_on_first_success": "Defines success as completing hosted sign-in and observing authenticated user state or claims.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The intent is API protection.",
+      "path": "Choose Protect your API and a server framework, configure authorization, send a token-bearing request, and verify allowed versus denied responses.",
+      "effect_on_first_success": "Defines success around API authorization rather than interactive sign-in.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The app is a single-page application.",
+      "path": "Create an OIDC SPA integration, configure Authorization Code with PKCE and redirect URIs, enable trusted origins, install the framework SDK, implement sign-in/out and protected routes, then sign in.",
+      "effect_on_first_success": "Adds public-client, CORS, PKCE, and browser SDK actions.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The app is server-side, mobile, or native.",
+      "path": "Follow the matching app type, redirect URI, credential, SDK, callback, and verification sequence.",
+      "effect_on_first_success": "Changes credential handling and callback implementation by runtime.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "An Okta Integrator Free Plan org and administrator access are required; signup needs a unique eligible business email and a location accepted by Okta's security controls.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "policy",
+      "description": "Signup requires acceptance of the Integrator Free Plan Agreement and Privacy Policy by someone authorized to bind the represented entity.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "verification",
+      "description": "The developer must receive the verification email and use its activation link before setting the password and authenticators.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "policy",
+      "description": "The free org is limited to 10 active users and deactivates after 180 consecutive days without a user sign-in unless an app is submitted to the OIN.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "permission",
+      "description": "The administrator needs sufficient role permissions to create and configure app integrations.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "approval",
+      "description": "Existing orgs without API Access Management may require support enablement or a Console-only alternative.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "choice",
+      "description": "The developer must choose sign-in versus API protection and an application architecture.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "choice",
+      "description": "A language or framework choice is required before atomic implementation steps exist.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://developer.okta.com/docs/guides/quickstart/main/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign users in",
+        "Server-side web app",
+        "Front-end web app",
+        "Mobile/native app",
+        "Protect your API"
+      ],
+      "evidence_supported": [
+        "App and runtime choices",
+        "Redirect positioning",
+        "Separate API outcome"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sign users in overview",
+      "url": "https://developer.okta.com/docs/guides/sign-in-overview/-/main/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Never used Okta before?",
+        "Primary considerations",
+        "Choose your auth"
+      ],
+      "evidence_supported": [
+        "App selection",
+        "Hosted redirect as recommended, most secure, fastest model",
+        "Embedded alternatives"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign users in to your SPA using the redirect model",
+      "url": "https://developer.okta.com/docs/guides/sign-into-spa-redirect/main/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Learning outcomes",
+        "Set up Okta",
+        "Create an Okta integration",
+        "Enable Trusted Origins"
+      ],
+      "evidence_supported": [
+        "Representative candidate prerequisites",
+        "Org and entitlement gates",
+        "SPA decisions",
+        "Trusted origins"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Basics: Create an app integration",
+      "url": "https://developer.okta.com/docs/guides/basics/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Learning outcomes",
+        "What you need",
+        "How to create an app integration"
+      ],
+      "evidence_supported": [
+        "Integrator Free Plan and admin requirements",
+        "Prebuilt versus custom choices",
+        "Testing goal"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Okta Integrator Free Plan org configurations",
+      "url": "https://developer.okta.com/docs/reference/org-defaults/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign up for an Integrator Free Plan org",
+        "Integrator Free Plan org features",
+        "Integrator Free Plan org limitations"
+      ],
+      "evidence_supported": [
+        "Workforce Identity plan selection, name/location/business-email form, verification email, org domain, activation link, password and authenticators, no-expiry rule, 180-day inactivity deactivation, 10-user limit, and unique-email rule"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Okta Developer sign up",
+      "url": "https://developer.okta.com/signup/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Choose what works best",
+        "Okta Integrator Free Plan",
+        "Signup form and agreements"
+      ],
+      "evidence_supported": [
+        "Auth0, 30-day Okta Platform trial, and Integrator Free Plan distinction; current required fields; required agreement and privacy acceptance; optional marketing consent; inactivity notice"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Okta Master Subscription Agreement",
+      "url": "https://www.okta.com/terms/",
+      "official_domain": true,
+      "source_type": "policy",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Agreement preamble",
+        "Free Trial Service",
+        "Effective Date"
+      ],
+      "evidence_supported": [
+        "Authority-to-bind and acceptance gate for free plans and trial services"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which application type and runtime should be measured?",
+      "impact": "It determines integration configuration, code, and terminal success.",
+      "reason_unresolved": "The Quickstart explicitly requires these choices and the roster gives only the company.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "question": "Which password and authenticator screens appear after the activation link?",
+      "impact": "Authenticator policy and recovery requirements can add device, factor-enrollment, and verification steps before the Admin Console opens.",
+      "reason_unresolved": "The current org-defaults reference establishes the activation link, password, and other authenticators but does not enumerate their exact in-product screens or factor choices.",
+      "checked_source_ids": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "No implementation-specific downstream work can be excluded until app type, runtime, and first-success boundary are chosen."
+  ],
+  "candidate_paths": [
+    {
+      "id": "angular-spa-redirect-sign-in",
+      "name": "Create an Okta Integrator Free Plan org and complete an Angular SPA redirect sign-in",
+      "selection_basis": "Okta recommends the hosted redirect model as the most secure and fastest sign-in integration, and its official Angular SPA guide ends with a signed-in profile view.",
+      "relationship_to_primary_path": "This is one complete peer route after the shared Okta spine selects Workforce Identity, front-end SPA sign-in, hosted redirect, and Angular.",
+      "steps": [
+        {
+          "step_number": 1,
+          "phase": "access",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open Okta Sign up and choose Sign up for Integrator Free Plan from the Workforce Identity option.",
+          "details": [
+            "The signup page also offers Auth0 and a 30-day Okta Platform trial, which are different routes."
+          ],
+          "input": "Intent to build and test a Workforce Identity integration.",
+          "output": "The Integrator Free Plan registration form.",
+          "success_signal": "The name, work email, and country or region fields are visible.",
+          "failure_or_wait": "Selecting another plan or Auth0 changes the organization and product path.",
+          "required": true,
+          "source_ids": ["S5", "S6"]
+        },
+        {
+          "step_number": 2,
+          "phase": "access",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Enter first name, last name, country or region, and a unique eligible business email.",
+          "details": [
+            "The same business email cannot create multiple Integrator Free Plan organizations."
+          ],
+          "input": "Eligible business identity information.",
+          "output": "A completed identity form.",
+          "success_signal": "All required identity fields pass validation.",
+          "failure_or_wait": "A reused or restricted email can be rejected based on location or security considerations.",
+          "required": true,
+          "source_ids": ["S5", "S6"]
+        },
+        {
+          "step_number": 3,
+          "phase": "access",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Accept the required Integrator Free Plan agreement and privacy terms, confirm authority to bind the organization, choose optional marketing consent, and submit Sign up.",
+          "details": [
+            "Marketing consent is optional, but acceptance of the applicable agreement and privacy policy is required."
+          ],
+          "input": "The completed form and authority to accept the terms.",
+          "output": "A submitted organization request.",
+          "success_signal": "Okta accepts the submission and initiates email verification.",
+          "failure_or_wait": "Lack of authority or refusal of the required terms blocks signup.",
+          "required": true,
+          "source_ids": ["S6", "S7"]
+        },
+        {
+          "step_number": 4,
+          "phase": "authenticate",
+          "actor": "platform",
+          "interface": "email",
+          "action": "Send the organization verification email with the org domain and activation link.",
+          "details": [
+            "This message is the documented handoff from registration to administrator setup."
+          ],
+          "input": "An accepted signup request.",
+          "output": "The Okta activation email.",
+          "success_signal": "The developer receives the org domain and activation link.",
+          "failure_or_wait": "Email delivery is an explicit wait and no delivery time is documented.",
+          "required": true,
+          "source_ids": ["S5"]
+        },
+        {
+          "step_number": 5,
+          "phase": "authenticate",
+          "actor": "developer",
+          "interface": "email",
+          "action": "Open the activation link and configure the administrator password and required authenticators.",
+          "details": [
+            "The activation flow establishes the first org administrator."
+          ],
+          "input": "The verification email and activation link.",
+          "output": "An activated Okta administrator identity.",
+          "success_signal": "The password and authenticators are accepted.",
+          "failure_or_wait": "A missing, expired, or used link requires recovery that the signup reference does not decompose.",
+          "required": true,
+          "source_ids": ["S5"]
+        },
+        {
+          "step_number": 6,
+          "phase": "access",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Sign in to the new org's Admin Console and retain the org domain.",
+          "details": [
+            "The Integrator Free Plan does not expire, but an org can deactivate after 180 days with no user sign-in and is limited to 10 active users."
+          ],
+          "input": "The activated administrator and org domain.",
+          "output": "Administrator access to the Integrator Free Plan org.",
+          "success_signal": "The Admin Console opens.",
+          "failure_or_wait": "Authentication failure or a deactivated org blocks application setup.",
+          "required": true,
+          "source_ids": ["S5"]
+        },
+        {
+          "step_number": 7,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open Applications, Applications, select Create App Integration, choose OIDC and Single-Page Application, then select Next.",
+          "details": [
+            "OIDC SPA is the app-integration type used by the Angular redirect guide."
+          ],
+          "input": "Okta administrator access.",
+          "output": "The SPA integration settings form.",
+          "success_signal": "The form shows SPA-specific grant and URI settings.",
+          "failure_or_wait": "Choosing another protocol or application type produces a different integration.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 8,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Name the integration, enable Authorization Code and Refresh Token, and configure the local sign-in and sign-out URIs.",
+          "details": [
+            "Set the sign-in redirect URI to http://localhost:4200/login/callback and the sign-out redirect URI to http://localhost:4200."
+          ],
+          "input": "An app name and the documented local URIs.",
+          "output": "The core OIDC SPA settings.",
+          "success_signal": "Both grant types and exact callback URIs are present.",
+          "failure_or_wait": "A mismatched redirect URI prevents Okta from returning authentication to the sample.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 9,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Choose the controlled-access assignment, save the integration, then use the General tab to verify Refresh Token, set the Initiate login URI, save again, and copy the Client ID.",
+          "details": [
+            "The selected user must be allowed to access the application.",
+            "On the General tab, confirm Refresh Token is selected and set the Initiate login URI to the local application URI documented by the guide before selecting Save."
+          ],
+          "input": "The completed SPA settings and intended test-user assignment.",
+          "output": "A saved OIDC SPA integration and client ID.",
+          "success_signal": "The integration exists, Refresh Token and Initiate login URI match the guide, the settings are saved, and the client ID is copied.",
+          "failure_or_wait": "An unassigned test user, missing Refresh Token grant, or incorrect Initiate login URI prevents the documented sign-in path from working as configured.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 10,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Add http://localhost:4200 as an Okta Trusted Origin for the required local redirect and CORS behavior.",
+          "details": [
+            "The guide explicitly enables the local base URI in Trusted Origins."
+          ],
+          "input": "The local Angular origin.",
+          "output": "A trusted local origin in the Okta org.",
+          "success_signal": "http://localhost:4200 appears in Trusted Origins with the required types.",
+          "failure_or_wait": "A missing trusted origin can block browser requests or redirect behavior.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 11,
+          "phase": "install",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Confirm a recent Node and npm environment, then create the Angular 22 app with npx @angular/cli@22 new okta-angular-sample --ssr=false.",
+          "details": [
+            "The guide disables server-side rendering for this browser SPA sample."
+          ],
+          "input": "Node, npm, and a writable project directory.",
+          "output": "A new Angular SPA project.",
+          "success_signal": "The okta-angular-sample directory is created.",
+          "failure_or_wait": "Unsupported runtime, package download, or scaffolding errors block setup.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 12,
+          "phase": "install",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Enter the project and install @okta/okta-angular@8.0 and @okta/okta-auth-js@8.0.",
+          "details": [
+            "These documented package versions provide the Angular integration and browser authentication client."
+          ],
+          "input": "The scaffolded Angular project.",
+          "output": "The Okta Angular and Auth JS dependencies.",
+          "success_signal": "npm completes installation without error.",
+          "failure_or_wait": "Dependency-resolution errors prevent configuration.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 13,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "ide",
+          "action": "Ensure the default custom authorization server has an access policy, then configure the Angular application with that issuer, the copied Client ID, redirect URI, scopes, and Okta authentication provider.",
+          "details": [
+            "The default custom authorization server must have an access policy before it can authorize this application.",
+            "The redirect URI must resolve to http://localhost:4200/login/callback and the issuer must use the new org domain's default authorization server."
+          ],
+          "input": "The Okta org domain, default authorization-server access policy, client ID, and guide's Angular configuration.",
+          "output": "An Angular app connected to the OIDC SPA integration.",
+          "success_signal": "The authentication provider and OktaAuth configuration contain no placeholders.",
+          "failure_or_wait": "A missing authorization-server access policy or wrong issuer, client ID, callback, or scopes causes authorization or callback failure.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 14,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "ide",
+          "action": "Add the sign-in and sign-out controls, login callback route, and the guide's initial unguarded Profile route and view.",
+          "details": [
+            "The callback component processes Okta's redirect, while the Profile route provides the visible authenticated result.",
+            "Do not label this initial Profile route as protected: the guide adds canActivateAuthGuard later, after the initial sign-in and profile test."
+          ],
+          "input": "The configured Angular authentication provider.",
+          "output": "A runnable SPA with authentication UI and routes.",
+          "success_signal": "The app includes Sign in, callback, the initial unguarded Profile route and view, and Sign out behavior.",
+          "failure_or_wait": "Missing callback or route configuration leaves the redirect incomplete.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 15,
+          "phase": "execute",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Run ng serve and open http://localhost:4200.",
+          "details": [
+            "The Angular development server hosts the configured SPA on the registered origin."
+          ],
+          "input": "The complete Angular sample.",
+          "output": "A running local Okta-integrated SPA.",
+          "success_signal": "The browser loads the SPA and shows the Sign in control.",
+          "failure_or_wait": "Build or port errors prevent the browser flow.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 16,
+          "phase": "execute",
+          "actor": "developer",
+          "interface": "other",
+          "action": "Select Sign in, authenticate as an assigned org user, and allow the callback to return to the SPA.",
+          "details": [
+            "Okta hosts the credential experience and returns the browser to the registered callback."
+          ],
+          "input": "Credentials for an assigned Okta user.",
+          "output": "An authenticated Angular application session.",
+          "success_signal": "The callback completes and the SPA changes to its signed-in state.",
+          "failure_or_wait": "Invalid credentials, an unassigned user, mismatched URI, issuer, or client ID blocks the redirect flow.",
+          "required": true,
+          "source_ids": ["S3"]
+        },
+        {
+          "step_number": 17,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "other",
+          "action": "Open Profile and verify that the signed-in user's name is displayed, then confirm Sign out is available.",
+          "details": [
+            "The profile content is the guide's observable proof that the SPA obtained and used the authenticated user state."
+          ],
+          "input": "The authenticated SPA session.",
+          "output": "A visible user profile in the Angular app.",
+          "success_signal": "The Profile view displays the user's name and the signed-in controls include Sign out.",
+          "failure_or_wait": "A completed login without the profile result does not satisfy this candidate terminal.",
+          "required": true,
+          "source_ids": ["S3"]
+        }
+      ],
+      "source_ids": ["S3", "S5", "S6", "S7"]
+    }
+  ],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,699 @@
+{
+  "platform": {
+    "name": "Snowflake",
+    "slug": "snowflake",
+    "organization": "Snowflake Inc."
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "Snowflake in 20 minutes introductory tutorial",
+    "selection_basis": "Snowflake's general Get started documentation places Snowflake in 20 minutes under interactive lessons, and its tutorial index labels it as the tutorial that introduces users to Snowflake. The guide explicitly ends with successful completion after object creation, file staging, loading, and several queries.",
+    "alternatives_considered": [
+      {
+        "name": "Load and query sample data using SQL",
+        "url": "https://docs.snowflake.com/en/en/learn-tutorials",
+        "reason_not_primary": "It is listed under data engineering, while Snowflake in 20 minutes is separately labeled as the tutorial that introduces users to Snowflake."
+      },
+      {
+        "name": "Snowsight quick tour",
+        "url": "https://docs.snowflake.com/en/user-guide/ui-snowsight-quick-tour",
+        "reason_not_primary": "It is an interface orientation topic and does not replace the selected introductory hands-on tutorial."
+      },
+      {
+        "name": "Snowflake Extension for Visual Studio Code",
+        "url": "https://docs.snowflake.com/en/user-guide/vscode-ext",
+        "reason_not_primary": "The tutorial says VS Code users might consider it, but the documented tutorial path itself requires and uses SnowSQL."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Complete Snowflake's official introductory hands-on tutorial after selecting Snowflake.",
+    "starting_url": "https://docs.snowflake.com/en/user-guide-getting-started",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Snowflake.",
+      "The developer has not yet created the tutorial objects, staged the sample files, or queried them."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Successfully complete Snowflake in 20 minutes.",
+    "normalized_outcome": "The developer has connected with SnowSQL, created the tutorial database, table, and X-Small warehouse, staged and loaded five sample CSV files, retrieved the data, inserted two rows, and run the tutorial's filtered and date queries.",
+    "observable_completion_signal": "The final DATEADD query returns employee names and calculated dates, after the earlier COPY result shows all five files loaded and the preceding queries return table rows and UK email addresses; the next section states that the introductory tutorial was successfully completed.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "After the ordered Create Snowflake objects, Stage data files, Copy data into target tables, and Query loaded data sections, the guide's next heading states Congratulations and says the introductory tutorial was successfully completed.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the terminal demonstrated state of Snowflake's selected introductory tutorial. Summary review, cleanup, exit, and further learning appear only after the completion statement.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Snowflake account and Snowflake user are required. A trial account creates a user with the required role; otherwise an administrator must provide a user.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "The user must have a role with privileges to create the database, table, and virtual warehouse. If a user must be created, an ACCOUNTADMIN or SECURITYADMIN can create one.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "SnowSQL must be installed for the operating system used to execute the tutorial.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "The supplied getting-started.zip archive must be downloaded and unpacked to /tmp on Linux or macOS, C:\\temp on Windows, or an equivalent path substituted in the PUT command.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "billing",
+      "requirement": "Object storage and a running virtual warehouse consume storage and Snowflake credits. The 30-day trial supplies free credits and does not require payment information; a non-trial account can incur charges.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Snowflake Get started and select the Snowflake in 20 Minutes tutorial.",
+      "details": [
+        "The general page describes this tutorial as creating Snowflake objects, loading data, and querying data.",
+        "The tutorial index separately calls it the tutorial that introduces users to Snowflake."
+      ],
+      "input": "Intent to learn the Snowflake platform",
+      "output": "Official introductory tutorial",
+      "success_signal": "The Snowflake in 20 minutes Introduction is visible.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Obtain a Snowflake account, user, and role that can create the tutorial objects.",
+      "details": [
+        "A 30-day trial supplies a user with the needed role.",
+        "Without a user, an administrator with ACCOUNTADMIN or SECURITYADMIN must create one."
+      ],
+      "input": "Organization account access or a trial signup",
+      "output": "Snowflake user with object-creation privileges",
+      "success_signal": "The user can authenticate and has the privileges required by the tutorial.",
+      "failure_or_wait": "The tutorial cannot be performed without a user; lacking administrative access introduces an administrator dependency.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose the operating-system installation route and install SnowSQL.",
+      "details": [
+        "Linux supports a downloaded installer or RPM package.",
+        "macOS supports a downloaded PKG or Homebrew cask.",
+        "Windows supports a downloaded MSI.",
+        "SnowSQL 1.3.0 and later disables automatic upgrades by default, so new versions require manual download and installation unless the setting is changed."
+      ],
+      "input": "Supported operating system and installation method",
+      "output": "Installed snowsql executable",
+      "success_signal": "SnowSQL can be started from the command line.",
+      "failure_or_wait": "macOS with zsh can require adding the documented executable alias to .zshrc; installer and package permissions can also block installation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Download getting-started.zip and unzip the sample CSV files.",
+      "details": [
+        "Save the linked archive to the local filesystem.",
+        "The tutorial assumes /tmp on Linux or macOS and C:\\temp on Windows.",
+        "Each file contains five comma-delimited data records."
+      ],
+      "input": "Snowflake sample-data archive",
+      "output": "Unpacked employees CSV files",
+      "success_signal": "The employees0*.csv files are available at the path that will be used by PUT.",
+      "failure_or_wait": "An incorrect directory or archive extraction prevents the later file pattern from resolving.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open a command-line window and start SnowSQL with the account identifier and user name.",
+      "details": [
+        "Run snowsql -a <account_identifier> -u <user_name>.",
+        "The preferred account identifier format is organization_name-account_name."
+      ],
+      "input": "Account identifier and Snowflake user name",
+      "output": "SnowSQL authentication prompt",
+      "success_signal": "SnowSQL requests authentication for the specified account and user.",
+      "failure_or_wait": "If the account identifier is unavailable after lockout, the tutorial directs the developer to the trial Welcome email or ORGADMIN.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Enter the Snowflake password when prompted and verify the SnowSQL command prompt appears.",
+      "details": [
+        "An IdP-configured account can instead add --authenticator externalbrowser and authenticate in a browser.",
+        "The prompt displays the current warehouse, database, and schema, or explicitly displays no warehouse, no database, and no schema."
+      ],
+      "input": "Password or federated browser authentication",
+      "output": "Authenticated SnowSQL session",
+      "success_signal": "A SnowSQL prompt is displayed for the current session.",
+      "failure_or_wait": "Invalid credentials, account identifier, MFA, or IdP authentication prevents the prompt from appearing.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create or replace the sf_tuts database.",
+      "details": [
+        "Run CREATE OR REPLACE DATABASE sf_tuts;.",
+        "The tutorial uses the database's default public schema."
+      ],
+      "input": "Privileged SnowSQL session",
+      "output": "sf_tuts database and public schema in session context",
+      "success_signal": "The command succeeds and the SnowSQL prompt reflects SF_TUTS.PUBLIC.",
+      "failure_or_wait": "Insufficient CREATE DATABASE privilege blocks the step.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Optionally verify the current database and schema with the context query.",
+      "details": [
+        "Run SELECT CURRENT_DATABASE(), CURRENT_SCHEMA();."
+      ],
+      "input": "Current SnowSQL session",
+      "output": "Current context result",
+      "success_signal": "The result shows SF_TUTS and PUBLIC.",
+      "failure_or_wait": "A different result means the expected database context is not active.",
+      "required": false,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create or replace the emp_basic table with the six columns shown in the tutorial.",
+      "details": [
+        "Create first_name, last_name, email, streetaddress, and city as STRING columns and start_date as DATE.",
+        "The column number, order, and types correspond to the supplied CSV fields."
+      ],
+      "input": "Tutorial CREATE TABLE statement",
+      "output": "sf_tuts.public.emp_basic table",
+      "success_signal": "The CREATE TABLE statement succeeds.",
+      "failure_or_wait": "Column mismatches would prevent the later records from loading as documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create or replace the X-Small sf_tuts_wh warehouse with the tutorial settings.",
+      "details": [
+        "Set WAREHOUSE_SIZE to X-SMALL, AUTO_SUSPEND to 180, AUTO_RESUME to TRUE, and INITIALLY_SUSPENDED to TRUE.",
+        "The warehouse automatically starts when a later SQL statement requires compute."
+      ],
+      "input": "Tutorial CREATE WAREHOUSE statement",
+      "output": "sf_tuts_wh warehouse in the current session",
+      "success_signal": "The CREATE WAREHOUSE statement succeeds and the prompt reflects the warehouse.",
+      "failure_or_wait": "Insufficient warehouse privileges block creation; warehouse use consumes credits when it runs.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Optionally verify the current warehouse.",
+      "details": [
+        "Run SELECT CURRENT_WAREHOUSE();."
+      ],
+      "input": "Current SnowSQL session",
+      "output": "Current warehouse result",
+      "success_signal": "The result shows SF_TUTS_WH.",
+      "failure_or_wait": "A different result means the expected warehouse is not active.",
+      "required": false,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Stage the employees0*.csv files in the emp_basic table stage with PUT.",
+      "details": [
+        "Use PUT file:///tmp/employees0*.csv @sf_tuts.public.%emp_basic on Linux or macOS, or PUT file://C:\\temp\\employees0*.csv @sf_tuts.public.%emp_basic on Windows.",
+        "PUT compresses the uploaded files with gzip by default."
+      ],
+      "input": "Unpacked local sample CSV files",
+      "output": "Five gzip-compressed files in the internal table stage",
+      "success_signal": "The result lists employees01 through employees05 with status UPLOADED.",
+      "failure_or_wait": "An incorrect local path, inaccessible file, or missing stage prevents the UPLOADED result.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Optionally list the staged files.",
+      "details": [
+        "Run LIST @sf_tuts.public.%emp_basic;."
+      ],
+      "input": "Internal emp_basic stage",
+      "output": "Stage contents",
+      "success_signal": "The five employees CSV gzip files are listed.",
+      "failure_or_wait": "Missing files indicate an incomplete PUT step.",
+      "required": false,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy the staged files into emp_basic with the tutorial COPY INTO statement.",
+      "details": [
+        "Use CSV format with optional double-quote enclosure, match employees01 through employees05 gzip files, and set ON_ERROR to skip_file.",
+        "The running warehouse supplies compute for the copy."
+      ],
+      "input": "Five staged CSV gzip files",
+      "output": "Loaded emp_basic rows",
+      "success_signal": "The COPY result lists all five files as LOADED with five rows loaded and zero errors for each.",
+      "failure_or_wait": "The tutorial's skip_file setting skips a file that contains an error; by contrast, the documented default behavior stops at the first error.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Retrieve all rows and columns from emp_basic.",
+      "details": [
+        "Run SELECT * FROM emp_basic;."
+      ],
+      "input": "Loaded emp_basic table",
+      "output": "Employee records",
+      "success_signal": "The query returns employee rows across all six columns.",
+      "failure_or_wait": "No rows or a query error indicates failed loading or incorrect session context.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Insert the two additional employee rows supplied by the tutorial.",
+      "details": [
+        "Run the displayed INSERT INTO emp_basic VALUES statement for Clementine Adamou and Marlowe De Anesy."
+      ],
+      "input": "Two tutorial employee records",
+      "output": "Two additional table rows",
+      "success_signal": "The INSERT statement succeeds.",
+      "failure_or_wait": "A schema or data-type mismatch prevents insertion.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Query email addresses ending in the United Kingdom top-level domain.",
+      "details": [
+        "Run SELECT email FROM emp_basic WHERE email LIKE '%.uk';."
+      ],
+      "input": "Loaded and extended emp_basic table",
+      "output": "Filtered email rows",
+      "success_signal": "The result includes the three .uk email addresses shown by the guide.",
+      "failure_or_wait": "Missing expected rows indicates incomplete data loading or insertion.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the final start-date query with DATEADD.",
+      "details": [
+        "Select first_name, last_name, and the date 90 days after start_date for rows whose start date is on or before 2017-01-01."
+      ],
+      "input": "Loaded emp_basic date values",
+      "output": "Four employee names and calculated benefit-start dates",
+      "success_signal": "The result shows the four rows displayed in the guide, after which the tutorial states successful completion.",
+      "failure_or_wait": "A missing or different result means the terminal query was not reproduced.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The organization does not already have a Snowflake account.",
+      "path": "Use the Snowflake self-service trial form with a valid email address, then select a cloud platform, region, and Snowflake Edition. No payment information or other qualifying information is required. The trial lasts 30 days or until its free usage balance is depleted, whichever comes first.",
+      "effect_on_first_success": "Adds signup and infrastructure choices but removes an immediate credit-card gate; compute and storage still reduce the trial balance.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer has an account but no user or insufficient object-creation privileges.",
+      "path": "Ask the Snowflake account administrator for a user and appropriate role. If a user must be created, someone with ACCOUNTADMIN or SECURITYADMIN performs that administration before the tutorial continues.",
+      "effect_on_first_success": "Introduces an administrator and permission dependency.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer uses Linux.",
+      "path": "Choose the Bash installer or RPM route. For the installer route, download the .bash file and optional signature from the SnowSQL Download page or AWS or Azure repository, optionally import the documented GPG key and verify the signature, open a terminal, run the Bash installer, and follow its prompts. The RPM route downloads the .rpm and installs it with rpm -i.",
+      "effect_on_first_success": "Adds package choice, download, optional signature verification, terminal execution, and installer permissions.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer uses macOS.",
+      "path": "Choose the PKG installer or Homebrew cask route. For PKG, download and open snowsql-darwin_x86_64.pkg and follow the installer; macOS verifies its signature. For Homebrew, run brew install --cask snowflake-snowsql. If zsh cannot resolve snowsql, add the documented alias for /Applications/SnowSQL.app/Contents/MacOS/snowsql to .zshrc and save it.",
+      "effect_on_first_success": "Adds installation-method choice and a possible shell-alias correction.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer uses Microsoft Windows.",
+      "path": "Download the SnowSQL MSI from the download page or AWS or Azure repository, open snowsql-windows_x86_64.msi and follow the installer, or run the documented msiexec command for unattended installation. Windows verifies the installer signature.",
+      "effect_on_first_success": "Adds MSI download, installer, and local installation permissions.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The account uses a configured identity provider.",
+      "path": "Start SnowSQL with --authenticator externalbrowser and complete authentication in the browser instead of entering a Snowflake password at the CLI prompt.",
+      "effect_on_first_success": "Replaces password entry with an external IdP and browser dependency.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer uses existing warehouse, database, table, and local data instead of Snowflake's recommended objects and files.",
+      "path": "Substitute those objects, data, paths, column definitions, stages, and query expectations throughout the tutorial.",
+      "effect_on_first_success": "Changes the commands and observable results, so the record's exact verification signals apply to the recommended sf_tuts path.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A Snowflake account and user are mandatory; an existing organization can require account-administrator coordination.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "permission",
+      "description": "The tutorial needs a role that can create the database, table, and warehouse; user creation can require ACCOUNTADMIN or SECURITYADMIN.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Trial signup requires cloud platform, region, and Snowflake Edition choices that affect credit consumption.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "SnowSQL installation branches by operating system and package method; macOS zsh can require a manual alias.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "download",
+      "description": "The tutorial requires downloading and unzipping a supplied CSV archive to a known local path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "SnowSQL requires an account identifier, user name, and password or federated-browser authentication.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "billing",
+      "description": "The warehouse consumes credits while running and the tutorial objects consume storage; trial credits prevent immediate payment but are finite.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "20 minutes",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started",
+      "url": "https://docs.snowflake.com/en/user-guide-getting-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start learning Snowflake with interactive lessons"
+      ],
+      "evidence_supported": [
+        "Platform-level selection of Snowflake in 20 Minutes as an interactive introductory tutorial",
+        "Official 20-minute label",
+        "Object, load, and query outcome summary"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Snowflake in 20 minutes",
+      "url": "https://docs.snowflake.com/en/user-guide/tutorials/snowflake-in-20minutes",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Introduction",
+        "Prerequisites",
+        "Log in to SnowSQL",
+        "Create Snowflake objects",
+        "Stage data files",
+        "Copy data into target tables",
+        "Query loaded data",
+        "Summary, clean up, and additional resources"
+      ],
+      "evidence_supported": [
+        "Complete introductory tutorial order",
+        "All required and optional actions",
+        "Authentication and existing-object branches",
+        "Command results and failure behavior",
+        "Terminal successful-completion statement",
+        "Post-success cleanup and learning sections"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Trial accounts",
+      "url": "https://docs.snowflake.com/en/user-guide/admin-trial-account",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Signing up for a trial account",
+        "Using compute resources",
+        "Using storage",
+        "Current limitations for trial accounts"
+      ],
+      "evidence_supported": [
+        "Valid email and no-payment signup requirement",
+        "Cloud, region, and edition choices",
+        "30-day or balance-depletion limit",
+        "Compute and storage consumption gates"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Installing SnowSQL",
+      "url": "https://docs.snowflake.com/en/user-guide/snowsql-install-config",
+      "official_domain": true,
+      "source_type": "installation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Installing SnowSQL on Linux using the installer",
+        "Installing SnowSQL on Linux using the RPM package",
+        "Installing SnowSQL on macOS using the installer",
+        "Installing SnowSQL on macOS using homebrew cask",
+        "Installing SnowSQL on Microsoft Windows using the installer",
+        "Understanding SnowSQL versioning"
+      ],
+      "evidence_supported": [
+        "Operating-system installation branches",
+        "Installer, package, signature, and alias actions",
+        "Installed executable completion signal",
+        "Manual-upgrade default"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What fields beyond a valid email address are shown by the current external trial signup form?",
+      "impact": "Additional identity or organization fields could add steps before cloud, region, and edition selection.",
+      "reason_unresolved": "The official documentation states that a valid email is all that is needed and documents the platform choices, but it does not enumerate every current form field.",
+      "checked_source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Reviewing the tutorial's Summary and key points after the successful-completion statement",
+    "Optionally dropping sf_tuts and sf_tuts_wh",
+    "Exiting or disconnecting SnowSQL",
+    "Completing other Snowflake tutorials or broader query and DML documentation"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

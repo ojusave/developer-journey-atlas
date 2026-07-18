@@ -1,0 +1,391 @@
+{
+  "platform": {
+    "name": "Square",
+    "slug": "square",
+    "organization": "Block, Inc."
+  },
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "Square Get Started, browser-based Sandbox payment path",
+    "selection_basis": "Square's official platform Get Started page defines one numbered four-part sequence, create an account and application, make the first API call, view the API logs, and verify the payment. The browser tools prefill the Sandbox token and CreatePayment request, so no language choice is required.",
+    "alternatives_considered": [
+      {
+        "name": "Square SDK quickstarts",
+        "url": "https://developer.squareup.com/docs/sdks",
+        "reason_not_primary": "These add language-specific installation and code, while the platform Get Started sequence explicitly uses Developer Console and API Explorer."
+      },
+      {
+        "name": "API Explorer generic GET and POST tutorial",
+        "url": "https://developer.squareup.com/docs/devtools/api-explorer",
+        "reason_not_primary": "This is a tool tutorial; the platform Get Started path prepopulates CreatePayment and continues through logs and seller verification."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Square developer application, make the documented first Sandbox API call, and verify the resulting payment.",
+    "starting_url": "https://developer.squareup.com/docs/square-get-started",
+    "assumed_prior_state": [
+      "The developer has arrived at Square's official Get Started sequence.",
+      "No Square account, developer application, or Sandbox payment exists yet."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Verify the Payment",
+    "normalized_outcome": "A Square developer application creates a completed Sandbox payment through API Explorer, exposes its request and response in API Logs, and shows the transaction in the Sandbox Square Dashboard.",
+    "observable_completion_signal": "The CreatePayment response contains a Payment object whose status is `COMPLETED`; the matching request and response are visible in API Logs, and the payment appears under Transactions in the default Sandbox test account.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "Square's platform Get Started page makes `Verify the Payment` step 4 and the final item in its sequence.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the final, seller-visible verification explicitly required by the official four-step platform journey.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Square account is required. New registration collects name, email, password, country, agreement to terms and policies, and business name.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "other",
+      "requirement": "The first exercise uses Square's Sandbox, default test account, Developer Console, and API Explorer; no production payments activation is required.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a Square account or sign in, then open the Developer Console.",
+      "details": [
+        "New registration asks for name, email, password, country, agreements, and business name.",
+        "An existing Square account can sign in and skip registration."
+      ],
+      "input": "Square account identity and required registration details.",
+      "output": "Authenticated Developer Console.",
+      "success_signal": "The Developer Console opens.",
+      "failure_or_wait": "A different country setting affects account context; terms and policy acceptance are required for registration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a developer application and supply its name and optional preferences.",
+      "details": [
+        "The account workflow can create the application during onboarding.",
+        "Existing developers can select an existing application and skip creation."
+      ],
+      "input": "Application name and any selected preferences.",
+      "output": "Square developer application with Sandbox context.",
+      "success_signal": "The application page appears in Developer Console.",
+      "failure_or_wait": "The first-call banner may be absent; Square provides a direct prepopulated API Explorer link as fallback.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open API Explorer from the application's first-test-payment banner and select Run Request on the prefilled CreatePayment request.",
+      "details": [
+        "API Explorer prepopulates the required fields and Sandbox access token.",
+        "The source ID is a Sandbox payment token representing a card."
+      ],
+      "input": "Developer application, default Sandbox test account, and prefilled request.",
+      "output": "CreatePayment request and response.",
+      "success_signal": "The response contains a Payment object with `status` equal to `COMPLETED`.",
+      "failure_or_wait": "If the request fails, the Response pane returns an error instead of the Payment object.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "From the API Explorer response, choose View Logs, select the API call, and inspect its Request and Response tabs.",
+      "details": [
+        "The API Logs page belongs to the selected application.",
+        "Square redacts sensitive data in logs."
+      ],
+      "input": "Completed CreatePayment call.",
+      "output": "Selected API log entry with request and response details.",
+      "success_signal": "The matching call and both HTTP payload views are visible.",
+      "failure_or_wait": "The log must be selected from the results list; log entries are retained for a limited period.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Return to Developer Console, open Sandbox test accounts, and choose Square Dashboard for the Default Test Account.",
+      "details": [
+        "This opens the Sandbox Square Dashboard, not the production seller dashboard."
+      ],
+      "input": "Default Sandbox test account.",
+      "output": "Sandbox Square Dashboard for that account.",
+      "success_signal": "The seller-style Sandbox dashboard opens.",
+      "failure_or_wait": "Opening a different test account would show a different transaction set.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Transactions and select the payment created in API Explorer.",
+      "details": [
+        "If it is not visible, expand the date range to include the payment."
+      ],
+      "input": "Sandbox Dashboard and created payment.",
+      "output": "Seller-visible Sandbox transaction details.",
+      "success_signal": "The matching payment appears and opens in Transactions.",
+      "failure_or_wait": "A date filter can hide the payment until the range is adjusted.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "A Square account already exists.",
+      "path": "Sign in and proceed to the Developer Console without creating another account.",
+      "effect_on_first_success": "The registration pages are skipped.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "A developer application already exists.",
+      "path": "Select the existing application instead of creating a new one.",
+      "effect_on_first_success": "Application creation is skipped, while the Sandbox call and verification remain the same.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The first-test-payment banner is not shown.",
+      "path": "Use the direct API Explorer link provided on the Make your First API Call page to open the same prepopulated CreatePayment view.",
+      "effect_on_first_success": "The path reaches the same CreatePayment request without the banner.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The payment is hidden by the current date range.",
+      "path": "Select a date range that includes when the API Explorer payment was created.",
+      "effect_on_first_success": "The matching transaction becomes available for final verification.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "A Square account and required registration fields and agreements precede Developer Console access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "A developer application is required even though API Explorer prefills the Sandbox token and request.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "verification",
+      "description": "The first API call succeeds only if CreatePayment returns a Payment object with `COMPLETED` status.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "verification",
+      "description": "Final confirmation occurs in a separate seller-facing Sandbox dashboard and can be obscured by its date filter.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "in minutes",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started",
+      "url": "https://developer.squareup.com/docs/square-get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get Started",
+        "Four numbered steps"
+      ],
+      "evidence_supported": [
+        "Platform-level sequence",
+        "In-minutes vendor claim",
+        "Final Verify the Payment milestone"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create an Account and Application",
+      "url": "https://developer.squareup.com/docs/get-started/create-account-and-application",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a Square account",
+        "Create an application"
+      ],
+      "evidence_supported": [
+        "Registration inputs and agreements",
+        "Application name and preferences",
+        "Existing-account and application branches"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Make your First API Call",
+      "url": "https://developer.squareup.com/docs/get-started/make-api-request",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a payment",
+        "Open API Explorer",
+        "Run Request",
+        "Review Request and Response"
+      ],
+      "evidence_supported": [
+        "Prefilled Sandbox access token and request",
+        "CreatePayment execution",
+        "Completed status and error signals",
+        "Banner fallback"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "View the API Logs",
+      "url": "https://developer.squareup.com/docs/get-started/view-log",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "View the API Logs"
+      ],
+      "evidence_supported": [
+        "Log navigation and request-response inspection"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Verify the Payment",
+      "url": "https://developer.squareup.com/docs/get-started/verify-transaction-in-seller-dashboard",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Verify the Payment"
+      ],
+      "evidence_supported": [
+        "Default Sandbox test-account navigation",
+        "Transactions verification",
+        "Date-range recovery branch"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does Square's `in minutes` claim include brand-new account registration and every final verification page?",
+      "impact": "The phrase may not describe total elapsed time for a developer beginning without an account.",
+      "reason_unresolved": "The platform page associates the phrase with creating an account and first call but does not define the measurement boundary.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Language-specific SDK installation and source code",
+    "Production access tokens and payments activation",
+    "Web Payments SDK or In-App Payments SDK tokenization",
+    "OAuth for seller accounts",
+    "Orders, inventory, customers, and other Square APIs"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

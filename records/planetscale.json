@@ -1,0 +1,429 @@
+{
+  "platform": {
+    "name": "PlanetScale",
+    "slug": "planetscale",
+    "organization": "PlanetScale"
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "PlanetScale Postgres dashboard quickstart",
+    "selection_basis": "PlanetScale's current Postgres product page labels its official quickstart as the route to deploy a first PostgreSQL database and learn the basics in under 10 minutes. The linked documentation then provides a complete dashboard path ending with the explicit terminal statement that the database is ready.",
+    "alternatives_considered": [
+      {
+        "name": "PlanetScale Postgres CLI quickstart",
+        "url": "https://planetscale.com/docs/postgres/tutorials/planetscale-postgres-quickstart",
+        "reason_not_primary": "The same page provides a CLI tab, but the dashboard tab is the first displayed route and avoids making local CLI installation the default."
+      },
+      {
+        "name": "PlanetScale Vitess quickstart",
+        "url": "https://planetscale.com/docs/vitess/tutorials/planetscale-quick-start-guide",
+        "reason_not_primary": "PlanetScale documents Vitess as a separate engine. Its current Postgres product page explicitly promotes the Postgres first-database quickstart, while the database form still exposes the engine choice."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Deploy a first PostgreSQL database on PlanetScale and obtain connection credentials.",
+    "starting_url": "https://planetscale.com/docs/postgres/tutorials/planetscale-postgres-quickstart",
+    "assumed_prior_state": [
+      "The developer has arrived at the official Postgres quickstart.",
+      "The developer does not yet have a PlanetScale database or its credentials."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Your database is ready",
+    "normalized_outcome": "A PlanetScale Postgres database with a main branch is provisioned, and the developer has generated and recorded a default role plus a usable connection string.",
+    "observable_completion_signal": "The dashboard shows the new database and main branch; the Connect flow displays host, username, password, database, port, and generated connection strings, after which the guide states that the database is ready.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The quickstart's Next steps section says `Your database is ready` after the create-database and create-credentials sections.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the terminal outcome explicitly stated by the official quickstart before the separate Day one and production-readiness material.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A PlanetScale account and organization are required. The documented CLI signup collects email, password, password confirmation, and requires following an emailed confirmation link before `pscale auth login`; the password is at least 10 characters and includes an uppercase letter, digit, or special character.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "billing",
+      "requirement": "Every plan requires a valid organization payment method. PlanetScale accepts debit or credit cards but not prepaid cards; a temporary verification hold can appear.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "plan",
+      "requirement": "The developer must select a cluster size and CPU architecture during database creation. The Postgres product page states that a single node starts at $5 per month.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or log in to the PlanetScale account, complete email confirmation when registering, and select the target organization.",
+      "details": [
+        "If no account exists, create one and complete the prompted organization creation.",
+        "The documented CLI registration route collects email, password, confirmation, then requires the email confirmation link before `pscale auth login`."
+      ],
+      "input": "PlanetScale account access.",
+      "output": "Organization dashboard.",
+      "success_signal": "The selected organization is visible.",
+      "failure_or_wait": "Account and organization creation are prerequisites if absent. An unconfirmed email blocks CLI login.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Organization Settings, Billing and add a valid debit or credit card before choosing a database plan.",
+      "details": [
+        "PlanetScale requires a valid payment method for all plans.",
+        "Prepaid cards are not accepted and a temporary preauthorization can appear while the card is verified."
+      ],
+      "input": "Organization administrator access and accepted payment card.",
+      "output": "Organization with a valid payment method on file.",
+      "success_signal": "Billing shows the payment method and database creation can proceed.",
+      "failure_or_wait": "A prepaid or invalid card is rejected; a temporary hold can take a few days to disappear from the bank statement.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click New database and select the Postgres engine.",
+      "details": [
+        "The form offers Vitess and Postgres.",
+        "Select Postgres for this documented quickstart."
+      ],
+      "input": "Selected organization.",
+      "output": "Postgres database configuration form.",
+      "success_signal": "Postgres is the selected engine.",
+      "failure_or_wait": "Choosing Vitess leaves this bounded path and enters the separate Vitess quickstart.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a unique database name, choose a primary region, then select cluster size and CPU architecture.",
+      "details": [
+        "PlanetScale recommends a region near the developer or application for lower latency.",
+        "The database name identifies the project in the dashboard and API, not a logical Postgres database."
+      ],
+      "input": "Name, region, cluster size, and CPU architecture choices.",
+      "output": "Reviewable database configuration.",
+      "success_signal": "All required configuration fields are populated.",
+      "failure_or_wait": "The plan and region choices affect cost and latency.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the settings and click Create database.",
+      "details": [
+        "PlanetScale provisions the PostgreSQL cluster, creates the main branch and default databases, and configures monitoring, backups, and high availability."
+      ],
+      "input": "Reviewed configuration.",
+      "output": "Provisioned Postgres database with main branch.",
+      "success_signal": "The new database and default main branch appear in the dashboard.",
+      "failure_or_wait": "Provisioning must complete; no duration is stated on the quickstart page itself.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the new database, click Connect, select Default role, and click Create default role.",
+      "details": [
+        "The default role is for administrative purposes and has significant privileges.",
+        "Only one default role can be created for the branch."
+      ],
+      "input": "Provisioned database and main branch.",
+      "output": "Generated default-role credentials.",
+      "success_signal": "The Connect flow displays Host, Username, and Password.",
+      "failure_or_wait": "The password is shown only once and must be reset if lost.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Record the host, username, password, database, and port, then generate a connection string under How are you connecting?.",
+      "details": [
+        "The default database is `postgres`.",
+        "Port 5432 is direct Postgres and 6432 uses PgBouncer.",
+        "Connections require SSL/TLS and certificate verification."
+      ],
+      "input": "Generated credentials and selected client format.",
+      "output": "Complete client connection string.",
+      "success_signal": "The credentials and connection string are visible and securely recorded; the guide then states that the database is ready.",
+      "failure_or_wait": "Navigating away loses the displayed password; reset is required to obtain a new one.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer chooses the CLI route.",
+      "path": "Check `pscale --version` and install the CLI if necessary. If no account exists, run `pscale signup`, enter email, a password of at least 10 characters containing an uppercase letter, digit, or special character, and password confirmation; open the emailed confirmation link; run `pscale auth login` and confirm the matching browser code. Ensure the organization has a valid non-prepaid payment card, choose the organization and region, run `pscale database create ... --engine postgres`, then run `pscale role reset-default` and record the credentials.",
+      "effect_on_first_success": "The same database-ready result is reached through local installation and browser-mediated CLI authentication.",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer selects Vitess instead of Postgres.",
+      "path": "Follow the separate PlanetScale Vitess quickstart, which creates a database, adds schema and data, and enables safe migrations.",
+      "effect_on_first_success": "The engine, SQL dialect, cost choices, steps, and terminal tutorial outcome change.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "Account and organization creation precede database creation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "billing",
+      "description": "All plans require an organization payment method; prepaid cards are rejected and card verification can create a temporary hold.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "The database creation form requires a choice between Vitess and Postgres.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "billing",
+      "description": "Cluster size and CPU architecture are required configuration choices; PlanetScale's Postgres product page says single-node Postgres starts at $5 per month.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "A privileged default role must be generated, and its one-time-displayed password must be stored securely.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "configuration",
+      "description": "The connection format, direct versus PgBouncer port, and required SSL parameters must be selected for the intended client.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "under 10 minutes",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "PlanetScale Postgres quickstart",
+      "url": "https://planetscale.com/docs/postgres/tutorials/planetscale-postgres-quickstart",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Create a new database",
+        "What happens during creation",
+        "Create credentials and connect",
+        "Connection strings",
+        "Security requirements",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Complete dashboard and CLI paths",
+        "Account and organization prerequisites",
+        "Engine, region, plan, and architecture choices",
+        "Provisioning behavior",
+        "Credential and SSL requirements",
+        "Explicit database-ready terminal state"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "PlanetScale for Postgres",
+      "url": "https://planetscale.com/postgres",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "PlanetScale for Postgres",
+        "Quickstart guide"
+      ],
+      "evidence_supported": [
+        "Current Postgres product emphasis",
+        "Single-node starting price",
+        "Under-10-minutes first-database quickstart claim"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "PlanetScale Vitess quickstart guide",
+      "url": "https://planetscale.com/docs/vitess/tutorials/planetscale-quick-start-guide",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Overview",
+        "Create a database",
+        "What's next"
+      ],
+      "evidence_supported": [
+        "Separate Vitess alternative",
+        "Vitess tutorial's distinct schema, data, and safe-migration outcome"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "PlanetScale CLI commands: signup",
+      "url": "https://planetscale.com/docs/cli/signup",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "The signup command",
+        "Examples"
+      ],
+      "evidence_supported": [
+        "Email, password, and password-confirmation signup",
+        "Password rules",
+        "Email confirmation link",
+        "Post-confirmation pscale auth login instruction"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Billing",
+      "url": "https://planetscale.com/docs/billing",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Payment methods",
+        "Why do I see a pre-authorization charge on my card?"
+      ],
+      "evidence_supported": [
+        "Valid payment method required for every plan",
+        "Organization Settings and Billing location",
+        "No prepaid cards",
+        "Temporary card hold"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does the under-10-minute claim include account and organization creation?",
+      "impact": "The vendor time claim may not represent a brand-new developer's total elapsed first mile.",
+      "reason_unresolved": "The product page states that the quickstart teaches the basics in under 10 minutes but does not define whether prerequisite account setup is included.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Creating least-privilege application roles",
+    "Executing a SQL query through psql or an application",
+    "Additional branches",
+    "Monitoring and scaling",
+    "Production readiness and the Day one guide",
+    "Vitess schema and safe-migrations workflow"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

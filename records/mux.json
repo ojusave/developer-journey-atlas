@@ -1,0 +1,295 @@
+{
+  "platform": {
+    "name": "Mux",
+    "slug": "mux",
+    "organization": "Mux, Inc."
+  },
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "Mux Video curl path, Stream videos in five minutes",
+    "selection_basis": "Mux's docs home lists Stream videos in five minutes as its core get-started route. The guide explicitly promises upload and playback in five minutes or less and demonstrates a shareable browser preview.",
+    "alternatives_considered": [
+      {
+        "name": "Official SDK",
+        "url": "https://www.mux.com/docs/core/stream-video-files",
+        "reason_not_primary": "The same guide offers several SDK tabs; curl is a complete request without language package installation."
+      },
+      {
+        "name": "Mux live streaming",
+        "url": "https://www.mux.com/docs/guides/start-live-streaming",
+        "reason_not_primary": "This is a separate starter guide; the docs home places on-demand Stream videos in five minutes first."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Submit a sample video to Mux, wait for processing, and watch the streamed result.",
+    "starting_url": "https://www.mux.com/docs/core/stream-video-files",
+    "assumed_prior_state": [
+      "The developer has arrived at the official five-minute guide.",
+      "No Mux token or asset exists yet."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Watch your Video",
+    "normalized_outcome": "A publicly playable Mux asset reaches ready state and streams in the browser through its playback ID.",
+    "observable_completion_signal": "The asset API reports `status: ready`, and opening `https://stream.new/v/{PLAYBACK_ID}` displays the streaming video.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The guide's Step 4 is `Watch your Video` and provides a browser preview URL before asset management and next steps.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the first rendered media result in Mux's official core onboarding guide.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Mux account with dashboard access is required to generate a token.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "The selected route uses curl and a browser; an online video URL is required, with sample URLs provided.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create an access token in the Mux dashboard.",
+      "details": [
+        "Keep the Production environment selected for the guide, grant Mux Video Read and Write, name the token, and click Generate token."
+      ],
+      "input": "Mux account and token configuration.",
+      "output": "Token ID and Secret Key.",
+      "success_signal": "Both credentials are displayed.",
+      "failure_or_wait": "The secret must be saved securely.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "POST a public video URL to the Mux assets endpoint using Basic authentication.",
+      "details": [
+        "Use the documented sample URL if needed, public playback policy, and basic video quality."
+      ],
+      "input": "Token pair and accessible video URL.",
+      "output": "Asset response with preparing status, Asset ID, and Playback ID.",
+      "success_signal": "The API returns both identifiers.",
+      "failure_or_wait": "Mux begins downloading and transcoding; the original file is not stored in exact form.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Wait until the asset's status becomes `ready`.",
+      "details": [
+        "Webhooks are preferred; the guide permits low-volume polling of the asset endpoint no more than once per second."
+      ],
+      "input": "Asset ID and credentials.",
+      "output": "Ready asset state.",
+      "success_signal": "The retrieve-asset response reports `status: ready`.",
+      "failure_or_wait": "Short videos often take seconds; large files or poor connections can take minutes or longer.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Construct the playback URL from the returned Playback ID.",
+      "details": [
+        "The HLS URL uses `https://stream.mux.com/{PLAYBACK_ID}.m3u8`.",
+        "Do not substitute the Asset ID."
+      ],
+      "input": "Playback ID.",
+      "output": "Streaming URL and optional player or stream.new preview URL.",
+      "success_signal": "The generated URL contains the Playback ID.",
+      "failure_or_wait": "Playback should not begin before ready state.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open `https://stream.new/v/{PLAYBACK_ID}` in a browser.",
+      "details": [
+        "Mux describes this as a shareable automatically generated preview."
+      ],
+      "input": "Ready asset Playback ID.",
+      "output": "Browser video playback.",
+      "success_signal": "The submitted video streams in the preview.",
+      "failure_or_wait": "An incorrect ID, non-ready asset, or private policy prevents playback.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer prefers an SDK.",
+      "path": "Install one of Mux's supported SDKs and submit the equivalent create-asset request with the same token and input URL.",
+      "effect_on_first_success": "The ready-state and browser playback signals remain the same.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "A webhook endpoint is available.",
+      "path": "Configure a Mux webhook and wait for the asset-ready notification instead of polling.",
+      "effect_on_first_success": "A public callback and signature-handling setup replaces manual status checks.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "Dashboard account access is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 1,
+      "type": "credential",
+      "description": "A Token ID and Secret with Video Read and Write permissions must be generated and stored.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "The input video must be accessible online and public playback must be requested for the shareable preview.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "wait",
+      "description": "Mux must download, transcode, and package the asset before status becomes ready.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "five minutes or less",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Stream videos in five minutes",
+      "url": "https://www.mux.com/docs/core/stream-video-files",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get an API Access Token",
+        "POST a video",
+        "Wait for ready",
+        "Watch your Video",
+        "Preview with stream.new",
+        "Next Steps"
+      ],
+      "evidence_supported": [
+        "Five-minute promise",
+        "Full credential, asset, wait, URL, and preview path",
+        "Ready and playback boundary"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Mux fundamentals",
+      "url": "https://www.mux.com/docs/core/mux-fundamentals",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Access tokens",
+        "Assets",
+        "Asset status lifecycle"
+      ],
+      "evidence_supported": [
+        "Recommended token permissions",
+        "Processing lifecycle",
+        "Ready-state meaning"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does the five-minute claim include account creation?",
+      "impact": "A brand-new user may take longer than the documented guide claim.",
+      "reason_unresolved": "The page promises upload and playback in five minutes but begins from token generation in an account dashboard.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Player integration in an application",
+    "Mux Data instrumentation",
+    "Webhooks at production volume",
+    "Signed playback and security",
+    "Captions, thumbnails, live streaming, and asset lifecycle management"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

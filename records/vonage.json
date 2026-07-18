@@ -1,0 +1,281 @@
+{
+  "platform": {
+    "name": "Vonage",
+    "slug": "vonage",
+    "organization": "Vonage"
+  },
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "Vonage API and channel not selected",
+    "selection_basis": "Vonage's platform getting-started page describes a suite of communication APIs and explicitly ends by telling developers to view documentation for their chosen API. It does not select one API, channel, authentication method, or terminal success.",
+    "alternatives_considered": [
+      {
+        "name": "Messages API SMS",
+        "url": "https://developer.vonage.com/en/messages/concepts/getting-started/getting-started-sms",
+        "reason_not_primary": "This requires Messages API account settings, a Vonage Application, JWT or Basic authentication, webhooks, and an SMS-specific sender and recipient."
+      },
+      {
+        "name": "Direct API sample requests",
+        "url": "https://developer.vonage.com/en/getting-started/overview",
+        "reason_not_primary": "The platform guide recommends curl or Postman for experimenting but does not name one endpoint or response as the platform outcome."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Make a first Vonage API interaction without a preselected communications channel or API.",
+    "starting_url": "https://developer.vonage.com/en/getting-started/overview",
+    "assumed_prior_state": [
+      "The developer has arrived after discovery.",
+      "No SMS, Voice, Video, Verify, Number Insight, or other API is selected."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "No single platform-wide first-success milestone is documented.",
+    "normalized_outcome": "Unresolved until a human selects the Vonage API and channel; candidate outcomes include a sample response, sent message, placed call, verification, or number lookup.",
+    "observable_completion_signal": "The platform overview says sample requests can confirm parameters and desired responses, then routes to the chosen API's documentation; each API defines a different response or delivery signal.",
+    "boundary_evidence": {
+      "type": "not-established-by-docs",
+      "official_label_or_terminal_state": "The general guide ends at `View the documentation for your chosen API to get started` rather than one API operation.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "Choosing SMS or another API would be a researcher choice prohibited by the dataset rules.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Vonage account provides an API key and secret; requests are charged per request, with initial free credit described.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "other",
+      "requirement": "A communications API, channel, and operation must be selected.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Vonage platform getting-started overview and review the common account, authentication, tool, webhook, and phone-number concepts.",
+      "details": [
+        "The overview applies across a suite of APIs."
+      ],
+      "input": "Intent to start using Vonage.",
+      "output": "Account setup plus API and tool choices.",
+      "success_signal": "No API result is produced at platform level.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Select the target API, operation, authentication mode, and curl, Postman, or SDK surface.",
+      "details": [
+        "Some APIs require a Vonage Application and JWT; Basic auth is easier but does not support all features.",
+        "Phone-number operations use E.164-format digits without a leading plus."
+      ],
+      "input": "Human-selected use case.",
+      "output": "A bounded API-specific quickstart.",
+      "success_signal": "No common terminal signal is documented.",
+      "failure_or_wait": "The platform guide cannot continue as one path without this choice.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Messages API SMS is selected.",
+      "path": "Set account SMS mode to Messages API, create a Vonage Application, configure status and inbound webhooks as needed, choose JWT or Basic authentication, provide SMS channel, message type, text, sender, and E.164 recipient, then POST to the Messages API and inspect the API response and later delivery status.",
+      "effect_on_first_success": "Success becomes an accepted or delivered SMS, with application, credential, number, balance, and regulatory gates.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Another Vonage API is selected.",
+      "path": "Follow that API's official documentation from account credentials through its first documented operation and response.",
+      "effect_on_first_success": "Authentication, prerequisites, cost, and observable completion signal change.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "Account signup creates the API key and secret and exposes balance management.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The API, channel, operation, tool, and authentication method must be chosen.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "billing",
+      "description": "API access is charged per request, with initial free credit and top-up described.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "Messages API SMS additionally requires account mode, application, and webhook configuration.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Working with Vonage APIs",
+      "url": "https://developer.vonage.com/en/getting-started/overview",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Signing up",
+        "Dashboard",
+        "Authentication",
+        "Experimenting",
+        "Server SDK",
+        "Webhooks",
+        "What to do next"
+      ],
+      "evidence_supported": [
+        "Cross-API platform breadth",
+        "Account, credentials, balance, tools, and auth",
+        "Explicit chosen-API handoff"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting started with SMS on Messages API",
+      "url": "https://developer.vonage.com/en/messages/concepts/getting-started/getting-started-sms",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Account settings",
+        "Create an Application",
+        "Configure Webhooks"
+      ],
+      "evidence_supported": [
+        "SMS candidate prerequisites and setup"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Messages API reference",
+      "url": "https://developer.vonage.com/en/api/messages",
+      "official_domain": true,
+      "source_type": "api-reference",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Send a Message",
+        "Authentication",
+        "Request Body"
+      ],
+      "evidence_supported": [
+        "Basic versus JWT auth",
+        "SMS required fields",
+        "E.164 number format"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Vonage API and terminal outcome should represent the platform?",
+      "impact": "The complete steps range from a simple authenticated lookup to application, webhook, number, policy, and delivery flows.",
+      "reason_unresolved": "The general official guide explicitly requires the developer to choose an API.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "No common after-success scope is selected.",
+    "Inbound webhooks, delivery reporting, production numbers, compliance, scaling, and SDK integration remain API-specific follow-ons."
+  ],
+  "candidate_paths": [
+    {
+      "id": "messages-api-sms-accepted",
+      "name": "Send an SMS request with the Messages API",
+      "selection_basis": "The platform guide does not select an API, but the official Messages API SMS getting-started page and API reference define the setup and an explicit `Accepted` response with a message UUID.",
+      "relationship_to_primary_path": "This is the Messages API, SMS channel, and JWT-authentication choice at primary step 2, expanded from account access through the API's accepted-request terminal.",
+      "steps": [
+        {"step_number": 1, "phase": "access", "actor": "developer", "interface": "console", "action": "Sign up for a Vonage API account and open the Developer Dashboard.", "details": ["Signup creates an API key and secret and provides initial free credit; API requests are charged per request."], "input": "Developer identity and account signup details.", "output": "Vonage account with API key, secret, and initial balance.", "success_signal": "The Dashboard shows the account credentials and balance.", "failure_or_wait": "Account access or insufficient balance blocks authenticated paid requests.", "required": true, "source_ids": ["S1"]},
+        {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "console", "action": "Open Dashboard Settings and set SMS settings to `Messages API`.", "details": ["This makes SMS webhooks use the format expected by the selected API."], "input": "Authenticated Developer Dashboard.", "output": "Account configured for Messages API SMS.", "success_signal": "The SMS setting is saved as Messages API.", "failure_or_wait": "Leaving the account in another SMS mode can produce webhook-format mismatch.", "required": true, "source_ids": ["S2"]},
+        {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "console", "action": "Create a Vonage Application for Messages API credentials and configuration.", "details": ["The application is the container for security and Messages API settings."], "input": "Vonage account and application details.", "output": "Vonage Application and application credentials.", "success_signal": "The application appears in the Developer Dashboard.", "failure_or_wait": "Missing account permission or invalid application configuration prevents creation.", "required": true, "source_ids": ["S1", "S2"]},
+        {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "console", "action": "Configure the application's message-status webhook and inbound-message webhook when those callbacks are required.", "details": ["Webhook endpoints must be publicly reachable; Vonage recommends ngrok for development exposure."], "input": "Public callback URLs or a deliberate no-webhook first request.", "output": "Saved Messages API webhook configuration.", "success_signal": "The application contains the intended callback URLs.", "failure_or_wait": "A private or unreachable URL prevents later status or inbound callbacks, though the accepted API response remains a separate signal.", "required": true, "source_ids": ["S1", "S2"]},
+        {"step_number": 5, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Generate a JWT for the Vonage Application and prepare the `Bearer` Authorization header.", "details": ["The Messages API supports JWT or Basic authentication, but not both; JWT supports webhook-enabled application features."], "input": "Application credentials and a JWT generation tool or CLI.", "output": "Bearer JWT for the request.", "success_signal": "A non-expired JWT is available for the Authorization header.", "failure_or_wait": "Invalid application credentials, token generation, or an expired token causes authentication failure.", "required": true, "source_ids": ["S1", "S3"]},
+        {"step_number": 6, "phase": "configure", "actor": "developer", "interface": "api", "action": "Build the JSON request with `channel: sms`, `message_type: text`, message `text`, `from`, and `to`.", "details": ["Sender and recipient use E.164 digits without a leading plus or international-access prefix.", "Country-specific regulatory fields or an eligible sender can be additional gates."], "input": "Message text, valid sender, recipient, and any required jurisdictional values.", "output": "Valid Messages API SMS request body.", "success_signal": "All required fields satisfy the API schema.", "failure_or_wait": "Invalid number format, sender, balance, required field, or country regulation causes rejection.", "required": true, "source_ids": ["S1", "S3"]},
+        {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST the JSON body to `https://{api-region}.nexmo.com/v1/messages` with the JWT and JSON content type.", "details": ["Select the API region appropriate to the account and request."], "input": "Endpoint, JWT, and valid SMS body.", "output": "Messages API response.", "success_signal": "The API accepts the request.", "failure_or_wait": "Authentication, schema, balance, policy, sender, recipient, or region errors return a non-accepted response that must be corrected before retrying.", "required": true, "source_ids": ["S3"]},
+        {"step_number": 8, "phase": "verify", "actor": "developer", "interface": "api", "action": "Inspect the accepted response and capture its `message_uuid`.", "details": ["The API reference labels the successful send response `Accepted` and returns the message UUID; later delivery status is a webhook-stage signal."], "input": "Messages API response.", "output": "Accepted SMS request identifier.", "success_signal": "The response is `Accepted` and includes `message_uuid`.", "failure_or_wait": "No UUID or a non-accepted response means the candidate has not reached its documented API terminal.", "required": true, "source_ids": ["S3"]}
+      ],
+      "source_ids": ["S1", "S2", "S3"]
+    }
+  ],
+  "candidate_path_gap": null
+}

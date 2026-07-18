@@ -1,0 +1,442 @@
+{
+  "platform": {
+    "name": "Vercel",
+    "slug": "vercel",
+    "organization": "Vercel Inc."
+  },
+  "category": "Cloud and application runtimes",
+  "surface": {
+    "name": "Getting started with Vercel, CLI deployment",
+    "selection_basis": "The Vercel documentation home routes to Getting Started. That guide says to deploy an app in three steps and states that every Vercel workflow starts with the CLI, making the CLI path the vendor-selected general route.",
+    "alternatives_considered": [
+      {
+        "name": "Dashboard Git deployment",
+        "url": "https://vercel.com/docs/git",
+        "reason_not_primary": "The getting-started guide presents this as an alternative under Deploy from the dashboard after stating that every workflow starts with the CLI."
+      },
+      {
+        "name": "Vercel Drop",
+        "url": "https://vercel.com/docs/deployments",
+        "reason_not_primary": "The deployment overview offers drag-and-drop as one deployment method, but the general getting-started guide selects the CLI."
+      },
+      {
+        "name": "REST API deployment",
+        "url": "https://vercel.com/docs/rest-api",
+        "reason_not_primary": "The deployment overview lists the API for programmatic workflows, not as the general getting-started route."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Deploy an existing local web project to Vercel using the vendor-selected general getting-started path.",
+    "starting_url": "https://vercel.com/docs",
+    "assumed_prior_state": [
+      "The developer has a local project directory ready to deploy.",
+      "The developer has not yet performed the Vercel CLI setup for this project."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Deploy your project with the Vercel CLI.",
+    "normalized_outcome": "The local project is built and deployed to Vercel, and the CLI returns the deployment URL.",
+    "observable_completion_signal": "The vercel command finishes successfully and writes the deployment URL to standard output.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The vendor's three-step getting-started sequence ends with Deploy your project; the CLI reference states that deployment stdout is always the Deployment URL.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    "why_this_is_the_boundary": "The official getting-started guide defines its core setup as three steps and ends that sequence at deployment. Plugin, skills, storage, and dashboard sections follow as optional extensions rather than prerequisites to the first deployment.",
+    "source_ids": [
+      "S2",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Vercel account.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Node.js 18 or later.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "A local application project directory.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Vercel Documentation and follow Getting started.",
+      "details": [
+        "The current guide defines a three-step CLI deployment sequence."
+      ],
+      "input": "Intent to deploy a local app.",
+      "output": "Getting started with Vercel guide.",
+      "success_signal": "The guide heading and prerequisites are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create or obtain access to a Vercel account.",
+      "details": [
+        "The guide requires an account but does not decompose registration inside this path."
+      ],
+      "input": "A supported Vercel sign-up identity.",
+      "output": "Vercel account access.",
+      "success_signal": "The account can authenticate through vercel login.",
+      "failure_or_wait": "Account-registration fields and verification vary outside the inspected guide.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Vercel CLI globally.",
+      "details": [
+        "The guide shows pnpm i -g vercel; package-manager equivalents are available."
+      ],
+      "input": "Node.js 18+ and a supported package manager.",
+      "output": "vercel executable installed.",
+      "success_signal": "The vercel command is available.",
+      "failure_or_wait": "Package installation can fail because of local permissions or environment configuration; no recovery is specified in the guide.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run vercel login.",
+      "details": [
+        "Follow the prompts to authenticate with the Vercel account."
+      ],
+      "input": "Installed CLI and Vercel account.",
+      "output": "Authenticated CLI session.",
+      "success_signal": "The login flow completes and the CLI can operate under the account.",
+      "failure_or_wait": "The exact provider or email authentication branch is prompt-dependent.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Navigate to the local project directory.",
+      "details": [],
+      "input": "Filesystem path to the project root.",
+      "output": "Terminal working directory set to the project root.",
+      "success_signal": "Project files are present in the current directory.",
+      "failure_or_wait": "Running from the wrong directory can configure or deploy the wrong project.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run vercel.",
+      "details": [
+        "For a first deployment, the CLI asks whether to set up and deploy the directory, which scope to use, whether to link an existing project, the project name, code directory, and whether to override detected settings."
+      ],
+      "input": "Local project and answers to first-time project-linking prompts.",
+      "output": "A linked or newly created Vercel Project and an initiated deployment.",
+      "success_signal": "The CLI accepts the project settings and starts framework detection, build, and deployment.",
+      "failure_or_wait": "Incorrect scope, project link, directory, or overridden settings can prevent a successful build or deploy.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Detect the framework and present default project settings.",
+      "details": [
+        "Detected defaults can include Build Command, Output Directory, and Development Command."
+      ],
+      "input": "Project files and package metadata.",
+      "output": "Detected framework and proposed settings.",
+      "success_signal": "The CLI displays auto-detected settings or accepts supplied overrides.",
+      "failure_or_wait": "An unsupported or misdetected project can require manual settings.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Build and deploy the project.",
+      "details": [
+        "The getting-started guide states that the CLI detects the framework, builds the project, and deploys it."
+      ],
+      "input": "Linked project and accepted build configuration.",
+      "output": "A Vercel deployment.",
+      "success_signal": "The deployment command exits successfully.",
+      "failure_or_wait": "Build or deployment errors are written to standard error and produce a nonzero exit code.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Return the Deployment URL on standard output.",
+      "details": [],
+      "input": "Successful deployment.",
+      "output": "Unique Vercel deployment URL.",
+      "success_signal": "A deployment URL is present on stdout, completing the guide's deploy step.",
+      "failure_or_wait": "A nonzero command exit indicates deployment error instead of success.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "The developer uses npm, yarn, or bun instead of pnpm.",
+      "path": "Use the equivalent global Vercel CLI installation command shown by the package-manager selector.",
+      "effect_on_first_success": "Only the installation command changes.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The local directory should link to an existing Vercel Project.",
+      "path": "Answer yes to Link to existing project and select the existing scope and project instead of creating a new one.",
+      "effect_on_first_success": "Project creation is skipped; build and deployment still return a deployment URL.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer wants the first deployment to be production.",
+      "path": "Run vercel --prod instead of vercel.",
+      "effect_on_first_success": "The deployment targets Production rather than the default deployment environment.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer chooses the Dashboard alternative.",
+      "path": "Open New Project, connect a Git provider, select a repository, configure the project, and click Deploy.",
+      "effect_on_first_success": "Replaces local CLI installation and prompts with account and Git-provider UI gates.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A Vercel account is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "The vendor-selected route requires a global Vercel CLI installation and Node.js 18+.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "credential",
+      "description": "The CLI must be authenticated with the Vercel account.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "choice",
+      "description": "First-time deployment prompts require scope, existing-project linkage, name, code directory, and settings decisions.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "wait",
+      "description": "The developer waits for framework detection, build, and deployment; no vendor duration is specified.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Vercel Documentation",
+      "url": "https://vercel.com/docs",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "March 13, 2026",
+      "sections_used": [
+        "Get started with Vercel",
+        "Next: Start / Getting started"
+      ],
+      "evidence_supported": [
+        "Official developer-documentation entry and getting-started route"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting started with Vercel",
+      "url": "https://vercel.com/docs/getting-started-with-vercel",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Install the Vercel CLI",
+        "Log in to Vercel",
+        "Deploy your project",
+        "Deploy from the dashboard"
+      ],
+      "evidence_supported": [
+        "Vendor-selected CLI route",
+        "Account and Node.js prerequisites",
+        "CLI install and login",
+        "Project deployment",
+        "Optional production command and Dashboard alternative"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Linking Projects with Vercel CLI",
+      "url": "https://vercel.com/docs/cli/project-linking",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Framework detection",
+        "Creating a new Vercel Project with the vercel command"
+      ],
+      "evidence_supported": [
+        "First-time interactive prompts",
+        "New versus existing project branch",
+        "Framework detection and default settings"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "vercel deploy",
+      "url": "https://vercel.com/docs/cli/deploy",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "January 13, 2026",
+      "sections_used": [
+        "Usage",
+        "Standard output usage",
+        "Standard error usage"
+      ],
+      "evidence_supported": [
+        "vercel command behavior",
+        "Deployment URL on stdout",
+        "Nonzero exit and stderr failure behavior"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact authentication prompts appear for each vercel login method?",
+      "impact": "The login gate cannot be decomposed by identity provider within this general path.",
+      "reason_unresolved": "The getting-started guide says only to follow the prompts and does not enumerate the provider-specific transitions.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Installing Vercel Plugin or agent skills",
+    "Adding a database or storage integration",
+    "Deploying to Production after a preview deployment",
+    "Adding a custom domain",
+    "Environment-variable management beyond values needed for the first build",
+    "Observability, scaling, security, and production checklist work"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

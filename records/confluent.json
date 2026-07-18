@@ -1,0 +1,421 @@
+{
+  "platform": {
+    "name": "Confluent",
+    "slug": "confluent",
+    "organization": "Confluent, Inc."
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "Confluent Cloud Console quick start, Section 1",
+    "selection_basis": "Confluent Cloud's overview sends new users to the Cloud Quick Start, whose first section explicitly gets a Basic Kafka cluster running, creates a topic, produces data, and displays the resulting messages. The Cloud Console is the first tab shown and avoids adding the CLI installation gate.",
+    "alternatives_considered": [
+      {
+        "name": "Confluent CLI route",
+        "url": "https://docs.confluent.io/confluent-cli/current/beginner-cloud.html",
+        "reason_not_primary": "This requires local CLI version 3.0 or later and extra operating-system tooling."
+      },
+      {
+        "name": "Confluent Platform quick start",
+        "url": "https://docs.confluent.io/platform/current/get-started/platform-quickstart.html",
+        "reason_not_primary": "This is the separate self-managed distribution; the cloud overview directly recommends the Confluent Cloud Quick Start."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Stream sample data through a first Confluent Cloud Kafka topic and see the messages.",
+    "starting_url": "https://docs.confluent.io/cloud/current/get-started/index.html",
+    "assumed_prior_state": [
+      "The developer has arrived at the official Confluent Cloud Quick Start.",
+      "The developer has no Kafka cluster, topic, or sample producer yet."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Step 4: View messages",
+    "normalized_outcome": "A Basic Confluent Cloud Kafka cluster is running, a users topic exists, a Datagen connector is producing sample records, and those records are visible in the topic's Messages tab.",
+    "observable_completion_signal": "The connector status changes from Provisioning to Running, then the users topic's Messages tab displays the produced records.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Section 1 says it sets up a cluster and produces data; Step 4 states the users topic is receiving messages and directs the user to view them.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the first externally observable streaming-data result in the vendor's official Cloud Quick Start. Stream Lineage and Flink SQL follow afterward.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Confluent Cloud account is required. Signup supports local email and password, Google, or GitHub; local signup collects full name, organization, email, country, and terms acceptance, then verifies email and creates a password.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "access",
+      "requirement": "A working Confluent Cloud environment with a Stream Governance package and internet connectivity are assumed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a Confluent Cloud account with local email and password, Google, or GitHub, then enter the required profile and country details and accept the applicable terms.",
+      "details": [
+        "The local route collects full name, organization, email, and country, then uses Start free, an emailed verification link, and a password-creation page.",
+        "Google and GitHub routes complete identity-provider authentication, then collect full name, organization, and country before Submit.",
+        "Confluent's try-free form requests a business email for personalized technical assistance and presents Terms of Service acceptance."
+      ],
+      "input": "Identity-provider account or local signup details, country, organization, and terms acceptance.",
+      "output": "Authenticated Confluent Cloud Console and automatically credited organization.",
+      "success_signal": "The developer is signed in to the Cloud Console and the organization receives its trial credit.",
+      "failure_or_wait": "The local route waits for email verification. The docs do not state an email-delivery SLA or a general manual approval step.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign in to Confluent Cloud and click Add cluster.",
+      "details": [
+        "The tutorial creates the cluster inside the default environment."
+      ],
+      "input": "Confluent Cloud account and environment access.",
+      "output": "Create cluster page.",
+      "success_signal": "Basic cluster configuration is available.",
+      "failure_or_wait": "A free-trial signup is required if access is absent.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Begin configuration for Basic, choose cloud provider, region, and one availability zone, then continue.",
+      "details": [
+        "Basic is the cluster type used by the quick start."
+      ],
+      "input": "Provider, region, and zone choices.",
+      "output": "Reviewable Basic cluster configuration.",
+      "success_signal": "The Create cluster page shows configuration and cost information.",
+      "failure_or_wait": "If no payment method exists, the Set payment page appears and must be completed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Name the cluster, review cost information, and select Launch cluster.",
+      "details": [
+        "Provisioning may take a few minutes."
+      ],
+      "input": "Cluster name and reviewed configuration.",
+      "output": "Provisioned Basic Kafka cluster.",
+      "success_signal": "Cluster Overview displays.",
+      "failure_or_wait": "Wait for provisioning to complete.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Topics, click Create topic, enter `users`, and select Create with defaults.",
+      "details": [
+        "The quick start defines a topic as the unit of organization for the cluster."
+      ],
+      "input": "Topic name `users`.",
+      "output": "Users topic available to producers and consumers.",
+      "success_signal": "A success message confirms topic creation.",
+      "failure_or_wait": "Ignore any extra action suggested by the success message and continue to the producer step.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Configure the Datagen Source connector for the users topic.",
+      "details": [
+        "Open Connectors, search for datagen, select Datagen Source, choose the Users template and users topic.",
+        "Select My account, generate and download a Kafka API key and secret, then choose JSON_SR, one task, and the documented connector name."
+      ],
+      "input": "Users topic, generated cluster API credentials, JSON_SR format, and connector name.",
+      "output": "Launched DatagenSourceConnector_users connector.",
+      "success_signal": "Connector status changes from Provisioning to Running.",
+      "failure_or_wait": "Provisioning lasts several seconds; the secret is downloaded and should be retained.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Topics, select users, and open its Messages tab.",
+      "details": [
+        "The page states the users topic is now receiving messages."
+      ],
+      "input": "Running Datagen connector.",
+      "output": "Visible stream of generated users records.",
+      "success_signal": "Messages are displayed in the topic detail page.",
+      "failure_or_wait": "If the connector is not Running, messages may not yet appear.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer chooses CLI or REST rather than Cloud Console.",
+      "path": "Use the parallel tabs to log in, create a cluster and topic, generate the required API credentials, define the Datagen connector configuration, and create the connector through commands or APIs.",
+      "effect_on_first_success": "The same running producer is reached, but local CLI installation or Cloud and Kafka API authentication are added.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "Confluent Cloud signup requires a local email route or Google or GitHub identity, plus profile and country details; local signup adds email verification and password creation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 1,
+      "type": "billing",
+      "description": "The organization automatically receives $400 in credit for up to 30 days. The trial ends when credit is exhausted or expires, and the organization is suspended if no payment or new promotion is available.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "billing",
+      "description": "Cluster creation displays cost information and requires setting a payment method when none exists; created resources can be billable.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "Cloud provider, region, and availability zone must be selected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "wait",
+      "description": "Cluster provisioning can take a few minutes.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "The connector needs a generated Kafka API key and secret, which are downloaded during setup.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quick Start for Confluent Cloud",
+      "url": "https://docs.confluent.io/cloud/current/get-started/index.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Considerations",
+        "Prerequisites",
+        "Section 1",
+        "Create a Kafka cluster",
+        "Create a Kafka topic",
+        "Create a sample producer",
+        "View messages"
+      ],
+      "evidence_supported": [
+        "Complete Cloud Console first path",
+        "Account, governance, billing, choice, credential, and wait gates",
+        "Running connector and visible-message completion signals"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Overview of Confluent Cloud Tutorials and Examples",
+      "url": "https://docs.confluent.io/cloud/current/get-started/tutorials/index.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Ready to get started",
+        "Cost to run examples",
+        "Confluent Cloud Quick Start"
+      ],
+      "evidence_supported": [
+        "Vendor routing to Cloud Quick Start",
+        "Billable-resource warning",
+        "Cloud versus self-managed distinction"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Manage Local User Accounts on Confluent Cloud",
+      "url": "https://docs.confluent.io/cloud/current/security/authenticate/user-identities/user-accounts/manage-local-user-accounts.html",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a local user (initial)",
+        "Local user: Sign in with Google",
+        "Local user: Sign in with GitHub"
+      ],
+      "evidence_supported": [
+        "Local full-name, organization, email, country, Start free, verification, and password sequence",
+        "Google registration route",
+        "GitHub registration and 2FA route",
+        "Cloud Console redirect"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Confluent Cloud Free Trial",
+      "url": "https://docs.confluent.io/cloud/current/get-started/free-trial.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Confluent Cloud Free Trial",
+        "Add payment methods",
+        "Free trial notifications"
+      ],
+      "evidence_supported": [
+        "Automatic organization credit",
+        "30-day expiry",
+        "Suspension and reactivation behavior",
+        "Resource deletion after prolonged suspension"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "FAQ for Confluent Cloud Billing",
+      "url": "https://docs.confluent.io/cloud/current/billing/billing-faq.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How does the Confluent Cloud free trial work?"
+      ],
+      "evidence_supported": [
+        "$400 USD credit",
+        "30-day or credit-exhaustion boundary",
+        "Payment method requirement for resource creation"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Start for free on Confluent Cloud",
+      "url": "https://www.confluent.io/confluent-cloud/tryfree/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start for free form"
+      ],
+      "evidence_supported": [
+        "Business email field",
+        "Full name, company, and country fields",
+        "Terms of Service acceptance",
+        "Start Free submission"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does an existing default environment always include an eligible Stream Governance package for new accounts?",
+      "impact": "A missing package adds an environment configuration or upgrade gate before cluster work.",
+      "reason_unresolved": "The quick start assumes a working environment with a package but does not guarantee every account's initial state.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Stream Lineage inspection",
+    "Flink workspace and SQL queries",
+    "Schema Registry",
+    "Client application code",
+    "Production networking, IAM, scaling, and monitoring",
+    "Resource cleanup, although the docs recommend it to avoid charges"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

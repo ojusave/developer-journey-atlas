@@ -1,0 +1,770 @@
+{
+  "platform": {
+    "name": "Datadog",
+    "slug": "datadog",
+    "organization": "Datadog, Inc."
+  },
+  "category": "Observability, testing, and release engineering",
+  "surface": {
+    "name": "Unresolved product and platform, with Linux host Agent reporting as the representative infrastructure route",
+    "selection_basis": "Datadog's Getting Started page describes a many-product observability platform and directs developers to separate guides for Agent, API, integrations, tracing, logs, RUM, Synthetic Monitoring, CI Visibility, security, and other products. The docs homepage lists Install the Agent first, and the Agent guide provides an observable default-metric result, so a Linux host Agent is preserved as the representative candidate. Neither the product nor Linux platform is a Datadog-wide default.",
+    "alternatives_considered": [
+      {
+        "name": "Datadog HTTP API",
+        "url": "https://docs.datadoghq.com/getting_started/api/",
+        "reason_not_primary": "This route uses API and application keys and a first API request rather than installed telemetry."
+      },
+      {
+        "name": "Getting Started with APM Tracing",
+        "url": "https://docs.datadoghq.com/getting_started/tracing/",
+        "reason_not_primary": "This explicitly sends a first trace but requires a language, sample application, Agent, and instrumentation choice."
+      },
+      {
+        "name": "Logs",
+        "url": "https://docs.datadoghq.com/logs/guide/",
+        "reason_not_primary": "First logs use source-specific collection and processing instead of default infrastructure metrics."
+      },
+      {
+        "name": "Synthetic Monitoring",
+        "url": "https://docs.datadoghq.com/getting_started/synthetics/",
+        "reason_not_primary": "This creates API, browser, mobile, or network tests and has different location, assertion, and billing choices."
+      },
+      {
+        "name": "Container, cloud, and configuration-management Agents",
+        "url": "https://docs.datadoghq.com/agent/",
+        "reason_not_primary": "These are peer Agent platforms with different credentials, manifests, permissions, and verification."
+      },
+      {
+        "name": "Datadog Learning Center Quick Start",
+        "url": "https://docs.datadoghq.com/getting_started/",
+        "reason_not_primary": "This is a hosted training route with a trial account and real cloud compute rather than onboarding the developer's actual environment."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Choose one Datadog product and first telemetry result; the representative path installs a Linux host Agent and verifies its default Agent metric in Datadog.",
+    "starting_url": "https://docs.datadoghq.com/getting_started/",
+    "assumed_prior_state": [
+      "No Datadog account, organization, site, API key, product, monitored environment, or platform is assumed.",
+      "For the representative route, the developer has a supported Linux host but has not installed the Agent."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "No platform-wide first milestone is established. The Agent guide says the developer can confirm the Agent is running correctly by finding datadog.agent.started or datadog.agent.running in Metrics Summary.",
+    "normalized_outcome": "Obtain Datadog organization access, select the correct Datadog site and Linux host platform, use Fleet Automation's in-app generated script to install and configure Agent 7, then verify an Agent metric with host and version metadata.",
+    "observable_completion_signal": "Metrics Summary shows datadog.agent.started or datadog.agent.running, and the opened Metric panel includes the reporting host and Agent version tags.",
+    "boundary_evidence": {
+      "type": "not-established-by-docs",
+      "official_label_or_terminal_state": "The general Getting Started page routes to many products. The Agent-specific guide separately defines default Agent metrics as the correctness check.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "The default Agent metric is the first documented observable proof that an installed Agent is running and reporting. It remains only a candidate because another product or Agent platform changes every preceding step.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "An authenticated user in a Datadog organization. The current self-service route is a 14-day free trial with no credit card; it requires a business email, password, first and last name, job title, company, acceptance of the Datadog Subscription Agreement and Privacy Policy, and optionally a phone number.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5",
+        "S7"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "region",
+      "requirement": "The correct Datadog site or region for the organization, such as datadoghq.com, datadoghq.eu, or a government site. The trial form warns that data cannot be migrated between regions after signup.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "hardware",
+      "requirement": "For the representative route, a Linux host on a version supported by the current Agent.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "permission",
+      "requirement": "Administrative access to the Linux host to execute the in-app installation script, install packages, create services and files, and start the Agent.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "access",
+      "requirement": "An organization API key for the Agent to submit metrics and events.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "access",
+      "requirement": "Outbound network access from the host to Datadog package, key, intake, and selected-site endpoints, directly or through a configured proxy.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Datadog Getting Started and choose a product area.",
+      "details": [
+        "The platform lists separate guides for UI, sites, Agent, API, integrations, containers, tracing, logs, CI, testing, security, RUM, and more."
+      ],
+      "input": "Intent to gain a first Datadog result.",
+      "output": "Product-specific route or unresolved choice.",
+      "success_signal": "The developer names the product and observable data type.",
+      "failure_or_wait": "No product-wide default is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Datadog free-trial form or use an administrator invitation.",
+      "details": [
+        "The self-service trial lasts 14 days and does not require a credit card.",
+        "The form links the Datadog Subscription Agreement and Privacy Policy.",
+        "Invited users instead receive an email with a Join Account link valid for 48 hours."
+      ],
+      "input": "Eligible business identity, trial route, or administrator invite.",
+      "output": "Trial signup form or invitation route.",
+      "success_signal": "The correct account-creation route is open.",
+      "failure_or_wait": "An invitation can expire; organization policy can constrain the login method.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a business email address for the self-service trial.",
+      "details": [
+        "The form labels this field Business Email."
+      ],
+      "input": "Business email address.",
+      "output": "Email value accepted by the form.",
+      "success_signal": "The account details step becomes available.",
+      "failure_or_wait": "An invalid or ineligible email prevents continuation.",
+      "required": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose the Datadog data region for the trial organization.",
+      "details": [
+        "The form warns to choose carefully because data cannot be migrated from one region to another."
+      ],
+      "input": "Required data-location and site choice.",
+      "output": "Selected Datadog region.",
+      "success_signal": "The region is recorded in the signup form.",
+      "failure_or_wait": "Choosing the wrong region creates a non-migratable organization placement for this signup.",
+      "required": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the remaining trial-account details.",
+      "details": [
+        "Create a password and enter first name, last name, job title, and company.",
+        "A phone number can be entered but is marked optional."
+      ],
+      "input": "Password, first and last name, job title, company, and optional phone number.",
+      "output": "Completed account-details form.",
+      "success_signal": "All required identity and company fields pass form validation.",
+      "failure_or_wait": "Missing required fields or an unacceptable password prevents submission.",
+      "required": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the linked agreements and create the trial account.",
+      "details": [
+        "Submitting the form indicates agreement to the Datadog Subscription Agreement and acknowledgment of the Privacy Policy."
+      ],
+      "input": "Completed form and acceptance of the linked legal terms.",
+      "output": "Datadog trial account and organization.",
+      "success_signal": "The account is created and the Datadog app can be opened.",
+      "failure_or_wait": "Form rejection or any post-submit verification required by the live flow delays access.",
+      "required": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm the Datadog organization and site.",
+      "details": [
+        "API keys are organization-specific.",
+        "The Agent site defaults to datadoghq.com but must match the organization's region or government site."
+      ],
+      "input": "Authenticated session and organization context.",
+      "output": "Correct organization and intake site.",
+      "success_signal": "The app and later Agent configuration target the same organization and site.",
+      "failure_or_wait": "A mismatched site can install an Agent that does not report to the viewed organization.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose Agent and then choose the Agent platform.",
+      "details": [
+        "Agent choices include host-based, container platforms, cloud platforms, and configuration management.",
+        "For the representative route, choose host-based Linux."
+      ],
+      "input": "Infrastructure telemetry intent and supported Linux host.",
+      "output": "Linux Agent route.",
+      "success_signal": "The Linux installation instructions are selected.",
+      "failure_or_wait": "Another platform changes installation and configuration.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Fleet Automation's Agent installation workflow for the Linux host.",
+      "details": [
+        "Datadog calls Fleet Automation the primary in-app workflow for installing, upgrading, configuring, and troubleshooting the Agent at scale.",
+        "The Linux docs direct the developer to follow in-app instructions and run the generated script."
+      ],
+      "input": "Datadog session, correct organization/site, and Linux target.",
+      "output": "Platform-specific Agent installation form and generated script.",
+      "success_signal": "The page generates a Linux installation command for the organization.",
+      "failure_or_wait": "App permissions or unsupported platform selection can block command generation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "authenticate",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Include the organization API key and target site in the generated Agent configuration.",
+      "details": [
+        "The Agent needs an API key to submit metrics and events.",
+        "Linux datadog.yaml stores api_key and site, while the generated script normally carries the required organization context."
+      ],
+      "input": "Organization API key and Datadog site.",
+      "output": "Organization-bound installation command.",
+      "success_signal": "The generated command is scoped to the intended organization and site.",
+      "failure_or_wait": "A missing, revoked, or incorrect API key prevents reporting.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the generated Fleet Automation installation script on the Linux host.",
+      "details": [
+        "Execute the exact in-app command rather than copying a generic command from another account.",
+        "The installation writes the Agent package and configuration and sets up the service."
+      ],
+      "input": "Administrative shell on supported Linux, generated command, and outbound network.",
+      "output": "Installed and configured Datadog Agent 7.",
+      "success_signal": "The package and service installation complete without an error.",
+      "failure_or_wait": "Package repository, signing key, network, proxy, sudo, distribution, architecture, or API-key errors can fail installation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "device",
+      "action": "Start the Agent service and begin default checks.",
+      "details": [
+        "The Agent collects its own health metrics plus default CPU, disk, IO, memory, network, NTP, uptime, file-handle, and load checks where supported.",
+        "datadog.agent.running has value 1 when the Agent is running and reporting; datadog.agent.started increments on start."
+      ],
+      "input": "Installed Agent service.",
+      "output": "Metrics submitted to Datadog intake.",
+      "success_signal": "The Agent service is running and can connect to Datadog.",
+      "failure_or_wait": "Service startup or intake connectivity can fail even after package installation.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Inspect local Agent status if the installation workflow requests or metrics do not appear.",
+      "details": [
+        "Linux Agent commands require appropriate permissions.",
+        "The Agent docs provide status, help, check, log, and troubleshooting routes."
+      ],
+      "input": "Installed Agent.",
+      "output": "Local status and check information.",
+      "success_signal": "Agent status indicates a running service and successful checks.",
+      "failure_or_wait": "Configuration, service, or connectivity errors require troubleshooting.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Metrics Summary in the Datadog app.",
+      "details": [
+        "This is the Agent guide's documented UI verification route."
+      ],
+      "input": "Authenticated Datadog session in the correct organization.",
+      "output": "Metrics Summary.",
+      "success_signal": "The metric search is available.",
+      "failure_or_wait": "Wrong organization or site hides the expected metric.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Search for datadog.agent.started or datadog.agent.running.",
+      "details": [
+        "If metrics are not visible immediately, the guide says it may take a few minutes for the Agent to send data.",
+        "Other default examples include ntp.offset and system.cpu.idle."
+      ],
+      "input": "Running reporting Agent.",
+      "output": "Matching Agent metric.",
+      "success_signal": "At least one default Agent metric appears.",
+      "failure_or_wait": "Wait a few minutes, then investigate service, API key, site, network, or host if no metric arrives.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Agent metric and inspect its metadata.",
+      "details": [
+        "Select either matching metric to open the Metric panel.",
+        "Without custom host tags, the panel should show Datadog's default version and host tags."
+      ],
+      "input": "Visible Agent metric.",
+      "output": "Metric panel for the reporting Agent.",
+      "success_signal": "The panel shows host and Agent version metadata, confirming the Agent is reporting.",
+      "failure_or_wait": "Missing host/version data or an unexpected host means the documented result has not been verified.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "An administrator invites the developer to an existing organization.",
+      "path": "The administrator opens Organization Settings > Users, selects Invite Users, enters email, assigns permitted roles, and sends the invite. The developer opens the email within 48 hours, selects Join Account, and signs in using an organization-allowed login method.",
+      "effect_on_first_success": "Adds an administrator actor, email handoff, role choice, and invitation-expiry wait.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer uses Google, password, or SAML login.",
+      "path": "Use a login method enabled by the organization. Google users are automatically email-verified at first login; password users verify while setting the first password; SAML users manually verify email for the additional account-management features described in the docs.",
+      "effect_on_first_success": "Changes identity, verification, and possible administrator coordination.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The monitored target is a container, Kubernetes cluster, cloud integration, configuration-managed fleet, or another operating system.",
+      "path": "Select that Agent or integration platform and follow its official installation guide, credentials, permissions, manifest or package steps, then verify its documented telemetry in Datadog.",
+      "effect_on_first_success": "Changes required infrastructure permissions, installation artifact, API-key injection, service model, and success telemetry.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The intended first success is API, APM, logs, RUM, Synthetic Monitoring, CI Visibility, security, or another Datadog product.",
+      "path": "Follow that product's official getting-started path and define its own credential, source, setup, send/test, and UI verification sequence.",
+      "effect_on_first_success": "Replaces Agent installation and default metrics with another data type and terminal signal.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "Datadog exposes many product-specific starting paths without one platform-wide success.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The developer needs a 14-day no-credit-card trial or organization membership and an enabled login method.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S5",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "approval",
+      "description": "Existing-organization access can require an administrator invitation and role assignment.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "choice",
+      "description": "The self-service trial requires a data region choice that the form says cannot later be migrated.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "policy",
+      "description": "Creating the account requires agreement to the Datadog Subscription Agreement and acknowledgment of the Privacy Policy.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "choice",
+      "description": "The Agent must report to the organization's correct Datadog site.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "choice",
+      "description": "Agent installation branches across host, container, cloud, and configuration-management platforms.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "credential",
+      "description": "The Agent requires an organization API key.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "installation",
+      "description": "The developer must execute a privileged, platform-specific in-app installation script on the monitored host.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "environment",
+      "description": "Package installation and telemetry submission require supported Linux and outbound access, or a proxy.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "wait",
+      "description": "New Agent metrics may take a few minutes to become visible.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "Total time not documented; after installation, the Agent guide says metrics may take a few minutes to appear",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started",
+      "url": "https://docs.datadoghq.com/getting_started/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What is Datadog?",
+        "Dive deeper into a product area"
+      ],
+      "evidence_supported": [
+        "Datadog product breadth and lack of a universal first path"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting Started with the Agent",
+      "url": "https://docs.datadoghq.com/getting_started/agent/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Data collected by the Agent",
+        "Agent metrics",
+        "Checks",
+        "Service checks",
+        "Finding metrics in the Datadog UI",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "Default telemetry, correctness metrics, UI verification, tags, and possible wait"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Agent",
+      "url": "https://docs.datadoghq.com/agent/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Choose A Platform",
+        "Managing the Agent with Fleet Automation",
+        "Configuration files",
+        "Datadog site"
+      ],
+      "evidence_supported": [
+        "Platform choice, recommended Fleet Automation workflow, and site configuration"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Linux",
+      "url": "https://docs.datadoghq.com/agent/supported_platforms/linux/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install the Agent",
+        "Configure the Agent",
+        "Commands",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "In-app generated install script, Linux config, API key, site, proxy, and local commands"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "User Management",
+      "url": "https://docs.datadoghq.com/account_management/users/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Add new members and manage invites"
+      ],
+      "evidence_supported": [
+        "Administrator invitation, role assignment, email link, and 48-hour expiry"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Account Management",
+      "url": "https://docs.datadoghq.com/account_management/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Organizations",
+        "Security",
+        "Email verification"
+      ],
+      "evidence_supported": [
+        "Organization membership, login-method verification differences, API keys, and email verification"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Start Your Free Datadog Trial",
+      "url": "https://www.datadoghq.com/free-datadog-trial/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start your 14-day free trial",
+        "Create your account"
+      ],
+      "evidence_supported": [
+        "14-day no-credit-card trial, business email, immutable region choice, password and profile fields, optional phone, Subscription Agreement, Privacy Policy, and account submission"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Datadog product should represent the platform?",
+      "impact": "Agent metrics, API requests, traces, logs, RUM sessions, Synthetic tests, CI data, and security findings have unrelated first paths and success signals.",
+      "reason_unresolved": "The official Getting Started page routes to many product areas, and the roster gives no intended telemetry.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Which Agent platform and operating-system version applies?",
+      "impact": "Host, container, Kubernetes, cloud, and configuration-management routes use different installation commands, permissions, credentials, and verification.",
+      "reason_unresolved": "Agent documentation requires a platform choice; Linux is only the representative candidate.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "question": "Does the live self-service trial require any post-submit email verification or additional onboarding screen before the app opens?",
+      "impact": "A post-submit verification or onboarding screen would add another access step before Agent setup.",
+      "reason_unresolved": "The public trial form exposes the required input fields and create-account action, but the authenticated post-submit state cannot be observed without creating an account.",
+      "checked_source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "question": "What exact command will Fleet Automation generate for the account?",
+      "impact": "The script varies by Datadog site, API key, operating system, Agent options, and current release.",
+      "reason_unresolved": "Current Linux docs intentionally delegate to the authenticated in-app generated script; fabricating a generic command would risk wrong credentials or region.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Adding custom host tags and verifying them after an Agent restart.",
+    "Installing Agent-based, crawler, or library integrations.",
+    "Enabling logs, traces, processes, OTLP, DogStatsD, or custom checks.",
+    "Creating dashboards, monitors, events, maps, notebooks, or alerts.",
+    "Fleet-wide upgrades, remote configuration, API-key rotation, production governance, cost optimization, and billing."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

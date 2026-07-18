@@ -1,0 +1,717 @@
+{
+  "platform": {
+    "name": "Docker",
+    "slug": "docker",
+    "organization": "Docker"
+  },
+  "category": "API infrastructure and developer tooling",
+  "surface": {
+    "name": "Docker Desktop Get Started, run docker/welcome-to-docker",
+    "selection_basis": "Docker's Introduction learning path begins with Get Docker Desktop, whose hands-on guide explicitly labels Run your first container and provides one docker run command plus a browser verification URL. Because installation differs materially by operating system and the guide does not choose one, this record normalizes the literal interactive macOS route as the representative primary path and preserves Windows and Linux as alternatives.",
+    "alternatives_considered": [
+      {
+        "name": "Docker Engine on Linux",
+        "url": "https://docs.docker.com/engine/install/",
+        "reason_not_primary": "It is a valid daemon-only route, but the official Introduction series selects Docker Desktop as the first module."
+      },
+      {
+        "name": "Develop with containers",
+        "url": "https://docs.docker.com/get-started/introduction/develop-with-containers/",
+        "reason_not_primary": "It starts a multi-container sample development environment after the first container has already run."
+      },
+      {
+        "name": "Build and push your first image",
+        "url": "https://docs.docker.com/get-started/introduction/build-and-push-first-image/",
+        "reason_not_primary": "It is the next module and adds Dockerfile, build, Docker Hub account, sign-in, tagging, and push."
+      },
+      {
+        "name": "Docker Playground or cloud environment",
+        "url": "https://www.docker.com/play-with-docker/",
+        "reason_not_primary": "It bypasses local Desktop installation and has different access and session limits."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Install Docker Desktop, start the official welcome container from the CLI, and see its frontend on localhost:8080.",
+    "starting_url": "https://docs.docker.com/get-started/introduction/get-docker-desktop/",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Docker's first-container route.",
+      "Docker Desktop is not yet installed or initialized.",
+      "The representative primary path uses a supported Mac with at least 4 GB RAM; Windows and Linux candidates remain documented branches.",
+      "Port 8080 is expected to be available."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Run your first container",
+    "normalized_outcome": "The developer installs and completes Docker Desktop setup, runs docker/welcome-to-docker detached with host port 8080 mapped to container port 80, and opens the rendered frontend in a browser.",
+    "observable_completion_signal": "http://localhost:8080 renders the official welcome container's landing page, and Docker Desktop Containers shows the running container.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The guide headings Run your first container and Access the frontend provide the command and localhost:8080 browser result; What's next says Docker Desktop is installed and the first container ran.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It proves installation, daemon startup, CLI access, registry image pull, container creation, port publication, running state, and browser reachability. Application development and image publishing are explicitly later modules.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "hardware",
+      "requirement": "For the representative Mac path, a supported macOS version on Apple silicon or Intel and at least 4 GB RAM are required; Docker supports the current and two previous major macOS releases.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "The user must be able to place Docker.app in Applications, start it, accept the Docker Subscription Service Agreement, and provide a macOS password if the selected setup settings require one.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "access",
+      "requirement": "Network access to download Docker Desktop and pull docker/welcome-to-docker is required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "A CLI terminal and web browser are required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "billing",
+      "requirement": "Docker Desktop is free for personal use, education, non-commercial open source, and small businesses with fewer than 250 employees and less than $10 million USD annual revenue. A paid Pro, Team, or Business subscription is required for professional use in larger organizations, government entities, and commercial use beyond free-tier limits.",
+      "required": false,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Mac install guide, confirm the Mac runs a supported macOS release with at least 4 GB RAM, determine Apple silicon or Intel architecture, and quit tools that might call Docker in the background.",
+      "details": [
+        "Docker recommends Rosetta 2 on Apple silicon for the best experience, but says it is not strictly required; a few optional Darwin/AMD64 command-line tools still require it.",
+        "Fleet-managed installations should use the PKG route instead of this interactive path."
+      ],
+      "input": "Mac model, macOS release, RAM, and architecture",
+      "output": "Eligible Mac and matching installer choice",
+      "success_signal": "The developer has selected the Apple silicon or Intel download matching the supported Mac.",
+      "failure_or_wait": "An unsupported macOS release, less than 4 GB RAM, wrong architecture, or background tool holding Docker can block or disrupt installation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Download the matching Docker Desktop for Mac installer from the install page or release notes.",
+      "details": [
+        "Keep the installer volume mounted until installation completes."
+      ],
+      "input": "Apple silicon or Intel choice",
+      "output": "Docker.dmg",
+      "success_signal": "The correct Docker.dmg is downloaded.",
+      "failure_or_wait": "A blocked download, incomplete file, proxy restriction, or wrong architecture requires obtaining the correct installer again.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Double-click Docker.dmg, then drag the Docker icon to the Applications folder.",
+      "details": [
+        "The default destination is /Applications/Docker.app."
+      ],
+      "input": "Docker.dmg and permission to write to Applications",
+      "output": "Docker.app installed in Applications",
+      "success_signal": "Docker.app appears in the Applications folder.",
+      "failure_or_wait": "A damaged-app security dialog, write restriction, or prematurely unmounted installer requires using the documented recovery or repeating installation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Double-click Docker.app in Applications to start Docker Desktop.",
+      "details": [],
+      "input": "Installed Docker.app",
+      "output": "Docker Desktop first-run flow",
+      "success_signal": "The Docker menu displays the Docker Subscription Service Agreement.",
+      "failure_or_wait": "macOS security checks or launch errors can delay or block first run and require the documented troubleshooting path.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the Docker Subscription Service Agreement and select Accept.",
+      "details": [
+        "Docker Desktop will not run without acceptance; the developer may close it and accept later by reopening Docker Desktop."
+      ],
+      "input": "Authority to agree to Docker's terms and any required subscription entitlement",
+      "output": "Accepted Docker Subscription Service Agreement",
+      "success_signal": "Docker Desktop advances to the installation-settings window.",
+      "failure_or_wait": "Declining or deferring agreement stops Docker Desktop; government or larger-organization use may require paid entitlement and procurement first.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose Use recommended settings or Use advanced settings, then select Finish and enter the macOS password if the chosen configuration requires it.",
+      "details": [
+        "Recommended settings automatically apply necessary configuration and require a password.",
+        "Advanced settings expose Docker CLI tool location, default Docker socket, and privileged port mapping choices."
+      ],
+      "input": "Setup-mode choice and password when required",
+      "output": "Completed Docker Desktop local configuration",
+      "success_signal": "The setup window finishes and Docker Desktop starts its engine.",
+      "failure_or_wait": "Missing password authority or an invalid advanced configuration blocks completion until corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "system",
+      "interface": "console",
+      "action": "Wait for Docker Desktop to finish initialization and report ready.",
+      "details": [
+        "Signing in is not required by the first-container guide unless an administrator has enforced sign-in or registry policy requires it."
+      ],
+      "input": "Completed first-run configuration",
+      "output": "Running Docker engine and available docker CLI",
+      "success_signal": "Docker Desktop is ready and the CLI can reach the engine.",
+      "failure_or_wait": "Engine initialization, resource, virtualization, helper, proxy, or enforced-sign-in failures must be resolved before the run command can succeed.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run docker run -d -p 8080:80 docker/welcome-to-docker.",
+      "details": [
+        "-d runs detached.",
+        "-p maps host port 8080 to container port 80.",
+        "Docker pulls the image when it is not already local."
+      ],
+      "input": "Running Docker engine, registry network, and available host port 8080",
+      "output": "Running welcome container and container ID",
+      "success_signal": "The command exits successfully with a container ID and the container remains running.",
+      "failure_or_wait": "A stopped engine, image-pull or registry failure, proxy issue, platform mismatch, or occupied port 8080 blocks startup.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open http://localhost:8080 in a browser.",
+      "details": [],
+      "input": "Running container with published port",
+      "output": "Rendered welcome frontend",
+      "success_signal": "The Docker welcome landing page loads from the container.",
+      "failure_or_wait": "Connection refusal, wrong port, container exit, firewall, proxy, or delayed startup requires checking the container state and logs before reloading.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Docker Desktop, select Containers, and inspect the running container's information.",
+      "details": [
+        "The guide exposes logs, files, Exec, Inspect, bind mounts, and stats, plus pause, resume, start, and stop actions."
+      ],
+      "input": "Running welcome container",
+      "output": "Docker Desktop container record",
+      "success_signal": "The welcome container is listed as running and its logs, files, shell, or inspect data can be opened.",
+      "failure_or_wait": "If absent or stopped, inspect CLI output and logs, remove the failed instance if needed, and run the command again.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The Mac uses Apple silicon.",
+      "path": "Choose the Apple silicon Docker Desktop download. Rosetta 2 is recommended for the best experience but is not strictly required for this guide; install it only if an optional Darwin/AMD64 command-line tool requires it.",
+      "effect_on_first_success": "Selects the Apple silicon binary and may add optional Rosetta installation.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The Mac uses Intel.",
+      "path": "Choose the Intel Docker Desktop download, then follow the same Docker.dmg, Applications, agreement, settings, and Finish actions.",
+      "effect_on_first_success": "Selects the Intel binary without the Apple-silicon Rosetta consideration.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The machine is Windows instead of the representative Mac.",
+      "path": "Confirm a supported Windows configuration; choose recommended per-user or all-users installation and an available x86_64, Microsoft Store, or Arm Early Access installer; download and run Docker Desktop Installer.exe; select the installation mode; choose WSL 2 or Hyper-V where prompted; authorize the wizard; select Close after success; start Docker Desktop from search; review the Docker Subscription Service Agreement; select Accept; wait for startup; then resume at the docker run command.",
+      "effect_on_first_success": "Replaces the macOS installation with Windows mode, backend, authorization, and possible elevation or WSL setup choices while preserving the first-container boundary.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The machine is Linux instead of the representative Mac.",
+      "path": "Confirm x86_64/amd64, a supported current or previous LTS Ubuntu, Debian, RHEL, or Fedora release, or accept that Arch is experimental; meet 64-bit kernel, CPU virtualization, KVM, QEMU 5.2 or later, systemd, desktop environment, and 4 GB RAM requirements; ensure the user can access /dev/kvm and sign out and in after group changes; open the distribution-specific install page; install its .deb or .rpm package and dependencies; launch Docker Desktop; accept the Docker Subscription Service Agreement; wait for the desktop-linux context; then resume at the docker run command.",
+      "effect_on_first_success": "Replaces the macOS installation with distribution package, KVM, group membership, VM, and Docker-context setup while preserving the first-container boundary.",
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The developer uses Docker Desktop personally, for education, for non-commercial open source, or in a small business below both documented thresholds.",
+      "path": "Accept the agreement under the documented free-use category and continue without purchasing a paid Docker Desktop subscription.",
+      "effect_on_first_success": "No billing or procurement step is added.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The developer uses Docker Desktop professionally in a larger organization, in a government entity, or commercially beyond the free-tier limits.",
+      "path": "Confirm an existing Docker Pro, Team, or Business entitlement or complete the organization's authorized purchase and assignment process, then accept the agreement and continue.",
+      "effect_on_first_success": "Adds subscription, procurement, and possibly seat-assignment approval before legitimate use.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer chooses recommended settings.",
+      "path": "Select Use recommended settings, select Finish, and enter the macOS password because this option requires it.",
+      "effect_on_first_success": "Applies Docker's necessary configuration automatically with one privileged confirmation.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer chooses advanced settings.",
+      "path": "Select Use advanced settings; choose the Docker CLI tools location, default Docker socket setting, and privileged port mapping setting; select Finish; enter the macOS password for any privileged choices.",
+      "effect_on_first_success": "Adds explicit local configuration decisions and may avoid or add privileged settings.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "An administrator has enforced Docker sign-in or registry policy requires authentication.",
+      "path": "Select Sign in, authenticate with the required Docker account and organization membership, complete any identity-provider or administrator requirements, wait for Desktop to confirm the session, then continue.",
+      "effect_on_first_success": "Adds account, authentication, and possibly organization membership, but the public first-container guide itself does not require sign-in.",
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "Host port 8080 is already in use.",
+      "path": "Stop the conflicting local service or choose another available host port in -p, such as 8081:80, then open the matching localhost URL.",
+      "effect_on_first_success": "Adds port diagnosis and changes the browser URL.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The image pull fails.",
+      "path": "Verify network, proxy, registry access, and Docker engine state; authenticate to the registry only if the environment requires it; retry docker run after the pull can proceed.",
+      "effect_on_first_success": "Adds network or proxy setup and another pull attempt.",
+      "source_ids": [
+        "S2",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The page does not load.",
+      "path": "Confirm the container is running in Docker Desktop or docker ps, inspect logs, verify the published port, correct the cause, restart or recreate the container, and reload the matching localhost URL.",
+      "effect_on_first_success": "Adds runtime diagnosis and recovery before visual success.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "The developer continues the Introduction series.",
+      "path": "Proceed to Develop with containers, start the multi-container sample, edit and observe it, then build and push a first image to Docker Hub.",
+      "effect_on_first_success": "Adds development, source editing, image build, Docker account, authentication, tagging, and registry push after the first container.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "The representative route requires a supported Mac and the correct Apple silicon or Intel installer; Windows and Linux are materially different paths.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "Installing Docker.app in Applications requires local write permission, a mounted installer, and successful macOS security checks.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "terms",
+      "description": "Docker Desktop cannot run until the Docker Subscription Service Agreement is accepted.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "billing",
+      "description": "A paid subscription is required for professional use in larger organizations, government entities, and commercial use beyond free-tier limits.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "choice",
+      "description": "The developer must choose recommended or advanced settings; recommended settings require a macOS password and advanced settings expose three configuration decisions.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "environment",
+      "description": "The Docker engine must finish starting before CLI calls work; sign-in remains conditional unless an administrator enforces it.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "environment",
+      "description": "Registry access and an available host port 8080 are needed for the exact command.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "Docker labels the full four-module Introduction learning series as 15 minutes. That scope includes Docker Desktop setup, the first container, developing with containers, building an image, and publishing to Docker Hub; it is not a specific claim for only this first-container boundary.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Docker Desktop",
+      "url": "https://docs.docker.com/get-started/introduction/get-docker-desktop/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Explanation",
+        "Try it out",
+        "Run your first container",
+        "Access the frontend",
+        "Manage containers using Docker Desktop",
+        "What's next"
+      ],
+      "evidence_supported": [
+        "Desktop selection",
+        "Enterprise subscription threshold",
+        "Exact run command",
+        "Browser boundary",
+        "Desktop inspection",
+        "Next module"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Docker Get Started introduction",
+      "url": "https://docs.docker.com/get-started/introduction/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "About this series",
+        "What you'll learn",
+        "Modules"
+      ],
+      "evidence_supported": [
+        "Official module order",
+        "First-container before build and publish"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get Docker",
+      "url": "https://docs.docker.com/get-started/get-docker/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get Docker",
+        "Docker Desktop terms",
+        "Platform choices"
+      ],
+      "evidence_supported": [
+        "Mac, Windows, Linux, and Docker Engine route selection"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Install Docker Desktop on Mac",
+      "url": "https://docs.docker.com/desktop/setup/install/mac-install/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "System requirements",
+        "Before you install or update",
+        "Install and run Docker Desktop on Mac",
+        "Install interactively"
+      ],
+      "evidence_supported": [
+        "Supported macOS and RAM",
+        "Architecture choice",
+        "Rosetta status",
+        "Download and drag installation",
+        "Agreement acceptance",
+        "Recommended and advanced settings",
+        "Finish and password"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Docker Desktop license agreement",
+      "url": "https://docs.docker.com/subscription/desktop-license/",
+      "official_domain": true,
+      "source_type": "policy",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Docker Desktop license agreement",
+        "Understanding licensing terms"
+      ],
+      "evidence_supported": [
+        "Agreement requirement",
+        "Free-use categories",
+        "Larger-organization paid use",
+        "Government-entity paid use",
+        "Qualifying paid plans"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Install Docker Desktop on Windows",
+      "url": "https://docs.docker.com/desktop/setup/install/windows-install/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Installation modes",
+        "System requirements",
+        "Install interactively",
+        "Start Docker Desktop",
+        "WSL verification and setup"
+      ],
+      "evidence_supported": [
+        "Windows installer candidates",
+        "Per-user and all-users modes",
+        "WSL 2 and Hyper-V choice",
+        "Wizard actions",
+        "Agreement acceptance"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Install Docker Desktop on Linux",
+      "url": "https://docs.docker.com/desktop/setup/install/linux/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Supported platforms",
+        "General system requirements",
+        "KVM virtualization support",
+        "Where to go next"
+      ],
+      "evidence_supported": [
+        "Supported distributions",
+        "Experimental Arch status",
+        "Linux prerequisites",
+        "KVM modules and user access",
+        "Distribution-specific route"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Sign in to Docker Desktop",
+      "url": "https://docs.docker.com/desktop/setup/sign-in/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Benefits of signing in",
+        "Sign-in enforcement"
+      ],
+      "evidence_supported": [
+        "Sign-in recommendation",
+        "Administrator-enforced sign-in condition",
+        "Registry access benefit"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which operating system and architecture should define the workshop's exact Docker setup path?",
+      "impact": "Installer, privileges, virtualization, WSL, package manager, restart, and troubleshooting differ materially.",
+      "reason_unresolved": "The guide offers Mac, Windows, and Linux without a canonical workshop platform; this record selects interactive macOS as a representative normalization rather than an official preference.",
+      "checked_source_ids": [
+        "S1",
+        "S3",
+        "S4",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "question": "Does the participant's organization require a paid Docker Desktop subscription?",
+      "impact": "The answer can add procurement and policy approval before use.",
+      "reason_unresolved": "The docs define free and paid categories, including government entities, but participant employment context and entitlement are outside the documentation.",
+      "checked_source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "question": "Should Docker Engine without Desktop represent Linux or server-oriented participants?",
+      "impact": "It removes Desktop UI and changes install, daemon, permissions, and verification steps.",
+      "reason_unresolved": "The Introduction series chooses Desktop, while Docker separately documents Engine as a valid product.",
+      "checked_source_ids": [
+        "S1",
+        "S3",
+        "S7"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Developing or editing the multi-container sample application",
+    "Writing a Dockerfile and building an image",
+    "Creating a Docker Hub account, signing in, tagging, and pushing",
+    "Docker Compose design beyond the first container",
+    "Production networking, volumes, security, image scanning, orchestration, and deployment",
+    "Stopping or deleting the welcome container unless needed for recovery"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

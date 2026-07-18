@@ -1,0 +1,732 @@
+{
+  "platform": {
+    "name": "Oracle Cloud Infrastructure",
+    "slug": "oracle-cloud-infrastructure",
+    "organization": "Oracle"
+  },
+  "category": "Cloud and application runtimes",
+  "surface": {
+    "name": "OCI resource type and interface not selected",
+    "selection_basis": "OCI's documentation home separates Start and Develop routes, and its official Create Your First Resources page offers coequal tutorials for compute, object storage, networking, databases, block volumes, and load balancers. It does not designate one as the platform default.",
+    "alternatives_considered": [
+      {
+        "name": "Launch your first Linux instance",
+        "url": "https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/launchinginstance.htm",
+        "reason_not_primary": "This is one compute-specific choice among several first-resource tutorials."
+      },
+      {
+        "name": "Get Started with the CLI",
+        "url": "https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/gettingstartedwiththeCLI.htm",
+        "reason_not_primary": "This interface-specific walkthrough creates compartments, networks, and instances and requires separate CLI setup; OCI does not present it as the only general route."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a first OCI resource without a preselected service or interface.",
+    "starting_url": "https://docs.oracle.com/en-us/iaas/Content/",
+    "assumed_prior_state": [
+      "The developer has arrived after discovery.",
+      "No OCI service, region-specific resource, compartment, or interface has been selected."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "No single OCI platform-wide first-success milestone is documented.",
+    "normalized_outcome": "Unresolved until a human selects a resource type and interface from OCI's official first-resource choices.",
+    "observable_completion_signal": "Each candidate tutorial has a different signal, such as a launched instance, created VCN, object-storage resource, database, block volume, or load balancer.",
+    "boundary_evidence": {
+      "type": "not-established-by-docs",
+      "official_label_or_terminal_state": "The official Create Your First Resources page lists multiple resource tutorials without selecting one default.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "Choosing a compute instance, VCN, database, or other resource would be a researcher choice rather than an OCI-documented platform default.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "Free Trial signup requires country or territory, name, a valid email address, CAPTCHA completion, address, and phone details.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "billing",
+      "requirement": "Most users must provide an accepted payment card for identity verification; Oracle may place a small temporary hold that is removed automatically.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "other",
+      "requirement": "A Home Region, resource type, and interaction interface must be selected. The Home Region cannot be changed after account creation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Oracle Cloud Free Trial signup, enter country or territory, name, valid email, and CAPTCHA, then select Verify my email.",
+      "details": [
+        "Oracle sends a verification link to the supplied address.",
+        "The link is valid for 30 minutes."
+      ],
+      "input": "Country, name, email address, and CAPTCHA response.",
+      "output": "Email verification message.",
+      "success_signal": "The verification email arrives with a signup link.",
+      "failure_or_wait": "An expired link requires restarting email verification; some countries must contact Oracle Sales instead of self-service signup.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the email link, create and confirm the account password, optionally enter a company name, and choose a cloud account name.",
+      "details": [
+        "The cloud account name identifies the tenancy sign-in context."
+      ],
+      "input": "Valid verification link, password, and cloud account name.",
+      "output": "Account identity configuration.",
+      "success_signal": "The signup form accepts the identity fields.",
+      "failure_or_wait": "Password or cloud account name validation can block continuation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the Home Region, accept the terms, and continue.",
+      "details": [
+        "The Home Region determines where the tenancy is created and cannot be changed later.",
+        "Free-tier availability varies by region."
+      ],
+      "input": "Region choice and terms acceptance.",
+      "output": "Fixed tenancy Home Region selection.",
+      "success_signal": "The address and phone section opens.",
+      "failure_or_wait": "A mistaken Home Region cannot be corrected after account creation.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter address and phone details, then add an accepted credit or eligible debit card and select Finish.",
+      "details": [
+        "Oracle uses the card for identity verification and may place a small temporary hold.",
+        "The Free Trial does not charge the card unless the account is upgraded."
+      ],
+      "input": "Address, phone, and payment-card details.",
+      "output": "Verified payment method.",
+      "success_signal": "The payment verification finishes and the trial terms are available.",
+      "failure_or_wait": "An unsupported card or failed verification blocks signup.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Accept the trial terms and select Start my free trial.",
+      "details": [
+        "The promotion includes $300 in credits valid for up to 30 days."
+      ],
+      "input": "Completed signup form and accepted terms.",
+      "output": "OCI tenancy provisioning request.",
+      "success_signal": "Oracle begins provisioning cloud services in the tenancy.",
+      "failure_or_wait": "Provisioning must finish before Console access is available.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Wait for tenancy provisioning and the redirect to the OCI Console, then retain the welcome email.",
+      "details": [
+        "Oracle redirects the developer after the services are provisioned and also sends a welcome email."
+      ],
+      "input": "Submitted Free Trial signup.",
+      "output": "Provisioned OCI tenancy and authenticated Console session.",
+      "success_signal": "The OCI Console opens and the welcome email confirms the account.",
+      "failure_or_wait": "The documentation does not state a provisioning duration.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the OCI documentation home and follow its Start route to first-resource tutorials.",
+      "details": [
+        "The home distinguishes Start from Develop routes.",
+        "The first-resource index groups tutorials by resource type."
+      ],
+      "input": "Provisioned OCI tenancy and intent to create a resource.",
+      "output": "A menu of official resource-specific tutorials.",
+      "success_signal": "The developer reaches the documented first-resource choices.",
+      "failure_or_wait": "No wait is documented at the tutorial router.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Select compute, storage, networking, database, load balancing, or another resource path and its interface.",
+      "details": [
+        "OCI resources may be region-specific or availability-domain-specific.",
+        "The CLI route itself includes compartment, VCN, and instance decisions."
+      ],
+      "input": "A human-selected resource outcome and interface.",
+      "output": "A bounded service-specific tutorial.",
+      "success_signal": "No common platform-level terminal signal is documented.",
+      "failure_or_wait": "The journey cannot continue as one canonical path without the selection.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 8,
+      "condition": "A Linux compute instance is selected.",
+      "path": "Follow OCI's console tutorial to choose a compartment and image, configure networking and keys, create the instance, wait for its lifecycle state, and connect as documented.",
+      "effect_on_first_success": "Success becomes a launched and accessible compute instance.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The CLI walkthrough is selected.",
+      "path": "Meet CLI requirements, choose or create a compartment, obtain tenancy and compartment identifiers, create a VCN, and issue the documented instance-launch commands until the returned resource state can be verified.",
+      "effect_on_first_success": "The path adds local CLI installation, credential, identifier, networking, and command-line gates.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "verification",
+      "description": "Email verification is mandatory and its signup link expires after 30 minutes.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "Home Region must be selected during signup and cannot be changed later.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "billing",
+      "description": "Most users must provide a payment card, and a temporary verification hold may appear.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "wait",
+      "description": "Tenancy services must be provisioned before the OCI Console redirect and welcome email.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "choice",
+      "description": "OCI requires a resource and interface choice among several equally presented first-resource paths.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Oracle Cloud Infrastructure Documentation",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start",
+        "Develop",
+        "Services"
+      ],
+      "evidence_supported": [
+        "General entry point",
+        "Separate starting and developer interfaces",
+        "Breadth of OCI services"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create Your First Resources",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/GSG/Reference/tutorials.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-04-02",
+      "sections_used": [
+        "Learn How to Create Resources",
+        "Compute",
+        "Object Storage",
+        "Networking",
+        "Database",
+        "Block Volume",
+        "Load Balancer"
+      ],
+      "evidence_supported": [
+        "Account framing",
+        "Region and availability-domain note",
+        "Coequal first-resource choices"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get Started with the Command Line Interface",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/gettingstartedwiththeCLI.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "About the CLI",
+        "Before You Begin",
+        "Working in a Compartment"
+      ],
+      "evidence_supported": [
+        "CLI-specific alternative",
+        "CLI setup and compartment prerequisites",
+        "VCN and instance scope"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Sign Up for the Oracle Cloud Free Trial",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/signingup_topic-Sign_Up_for_Free_Oracle_Cloud_Promotion.htm",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign Up for the Free Trial",
+        "Verify your email",
+        "Account information",
+        "Payment method",
+        "Start my free trial"
+      ],
+      "evidence_supported": [
+        "Identity and CAPTCHA fields",
+        "30-minute email verification link",
+        "Password and cloud account name",
+        "Immutable Home Region",
+        "Address, phone, card, and temporary hold",
+        "Tenancy provisioning, Console redirect, and welcome email",
+        "Country and sales branches"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Oracle Cloud Free Tier",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Free Trial",
+        "Sign Up",
+        "Home Region"
+      ],
+      "evidence_supported": [
+        "$300 credit for up to 30 days",
+        "Phone and credit-card requirement for most users",
+        "Home Region warning",
+        "Trial-end behavior"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Launching Your First Linux Instance",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/Compute/tutorials/first-linux-instance/overview.htm",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before You Begin",
+        "1. Create a Compartment",
+        "2. Create a Virtual Cloud Network",
+        "3. Create a Virtual Machine Instance",
+        "4. Connect to Your Instance"
+      ],
+      "evidence_supported": [
+        "Free Tier or paid account and OpenSSH prerequisites",
+        "Compartment creation",
+        "Internet-connected VCN wizard",
+        "Oracle Linux and Always Free eligible shape configuration",
+        "Public IPv4 and generated SSH keys",
+        "Several-minute provisioning and boot wait",
+        "SSH connection and visible default shell terminal"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which OCI resource and interface should represent the platform's first mile?",
+      "impact": "The full steps, credentials, cost exposure, wait states, and success signal differ by resource.",
+      "reason_unresolved": "OCI officially presents several first-resource tutorials without a single default.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "No after-success scope is selected while the platform-wide boundary remains unresolved.",
+    "Production network design, IAM hardening, scaling, monitoring, and later service tutorials are excluded."
+  ],
+  "candidate_paths": [
+    {
+      "id": "free-trial-first-linux-instance",
+      "name": "Create an OCI Free Trial tenancy and connect to the first Linux instance",
+      "selection_basis": "OCI lists several coequal first resources, but its official Launching Your First Linux Instance tutorial supplies a complete console path from an OCI account through compartment and network creation to an authenticated shell on an Oracle Linux VM.",
+      "relationship_to_primary_path": "This follows the Free Trial signup spine in primary steps 1 through 6, selects Linux compute at step 8, and expands the official first-instance tutorial through SSH connection.",
+      "steps": [
+        {
+          "step_number": 1,
+          "phase": "access",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open Oracle Cloud Free Trial signup, enter country or territory, name, valid email, and CAPTCHA, then select Verify my email.",
+          "details": ["Oracle sends a verification link that is valid for 30 minutes."],
+          "input": "Country, name, reachable email, and CAPTCHA response.",
+          "output": "Email verification message.",
+          "success_signal": "The verification email arrives with a signup link.",
+          "failure_or_wait": "An expired link requires restarting verification; some countries require contacting Oracle Sales.",
+          "required": true,
+          "source_ids": ["S4"]
+        },
+        {
+          "step_number": 2,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open the verification link, create and confirm the password, optionally enter a company name, and choose a cloud account name.",
+          "details": [],
+          "input": "Valid email link, password, and cloud account name.",
+          "output": "Configured tenancy identity.",
+          "success_signal": "The signup form accepts the account information.",
+          "failure_or_wait": "Password or cloud account name validation can block continuation.",
+          "required": true,
+          "source_ids": ["S4"]
+        },
+        {
+          "step_number": 3,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Select the Home Region, accept the terms, and continue.",
+          "details": ["The Home Region cannot be changed after account creation and Free Tier availability varies by region."],
+          "input": "Region decision and terms acceptance.",
+          "output": "Fixed tenancy Home Region.",
+          "success_signal": "The address and phone section opens.",
+          "failure_or_wait": "A mistaken Home Region cannot be corrected after the account is created.",
+          "required": true,
+          "source_ids": ["S4", "S5"]
+        },
+        {
+          "step_number": 4,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Enter the address and phone details, provide a post office box if Oracle asks for one, provide a CPF if the address is in Brazil, and select Continue.",
+          "details": ["The post office box and Brazil CPF fields are conditional requirements documented in the official signup instructions."],
+          "input": "Address, phone, and any requested post office box or Brazil CPF details.",
+          "output": "Accepted contact details and the payment verification section.",
+          "success_signal": "The Add payment verification method control becomes available.",
+          "failure_or_wait": "Missing or invalid address, phone, requested post office box, or Brazil CPF details blocks continuation.",
+          "required": true,
+          "source_ids": ["S4"]
+        },
+        {
+          "step_number": 5,
+          "phase": "billing",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Select Add payment verification method, choose Credit Card, enter an accepted card's details, and select Finish.",
+          "details": ["Oracle uses the card for identity verification and may place a small temporary hold that is removed automatically."],
+          "input": "Accepted payment-card details.",
+          "output": "Verified payment method.",
+          "success_signal": "Payment verification completes and the trial terms become available.",
+          "failure_or_wait": "An unsupported card or failed verification blocks signup.",
+          "required": true,
+          "source_ids": ["S4", "S5"]
+        },
+        {
+          "step_number": 6,
+          "phase": "execute",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Accept the trial terms and select Start my free trial.",
+          "details": ["The promotion includes $300 in credits valid for up to 30 days."],
+          "input": "Completed signup and accepted terms.",
+          "output": "OCI tenancy provisioning request.",
+          "success_signal": "Oracle begins provisioning cloud services.",
+          "failure_or_wait": "Console access is unavailable until provisioning finishes.",
+          "required": true,
+          "source_ids": ["S4", "S5"]
+        },
+        {
+          "step_number": 7,
+          "phase": "wait",
+          "actor": "system",
+          "interface": "console",
+          "action": "Wait for tenancy provisioning and the redirect to the OCI Console, then retain the welcome email.",
+          "details": ["Oracle does not state a provisioning duration on the signup page."],
+          "input": "Submitted Free Trial signup.",
+          "output": "Provisioned OCI tenancy and authenticated Console session.",
+          "success_signal": "The OCI Console opens and the welcome email confirms the account.",
+          "failure_or_wait": "The resource tutorial cannot begin until provisioning completes.",
+          "required": true,
+          "source_ids": ["S4"]
+        },
+        {
+          "step_number": 8,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Confirm that the local macOS, Linux, or Windows computer has an `ssh` client.",
+          "details": ["The tutorial states that current versions of these operating systems include OpenSSH by default."],
+          "input": "Supported local computer and terminal.",
+          "output": "Available SSH client.",
+          "success_signal": "The `ssh` command is available locally.",
+          "failure_or_wait": "Without an SSH client, the candidate cannot reach its terminal signal.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 9,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open Identity & Security, select Compartments, create a compartment with a name, required description, and parent compartment, then select it.",
+          "details": ["The tutorial uses one dedicated compartment for its network, instance, and optional storage resources."],
+          "input": "Authenticated tenancy and compartment details.",
+          "output": "Tutorial compartment.",
+          "success_signal": "The new compartment appears in the list and can be selected.",
+          "failure_or_wait": "Missing IAM permission or invalid compartment details prevent resource organization and creation.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 10,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open Networking, select Virtual cloud networks, choose Start VCN Wizard, and select Create VCN with Internet Connectivity.",
+          "details": ["The wizard creates a VCN, internet gateway, public and private subnets, route tables, and security lists."],
+          "input": "Selected tutorial compartment.",
+          "output": "Internet-connected VCN configuration wizard.",
+          "success_signal": "The VCN configuration form opens for the selected compartment.",
+          "failure_or_wait": "Missing networking permission or wrong compartment prevents VCN setup.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 11,
+          "phase": "execute",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Name the VCN, keep the tutorial defaults for DNS and public and private subnet address settings, review the selections, and select Create.",
+          "details": [],
+          "input": "VCN name, compartment, and documented default network settings.",
+          "output": "VCN and related-resource creation request.",
+          "success_signal": "OCI begins creating the VCN and its related resources.",
+          "failure_or_wait": "Invalid CIDR, quota, permission, name, or service errors stop network creation.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 12,
+          "phase": "wait",
+          "actor": "system",
+          "interface": "console",
+          "action": "Wait for VCN creation to complete and select View VCN.",
+          "details": ["The tutorial says network creation might take a moment."],
+          "input": "Submitted VCN wizard.",
+          "output": "Available internet-connected VCN with public subnet.",
+          "success_signal": "The VCN details page shows the created network resources.",
+          "failure_or_wait": "Failed or incomplete related resources prevent the instance from receiving internet connectivity.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 13,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Open Compute, select Instances and Create Instance, then enter the instance name and select the tutorial compartment.",
+          "details": [],
+          "input": "Tutorial compartment and instance name.",
+          "output": "Create compute instance page scoped to the compartment.",
+          "success_signal": "The instance configuration form accepts the name and compartment.",
+          "failure_or_wait": "Missing compute permission or invalid compartment selection prevents configuration.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 14,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Keep the tutorial placement and security defaults, select the Oracle Linux image and an Always Free eligible virtual-machine shape, then select the created VCN and its public subnet with a public IPv4 address.",
+          "details": ["The tutorial illustrates Oracle Linux 8 and an Ampere VM.Standard.A1.Flex shape while noting that actual values can differ."],
+          "input": "Available image, eligible shape, VCN, public subnet, and capacity.",
+          "output": "Configured Oracle Linux VM with public networking.",
+          "success_signal": "The form shows the selected image, shape, VCN, public subnet, and public IPv4 assignment.",
+          "failure_or_wait": "Region capacity, shape eligibility, image, networking, quota, or permission problems block creation.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 15,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "console",
+          "action": "Use Generate a key pair for me, save both private and public SSH keys in a secure location, keep the documented boot-volume and no-block-volume settings, and select Create.",
+          "details": ["OCI-generated private keys cannot be retrieved again after instance creation."],
+          "input": "Completed instance configuration and local secure key location.",
+          "output": "Saved SSH key pair and submitted instance creation request.",
+          "success_signal": "The instance details page opens in Provisioning state.",
+          "failure_or_wait": "Losing the private key, failing to save it, or an instance validation error prevents later connection.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 16,
+          "phase": "wait",
+          "actor": "system",
+          "interface": "console",
+          "action": "Wait without refreshing until the instance reaches Running, then allow several additional minutes for Oracle Linux to boot and obtain its public IP address.",
+          "details": ["The tutorial says provisioning takes several minutes and the operating system needs another few minutes before connection."],
+          "input": "Submitted instance request.",
+          "output": "Running Oracle Linux instance and public IP address.",
+          "success_signal": "The lifecycle state is Running and the public IP is visible.",
+          "failure_or_wait": "Provisioning, capacity, network, or boot failure prevents SSH access.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 17,
+          "phase": "authenticate",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Restrict the private key permissions, then run `ssh -i <private_key_file> opc@<public-ip-address>` and accept the host-key fingerprint on first connection.",
+          "details": ["The Unix-style path uses `chmod 400 <private_key_file>` before SSH; Oracle Linux uses the default username `opc`."],
+          "input": "Saved private key, public IP, local SSH client, and reachable port 22.",
+          "output": "Authenticated SSH connection to the instance.",
+          "success_signal": "SSH accepts the key and opens the remote session.",
+          "failure_or_wait": "Wrong key permissions, username, key, public IP, network path, boot state, or host-key response blocks connection.",
+          "required": true,
+          "source_ids": ["S6"]
+        },
+        {
+          "step_number": 18,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Verify that the default Oracle Linux shell prompt is visible on the remote instance.",
+          "details": ["The tutorial's optional block-volume and cleanup tasks occur after this first connected-instance result."],
+          "input": "Authenticated SSH session.",
+          "output": "Accessible running OCI Compute instance.",
+          "success_signal": "The developer is connected to the default shell for the instance.",
+          "failure_or_wait": "No remote shell means the documented first Linux instance journey is incomplete.",
+          "required": true,
+          "source_ids": ["S6"]
+        }
+      ],
+      "source_ids": ["S4", "S5", "S6"]
+    }
+  ],
+  "candidate_path_gap": null
+}

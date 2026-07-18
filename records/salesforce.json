@@ -1,0 +1,926 @@
+{
+  "platform": {
+    "name": "Salesforce",
+    "slug": "salesforce",
+    "organization": "Salesforce"
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "Salesforce REST API Quick Start using Developer Edition, Salesforce CLI, and cURL",
+    "selection_basis": "Salesforce's REST API guide labels this the Quick Start, says it sets up a basic environment and updates a record, and explicitly chooses the free Developer Edition, Salesforce CLI authentication, and cURL. Salesforce exposes many co-equal products and development surfaces, so this REST API path is representative rather than organization-wide canonical.",
+    "alternatives_considered": [
+      {
+        "name": "Development sandbox",
+        "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_dev_org.htm",
+        "reason_not_primary": "The Quick Start permits a development sandbox, but Developer Edition is its free self-service example."
+      },
+      {
+        "name": "Custom connected app OAuth",
+        "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_oauth.htm",
+        "reason_not_primary": "The guide says a custom connected app is valid, but uses Salesforce CLI because its connected app requires no configuration."
+      },
+      {
+        "name": "Salesforce CLI request tools",
+        "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_using_other_tools.htm",
+        "reason_not_primary": "The guide names Salesforce CLI as another API exercise tool, while the selected sample sequence is written in cURL."
+      },
+      {
+        "name": "Postman",
+        "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_using_other_tools.htm",
+        "reason_not_primary": "Postman is an official documented third-party alternative but changes installation, environment, and request actions."
+      },
+      {
+        "name": "Other Salesforce APIs and platform surfaces",
+        "url": "https://developer.salesforce.com/docs",
+        "reason_not_primary": "Apex, Lightning, GraphQL, Bulk, Composite, Marketing, Commerce, Data Cloud, and other products have different first successes."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Use Salesforce's REST API Quick Start to authenticate a free Developer Edition org, inspect REST resources and Account metadata, query Accounts, update one Account's BillingCity, and verify the update.",
+    "starting_url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart.htm",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Salesforce REST API.",
+      "The developer does not yet have a Developer Edition org, Salesforce CLI, authenticated org, access token, or instance URL.",
+      "The developer can install Salesforce CLI and use cURL."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Quick Start record update completed",
+    "normalized_outcome": "The developer authenticates a free Salesforce Developer Edition org with Salesforce CLI, walks through the documented REST discovery and Account queries, patches one Account's BillingCity to Fremont, receives HTTP 204, and sees the changed value in Salesforce.",
+    "observable_completion_signal": "The PATCH request returns HTTP/1.1 204 No Content, and refreshing the Account page shows BillingCity changed to Fremont.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Quick Start's final Update a Field on a Record section demonstrates HTTP 204 No Content and directs the developer to refresh the Account page to see Fremont.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    "why_this_is_the_boundary": "The Quick Start introduction defines its outcome as updating a record. The final PATCH plus visible Account refresh proves signup, permission, CLI authentication, token retrieval, REST discovery, query, request body, write permission, and the update itself.",
+    "source_ids": [
+      "S1",
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A free Salesforce Developer Edition org or an existing development sandbox is required; new-org activation requires an email inbox the developer can access.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "The Salesforce user profile must have API Enabled permission and enough Account access to query and update the selected record.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "The latest Salesforce CLI for the operating system and cURL or an equivalent REST client are required for the representative route.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "A globally unique Salesforce username in email-address format, an accessible account email, and the password set during activation are needed for browser login; CLI then provides the bearer access token and instance URL.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S7",
+        "S9",
+        "S10"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "billing",
+      "requirement": "The representative Quick Start uses the free Developer Edition; no payment card is documented.",
+      "required": false,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "other",
+      "requirement": "Developer Edition has a 5 MB data-storage maximum, which Salesforce says does not prevent completing the examples.",
+      "required": false,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Salesforce's Developer Edition signup page from the REST Quick Start.",
+      "details": [
+        "The current page presents Developer Edition as a free Salesforce Platform environment.",
+        "A development sandbox remains an alternative to new-org signup."
+      ],
+      "input": "Browser and accessible email inbox",
+      "output": "Developer Edition signup form",
+      "success_signal": "The Sign up for your Developer Edition form is visible.",
+      "failure_or_wait": "A page-load, consent-manager, region, or client-side form error must be resolved before submission.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Complete the signup prompts and select Sign me up.",
+      "details": [
+        "The current official form requires First name, Last name, Job title, Company, Country or region, and Work email; State or province can be conditionally requested by country.",
+        "Use an email inbox you can access because the activation link is delivered there.",
+        "Where the signup flow requests Username, Salesforce Help requires a globally unique value in email-address format; it does not need to be the same as the accessible email or even a functioning mailbox.",
+        "Accept the required Main Services Agreement for Developer Services, Salesforce Program Agreement, and API Terms of Service."
+      ],
+      "input": "Identity, job title, company, geography, accessible work email, unique username when prompted, and required agreements",
+      "output": "Submitted Developer Edition request",
+      "success_signal": "A signup confirmation message appears.",
+      "failure_or_wait": "Missing required fields or agreement, invalid email, duplicate username, region-dependent field error, or service error blocks enrollment and requires correction and resubmission.",
+      "required": true,
+      "source_ids": [
+        "S7",
+        "S8",
+        "S9",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "system",
+      "interface": "email",
+      "action": "Wait for the Salesforce Developer Edition activation or welcome email to arrive in the accessible inbox.",
+      "details": [
+        "Salesforce says delivery can take a few minutes; no exact REST Quick Start timing guarantee is stated."
+      ],
+      "input": "Submitted signup and accessible inbox",
+      "output": "Activation email",
+      "success_signal": "The Salesforce activation message with its account-verification link is present.",
+      "failure_or_wait": "Delivery delay, spam filtering, inaccessible email, rejected enrollment, or duplicate-username enrollment failure prevents activation until resolved.",
+      "required": true,
+      "source_ids": [
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the activation email and select its Verify Account or verification link.",
+      "details": [],
+      "input": "Activation email",
+      "output": "Developer Edition account activation page",
+      "success_signal": "Salesforce prompts the developer to finish registration.",
+      "failure_or_wait": "An expired, already-used, or wrong-account link requires a new activation or password-reset path.",
+      "required": true,
+      "source_ids": [
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Set the Developer Edition password, select and answer the security challenge question, and complete the login process.",
+      "details": [
+        "Preserve the unique username, password, and login URL securely for CLI authentication and later sign-in."
+      ],
+      "input": "Activation link, new password, and security question answer",
+      "output": "Activated Developer Edition credentials and authenticated session",
+      "success_signal": "The new Developer Edition org opens while logged in.",
+      "failure_or_wait": "A password-policy error, unanswered challenge question, expired activation, or incomplete login requires correction or account recovery.",
+      "required": true,
+      "source_ids": [
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm the first Developer Edition login succeeds and verify the user profile has API Enabled permission.",
+      "details": [
+        "The Quick Start says Developer Edition includes API Enabled and that its 5 MB data-storage maximum does not block the examples."
+      ],
+      "input": "Activated Developer Edition session",
+      "output": "API-enabled Developer Edition org",
+      "success_signal": "The org is accessible and API Enabled is present for the user.",
+      "failure_or_wait": "Missing API Enabled or a login failure blocks CLI and REST authentication and requires profile or account correction.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install or update the latest Salesforce CLI and verify the installation.",
+      "details": [],
+      "input": "Supported operating system",
+      "output": "Working sf command",
+      "success_signal": "Salesforce CLI verification succeeds.",
+      "failure_or_wait": "Installation, PATH, or version problems must be corrected before authentication.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run sf org login web, sign in to the Developer Edition org in the opened browser, and select Allow.",
+      "details": [
+        "For a sandbox, append --instance-url with the sandbox My Domain URL.",
+        "Salesforce CLI acts as the connected app, so no custom connected-app configuration is required."
+      ],
+      "input": "Org credentials and optional sandbox URL",
+      "output": "CLI-authorized Salesforce org",
+      "success_signal": "The CLI prints Successfully authorized with the username and org ID.",
+      "failure_or_wait": "Wrong credentials, sandbox URL, denied consent, or browser callback failure prevents authorization and requires retrying the login.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run sf org display --target-org with the username and copy the Access Token and Instance Url.",
+      "details": [
+        "An alias can optionally shorten the username.",
+        "If the token expires, repeat org display to get a new token."
+      ],
+      "input": "Authorized username",
+      "output": "Bearer access token and instance URL",
+      "success_signal": "Org Description shows Status Active plus Access Token and Instance Url.",
+      "failure_or_wait": "An unknown target org, disconnected status, or expired authorization requires listing orgs or logging in again.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Prepare cURL requests with the instance My Domain, straight quotes, Authorization: Bearer token, JSON content type where needed, and local request-body files for writes.",
+      "details": [
+        "On macOS or Linux, escape the exclamation mark in a double-quoted token or use single quotes.",
+        "Attach JSON with --data-binary or -d."
+      ],
+      "input": "Instance URL, access token, cURL, and local filesystem",
+      "output": "Correct cURL authentication and body format",
+      "success_signal": "The shell preserves the full bearer token and can read the body file.",
+      "failure_or_wait": "Curly quotes, an unescaped exclamation mark, a truncated token, or missing body file causes shell or API failure.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "GET /services/data/ on the org's My Domain to list available Salesforce API versions.",
+      "details": [
+        "This Versions request does not require authentication."
+      ],
+      "input": "Instance My Domain",
+      "output": "Array of valid API versions",
+      "success_signal": "The response contains label, url, and version entries.",
+      "failure_or_wait": "Wrong domain or network failure prevents version discovery.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "GET /services/data/v67.0/ with the bearer token to list resources for the documented version.",
+      "details": [],
+      "input": "Instance URL and access token",
+      "output": "Resource map",
+      "success_signal": "The response includes sobjects, search, query, and recent resource URLs.",
+      "failure_or_wait": "Invalid or expired token, API permission, domain, or version errors require correcting authentication or using an available version.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "GET /services/data/v67.0/sobjects/ to run Describe Global and confirm Account is available.",
+      "details": [],
+      "input": "Authorized version resource",
+      "output": "Global sObject list",
+      "success_signal": "The response includes the Account object's metadata and URLs.",
+      "failure_or_wait": "Object permissions or an incorrect version can omit or block Account.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "GET /services/data/v67.0/sobjects/Account/ to retrieve basic Account metadata and recent items.",
+      "details": [],
+      "input": "Account sObject resource",
+      "output": "Account objectDescribe and recentItems",
+      "success_signal": "The response includes Account name, label, key prefix, capabilities, and recent Account IDs if present.",
+      "failure_or_wait": "No recent accounts can make the later example ID unavailable; use a queried Account ID.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "GET /services/data/v67.0/sobjects/Account/describe/ to retrieve detailed Account fields and relationships.",
+      "details": [],
+      "input": "Account describe resource",
+      "output": "Detailed Account metadata",
+      "success_signal": "The response includes fields such as Id and updateable, childRelationships, and Account URLs.",
+      "failure_or_wait": "Missing permission or wrong object path blocks metadata retrieval.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Execute the documented SOQL query SELECT name from Account and choose an Account ID from the response.",
+      "details": [
+        "URL-encode the query as shown in the guide."
+      ],
+      "input": "Bearer token and query resource",
+      "output": "Account names and IDs",
+      "success_signal": "The response has done true, totalSize, and Account records with IDs.",
+      "failure_or_wait": "SOQL syntax, URL encoding, object permission, or an empty result requires correction or creating sample data.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Create patchaccount.json with BillingCity set to Fremont and PATCH /sobjects/Account/{ID} using --data-binary.",
+      "details": [
+        "Send Content-Type application/json and the bearer token.",
+        "Use the selected Account ID."
+      ],
+      "input": "Account ID and patchaccount.json",
+      "output": "Updated Account record",
+      "success_signal": "The API returns HTTP/1.1 204 No Content.",
+      "failure_or_wait": "Invalid JSON, wrong ID, non-updateable record or field, insufficient permission, expired token, or missing body prevents the 204 response.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open or refresh the Account page in Salesforce and verify BillingCity is Fremont.",
+      "details": [],
+      "input": "Patched Account ID",
+      "output": "Visible persisted field update",
+      "success_signal": "The Account billing address shows Fremont.",
+      "failure_or_wait": "A different Account, stale page, failed PATCH, or automation overwriting the value prevents visual confirmation.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "A development sandbox is used.",
+      "path": "Use the existing sandbox user with API Enabled; install CLI; run sf org login web with --instance-url set to the sandbox My Domain URL; authorize; display the sandbox token and instance URL; then run the same request sequence against that sandbox.",
+      "effect_on_first_success": "Skips Developer Edition signup but adds sandbox access and the instance-url login flag.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Enrollment reports that the email address is already in use.",
+      "path": "Check the Username rather than abandoning the accessible account email. Salesforce's troubleshooting article says this message can actually mean the globally unique username is already taken; choose a new username in email-address format, keep the same accessible email if desired, and resubmit.",
+      "effect_on_first_success": "Adds a corrected signup attempt while preserving activation delivery to the same inbox.",
+      "source_ids": [
+        "S7",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The activation email does not arrive.",
+      "path": "Confirm the submitted email inbox is accessible, check spam or filtering, verify the signup produced confirmation rather than an enrollment error, correct any duplicate-username failure, and repeat or recover the signup according to the page shown.",
+      "effect_on_first_success": "Adds email diagnosis, possible resubmission, and another activation wait.",
+      "source_ids": [
+        "S7",
+        "S9",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "A custom connected app is required.",
+      "path": "Create and configure the connected app, select OAuth scopes, set callback and policy, implement a supported OAuth flow, exchange for an access token, capture instance_url, and then enter the cURL sequence.",
+      "effect_on_first_success": "Adds app configuration and OAuth implementation that the Quick Start avoids by using Salesforce CLI.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The access token expires.",
+      "path": "Run sf org display --target-org again to obtain the refreshed token; if the org is no longer connected, repeat sf org login web and Allow; replace the token in later requests and retry.",
+      "effect_on_first_success": "Adds token renewal or login before the failed request can succeed.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "The token's exclamation mark triggers shell history expansion.",
+      "path": "Enclose the Authorization header in single straight quotes or escape the exclamation mark with a backslash inside double straight quotes, then resend.",
+      "effect_on_first_success": "Fixes local shell parsing without changing Salesforce authorization.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "cURL is not desired.",
+      "path": "Use Salesforce CLI or Postman to send equivalent requests with the same instance URL, API version, bearer token, paths, query, Account ID, PATCH body, and final verification.",
+      "effect_on_first_success": "Changes tool installation and interface while preserving the request sequence and boundary.",
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "API version 67.0 is not in the Versions response.",
+      "path": "Select a current version returned by /services/data/, replace v67.0 consistently in every versioned request, and continue with that version.",
+      "effect_on_first_success": "Changes request URLs and potentially response schema while preserving the operations.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 16,
+      "condition": "No Account record is available to update.",
+      "path": "Create an Account using an authorized sObject POST or add sample data in the org, query again to obtain its ID, then continue with the PATCH.",
+      "effect_on_first_success": "Adds a record-creation step before the documented update.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "The PATCH does not return 204.",
+      "path": "Inspect the Salesforce error body; verify token, API Enabled, Account and field permissions, API version, Account ID, Content-Type, straight quotes, and patchaccount.json; correct the cause and retry the PATCH, then refresh the Account.",
+      "effect_on_first_success": "Adds diagnosis and a repeated write before terminal verification.",
+      "source_ids": [
+        "S2",
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "Signup requires identity, job title, company, geography, accessible work email, a globally unique username where prompted, and submission of the live form.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7",
+        "S8",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "terms",
+      "description": "The current form requires agreement to the Developer Services, Salesforce Program, and API terms.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "wait",
+      "description": "The developer must wait for an activation email sent to an accessible inbox.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "verification",
+      "description": "The activation-email verification link must be opened before password setup and first login.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "credential",
+      "description": "Activation requires a new password and security challenge question; username, password, and login URL must be preserved.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "installation",
+      "description": "The representative route requires installing and verifying the latest Salesforce CLI plus cURL.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "verification",
+      "description": "Browser login and an Allow consent action are required before CLI authorization completes.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "credential",
+      "description": "The bearer token and instance URL must be copied from CLI output and the token can expire.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "configuration",
+      "description": "cURL quoting, token exclamation marks, JSON files, headers, instance domain, and API version create several local failure points.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "other",
+      "description": "A queryable and updateable Account record and its ID are required for the terminal PATCH.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "permission",
+      "description": "The authenticated user needs object, record, and BillingCity update access to receive 204.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "REST API Quick Start",
+      "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "API version 262.0",
+      "sections_used": [
+        "Quick Start",
+        "Using cURL",
+        "Step One",
+        "Step Two",
+        "Step Three",
+        "Using Other Tools"
+      ],
+      "evidence_supported": [
+        "Official guide scope",
+        "Developer Edition and cURL selection",
+        "Update-record target",
+        "Ordered child guides"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Step One: Sign up for Salesforce Developer Edition",
+      "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_dev_org.htm",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "API version 262.0",
+      "sections_used": [
+        "Developer Edition signup",
+        "Development sandbox",
+        "API Enabled permission"
+      ],
+      "evidence_supported": [
+        "Free org",
+        "5 MB limit",
+        "Sandbox alternative",
+        "API permission gate"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Step Two: Set Up Authentication",
+      "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_oauth.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "API version 262.0",
+      "sections_used": [
+        "Get an Access Token with Salesforce CLI",
+        "Optional Salesforce CLI Shortcuts"
+      ],
+      "evidence_supported": [
+        "CLI choice and installation",
+        "Web login and Allow",
+        "Sandbox flag",
+        "Success message",
+        "Token and instance URL",
+        "Expiry recovery"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Using cURL",
+      "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_using_curl.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "API version 262.0",
+      "sections_used": [
+        "Attach Request Bodies",
+        "Handle Exclamation Marks in Access Tokens"
+      ],
+      "evidence_supported": [
+        "Body-file syntax",
+        "Token quoting and escape branch",
+        "Straight-quote requirement"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Step Three: Walk Through the Sample Code",
+      "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_code.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "API version 262.0",
+      "sections_used": [
+        "Get the Salesforce Version",
+        "Get a List of Resources",
+        "Get a List of Available Objects",
+        "Get Basic Object Information",
+        "Get a List of Fields",
+        "Execute a SOQL Query",
+        "Update a Field on a Record"
+      ],
+      "evidence_supported": [
+        "Complete request order",
+        "Expected response shapes",
+        "Account ID acquisition",
+        "PATCH body",
+        "204 and visible Fremont boundary"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Using Other Tools",
+      "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_using_other_tools.htm",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "API version 262.0",
+      "sections_used": [
+        "Salesforce CLI",
+        "Postman"
+      ],
+      "evidence_supported": [
+        "Non-cURL alternatives"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "How to Sign Up for Trailhead with a Developer Edition",
+      "url": "https://help.salesforce.com/s/articleView?id=005298906&language=en_US&type=1",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What's a Developer Edition?",
+        "Sign up for a Developer Edition",
+        "Activate the Developer Edition"
+      ],
+      "evidence_supported": [
+        "Free Developer Edition",
+        "Accessible real email",
+        "Globally unique username in email-address format",
+        "Activation-email wait",
+        "Verification link",
+        "Password and security question"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Sign up for your Developer Edition",
+      "url": "https://www.salesforce.com/products/free-trial/developer/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Developer Edition signup form",
+        "Required form fields",
+        "Required disclosures"
+      ],
+      "evidence_supported": [
+        "First and last name",
+        "Job title",
+        "Company",
+        "Country or region",
+        "Conditional state or province",
+        "Work email",
+        "Sign me up action",
+        "Required Developer Services, Program, and API agreements",
+        "Free environment positioning"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Troubleshooting the Issue of Not Getting Health Trial Environment",
+      "url": "https://help.salesforce.com/s/articleView?id=001426366&language=en_US&type=1",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-04-23",
+      "sections_used": [
+        "Description",
+        "Resolution"
+      ],
+      "evidence_supported": [
+        "Misleading duplicate-email enrollment message",
+        "Actual global username uniqueness conflict",
+        "Same account email reusable with a different username"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Agent Script example setup",
+      "url": "https://developer.salesforce.com/docs/ai/agentforce/guide/ascript-example-rag-jargon.html",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Developer Edition setup prerequisite"
+      ],
+      "evidence_supported": [
+        "Accessible inbox",
+        "Submit signup form",
+        "Welcome-email verification",
+        "New password",
+        "Security question",
+        "Complete login",
+        "Preserve username and password"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Salesforce product or development surface should represent the workshop's organization-wide first mile?",
+      "impact": "REST API, Apex, Lightning, GraphQL, Bulk, Marketing, Commerce, Data Cloud, and other surfaces have different accounts, tools, and terminal outcomes.",
+      "reason_unresolved": "The REST guide is canonical only within REST API and does not claim to represent all Salesforce development.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Will the live Developer Edition form request a separate Username or CAPTCHA for this participant?",
+      "impact": "A Username prompt adds the global-uniqueness choice and duplicate retry; a conditional CAPTCHA would add an anti-bot gate before submission.",
+      "reason_unresolved": "Current Salesforce Help still instructs developers to supply a unique username, while the current public form schema reviewed on the research date lists identity, company, geography, work email, and agreements but does not expose a Username or CAPTCHA field. Static official sources cannot establish conditionally rendered runtime controls.",
+      "checked_source_ids": [
+        "S7",
+        "S8",
+        "S9",
+        "S10"
+      ]
+    },
+    {
+      "question": "Will the new Developer Edition org contain an Account record suitable for the documented update?",
+      "impact": "An empty org adds account creation before the terminal PATCH.",
+      "reason_unresolved": "The sample responses assume Account records but the signup guide does not guarantee a specific data set.",
+      "checked_source_ids": [
+        "S2",
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Custom connected-app OAuth implementation",
+    "Production org access and enterprise permission administration",
+    "Creating, deleting, or bulk-processing records beyond the one Account update",
+    "Apex, Lightning, GraphQL, Bulk, Composite, Streaming, Pub/Sub, Marketing, Commerce, and Data Cloud journeys",
+    "Postman workspace setup unless selected",
+    "Token lifecycle engineering, secret storage, retries, monitoring, and deployment",
+    "Additional REST resources beyond the Quick Start sequence"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

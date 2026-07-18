@@ -1,0 +1,1026 @@
+{
+  "platform": {
+    "name": "Adyen",
+    "slug": "adyen",
+    "organization": "Adyen"
+  },
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "Adyen online payments, Web Drop-in, Sessions flow, test environment",
+    "selection_basis": "Adyen's general getting-started guide presents online payments, in-person payments, Adyen for Platforms, and plugins as co-equal integration choices. For online payments, Adyen says Sessions is the default server-side flow recommended for most integrations, and the Web Drop-in guide provides the most complete documented first end-to-end test-payment route. Adyen does not declare this route canonical for the whole platform, so the platform-level selection still needs human judgment.",
+    "alternatives_considered": [
+      {
+        "name": "In-person payments",
+        "url": "https://docs.adyen.com/point-of-sale",
+        "reason_not_primary": "It requires a POS application or standalone terminal and has a different hardware, account, and payment-verification journey."
+      },
+      {
+        "name": "Adyen for Platforms",
+        "url": "https://docs.adyen.com/marketplaces/get-started",
+        "reason_not_primary": "It begins with Sales contact, implementation scoping, and an Adyen-provisioned test account rather than the self-service online-payment route."
+      },
+      {
+        "name": "Plugins",
+        "url": "https://docs.adyen.com/plugins",
+        "reason_not_primary": "The first mile depends on the selected commerce system and plugin rather than Adyen's direct Web Drop-in integration."
+      },
+      {
+        "name": "Online payments, Advanced flow",
+        "url": "https://docs.adyen.com/online-payments/build-your-integration/advanced-flow",
+        "reason_not_primary": "It uses three Checkout API requests and is documented for use cases that Sessions does not cover; Adyen labels Sessions the default for most integrations."
+      },
+      {
+        "name": "Online payments, Web Components",
+        "url": "https://docs.adyen.com/online-payments/build-your-integration/sessions-flow",
+        "reason_not_primary": "Components provide individual payment-method UI rather than the pre-built Drop-in, but the same guide treats both as valid client choices."
+      },
+      {
+        "name": "Online payments for iOS, Android, React Native, or Flutter",
+        "url": "https://docs.adyen.com/online-payments/build-your-integration",
+        "reason_not_primary": "Each client platform has different SDK, application, redirect, and UI setup even when Sessions remains the server-side flow."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Build Adyen's recommended default online-payment flow for a website, make one test card payment through Web Drop-in, and confirm the authorized result in both the client and webhook.",
+    "starting_url": "https://docs.adyen.com/get-started-with-adyen",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Adyen, but has not yet chosen among online, in-person, Platforms, or plugin integration families.",
+      "The developer does not yet have an Adyen test account, API key, client key, merchant account structure, or configured webhook.",
+      "The developer has an existing website or web application with a server, client, and a publicly reachable webhook endpoint or a way to expose one.",
+      "The first success is confined to Adyen's test environment and does not require a live-account application, contract, compliance form, or real payment card."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "A completed payment session with an Authorised payment result and a successful AUTHORISATION webhook",
+    "normalized_outcome": "The developer creates an Adyen test account and credentials, implements Web Drop-in using the Sessions flow, submits a documented test card payment, shows the authorized result to the shopper, and receives the matching AUTHORISATION webhook with success true.",
+    "observable_completion_signal": "The client receives resultCode Authorised, or the optional session-result request returns status completed with resultCode Authorised, and the webhook server receives an AUTHORISATION event whose success field is true for the same merchantReference or pspReference.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Sessions guide demonstrates status completed and resultCode Authorised, states that completed means the payment was authorized, and shows a successful AUTHORISATION webhook with success true.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the first documented end-to-end proof that the account, server credential, client credential, session request, payment UI, shopper action, client result handling, and asynchronous webhook all work together. Live-account approval and production configuration are explicitly later steps.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S4",
+      "S7",
+      "S8"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A free Adyen test account and access to the test Customer Area are required for the self-service online-payment route.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "knowledge",
+      "requirement": "The developer must choose online payments rather than in-person payments, Adyen for Platforms, or a commerce plugin, then choose server-side flow, client platform, UI integration, and server language.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "The Customer Area user needs Merchant admin and Manage API credentials roles; the API credential needs the default payment roles.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "The server needs an API credential and API key, while Web Drop-in needs a client key linked to that credential and an allowed origin.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "A web application with server-side code, client-side code, a supported browser, and one documented Adyen API-library runtime is required for the representative route.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "access",
+      "requirement": "A public webhook endpoint capable of accepting the configured method and returning a successful HTTP status within 10 seconds is required for end-to-end outcome verification.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "order": 7,
+      "type": "billing",
+      "requirement": "The first success uses the test environment and documented test card details; the official first-mile guides do not require a credit card or live payment.",
+      "required": false,
+      "source_ids": [
+        "S1",
+        "S8"
+      ]
+    },
+    {
+      "order": 8,
+      "type": "other",
+      "requirement": "The website architecture must observe the documented iframe, WebView, server-side rendering, browser, redirect, and Content Security Policy limitations that apply to the selected payment flow.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Adyen's general getting-started guide and select Online payments as the integration family.",
+      "details": [
+        "The same page also offers In-person payments, Adyen for Platforms, and Plugins.",
+        "The test account can be created before or while starting the live-account application, but the first success remains in test."
+      ],
+      "input": "Decision to accept a first test payment on a website",
+      "output": "Online-payments integration route",
+      "success_signal": "The online-payments checklist and build guide are the active documentation path.",
+      "failure_or_wait": "Selecting a different integration family changes the account, setup, hardware, or application journey and cannot be represented by this path.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a free Adyen test account and sign in to the test Customer Area.",
+      "details": [
+        "The signup creates an admin user and grants access to the unified test dashboard.",
+        "The test account supports test payments, inviting team members, applying for live, and starting the integration.",
+        "A test account does not guarantee approval to process live payments."
+      ],
+      "input": "Adyen signup identity and business information requested by the current form",
+      "output": "Test Customer Area access and initial admin user",
+      "success_signal": "The developer can open the test Customer Area and see the company and merchant account context.",
+      "failure_or_wait": "The official getting-started page does not enumerate the current signup fields, verification screens, anti-abuse checks, or possible account-creation delays.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Determine the test company-account and merchant-account structure, confirm the admin user, and add team users or payment methods needed for the test.",
+      "details": [
+        "Adyen uses one company account with one or more merchant-account subaccounts.",
+        "The initial test structure should resemble the intended live structure, though it can be finalized later.",
+        "The checklist directs the developer to add the payment methods that the integration will accept."
+      ],
+      "input": "Test business structure, team members, and intended first payment method",
+      "output": "Selected merchant account, authorized users, and enabled test payment method",
+      "success_signal": "A merchant account name is available for the Sessions request and the chosen test payment method can be offered.",
+      "failure_or_wait": "Missing user roles, the wrong account level, or an unavailable payment method blocks later credentials or checkout behavior.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Generate and securely store the test API key for the payment API credential.",
+      "details": [
+        "In the test Customer Area, open Developers, API credentials, choose the Payments tab and credential username, open Server settings, Authentication, API key, then generate and copy the key.",
+        "The key cannot be copied again after leaving the page.",
+        "Save changes after generation."
+      ],
+      "input": "Customer Area access with Merchant admin or Manage API credentials role",
+      "output": "Test API key associated with the selected API credential",
+      "success_signal": "The key is stored outside client code and the credential has the default payment roles.",
+      "failure_or_wait": "Insufficient user roles hide credential controls; losing the one-time displayed value requires generating another key.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Generate the client key, add the website's allowed origin, store the key, and save the credential changes.",
+      "details": [
+        "Open Developers, API credentials, select the integration credential, then Client settings, Authentication, Client key.",
+        "Generate and copy the test-prefixed client key.",
+        "Under allowed origins, add the development domain; localhost or 127.0.0.1 can use HTTP as secure contexts in test, while live requires HTTPS.",
+        "New allowed origins can take a few seconds to become available."
+      ],
+      "input": "API credential and exact website origin",
+      "output": "Client key linked to an allowed test origin",
+      "success_signal": "The test client key is available to the client application and the origin appears in the credential configuration.",
+      "failure_or_wait": "An absent or mismatched allowed origin prevents Drop-in client authentication; a newly added origin may require a short wait before retrying.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Expose a webhook endpoint, configure a Standard webhook with default event codes in the test Customer Area, and test that Adyen receives a successful acknowledgement.",
+      "details": [
+        "The endpoint must accept JSON, HTTP POST, or SOAP at a public URL and use the documented test ports and TLS requirements.",
+        "In Developers, Webhooks, create a new webhook, add the Standard type, set General and Server configuration values, configure security including HMAC or basic authentication as applicable, select events, and save the configuration.",
+        "Test configuration for the selected merchant account and event; the endpoint must return a successful HTTP status such as 200 or 202 within 10 seconds."
+      ],
+      "input": "Public webhook URL, method, merchant account, event selection, and security configuration",
+      "output": "Enabled and tested Standard webhook subscription",
+      "success_signal": "Test configuration succeeds and the endpoint acknowledges the test event.",
+      "failure_or_wait": "A timeout, non-2xx response, inaccessible URL, wrong port or TLS setup, authentication failure, or signature-validation failure sends events to retry handling and requires correction before another test.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose the Sessions server-side flow, Web client platform, Drop-in UI, current Web version, and one documented server language.",
+      "details": [
+        "Adyen calls Sessions the default flow for most online-payment integrations and describes it as one Checkout API request.",
+        "Advanced flow uses paymentMethods, payments, and payments/details and supports additional cases.",
+        "The Web Drop-in guide offers Java, PHP, C#, Node.js, Go, Python, and Ruby API libraries, with curl request examples also shown."
+      ],
+      "input": "Website architecture, supported use cases, and installed server runtime",
+      "output": "Web Drop-in plus Sessions implementation plan and language-specific branch",
+      "success_signal": "The matching tabs and version in the dynamic integration guide are selected.",
+      "failure_or_wait": "Adyen does not name one server language canonical; selecting another client platform, UI, flow, or version changes the subsequent actions.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the selected official Adyen server API library and initialize its client with the API key and TEST environment.",
+      "details": [
+        "Use the runtime-specific package command and minimum version documented in the selected tab.",
+        "Keep the API key on the server.",
+        "The guide also links official example integrations for several languages."
+      ],
+      "input": "Supported runtime, package manager, and test API key",
+      "output": "Server-side Checkout API client configured for test",
+      "success_signal": "The application can construct the Checkout service without exposing the API key to the browser.",
+      "failure_or_wait": "A missing runtime, unsupported version, dependency failure, wrong environment, or invalid API key blocks the Sessions request.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "sdk",
+      "action": "Create a server route that makes a test Checkout API /sessions request and returns the session id and sessionData to the client.",
+      "details": [
+        "Include merchantAccount, amount with currency and minor-unit value, returnUrl without PII, and a unique reference of at least three characters.",
+        "For Web, set channel as Web where required by the selected code path; countryCode and other fields control available payment methods.",
+        "Use an idempotency key for the API request as shown by the language setup.",
+        "A successful request returns HTTP 201 with sessionData and id."
+      ],
+      "input": "Merchant account, amount, currency, return URL, reference, API key, and optional shopper context",
+      "output": "Session id and sessionData returned by the server to the browser",
+      "success_signal": "The Checkout test endpoint returns HTTP 201 and the client receives both session fields.",
+      "failure_or_wait": "API errors can result from authentication, permissions, invalid fields, unavailable payment methods, or environment mismatch and must be handled before retrying.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install Adyen Web on the front end using the recommended npm route or the documented embedded script and stylesheet route.",
+      "details": [
+        "The npm route can import Drop-in with all payment methods or import individual payment-method components for tree shaking.",
+        "Import the Adyen stylesheet together with the JavaScript library."
+      ],
+      "input": "Web application package system and selected Web version",
+      "output": "AdyenCheckout, Dropin, and required styles available to client code",
+      "success_signal": "The browser build resolves the library and stylesheet without version or module errors.",
+      "failure_or_wait": "Incorrect package version, missing CSS, module-format mismatch, or server-side rendering initialization can prevent the checkout UI from loading.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add a DOM container for Drop-in, configure AdyenCheckout, create Drop-in, and mount it in the browser.",
+      "details": [
+        "Pass the server's session id and sessionData, the test client key, environment test, country code or locale, and required event handlers including onPaymentCompleted and onError.",
+        "Configure individual payment methods if needed.",
+        "Create the Dropin instance and mount it to the selected CSS selector or HTMLElement.",
+        "Initialize AdyenCheckout and Components on the client side when using server-side rendering."
+      ],
+      "input": "Session data, client key, environment, locale or country context, handlers, and DOM selector",
+      "output": "Rendered Drop-in showing available test payment methods",
+      "success_signal": "The Drop-in UI is mounted and ready for shopper interaction.",
+      "failure_or_wait": "An invalid session, wrong client key, disallowed origin, missing locale or country context, unsupported browser, CSP issue, iframe restriction, or client-side initialization error prevents rendering or interaction.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Implement redirect-result handling and shopper-facing payment-status handling.",
+      "details": [
+        "When a payment method redirects, read sessionId and redirectResult from the return URL, create AdyenCheckout with the session id, and submit redirectResult.",
+        "Use onPaymentCompleted or onPaymentFailed and the resultCode to show the current payment status.",
+        "If the shopper never returns, do not submit details and rely on the webhook outcome."
+      ],
+      "input": "Return URL parameters and checkout result events",
+      "output": "Redirect recovery and visible result state",
+      "success_signal": "A returned shopper sees the status corresponding to the resultCode, and non-returning flows still have webhook outcome handling.",
+      "failure_or_wait": "Malformed or absent return parameters, an incorrect return URL, or repeated submitDetails calls can prevent client confirmation; asynchronous methods may remain pending until a webhook arrives.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open the checkout, select card, enter an official Adyen test card number, future expiry date, and test security code, then submit the payment.",
+      "details": [
+        "The official test-card list includes Visa and other scheme numbers with expiry 03/2030 and security code 737 for many examples.",
+        "Test card numbers work only on Adyen's test platform and must not be used for live payments.",
+        "The guide recommends testing each payment method intended for shoppers."
+      ],
+      "input": "Rendered Drop-in and documented test-card details",
+      "output": "Submitted test payment in the active session",
+      "success_signal": "Drop-in completes the payment flow and triggers a payment-completed or payment-failed event.",
+      "failure_or_wait": "Invalid test details, a refused test scenario, missing payment-method configuration, 3D Secure or redirect handling, session expiry, or network errors require correction or a new session before retrying.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "sdk",
+      "action": "Verify the client-side result is Authorised and show the successful status to the shopper.",
+      "details": [
+        "The onPaymentCompleted result provides resultCode.",
+        "Optionally send sessionResult and the original session id to the server and call GET /sessions/{id}?sessionResult=... once.",
+        "The demonstrated successful response has status completed and a payment resultCode of Authorised; the guide says completed means authorized."
+      ],
+      "input": "Checkout completion result and optional sessionResult",
+      "output": "Visible authorized test-payment state",
+      "success_signal": "The client resultCode is Authorised, or the one-time session-result response is completed with Authorised.",
+      "failure_or_wait": "Refused, pending, canceled, expired, or failed results are not the target; the session-result response is a snapshot and must not be polled for updates.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Receive the asynchronous AUTHORISATION webhook, acknowledge it, and match it to the test order.",
+      "details": [
+        "Match merchantReference to the order reference or use pspReference for end-to-end testing.",
+        "A successful event has eventCode AUTHORISATION and success true.",
+        "Return a 2xx acknowledgement within 10 seconds, and use the webhook rather than the client result as the order-management outcome."
+      ],
+      "input": "Configured Standard webhook and completed test payment",
+      "output": "Acknowledged, correlated successful authorization event",
+      "success_signal": "The webhook endpoint records AUTHORISATION with success true for the same test payment and replies 200 or 202.",
+      "failure_or_wait": "Webhook delivery is asynchronous; a non-2xx response or timeout enters retry handling, while success false includes the refusal reason and requires a new corrected payment attempt.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "In-person payments is selected.",
+      "path": "Leave the online checklist and use the point-of-sale getting-started route. Choose an integrated POS application or standalone terminal model, obtain the required test account and terminal or mobile hardware, configure Terminal API credentials and connection, install or pair the device, make a test point-of-sale payment, and verify the terminal and webhook or Customer Area result.",
+      "effect_on_first_success": "Adds hardware, terminal logistics, device networking, and Terminal API setup and changes the success from browser Drop-in to a physical or mobile terminal payment.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "Adyen for Platforms is selected.",
+      "path": "Contact Adyen Sales to register interest; work with an Adyen contact to scope user onboarding, split payments, transaction risk, payouts, and reporting; wait for Adyen to provision the test account and email admin credentials; configure Customer Area resources, API credentials, and webhooks; follow the Platforms checklist and APIs; test the platform integration in the test environment.",
+      "effect_on_first_success": "Replaces self-service account creation with Sales qualification, collaborative design, and Adyen-provisioned credentials before API work can begin.",
+      "source_ids": [
+        "S1",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "A commerce plugin is selected.",
+      "path": "Choose the documented commerce system and compatible Adyen-built or partner plugin, meet that platform's version and account prerequisites, install the plugin, enter Adyen test credentials and merchant account settings, configure payment methods and webhooks, place a test order, and verify its payment result in both systems.",
+      "effect_on_first_success": "Moves much of the SDK work into a platform-specific extension but adds a commerce-system account, plugin compatibility, and two-system configuration.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The Advanced server-side flow is required.",
+      "path": "Use the Advanced flow guide and implement paymentMethods to fetch methods, payments to submit payment data, and payments/details to complete redirects or additional actions; preserve client status display and AUTHORISATION webhook handling; test until the same authorized state is observed.",
+      "effect_on_first_success": "Changes one server request into three and moves more payment-state handling to the merchant server.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "Web Components is selected instead of Drop-in.",
+      "path": "Follow the Components section of the Sessions guide: install the same Web library, create the target DOM element, configure AdyenCheckout with the session, import and configure the chosen payment-method Component, mount that Component, handle redirects and results, submit a test payment, and verify the AUTHORISATION webhook.",
+      "effect_on_first_success": "Replaces the all-in-one checkout UI with one or more individually configured payment-method components.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "iOS, Android, React Native, or Flutter is selected.",
+      "path": "Choose the platform-specific Drop-in or Components guide, install its Adyen client SDK, configure the mobile application and return/deep-link behavior, create Sessions on the server, present the native checkout, submit platform test payment details, handle app return and result, and verify the AUTHORISATION webhook.",
+      "effect_on_first_success": "Changes client runtime, package manager, UI mounting, and redirect return handling while retaining server credentials, Sessions, and webhook outcome.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "A server API-library language must be selected.",
+      "path": "Choose one official tab and meet its requirements: Java 11 or later and Maven, PHP 7.3 or later with Composer plus cURL and JSON, .NET Standard 2.0 or later with NuGet, Node.js 18 or later with npm, Go 1.13 or later with Go modules, Python 3.6 or later with pip, or Ruby 2.7 or later with Bundler. Install the package and initialize the matching Checkout client for TEST.",
+      "effect_on_first_success": "Changes runtime, package installation, client construction, and code examples, but not the required session fields or authorized-payment boundary.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "The front end cannot or should not use npm.",
+      "path": "Use the guide's embedded Adyen Web script and stylesheet tags for the selected version, expose the global classes to client code, then configure and mount Drop-in exactly as in the main path.",
+      "effect_on_first_success": "Avoids npm and bundler setup but changes dependency loading, version pinning, and import syntax.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "Bundle size requires individual payment-method imports.",
+      "path": "Import Drop-in and only the required payment-method components, pass them in paymentMethodComponents, and add new imports whenever another payment method is enabled.",
+      "effect_on_first_success": "Reduces bundle size but adds an explicit code change for each payment method.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "The selected test payment method does not redirect.",
+      "path": "Do not execute the return-URL submitDetails route; let Drop-in complete locally, handle onPaymentCompleted or onPaymentFailed, then wait for and process the AUTHORISATION webhook.",
+      "effect_on_first_success": "Skips the conditional redirect round trip without changing the final authorization proof.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "The shopper is redirected but never returns to the website.",
+      "path": "Do not call submitDetails without redirectResult; leave the client unresolved if necessary and wait for the webhook outcome, then update the order from the webhook.",
+      "effect_on_first_success": "Removes client-side completion as a reliable signal, so the webhook becomes the only terminal proof.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "The client-side card integration is not ready but the server API must be tested.",
+      "path": "Use the official encrypted-card testing convention by prefixing the documented test card number, expiry month, expiry year, and security code with test_ in a test-only API request; then inspect the API response and webhook. Do not use this test shortcut in live.",
+      "effect_on_first_success": "Bypasses Drop-in and therefore does not prove the complete representative browser journey, though it can isolate the server payment route.",
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "The session is expired.",
+      "path": "Create a new /sessions resource, send the new id and sessionData to the browser, recreate AdyenCheckout and Drop-in, re-enter test payment details, and submit again.",
+      "effect_on_first_success": "Repeats the session and client initialization because the default session cannot be completed after expiry.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The result is refused or failed.",
+      "path": "Use the client result, webhook reason, API logs, and documented response handling to identify the failure; correct credentials, request fields, payment-method setup, card details, origin, or shopper-action handling; create a fresh session when needed; submit another test payment and recheck both client and webhook.",
+      "effect_on_first_success": "Adds diagnosis and another payment attempt; success false or a non-Authorised result does not satisfy the boundary.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The payment method is asynchronous and returns paymentPending.",
+      "path": "Show the pending state to the shopper and wait for the later webhook outcome instead of polling the session-result endpoint; only treat the journey as successful after the webhook reports the required successful authorization state.",
+      "effect_on_first_success": "Adds an external wait and makes webhook delivery the terminal signal.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 15,
+      "condition": "The webhook test or delivery fails.",
+      "path": "Inspect the Customer Area failure reason; verify the public URL, allowed port, TLS, method, authentication or HMAC handling, event selection, merchant account, response code, and response latency; correct the endpoint, rerun Test configuration, then repeat the end-to-end test payment and correlate references.",
+      "effect_on_first_success": "Adds webhook troubleshooting and another configuration test or payment because client authorization alone does not prove the full documented architecture.",
+      "source_ids": [
+        "S7"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "Four general integration families lead to materially different first miles, and Adyen does not name one platform-wide canonical route.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The online route requires an Adyen test account and Customer Area access; the exact current signup fields and verification sequence are not described in the documentation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "configuration",
+      "description": "Company and merchant account structure, users, roles, and test payment methods must be set before the integration can create the intended checkout.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "permission",
+      "description": "Merchant admin and Manage API credentials roles govern access to keys and credentials.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "credential",
+      "description": "The API key is displayed for copying during generation and must be stored securely on the server.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "configuration",
+      "description": "The client key and exact allowed origin must match; newly added origins can take a few seconds to propagate.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "environment",
+      "description": "End-to-end proof requires a public webhook endpoint with allowed ports, supported TLS, authentication or HMAC handling, and a 2xx acknowledgement within 10 seconds.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "choice",
+      "description": "Server flow, client platform, Drop-in versus Components, Web version, and one of seven server-language routes must be chosen before implementation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "installation",
+      "description": "Each server API library has its own runtime floor, package manager, install command, and client construction.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "configuration",
+      "description": "The Sessions request must align merchant account, currency, minor-unit amount, return URL, unique reference, environment, and payment-method context.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "environment",
+      "description": "Browser support, client-side initialization, iframe and WebView guidance, allowed origin, CSP, library CSS, and redirect constraints can prevent the payment UI or shopper actions from working.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "other",
+      "description": "The developer must simulate a shopper with official test credentials and may encounter redirects, 3D Secure, refused scenarios, or session expiry before authorization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "wait",
+      "description": "The authoritative payment outcome arrives asynchronously by webhook; pending methods or delayed delivery extend the journey.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Adyen",
+      "url": "https://docs.adyen.com/get-started-with-adyen",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2024-03-19",
+      "sections_used": [
+        "Step 1. Create a test account",
+        "Step 2. Build your integration",
+        "Step 3. Apply for your live account",
+        "Step 4. Sign the contract and get your live account",
+        "Step 5. Get ready to accept live payments"
+      ],
+      "evidence_supported": [
+        "Test-account entry",
+        "Four integration families",
+        "Test-versus-live boundary",
+        "Live approval and contract steps excluded after first success"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Integration checklist",
+      "url": "https://docs.adyen.com/online-payments/integration-checklist",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2019-05-15",
+      "sections_used": [
+        "Set up your test account",
+        "Build your integration",
+        "Reporting and reconciliation",
+        "Go live"
+      ],
+      "evidence_supported": [
+        "Account structure",
+        "Users and credentials",
+        "Payment methods",
+        "Webhooks",
+        "Error and refused-payment handling",
+        "Testing and live boundary"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Build your integration",
+      "url": "https://docs.adyen.com/online-payments/build-your-integration",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-07-17",
+      "sections_used": [
+        "Choose your server-side implementation",
+        "Sessions flow",
+        "Advanced flow",
+        "Supported use cases",
+        "Integration comparison",
+        "Get started"
+      ],
+      "evidence_supported": [
+        "Sessions default recommendation",
+        "Server-flow alternatives",
+        "Endpoint count and use-case differences"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Sessions flow integration guide, Web Drop-in",
+      "url": "https://docs.adyen.com/online-payments/build-your-integration/sessions-flow?platform=Web&integration=Drop-in",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2023-03-10",
+      "sections_used": [
+        "Requirements",
+        "How it works",
+        "Integration steps",
+        "Install an API library",
+        "Create a session",
+        "Prepare your front end",
+        "Create Drop-in",
+        "Handle the redirect",
+        "Get the payment outcome",
+        "Update your order management system",
+        "Test and go live"
+      ],
+      "evidence_supported": [
+        "Complete Web Drop-in action order",
+        "All server-language routes",
+        "Required session fields",
+        "Client configuration",
+        "Redirect and failure branches",
+        "Authorised client and completed session states",
+        "Successful AUTHORISATION webhook boundary"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "API credentials",
+      "url": "https://docs.adyen.com/development-resources/api-credentials",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2021-08-06",
+      "sections_used": [
+        "Requirements",
+        "Create additional API credentials",
+        "Generate an API key",
+        "Manage API permissions",
+        "Manage API credential account scope"
+      ],
+      "evidence_supported": [
+        "Credential composition",
+        "Customer Area navigation",
+        "API-key generation and one-time copy",
+        "Roles and scope"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Client-side authentication",
+      "url": "https://docs.adyen.com/development-resources/client-side-authentication",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2021-10-20",
+      "sections_used": [
+        "Availability and compatibility",
+        "How it works",
+        "Allowed origins",
+        "Get your client key",
+        "Manage allowed origins"
+      ],
+      "evidence_supported": [
+        "Client-key role",
+        "Allowed-origin rules",
+        "Customer Area navigation",
+        "Test prefix",
+        "Propagation wait"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Configure and manage webhooks",
+      "url": "https://docs.adyen.com/development-resources/webhooks/configure-and-manage",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-07-17",
+      "sections_used": [
+        "Expose an endpoint on your server",
+        "Set up webhooks in your Customer Area",
+        "Accept webhooks",
+        "Test your webhooks server",
+        "End-to-end testing"
+      ],
+      "evidence_supported": [
+        "Webhook endpoint and port requirements",
+        "Configuration action order",
+        "Security options",
+        "2xx within 10 seconds",
+        "Test and retry path",
+        "Reference correlation"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Test card numbers",
+      "url": "https://docs.adyen.com/development-resources/test-cards-and-credentials/test-card-numbers",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2024-10-21",
+      "sections_used": [
+        "Requirements",
+        "Encrypted card details",
+        "Visa",
+        "3D Secure 2"
+      ],
+      "evidence_supported": [
+        "Test-only card use",
+        "Documented card values",
+        "test_ server-only shortcut",
+        "Redirect and 3D Secure test options"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Adyen for Platforms: Get started",
+      "url": "https://docs.adyen.com/marketplaces/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2022-10-26",
+      "sections_used": [
+        "Requirements",
+        "How it works",
+        "Get in touch with us",
+        "Scope and design your implementation",
+        "Access and set up your online dashboard",
+        "Build your integration",
+        "Test your integration"
+      ],
+      "evidence_supported": [
+        "Sales-first qualification",
+        "Collaborative scoping",
+        "Adyen-provisioned test account",
+        "Platforms build and test order"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Adyen integration family should represent the workshop's canonical platform first mile?",
+      "impact": "Online, in-person, Platforms, and plugin routes have different account gates, hardware, actors, implementation steps, and terminal signals.",
+      "reason_unresolved": "The general official guide presents all four as choices and does not designate a platform-wide canonical route.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S9"
+      ]
+    },
+    {
+      "question": "Which server language, Web version, and client packaging route should be used for the representative online implementation?",
+      "impact": "They change runtime prerequisites, install commands, imports, configuration syntax, and troubleshooting.",
+      "reason_unresolved": "The dynamic Sessions guide supports seven API-library languages, npm and embedded client loading, and version selection without naming one canonical combination.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "question": "What exact fields, verification checks, and wait states appear in the current Adyen free test-account signup?",
+      "impact": "These screens may add business data, email verification, anti-abuse checks, or delays before the Customer Area is accessible.",
+      "reason_unresolved": "The official getting-started page links to signup but does not document the form field-by-field.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Which test payment method and region should define the workshop's first authorized transaction?",
+      "impact": "Payment-method availability, required fields, 3D Secure, redirects, and asynchronous states can change the number and kind of steps.",
+      "reason_unresolved": "Adyen supports many payment methods and says to add those needed by the integration; no single method is labeled universal or canonical.",
+      "checked_source_ids": [
+        "S2",
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "question": "Can a workshop participant expose a public webhook endpoint that satisfies Adyen's port, TLS, security, and response-time requirements?",
+      "impact": "Without it, the browser can demonstrate a client result but cannot complete the documented asynchronous order-outcome proof.",
+      "reason_unresolved": "The requirement is documented, but the participant environment and network policy are outside the documentation.",
+      "checked_source_ids": [
+        "S4",
+        "S7"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Live-account eligibility review, Sales qualification for live processing, application requirements, legal checks, approval wait, contract, and PCI attestation",
+    "Recreating all test settings, keys, client keys, allowed origins, webhooks, and payment methods in the live Customer Area",
+    "Live endpoint prefixes, HTTPS production checkout, production card processing, pricing, settlement, payouts, reporting, and reconciliation",
+    "Refunds, cancellations, capture, tokenization, account updater, auto rescue, donations, network tokenization, partial payments, and other post-authorization features",
+    "Full refused-payment matrix, every payment method, regional configuration, localization, styling, express checkout, recurring payments, and 3D Secure optimization",
+    "In-person terminal deployment, Adyen for Platforms buildout, plugin-specific installations, Issuing, Capital, business accounts, and other product-family journeys",
+    "Production hardening, secret rotation, credential segmentation, webhook failover, replay protection, monitoring, and long-term order-management design"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

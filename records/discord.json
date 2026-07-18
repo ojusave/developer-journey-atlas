@@ -1,0 +1,902 @@
+{
+  "platform": {
+    "name": "Discord",
+    "slug": "discord",
+    "organization": "Discord Inc."
+  },
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "Building your first Discord Bot",
+    "selection_basis": "Discord's platform overview says bots are the most common Discord app type and the Bots & Companion Apps page routes to an end-to-end Getting Started guide. The guide is a step-by-step first-app tutorial and explicitly redirects iframe game builders to the Activity alternative.",
+    "alternatives_considered": [
+      {
+        "name": "Building your first Activity",
+        "url": "https://docs.discord.com/developers/activities/building-an-activity",
+        "reason_not_primary": "The bot quickstart explicitly identifies this as the alternative for games or social experiences in an iframe."
+      },
+      {
+        "name": "Discord Social SDK Getting Started",
+        "url": "https://discord.com/developers/docs/social-sdk/getting_started.html",
+        "reason_not_primary": "The platform overview presents the Social SDK as a game-specific app type, while bots are identified as most common."
+      },
+      {
+        "name": "Webhook-only integration",
+        "url": "https://docs.discord.com/developers/resources/webhook",
+        "reason_not_primary": "The Bots page says webhooks can be simpler for push-only messaging, but they cannot handle the interactive first-app outcome."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Build and test Discord's complete JavaScript rock-paper-scissors bot tutorial through slash commands, buttons, select menus, and a posted game result.",
+    "starting_url": "https://docs.discord.com/developers/quick-start/overview-of-apps",
+    "assumed_prior_state": [
+      "The developer has a Discord user account and can create or administer a quiet test server.",
+      "The developer has not yet created the tutorial application."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Build your first Discord app.",
+    "normalized_outcome": "A configured and installed Discord bot receives interactions through a public endpoint, runs the /challenge game across two users, and posts the calculated result to the original channel.",
+    "observable_completion_signal": "After User A runs /challenge, User B accepts and selects an object, and the app posts the readable game result in the original channel; the guide then says to test everything and congratulates the developer.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The guide is labeled a step-by-step tutorial for building your first Discord app and its Next steps begin with Congrats on building your first Discord app after the complete game test.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "The terminal game flow exercises every capability promised at the start: slash commands, messages, and component interactions. The earlier /test response is an intermediate check because the same guide explicitly continues to add the finished rock-paper-scissors app.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Discord account.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "A test server where the developer can authorize server installation with MANAGE_GUILD permission, or permission to create a free server.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "knowledge",
+      "requirement": "Basic JavaScript understanding.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "Node.js, Git, npm, a code editor, and a terminal.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "ngrok for exposing the local Express server; installation may occur when the guide reaches public-endpoint setup.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Overview of Discord Apps and select Bots & Companion Apps, then Getting Started.",
+      "details": [
+        "Bots are the most common app type; the guide is the end-to-end first-bot tutorial."
+      ],
+      "input": "Intent to build a Discord bot.",
+      "output": "Building your first Discord Bot guide.",
+      "success_signal": "Step 0 and promised finished game are visible.",
+      "failure_or_wait": "Activity and Social SDK builders follow separate routes.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone discord/discord-example-app.",
+      "details": [],
+      "input": "Git, Node.js, and terminal.",
+      "output": "Local discord-example-app directory.",
+      "success_signal": "git clone completes.",
+      "failure_or_wait": "Network, Git, or filesystem errors are not decomposed.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Change into discord-example-app.",
+      "details": [],
+      "input": "Cloned repository.",
+      "output": "Project working directory.",
+      "success_signal": "package.json and tutorial files are present.",
+      "failure_or_wait": "Wrong directory blocks dependency installation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm install.",
+      "details": [],
+      "input": "Node.js, npm, and project directory.",
+      "output": "Installed project dependencies.",
+      "success_signal": "npm completes successfully.",
+      "failure_or_wait": "Dependency or network failures require local recovery not described.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Open the project in a code editor and review its structure.",
+      "details": [
+        "The guide identifies app.js, commands.js, game.js, utils.js, .env, examples, and package files."
+      ],
+      "input": "Installed project.",
+      "output": "Editable tutorial project.",
+      "success_signal": "The listed files are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a Discord application, enter a name, and press Create.",
+      "details": [],
+      "input": "Authenticated Discord developer account.",
+      "output": "New Discord application and General Information page.",
+      "success_signal": "Application ID and Interactions Endpoint URL fields are visible.",
+      "failure_or_wait": "An existing app can be used instead.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Rename .env.sample to .env.",
+      "details": [],
+      "input": "Tutorial repository.",
+      "output": "Credential environment file.",
+      "success_signal": "The project contains .env.",
+      "failure_or_wait": "Accidentally committing the file can expose credentials.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy Application ID into the APP_ID placeholder in .env.",
+      "details": [],
+      "input": "General Information page and .env.",
+      "output": "Configured application ID.",
+      "success_signal": "APP_ID contains the portal value.",
+      "failure_or_wait": "Copy errors break registration and webhook operations.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy Public Key into the PUBLIC_KEY placeholder in .env.",
+      "details": [
+        "The sample uses it to verify that interaction requests come from Discord."
+      ],
+      "input": "General Information page and .env.",
+      "output": "Configured public key.",
+      "success_signal": "PUBLIC_KEY contains the portal value.",
+      "failure_or_wait": "Wrong key causes endpoint verification failure.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Bot, click Reset Token, copy the new bot token into .env, and store it securely.",
+      "details": [
+        "The token cannot be viewed again without regeneration and must not be shared or committed."
+      ],
+      "input": "Bot settings and secure storage.",
+      "output": "Configured bot token.",
+      "success_signal": "BOT_TOKEN contains the newly generated value and a secure copy exists.",
+      "failure_or_wait": "Loss requires another reset; exposure requires regeneration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Installation, enable both User Install and Guild Install.",
+      "details": [
+        "Discord recommends both contexts by default."
+      ],
+      "input": "Application settings.",
+      "output": "Both installation contexts selected.",
+      "success_signal": "Both toggles are active.",
+      "failure_or_wait": "A server-only or user-only app is a documented specialization.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Discord Provided Link in Install Link.",
+      "details": [],
+      "input": "Installation page.",
+      "output": "Default Install Settings section.",
+      "success_signal": "Default Install Settings appears.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Add the applications.commands scope for User Install.",
+      "details": [],
+      "input": "Default install settings.",
+      "output": "User-install command scope.",
+      "success_signal": "The scope is listed for User Install.",
+      "failure_or_wait": "User-installed apps are limited to commands.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "For Guild Install, add applications.commands and bot scopes, then select Send Messages permission.",
+      "details": [
+        "Selecting bot reveals the Permissions menu."
+      ],
+      "input": "Default install settings.",
+      "output": "Guild scopes and bot permission.",
+      "success_signal": "The settings show both scopes and Send Messages.",
+      "failure_or_wait": "Additional permissions are optional and use-case-specific.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the default Install Link, open it, choose Add to server, select the test server, and complete authorization.",
+      "details": [],
+      "input": "Install link and MANAGE_GUILD permission on a quiet test server.",
+      "output": "Server-installed app.",
+      "success_signal": "The bot appears in the server member list.",
+      "failure_or_wait": "Missing server permission or choosing the wrong server blocks safe testing.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the same link, choose Add to my apps, and complete user installation.",
+      "details": [],
+      "input": "Install link and Discord user account.",
+      "output": "User-installed app.",
+      "success_signal": "A direct message with the app can be opened.",
+      "failure_or_wait": "Installation prompts can be denied or cancelled.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm run register from the project directory.",
+      "details": [
+        "The script uses the HTTP API to PUT the commands in ALL_COMMANDS as global application commands."
+      ],
+      "input": "Configured APP_ID and BOT_TOKEN.",
+      "output": "Registered slash commands.",
+      "success_signal": "The command completes without API error.",
+      "failure_or_wait": "Invalid credentials, permissions, or request errors prevent registration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Return to the test server and verify that the slash commands appear.",
+      "details": [
+        "They do not work yet because the app is not receiving requests."
+      ],
+      "input": "Registered global commands.",
+      "output": "Visible slash commands.",
+      "success_signal": "The commands appear in Discord.",
+      "failure_or_wait": "Propagation delay is possible but not quantified.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm run start in the project directory.",
+      "details": [
+        "The Express server defaults to port 3000 and verifies request headers and PING requests."
+      ],
+      "input": "Installed dependencies and configured .env.",
+      "output": "Running local interaction server.",
+      "success_signal": "Terminal output says the app is running on port 3000.",
+      "failure_or_wait": "Port conflicts or application errors block the server.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Confirm the local server reports port 3000.",
+      "details": [],
+      "input": "Started application.",
+      "output": "Known local port.",
+      "success_signal": "The terminal reports the expected port.",
+      "failure_or_wait": "A custom PORT requires the tunnel and endpoint to match.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install ngrok if it is not already available.",
+      "details": [],
+      "input": "Supported local environment.",
+      "output": "ngrok executable.",
+      "success_signal": "The ngrok command is available.",
+      "failure_or_wait": "The guide delegates installation details to ngrok.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open a second terminal and run ngrok http 3000.",
+      "details": [],
+      "input": "Running local server and installed ngrok.",
+      "output": "Public forwarding tunnel.",
+      "success_signal": "ngrok reports Tunnel Status online and an HTTPS Forwarding URL to localhost:3000.",
+      "failure_or_wait": "Authentication, network, or port mismatch can prevent a tunnel.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Paste the ngrok HTTPS URL plus /interactions into Interaction Endpoint URL.",
+      "details": [],
+      "input": "Online tunnel forwarding to the sample app.",
+      "output": "Configured endpoint value.",
+      "success_signal": "The field contains the full public interactions URL.",
+      "failure_or_wait": "Wrong URL or missing suffix fails verification.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Save Changes and verify the interaction endpoint.",
+      "details": [
+        "The sample verifies Discord request signatures with PUBLIC_KEY and answers PING."
+      ],
+      "input": "Running app, running tunnel, correct URL, and public key.",
+      "output": "Verified endpoint.",
+      "success_signal": "The portal accepts and saves the endpoint.",
+      "failure_or_wait": "If verification fails, check that app and ngrok use the same port and that the URL is copied correctly.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Trigger /test in the server.",
+      "details": [
+        "The existing app.js handler returns hello world plus a random emoji."
+      ],
+      "input": "Visible command and verified endpoint.",
+      "output": "First interaction response.",
+      "success_signal": "The app posts hello world and an emoji in the originating context.",
+      "failure_or_wait": "This is an intermediate check, not the guide's final app.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add the documented /challenge command handler after the /test block.",
+      "details": [
+        "Parse context, user ID, and selected object; store the active game by interaction ID; return a channel message with an Accept button and unique custom_id."
+      ],
+      "input": "Working /test app and tutorial code.",
+      "output": "Challenge handler.",
+      "success_signal": "The code matches the guide or examples/app.js.",
+      "failure_or_wait": "Syntax or placement errors stop the server or handler.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Run /challenge, select an object, and verify that the channel receives an Accept button.",
+      "details": [],
+      "input": "Running updated app and registered challenge command.",
+      "output": "Active game invitation.",
+      "success_signal": "The channel shows a challenge message with Accept.",
+      "failure_or_wait": "The app may need restart after code changes; the guide does not state a specific restart command here.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add the documented message-component handler for Accept.",
+      "details": [
+        "Match accept_button_, recover game ID, send an ephemeral select menu with shuffled choices, delete the original challenge message, and catch request errors."
+      ],
+      "input": "Challenge handler and activeGames state.",
+      "output": "Button interaction handler.",
+      "success_signal": "The code can respond to an Accept component.",
+      "failure_or_wait": "Errors are logged as Error sending message.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "As a second user, press Accept and verify the ephemeral object-choice menu.",
+      "details": [],
+      "input": "Active challenge and updated running app.",
+      "output": "Second-player selection UI.",
+      "success_signal": "The accepting user sees What is your object of choice? and a select menu.",
+      "failure_or_wait": "Another user cannot complete the game if the button handler fails.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Extend the component handler for select_choice interactions.",
+      "details": [
+        "Recover game ID; read second user and choice; call getResult; delete active game; post result; patch the ephemeral message to Nice choice; catch errors."
+      ],
+      "input": "Active-game state and tutorial select-handler code.",
+      "output": "Complete game interaction handler.",
+      "success_signal": "The source contains both button and select branches.",
+      "failure_or_wait": "Missing state or request failures prevent a result.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 31,
+      "phase": "execute",
+      "actor": "external-system",
+      "interface": "other",
+      "action": "Run the complete two-user game flow.",
+      "details": [
+        "User A runs /challenge and chooses an object; Discord posts the invitation; User B accepts and chooses an object."
+      ],
+      "input": "Running app, verified endpoint, two installations/users, and complete handlers.",
+      "output": "Calculated game completion.",
+      "success_signal": "Discord delivers all interactions to the app and receives valid responses.",
+      "failure_or_wait": "Tunnel, server, state, permissions, or handler errors can interrupt the flow.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 32,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify the final result is posted to the original channel and the ephemeral message updates.",
+      "details": [
+        "The guide then says that is it, directs the developer to test everything, and begins Next steps with a congratulations."
+      ],
+      "input": "Completed two-user interaction.",
+      "output": "Finished first Discord app.",
+      "success_signal": "A readable winner/result appears publicly and the second user's ephemeral message says Nice choice with an emoji.",
+      "failure_or_wait": "If either message is absent, the full tutorial outcome is incomplete.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The intended application is an iframe game or social experience.",
+      "path": "Follow Building your first Activity instead of the bot tutorial.",
+      "effect_on_first_success": "Changes the SDK, runtime, installation, and terminal interaction.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Node.js is not installed.",
+      "path": "Install Node.js before cloning and installing dependencies.",
+      "effect_on_first_success": "Adds a prerequisite installation gate before Step 0 commands.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "The app intentionally supports only server or only user installation.",
+      "path": "Enable only the applicable context and adjust scopes and later installation tests.",
+      "effect_on_first_success": "The tutorial's both-context verification no longer applies.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The bot needs permissions beyond Send Messages.",
+      "path": "Select the additional granular permissions required by the use case.",
+      "effect_on_first_success": "Adds permission review and broader authorization; not needed for the tutorial.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 20,
+      "condition": "Port 3000 is unavailable.",
+      "path": "Set PORT in .env and use that same port in ngrok.",
+      "effect_on_first_success": "Changes the local and tunnel configuration together.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 24,
+      "condition": "Endpoint verification fails.",
+      "path": "Confirm both processes use the same port, the forwarding URL is correct, /interactions is appended, and PUBLIC_KEY matches the application.",
+      "effect_on_first_success": "Adds diagnostic and retry work before commands can respond.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "The tutorial requires Node.js, Git, npm dependencies, and a code editor.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "account",
+      "description": "A Discord developer account and application are required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "credential",
+      "description": "Application ID, Public Key, and a one-time bot token must be copied accurately and protected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "permission",
+      "description": "Server installation requires a quiet test server and MANAGE_GUILD authorization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 21,
+      "type": "installation",
+      "description": "An ngrok installation is required for the documented local-development route.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 22,
+      "type": "environment",
+      "description": "The local server and public tunnel must remain running on matching ports.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 24,
+      "type": "verification",
+      "description": "Discord must verify the public interaction endpoint before the commands work.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 31,
+      "type": "other",
+      "description": "The terminal game verification requires a second participant or user context to accept and choose an object.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Overview of Discord Apps",
+      "url": "https://docs.discord.com/developers/quick-start/overview-of-apps",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "The Three Types of Discord Apps",
+        "Where Apps Install",
+        "What APIs Can Apps Use?",
+        "Start Building"
+      ],
+      "evidence_supported": [
+        "App-type alternatives",
+        "Application as common entity",
+        "Bot, Activity, Social SDK distinction",
+        "Start routes"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Building your first Discord Bot",
+      "url": "https://docs.discord.com/developers/quick-start/getting-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What we'll be building",
+        "Resources used",
+        "Step 0: Project Setup",
+        "Step 1: Creating an app",
+        "Fetching your credentials",
+        "Configuring your bot",
+        "Choosing installation contexts",
+        "Setting up an install link",
+        "Adding scopes and bot permissions",
+        "Installing your app",
+        "Step 2: Running your app",
+        "Installing slash commands",
+        "Step 3: Handling interactivity",
+        "Set up a public endpoint",
+        "Adding an interaction endpoint URL",
+        "Handling slash command requests",
+        "Step 4: Adding message components",
+        "Adding a command with options",
+        "Handling the command interaction",
+        "Handling button interactions",
+        "Handling select menu interactions",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Complete ordered first-bot tutorial",
+        "Prerequisites and tools",
+        "Credentials and permissions",
+        "Install contexts",
+        "Command registration",
+        "Tunnel and verification",
+        "Intermediate test",
+        "All game handlers",
+        "Failure hints",
+        "Final game and congratulations boundary"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Bots & Companion Apps",
+      "url": "https://docs.discord.com/developers/platform/bots",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Bots & Companion Apps",
+        "Getting Started"
+      ],
+      "evidence_supported": [
+        "Bots as most common app type",
+        "End-to-end first-bot guide recommendation",
+        "Webhook alternative"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact Discord account registration steps precede Developer Portal access for a new person?",
+      "impact": "The account gate cannot be decomposed to screen level.",
+      "reason_unresolved": "The bot guide assumes an available Discord user account and starts at project setup and application creation.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "question": "How long do global slash commands take to appear under current propagation conditions?",
+      "impact": "The developer may wait after registration without knowing whether it failed.",
+      "reason_unresolved": "The guide says the commands should appear but provides no duration or retry threshold.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Production hosting instead of ngrok",
+    "Persistent database for active game state",
+    "Privileged intents and app verification",
+    "Additional commands, modals, and components",
+    "Monetization",
+    "User-installable-app deep dive",
+    "Activity and Social SDK development",
+    "Production security and scaling"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

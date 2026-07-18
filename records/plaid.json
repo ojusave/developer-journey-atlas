@@ -1,0 +1,735 @@
+{
+  "platform": {
+    "name": "Plaid",
+    "slug": "plaid",
+    "organization": "Plaid"
+  },
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "Plaid main web Quickstart in Sandbox",
+    "selection_basis": "Plaid labels this repository the main Quickstart, links it from the docs homepage, and explicitly marks completion after Link creates an Item, the public token is exchanged, and /accounts/get returns account data. The backend is implemented in five officially supported languages with no one labeled canonical, so language selection still needs human judgment.",
+    "alternatives_considered": [
+      {
+        "name": "Identity Verification Quickstart",
+        "url": "https://github.com/plaid/idv-quickstart",
+        "reason_not_primary": "The main guide explicitly routes Identity Verification to a specialized application with a different user and verification outcome."
+      },
+      {
+        "name": "Plaid Check CRA Quickstart",
+        "url": "https://github.com/plaid/credit-quickstart",
+        "reason_not_primary": "Credit reporting products require a specialized user and report flow rather than the general Link Item and accounts response."
+      },
+      {
+        "name": "Income Verification Starter app",
+        "url": "https://github.com/plaid/income-sample",
+        "reason_not_primary": "Income uses a specialized starter application and credentials."
+      },
+      {
+        "name": "Layer Quickstart",
+        "url": "https://github.com/plaid/layer-quickstart",
+        "reason_not_primary": "Layer has a separate embedded experience and success boundary."
+      },
+      {
+        "name": "Plaid Postman Collection",
+        "url": "https://plaid.com/docs/api/postman/",
+        "reason_not_primary": "It is the documented no-code API route, but it bypasses the main Quickstart's full Link web experience."
+      },
+      {
+        "name": "Tiny Quickstart",
+        "url": "https://github.com/plaid/tiny-quickstart",
+        "reason_not_primary": "The official repository calls it a simpler non-React or minimal alternative; the main Quickstart is explicitly designed to show more products and configurations."
+      },
+      {
+        "name": "Mobile Link",
+        "url": "https://plaid.com/docs/link/",
+        "reason_not_primary": "The main Quickstart states that it covers web apps and sends mobile apps to platform-specific Link setup."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Run Plaid locally in Sandbox, create the first Item through Link, exchange its token, and retrieve its accounts.",
+    "starting_url": "https://plaid.com/docs/quickstart/",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Plaid's main web Quickstart rather than a specialized product app.",
+      "The developer does not yet have a Plaid account, Client ID, or Sandbox secret.",
+      "The developer has not selected Node, Python, Ruby, Go, or Java as the backend."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Congratulations, you have completed the Plaid Quickstart",
+    "normalized_outcome": "The developer runs the main React Quickstart against Sandbox, creates a first Item through Link, exchanges its public token for an access token and item ID, then uses the access token to retrieve account names and balances.",
+    "observable_completion_signal": "The Quickstart displays account data returned by /accounts/get, including Plaid Checking, Saving, and CD balances plus the Item and request_id, immediately before the guide's explicit completion message.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The Next steps section follows the /accounts/get example and says Congratulations, you have completed the Plaid Quickstart.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It proves the complete first web integration: credentials, two local processes, Link token, institution login, Item creation, token exchange, protected server credential use, and a real product-neutral account API response. Product customization and production access come afterward.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S4",
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Plaid Dashboard account and team are required to receive the Client ID and Sandbox secret.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "credential",
+      "requirement": "The team Client ID and environment-specific Sandbox secret are required and must remain on the server side.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "Git, npm, and one supported backend runtime are required. The repository generally targets active LTS versions such as Node 18+, Python 3.9+, and Ruby 3.0+; Go and Java are also supported.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "Windows requires Git symbolic-link support or an elevated Unix-compatible shell and a terminal capable of basic Unix shell commands.",
+      "required": false,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "knowledge",
+      "requirement": "The developer must choose Node, Python, Ruby, Go, or Java for the first-party backend; the frontend is React.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "billing",
+      "requirement": "The first success uses Sandbox test data. The guide does not require production access, a live bank credential, or a payment card.",
+      "required": false,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Plaid's main Quickstart and confirm that the desired outcome is a general web Link Item and account API call.",
+      "details": [
+        "Identity Verification, Plaid Check CRA, Income Verification, and Layer are redirected to separate quickstarts.",
+        "The main repository targets a React frontend and many Plaid APIs."
+      ],
+      "input": "Plaid web Quickstart intent",
+      "output": "Main Quickstart path rather than a specialized product path",
+      "success_signal": "Quickstart setup and Create your first Item are visible.",
+      "failure_or_wait": "A specialized product or mobile application requires a different route before setup begins.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign up for or sign in to the Plaid Dashboard, verify the account email, and acknowledge Plaid's terms.",
+      "details": [
+        "Plaid's account billing guidance requires a verified email before the current Trial application, and the API overview says completed signup plus terms acknowledgment precedes credential delivery.",
+        "The exact live signup form fields remain dynamic and are not enumerated by the official Quickstart."
+      ],
+      "input": "Plaid developer identity and team information",
+      "output": "Verified Plaid Dashboard team access with acknowledged terms",
+      "success_signal": "Account verification and terms acknowledgment complete, and Developers > API Keys is accessible.",
+      "failure_or_wait": "A missing verification email or unacknowledged terms blocks credential access; the public Quickstart does not enumerate every signup field, team naming, use-case question, or anti-abuse screen.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Dashboard API Keys section and obtain the team's live Client ID plus the Sandbox secret.",
+      "details": [
+        "Client ID is the team's private identifier.",
+        "The secret is private and differs between Sandbox and Production.",
+        "Plaid states that after signup and terms acknowledgment it provides the live client_id and secret through the Dashboard; the first journey deliberately uses the Sandbox secret."
+      ],
+      "input": "Verified Dashboard access and acknowledged terms",
+      "output": "PLAID_CLIENT_ID and Sandbox PLAID_SECRET values",
+      "success_signal": "The live team client_id plus environment secrets are available, and the Sandbox pair is selected for local configuration.",
+      "failure_or_wait": "Using a Production secret or exposing either value in client code violates the documented environment and token model.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify Git, npm, the intended backend runtime, and a Unix-capable terminal are available.",
+      "details": [
+        "Windows users must enable symlinks in Git or use the special clone command from an elevated Git Bash shell."
+      ],
+      "input": "Local development machine",
+      "output": "Quickstart-capable toolchain",
+      "success_signal": "git, npm, and the selected language commands run.",
+      "failure_or_wait": "Missing runtime, npm, Unix shell behavior, or Windows symlink support blocks clone or startup.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone the official plaid/quickstart repository and enter its root directory.",
+      "details": [
+        "Normal HTTPS: git clone https://github.com/plaid/quickstart then cd quickstart.",
+        "Windows fallback: git clone -c core.symlinks=true https://github.com/plaid/quickstart."
+      ],
+      "input": "Git and repository URL",
+      "output": "Local Plaid Quickstart checkout",
+      "success_signal": "frontend plus node, python, ruby, go, and java directories are present.",
+      "failure_or_wait": "On Windows, broken symbolic links can make the checkout unusable.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy .env.example to .env and populate at least PLAID_CLIENT_ID and the Sandbox PLAID_SECRET.",
+      "details": [
+        "Keep the environment set to Sandbox for the first journey.",
+        "The repository warns that .env is for local convenience and must not be used to hold production secrets."
+      ],
+      "input": "Client ID, Sandbox secret, and optional product configuration",
+      "output": "Configured local Quickstart environment",
+      "success_signal": "The selected backend can read both required values.",
+      "failure_or_wait": "Missing or incorrect values cause link-token or API-call errors; product and institution incompatibility can cause Connectivity not supported.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose Node, Python, Ruby, Go, or Java as the first-party Quickstart backend.",
+      "details": [
+        "All five are present in the official main repository.",
+        "A community .NET implementation exists but Plaid says it is not created, reviewed, or supported by Plaid."
+      ],
+      "input": "Installed language and workshop stack preference",
+      "output": "Human-selected backend route",
+      "success_signal": "One first-party backend directory and start command are selected.",
+      "failure_or_wait": "Plaid does not label one backend language canonical; selecting Node merely because the web page displays its tab would be researcher judgment.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 7,
+      "condition": "Node is selected.",
+      "path": "Enter quickstart/node; run npm install; run ./start.sh and verify the backend listens on localhost:8000; in a second shell enter quickstart/frontend, run npm install or npm ci, run npm start, and open localhost:3000; select Launch Link; let the backend call /link/token/create with the unique client_user_id, Plaid Test App name, configured products, language, optional webhook and redirect URI, and country codes; let the React client initialize Link with the returned one-time link_token; select any supported Sandbox institution; enter user_good and pass_good and, if prompted, 1234 for 2FA; advance to create the first Item and receive public_token through onSuccess; let the frontend send public_token to the server; let the backend call /item/public_token/exchange, capture access_token and item_id, and return public_token_exchange complete; store the access token server-side for the session; press the Quickstart Accounts button or invoke its /api/accounts route; let the server call /accounts/get with the access token; verify account names, balances, Item metadata, and request_id are displayed. This is the explicit completed-Quickstart boundary.",
+      "effect_on_first_success": "Produces the complete documented main path using the displayed Node backend tab.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "Python is selected.",
+      "path": "Enter quickstart/python; optionally create and activate a virtual environment; run pip3 install -r requirements.txt; run ./start.sh; if SSL certificate verification fails on macOS, run the matching Python Install Certificates.command and retry; then start the common React frontend, complete Link with Sandbox credentials, exchange the public token in the Python backend, call /accounts/get, and verify accounts, Item, and request_id.",
+      "effect_on_first_success": "Changes backend dependency and code path while retaining the same React, Link, Item, exchange, and accounts success.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "Ruby is selected.",
+      "path": "Enter quickstart/ruby; run bundle; run ./start.sh; then start the common React frontend, complete Link with Sandbox credentials, exchange the public token in the Ruby backend, call /accounts/get, and verify accounts, Item, and request_id.",
+      "effect_on_first_success": "Changes backend runtime and package installation only.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "Go is selected.",
+      "path": "Enter quickstart/go; run go build; run ./start.sh; then start the common React frontend, complete Link with Sandbox credentials, exchange the public token in the Go backend, call /accounts/get, and verify accounts, Item, and request_id.",
+      "effect_on_first_success": "Adds a compile step and Go client while preserving the rest of the path.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "Java is selected.",
+      "path": "Enter quickstart/java; run mvn clean package; run ./start.sh; then start the common React frontend, complete Link with Sandbox credentials, exchange the public token in the Java backend, call /accounts/get, and verify accounts, Item, and request_id.",
+      "effect_on_first_success": "Adds a Maven package step and Java client while preserving the rest of the path.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "Identity Verification, Plaid Check CRA, Income Verification, or Layer is the intended product.",
+      "path": "Leave the main Quickstart and use the named official specialized quickstart or starter app. Follow its product enablement, user creation or identity configuration, environment variables, server and client startup, Link or embedded flow, product-specific API request, and explicit verification outcome.",
+      "effect_on_first_success": "Changes the definition of success and can add product-access or identity-data requirements.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "No-code API exploration is preferred.",
+      "path": "Use the official Plaid Postman Collection: require Plaid Sandbox access and a Postman account; fork or import the collection and environment; set client_id, Sandbox secret, and base URL; select the environment; send the required token and product requests; inspect the response and Postman console. This does not reproduce the main Link UI journey.",
+      "effect_on_first_success": "Avoids local application code but changes the experience from end-user Link to API requests in Postman.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "A minimal or non-React frontend is preferred.",
+      "path": "Use the official Tiny Quickstart, choose JavaScript, Next.js, React, or React Native frontend, configure Sandbox credentials, start its minimal backend and single endpoint, execute its Link or token flow, and verify the route-specific response.",
+      "effect_on_first_success": "Reduces repository surface but is not the main multi-product Quickstart.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Automated tests or repeated manual tests should bypass Link.",
+      "path": "Call the Sandbox-only /sandbox/public_token/create endpoint with Client ID, Sandbox secret, supported institution ID, at least one initial product, and optional user ID; receive public_token and request_id; exchange it through /item/public_token/exchange for access_token and item_id; call /accounts/get and verify the response. Do not use this bypass in Production.",
+      "effect_on_first_success": "Removes institution selection, credential entry, 2FA, and client Link UI while still creating a Sandbox Item and account response.",
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Link-token or API calls fail or return 400.",
+      "path": "Inspect backend logs for the Plaid error and Dashboard activity logs if local logs are unavailable; correct credentials, environment, product, or request fields; restart the affected process and retry.",
+      "effect_on_first_success": "Adds diagnosis and another token creation or API request.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Link shows Connectivity not supported after institution selection.",
+      "path": "Compare PLAID_PRODUCTS with the selected institution's supported products, remove unsupported products from .env, restart the backend, recreate the link token, and select the institution again.",
+      "effect_on_first_success": "Changes configured products and repeats the entire Link sequence.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "A redirect URI is configured for Sandbox OAuth testing.",
+      "path": "Set PLAID_REDIRECT_URI to http://localhost:3000/, register the identical URI under Developers > API > Allowed redirect URIs, initialize Link normally without receivedRedirectUri, then reinitialize with the received redirect URI only after the OAuth return. A mismatched or unnecessary redirect causes documented failures.",
+      "effect_on_first_success": "Adds Dashboard configuration and a second Link initialization around an OAuth redirect; it is optional for the normal web Quickstart.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The main Quickstart uses a product available by default in Sandbox.",
+      "path": "Use Sandbox without payment. Plaid documents it as free and fully featured, with all Plaid API and Link functionality supported, test accounts and institutions, and an unlimited number of test Items. Most products require no additional configuration.",
+      "effect_on_first_success": "Keeps the first Item and API response inside a free test-data environment without a production-access or billing gate.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The selected Sandbox product is one of the products that requires special enablement, such as Payment Initiation, or is otherwise unavailable to the team.",
+      "path": "Request product access through the Plaid Dashboard support flow and wait for the team to be specially enabled before retrying the Sandbox Quickstart. Identity Verification has its own access process and is not available by default.",
+      "effect_on_first_success": "Adds a product-specific access request and approval wait that must not be generalized to products immediately available in Sandbox.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A Plaid team account, email verification, and terms acknowledgment precede Dashboard credential access; exact dynamic signup and use-case screens are not described in the Quickstart.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "The team Client ID and Sandbox secret must be retrieved from the Dashboard and kept server-side.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "environment",
+      "description": "The Quickstart requires Git, npm, an active backend runtime, two local processes, and Unix-style shell behavior; Windows also needs symbolic-link handling.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "configuration",
+      "description": "Environment, credentials, requested products, institution support, and optional redirect URI must agree or Link and API requests fail.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "choice",
+      "description": "Five first-party backend languages have different installs and failure modes, with no canonical language label.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "other",
+      "description": "The end-user simulation requires institution selection, Sandbox username and password, and sometimes 2FA code 1234 before an Item exists.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "credential",
+      "description": "The public token must be exchanged server-side, and the resulting long-lived access token must never be exposed to the client.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "approval",
+      "description": "Most products work immediately in the free Sandbox, but some products require the team to request special enablement before the first test Item can be created.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The official repository says developers can get Plaid Link and the API running in minutes; the docs also label a separate tutorial series Plaid in 3 Minutes, but do not claim the complete written journey always takes three minutes.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with the Quickstart",
+      "url": "https://plaid.com/docs/quickstart/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Introduction",
+        "Quickstart setup",
+        "Create your first Item",
+        "How it works",
+        "Making API requests",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Account and key prerequisites",
+        "Displayed Node setup",
+        "Complete Link and token flow",
+        "Sandbox credentials",
+        "Accounts request",
+        "Explicit completion boundary",
+        "Specialized product alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "plaid/quickstart",
+      "url": "https://github.com/plaid/quickstart",
+      "official_domain": true,
+      "source_type": "official-repository",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Plaid quickstart",
+        "Additional Quickstarts",
+        "Clone the repository",
+        "Set up your environment variables",
+        "Run the quickstart",
+        "Test credentials",
+        "Troubleshooting",
+        "Testing OAuth"
+      ],
+      "evidence_supported": [
+        "Main-Quickstart designation",
+        "Five first-party backend routes",
+        "Commands and runtime requirements",
+        "Windows branch",
+        "All documented retry paths",
+        "Tiny and specialized alternatives",
+        "In-minutes claim"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sandbox Overview",
+      "url": "https://plaid.com/docs/sandbox/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sandbox overview",
+        "Using Sandbox",
+        "Bypassing Link",
+        "Testing with live data using a Trial plan"
+      ],
+      "evidence_supported": [
+        "Free and fully featured Sandbox",
+        "Unlimited test Items",
+        "Sandbox host and credentials",
+        "Product enablement exceptions",
+        "Link bypass guidance",
+        "Test-versus-live boundary"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "API Overview",
+      "url": "https://plaid.com/docs/api/",
+      "official_domain": true,
+      "source_type": "api-reference",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "API access",
+        "API host",
+        "Authentication",
+        "Tokens",
+        "Responses"
+      ],
+      "evidence_supported": [
+        "Signup and terms acknowledgment before live credential delivery",
+        "Client ID and secret request requirements",
+        "Sandbox and Production hosts",
+        "Server-only token safety",
+        "request_id verification"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Items API",
+      "url": "https://plaid.com/docs/api/items/",
+      "official_domain": true,
+      "source_type": "api-reference",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Token exchange flow",
+        "/item/get"
+      ],
+      "evidence_supported": [
+        "Link token to public token to access token sequence",
+        "Hosted and Sandbox alternatives",
+        "Item meaning and access-token use"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Plaid Postman Collection",
+      "url": "https://plaid.com/docs/api/postman/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Configure the environment",
+        "Send requests"
+      ],
+      "evidence_supported": [
+        "No-code route",
+        "Plaid and Postman account requirements",
+        "Environment and request sequence"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Account pricing and billing",
+      "url": "https://plaid.com/docs/account/billing/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Trial plans",
+        "Pricing models"
+      ],
+      "evidence_supported": [
+        "Dashboard account email verification",
+        "Sandbox always free"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which first-party backend language should define the canonical Plaid workshop journey?",
+      "impact": "The choice changes runtime prerequisites, dependency installation, build steps, and language-specific failure modes while preserving the same frontend and outcome.",
+      "reason_unresolved": "The main repository supports Node, Python, Ruby, Go, and Java and does not name one canonical backend.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "question": "What exact Plaid signup form, team naming, business-detail, use-case, and anti-abuse screens appear today?",
+      "impact": "They may add manual fields, business details, product selection, or approval before the now-documented email verification, terms acknowledgment, and credential delivery complete.",
+      "reason_unresolved": "Official docs establish account verification, terms acknowledgment, and Dashboard credential availability but do not enumerate every dynamic form field.",
+      "checked_source_ids": [
+        "S1",
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "question": "Which PLAID_PRODUCTS value should the workshop preconfigure?",
+      "impact": "It affects link-token fields, institution compatibility, billed products in the response, available Quickstart buttons, and potential product enablement errors.",
+      "reason_unresolved": "The code explanation uses Auth as an example, while the main repository is deliberately multi-product.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Selecting Node, Python, Ruby, Go, or Java without workshop-owner direction",
+    "Identity Verification, CRA, Income, Layer, Transfer, Transactions, or partner-specific product journeys",
+    "Mobile iOS and Android Link integration",
+    "Production access application, company verification, OAuth institution approval, live credentials, billing, and real bank data",
+    "Persistent database design for access tokens beyond the Quickstart's in-memory demonstration",
+    "Webhooks, update mode, institution-specific recovery, transaction sync, consent renewal, and Item lifecycle after the first accounts response",
+    "Production redirect HTTPS, self-signed localhost certificates, and production deployment hardening"
+  ],
+  "candidate_paths": [
+    {
+      "id": "node-react-sandbox-accounts",
+      "name": "Node backend and React frontend Sandbox Quickstart",
+      "selection_basis": "Node is one of five co-equal first-party Quickstart backends. Its official repository and Quickstart document every action through Link, public-token exchange, /accounts/get, and displayed account data, so it is retained as a complete representative candidate.",
+      "relationship_to_primary_path": "Continues after primary_path step 7 by selecting Node. The shared path already completes Plaid account and email setup, Sandbox credential retrieval, prerequisite checks, repository clone, and .env configuration.",
+      "steps": [
+        {"step_number":1,"phase":"install","actor":"developer","interface":"cli","action":"Enter quickstart/node and run npm install.","details":[],"input":"Cloned Quickstart with Sandbox .env values","output":"Installed Node backend dependencies","success_signal":"npm completes and the backend dependencies are present.","failure_or_wait":"npm, network, lockfile, version, or permission errors must be corrected before startup.","required":true,"source_ids":["S1","S2"]},
+        {"step_number":2,"phase":"execute","actor":"developer","interface":"cli","action":"Run ./start.sh for the Node backend.","details":[],"input":"Installed backend and populated root .env","output":"Quickstart backend process","success_signal":"The backend reports that it is listening on localhost:8000.","failure_or_wait":"If startup or API initialization fails, inspect backend logs, correct credentials, environment, dependency, or port errors, and restart.","required":true,"source_ids":["S1","S2"]},
+        {"step_number":3,"phase":"install","actor":"developer","interface":"cli","action":"In a second shell enter quickstart/frontend and run npm install.","details":[],"input":"Cloned Quickstart frontend","output":"Installed React frontend dependencies","success_signal":"The frontend packages are present.","failure_or_wait":"npm, network, lockfile, version, or permission errors must be corrected while leaving the backend running.","required":true,"source_ids":["S1"]},
+        {"step_number":4,"phase":"execute","actor":"developer","interface":"cli","action":"Run npm start in quickstart/frontend.","details":[],"input":"Installed frontend","output":"React Quickstart development server","success_signal":"The frontend serves http://localhost:3000.","failure_or_wait":"Build, dependency, port, or proxy errors must be corrected and the frontend restarted.","required":true,"source_ids":["S1","S2"]},
+        {"step_number":5,"phase":"arrive","actor":"developer","interface":"console","action":"Open http://localhost:3000 and select Launch Link.","details":[],"input":"Running backend and frontend","output":"Link-token request and Plaid Link launch","success_signal":"The Plaid Link institution-selection UI opens.","failure_or_wait":"If Link does not open, inspect frontend and backend logs and verify the link-token request reaches localhost:8000.","required":true,"source_ids":["S1","S2"]},
+        {"step_number":6,"phase":"authenticate","actor":"external-system","interface":"api","action":"Let the backend call /link/token/create for the Quickstart user and return the one-time link_token.","details":["The request includes a unique client_user_id, Plaid Test App client name, configured products, language, optional webhook and redirect URI, and country codes."],"input":"Sandbox Client ID, secret, environment, and PLAID_PRODUCTS","output":"One-time Link token","success_signal":"The React client initializes Link with the returned link_token.","failure_or_wait":"A 400 or other API error requires inspecting backend or Dashboard activity logs and correcting credentials, environment, products, country codes, redirect URI, or request fields before relaunching Link.","required":true,"source_ids":["S1","S4"]},
+        {"step_number":7,"phase":"configure","actor":"developer","interface":"console","action":"Select a supported Sandbox institution in Link.","details":[],"input":"Open Plaid Link and configured products","output":"Institution-specific Sandbox login form","success_signal":"Link displays the institution's test credential fields.","failure_or_wait":"If Link reports Connectivity not supported, choose an institution supporting PLAID_PRODUCTS or remove unsupported products from .env, restart the backend, recreate the link token, and retry.","required":true,"source_ids":["S1","S3"]},
+        {"step_number":8,"phase":"authenticate","actor":"developer","interface":"console","action":"Enter user_good and pass_good, and enter 1234 if Link prompts for two-factor authentication.","details":[],"input":"Plaid Sandbox test credentials","output":"Authenticated Sandbox institution flow","success_signal":"Link advances through account connection and reaches success.","failure_or_wait":"Different Sandbox test credentials intentionally trigger other states; use the documented good credentials for this success candidate.","required":true,"source_ids":["S1","S3"]},
+        {"step_number":9,"phase":"execute","actor":"external-system","interface":"console","action":"Complete Link so it creates the first Item and invokes onSuccess with public_token.","details":[],"input":"Successful Sandbox institution authentication","output":"Plaid Item and short-lived public token","success_signal":"The Quickstart frontend receives public_token through Link onSuccess.","failure_or_wait":"Institution, product, OAuth redirect, or Link-flow errors must be corrected before onSuccess fires.","required":true,"source_ids":["S1","S5"]},
+        {"step_number":10,"phase":"execute","actor":"developer","interface":"api","action":"Allow the frontend to send public_token to the Quickstart backend.","details":[],"input":"Link public token","output":"Server-side exchange request","success_signal":"The Node backend receives the public token.","failure_or_wait":"Frontend-to-backend connectivity, route, or payload errors must be corrected before exchange.","required":true,"source_ids":["S1","S2"]},
+        {"step_number":11,"phase":"authenticate","actor":"external-system","interface":"api","action":"Let the backend call /item/public_token/exchange and capture access_token and item_id.","details":["The Quickstart returns public_token_exchange complete after the exchange."],"input":"Sandbox Client ID, secret, and public token","output":"Item access token and Item ID","success_signal":"The backend logs or returns public_token_exchange complete with no Plaid error.","failure_or_wait":"Expired, already-used, malformed, or wrong-environment public tokens and invalid credentials must be corrected by relaunching Link or fixing .env and retrying.","required":true,"source_ids":["S1","S4","S5"]},
+        {"step_number":12,"phase":"authenticate","actor":"developer","interface":"other","action":"Keep the access token on the server for the Quickstart session.","details":["Access tokens are long-lived Item credentials and must not be exposed to the frontend in a production design."],"input":"Exchanged access token","output":"Server-side Item authentication state","success_signal":"The backend can use the token for the session's Plaid API calls.","failure_or_wait":"Losing or exposing the token prevents or compromises later requests; recreate the Item for the Quickstart if necessary.","required":true,"source_ids":["S1","S5"]},
+        {"step_number":13,"phase":"execute","actor":"developer","interface":"console","action":"Select the Quickstart Accounts button.","details":["This invokes the Quickstart /api/accounts route."],"input":"Frontend with connected Item","output":"Backend accounts request","success_signal":"The Node backend calls Plaid /accounts/get with the stored access token.","failure_or_wait":"If the button or request fails, verify Item state, backend session, frontend proxy, and both running processes.","required":true,"source_ids":["S1","S2"]},
+        {"step_number":14,"phase":"verify","actor":"developer","interface":"console","action":"Verify the /accounts/get result is rendered in the Quickstart.","details":[],"input":"Successful Accounts API response","output":"Completed Plaid Quickstart first result","success_signal":"The page displays account names, balances, Item metadata, and request_id.","failure_or_wait":"A Plaid error requires inspecting backend and Dashboard activity logs, correcting the reported credential, product, Item, or request problem, and retrying the Accounts action.","required":true,"source_ids":["S1","S2","S4"]}
+      ],
+      "source_ids": ["S1", "S2", "S3", "S4", "S5"]
+    }
+  ],
+  "candidate_path_gap": null
+}

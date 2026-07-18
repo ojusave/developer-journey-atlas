@@ -1,0 +1,377 @@
+{
+  "platform": {
+    "name": "Arize AI",
+    "slug": "arize-ai",
+    "organization": "Arize AI"
+  },
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Arize AX Instrument your agent, manual Python path",
+    "selection_basis": "The current Arize AX documentation labels Instrument your agent as Part 1 of the Get Started series. It explicitly ends with traces visible in AX and a congratulations state. The manual Python path is a complete code route on the same page.",
+    "alternatives_considered": [
+      {
+        "name": "Arize Skills instrumentation",
+        "url": "https://arize.com/docs/ax/get-started/get-started-tracing",
+        "reason_not_primary": "This parallel route delegates code changes and verification to a coding-agent skill, while the manual route exposes the developer-visible steps."
+      },
+      {
+        "name": "Machine Learning quickstart",
+        "url": "https://arize.com/docs/ax/machine-learning/machine-learning/quickstart",
+        "reason_not_primary": "This is a separate predictive-ML workflow. The current AX Get Started series makes agent tracing Part 1."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Instrument an existing Python LLM application and see its first trace in Arize AX.",
+    "starting_url": "https://arize.com/docs/ax/get-started/get-started-tracing",
+    "assumed_prior_state": [
+      "The developer has an LLM app in Python or will use the companion notebook.",
+      "The app has not yet been instrumented for Arize AX."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Congratulations!",
+    "normalized_outcome": "A request through the developer's instrumented app produces a trace visible in the selected Arize AX project, with its span tree, model, prompt, response, latency, and token counts.",
+    "observable_completion_signal": "The AX project lists one trace per handled request; opening one displays the full span tree and request details.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The Part 1 guide ends with `Congratulations!` and states that the developer now has full visibility into every execution step.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the explicit terminal state of Part 1 before the next official guide, Evaluate your agent.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A free Arize AX account is required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Bring a runnable, provider-configured LLM application in Python or TypeScript, or use the companion notebook. The concrete OpenAI Python route requires Python 3.9 or later and an `OPENAI_API_KEY`; the provider-specific route otherwise requires its equivalent provider credential.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "credential",
+      "requirement": "Obtain the AX Space ID and API key. The current quickstart places both on Projects, New Tracing Project, while the current auto-instrumentation and provider pages also point to Settings, API Keys or Space Settings.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign in to Arize AX and create a tracing project from Projects, New Tracing Project.",
+      "details": [
+        "The current quickstart's project setup page exposes both required credentials.",
+        "Other current Arize setup pages locate the Space ID and API key under Settings, API Keys or Space Settings, so the UI route is documentation-version dependent."
+      ],
+      "input": "Arize AX account.",
+      "output": "New tracing project setup page.",
+      "success_signal": "Space ID and Create API Key control are visible.",
+      "failure_or_wait": "No manual approval wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the Space ID, create or copy an API key from the credential location shown by the selected current guide, and store both securely.",
+      "details": [
+        "The credentials are used by the tracer registration code.",
+        "Use Projects, New Tracing Project on the quickstart, or Settings, API Keys or Space Settings when following the auto-instrumentation or OpenAI provider guide."
+      ],
+      "input": "Tracing project setup page.",
+      "output": "ARIZE_SPACE_ID and ARIZE_API_KEY values.",
+      "success_signal": "Both credentials are available for local configuration.",
+      "failure_or_wait": "Losing the secret requires generating or selecting usable credentials again.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install `arize-otel`, the LLM provider SDK, and the matching OpenInference instrumentor.",
+      "details": [
+        "The documented OpenAI example uses `pip install arize-otel openai openinference-instrumentation-openai`.",
+        "Other stacks replace or add the provider or framework instrumentor.",
+        "The concrete OpenAI Python path requires Python 3.9 or later."
+      ],
+      "input": "Python environment for the target app.",
+      "output": "Tracing and instrumentor packages installed.",
+      "success_signal": "The packages import in the application environment.",
+      "failure_or_wait": "Using an agent framework with an LLM provider requires instrumenting both.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Register the tracer provider before any LLM call and invoke the instrumentor.",
+      "details": [
+        "Pass Space ID, API key, and project name to `register`.",
+        "Choose the endpoint matching the AX account's US, EU, or Canada data region.",
+        "Call the provider instrumentor's `.instrument()` with the tracer provider.",
+        "For the OpenAI example, export a usable `OPENAI_API_KEY` in addition to the Arize credentials."
+      ],
+      "input": "Credentials, project name, data region, and app code.",
+      "output": "Application configured to export provider spans to AX.",
+      "success_signal": "Instrumentation executes before the first model call.",
+      "failure_or_wait": "A mismatched data-region endpoint or wrong credentials prevent trace export.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Run representative requests through the instrumented application.",
+      "details": [
+        "The guide suggests a typical request and a tricky edge case."
+      ],
+      "input": "Instrumented app and test inputs.",
+      "output": "Application executions that emit traces.",
+      "success_signal": "Requests complete and spans are sent to AX.",
+      "failure_or_wait": "The guide does not state an ingestion duration.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the AX project, confirm the request traces, and expand one trace.",
+      "details": [
+        "The trace list has one trace per handled request.",
+        "The expanded tree shows model, prompt, response, latency, token counts, and exact input and output."
+      ],
+      "input": "Completed instrumented requests.",
+      "output": "Visible trace list and expanded span tree.",
+      "success_signal": "A trace corresponding to the run is visible with its execution details.",
+      "failure_or_wait": "Missing traces require checking credentials, endpoint, package, and initialization order, though the quickstart does not enumerate troubleshooting here.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "The app uses Anthropic, LangChain, LlamaIndex, CrewAI, or OpenAI Agents instead of the plain OpenAI client.",
+      "path": "Install the matching OpenInference package listed in the integration table and call its instrumentor; instrument both framework and provider when both are present.",
+      "effect_on_first_success": "The trace signal stays the same, while package and span structure change.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer chooses Arize Skills.",
+      "path": "Install the arize-instrumentation skill, set credentials, open the coding agent in the project root, ask it to set up tracing, and have it run the app to verify spans before viewing or exporting them.",
+      "effect_on_first_success": "A coding agent performs code analysis and instrumentation instead of manual edits.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "An AX account and tracing project are required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "credential",
+      "description": "Space ID and API key must be created, copied, and supplied to the application; current official pages expose them through more than one UI location.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "The tracing wrapper and stack-specific instrumentor packages must be installed.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "credential",
+      "description": "The selected LLM provider must already be runnable with its own credential; the OpenAI path requires `OPENAI_API_KEY`.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "choice",
+      "description": "The developer must choose the correct provider or framework instrumentor and data-region endpoint.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "configuration",
+      "description": "Registration and instrumentation must run before any model calls.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Instrument your agent",
+      "url": "https://arize.com/docs/ax/get-started/get-started-tracing",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before you start",
+        "Choose how you want to work",
+        "By Arize Skills",
+        "By Code",
+        "Instrument your app",
+        "Generate some traces",
+        "See your traces in Arize AX",
+        "Congratulations"
+      ],
+      "evidence_supported": [
+        "Part 1 primary quickstart selection",
+        "Account, app, project, credential, package, provider, and region requirements",
+        "Complete manual and skill routes",
+        "Visible trace and congratulations boundary"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Auto-Instrumentation",
+      "url": "https://arize.com/docs/ax/instrument/set-up-tracing",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start from the Arize AX UI",
+        "Register and instrument"
+      ],
+      "evidence_supported": [
+        "New Tracing Project setup wizard",
+        "Settings and API Keys credential location",
+        "Space ID and new API key labels",
+        "Current provider and region setup"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "OpenAI",
+      "url": "https://arize.com/docs/ax/integrations/llm-providers/openai",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Launch Arize AX",
+        "Configure credentials",
+        "Verify in Arize AX"
+      ],
+      "evidence_supported": [
+        "Python 3.9 or Node.js 18 prerequisite",
+        "OpenAI or Azure OpenAI credentials",
+        "Space Settings credential location",
+        "Concrete OpenAI trace path",
+        "Trace visible within about 30 seconds"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "How long after a request completes should its trace take to appear?",
+      "impact": "The workshop cannot distinguish expected ingestion delay from a broken configuration by time alone.",
+      "reason_unresolved": "The quickstart says traces appear in the project but provides no ingestion-time claim.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Automated evaluations",
+    "Prompt improvement and experiments",
+    "Production sampling and custom spans",
+    "Dashboards, metrics, and retention",
+    "Exporting traces programmatically"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,262 @@
+{
+  "platform": {
+    "name": "OpenAI",
+    "slug": "openai",
+    "organization": "OpenAI"
+  },
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "OpenAI Responses API, JavaScript developer quickstart",
+    "selection_basis": "OpenAI's official Developer quickstart explicitly says to create an API key and run a first API call. Its first language tab is JavaScript and the documented terminal signal is printed model output. This establishes the boundary without selecting it independently.",
+    "alternatives_considered": [
+      {
+        "name": "Python quickstart",
+        "url": "https://developers.openai.com/api/docs/quickstart",
+        "reason_not_primary": "The same official page offers an equivalent Python tab; JavaScript is the first displayed route, so only local package and run commands differ."
+      },
+      {
+        "name": "Agents SDK quickstart",
+        "url": "https://developers.openai.com/api/docs/guides/agents/quickstart",
+        "reason_not_primary": "This is a later, more specialized agent path; the general Developer quickstart first establishes a basic Responses API call."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create credentials and receive output from a first OpenAI API request.",
+    "starting_url": "https://developers.openai.com/api/docs/quickstart",
+    "assumed_prior_state": [
+      "The developer has arrived at OpenAI's official Developer quickstart.",
+      "The developer has no configured API key, SDK package, or example file yet."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Run an API Call",
+    "normalized_outcome": "A JavaScript program sends the documented Responses API request and prints the model-generated text.",
+    "observable_completion_signal": "Running `node example.mjs` prints the output text; the page then says `Congrats on running a free test API request!`.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The quickstart's heading is `Install the OpenAI SDK and Run an API Call`, followed by a printed response and a congratulations message for the free test request.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is the first complete authenticated API interaction explicitly established by the general official quickstart, before billing credits and more specialized capabilities.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "Access to the OpenAI Platform dashboard is required to create an API key.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "A server-side JavaScript runtime such as Node.js, Deno, or Bun and an npm-compatible package manager are needed for the selected tab.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create an API key in the OpenAI dashboard and store it securely.",
+      "details": [
+        "The quickstart warns to keep the key in a safe location."
+      ],
+      "input": "OpenAI Platform account access.",
+      "output": "New API key.",
+      "success_signal": "The key is generated and copied to secure local storage.",
+      "failure_or_wait": "The page does not document a manual approval wait.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export the key as `OPENAI_API_KEY` in the terminal.",
+      "details": [
+        "The macOS and Linux example uses `export`; PowerShell uses `setx`.",
+        "OpenAI SDKs read this environment variable automatically."
+      ],
+      "input": "Generated API key.",
+      "output": "API key available to the SDK process.",
+      "success_signal": "The environment variable is set for the runtime.",
+      "failure_or_wait": "Shell persistence and process refresh behavior depend on the operating system.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the official JavaScript SDK with `npm install openai`.",
+      "details": [
+        "The selected tab supports server-side Node.js, Deno, or Bun environments."
+      ],
+      "input": "JavaScript project and package manager.",
+      "output": "OpenAI SDK dependency installed.",
+      "success_signal": "The `openai` package is available to import.",
+      "failure_or_wait": "Package installation requires network and filesystem access.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Create `example.mjs` with the documented Responses API example.",
+      "details": [
+        "Import OpenAI and instantiate the client.",
+        "Call `client.responses.create` with the documented model and one-sentence bedtime-story input, then log `response.output_text`."
+      ],
+      "input": "Documented JavaScript example.",
+      "output": "Runnable example program.",
+      "success_signal": "The file contains the client, request, and print statements.",
+      "failure_or_wait": "Incorrect environment loading or a missing key prevents authentication.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `node example.mjs`.",
+      "details": [
+        "The SDK authenticates from the environment and calls the Responses API."
+      ],
+      "input": "Runnable example and configured API key.",
+      "output": "Model response object and printed output text.",
+      "success_signal": "A generated one-sentence story appears in the terminal and the quickstart's congratulations state is reached.",
+      "failure_or_wait": "The docs say output should appear in a few moments; API errors are not detailed in this quickstart section.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer uses Windows PowerShell.",
+      "path": "Use `setx OPENAI_API_KEY \"your_api_key_here\"`, then continue with the selected SDK runtime.",
+      "effect_on_first_success": "Only environment-variable setup changes.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer selects Python, .NET, Java, Go, or Ruby.",
+      "path": "Use the corresponding official SDK install, example code, and runtime command in the parallel language tab.",
+      "effect_on_first_success": "All routes end at a first Responses API output, but local tooling differs.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "The developer needs dashboard access to create the API key.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 1,
+      "type": "credential",
+      "description": "A secret API key must be created, copied, stored safely, and exposed to the SDK without embedding it in code.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "The official SDK must be installed for the selected language.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developer quickstart",
+      "url": "https://developers.openai.com/api/docs/quickstart",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create and export an API key",
+        "Install the OpenAI SDK and Run an API Call",
+        "Add credits to keep building"
+      ],
+      "evidence_supported": [
+        "General first-API-call boundary",
+        "Dashboard key and environment steps",
+        "Language SDK alternatives",
+        "JavaScript install, file, request, run, and printed-output signals",
+        "Free-test congratulations and post-success billing step"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What account states receive the free test API request referenced by the quickstart?",
+      "impact": "Some developers may encounter a billing or credit gate before the same terminal response.",
+      "reason_unresolved": "The quickstart congratulates the reader for a free test and places Add credits afterward, but does not define eligibility conditions on this page.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Adding credits for higher limits",
+    "Responses starter application",
+    "Image and file analysis",
+    "Built-in tools and function calling",
+    "Agents SDK",
+    "Production key management, retries, monitoring, and cost controls"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

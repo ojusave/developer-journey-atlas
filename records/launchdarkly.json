@@ -1,0 +1,532 @@
+{
+  "platform": {
+    "name": "LaunchDarkly",
+    "slug": "launchdarkly",
+    "organization": "LaunchDarkly, Inc."
+  },
+  "category": "Observability, testing, and release engineering",
+  "surface": {
+    "name": "LaunchDarkly software-developer quickstart, SDK not selected",
+    "selection_basis": "LaunchDarkly's docs home sends new users to Get started, and the developer role path says to set up an SDK, create a first feature flag, and use the Quickstart or CLI. The in-app Quickstart is the recommended guided route but supports many client-side, server-side, mobile, and edge SDKs; installation, credentials, code, contexts, execution, and fallback behavior differ by SDK.",
+    "alternatives_considered": [
+      {
+        "name": "In-app Quickstart",
+        "url": "https://launchdarkly.com/docs/home/getting-started/feature-management",
+        "reason_not_primary": "It creates a first flag and sample application but asks the developer to choose an SDK."
+      },
+      {
+        "name": "LaunchDarkly CLI setup",
+        "url": "https://launchdarkly.com/docs/home/getting-started/cli",
+        "reason_not_primary": "The developer role page presents CLI as an alternative to the in-app Quickstart."
+      },
+      {
+        "name": "Individual SDK onboarding guides",
+        "url": "https://launchdarkly.com/docs/home/onboarding",
+        "reason_not_primary": "The official onboarding index lists .NET, Android, Go, iOS, Java, JavaScript, Node.js client and server, Python, React Native, React Web, Vue, and other distinct routes."
+      },
+      {
+        "name": "Product manager flag toggle",
+        "url": "https://launchdarkly.com/docs/home/getting-started/toggle/",
+        "reason_not_primary": "The role router gives product managers a UI-first path without requiring the same SDK implementation sequence."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create, evaluate, and visibly toggle a first LaunchDarkly feature flag without a preselected SDK or application stack.",
+    "starting_url": "https://launchdarkly.com/docs/home/getting-started/roles",
+    "assumed_prior_state": [
+      "The developer has arrived after discovery.",
+      "No SDK type, runtime, project, environment, feature flag, or context is selected."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Create your first flag, install an SDK, and enable your first feature",
+    "normalized_outcome": "In a selected SDK branch, an application initializes LaunchDarkly, evaluates a first flag for a context, and changes its visible behavior when the flag is turned on and off.",
+    "observable_completion_signal": "The application immediately changes to the corresponding variation after the developer toggles the flag and selects Review and save; initialization logs show `SDK successfully initialized` rather than failure.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The official docs describe the Quickstart as the workflow to create a first flag, install an SDK, and enable a first feature, and the toggle page says changes should appear immediately in the application.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    "why_this_is_the_boundary": "The success outcome is documented, but an atomic path cannot be fixed until a human selects the SDK and application environment.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "Create a LaunchDarkly account through the no-card 14-day free trial. When the trial ends, the account automatically converts to the free Developer plan unless upgraded; a project and environment are required for the flag and SDK credential.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "A runnable application and package manager for one supported SDK are required.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "The member must be able to create flags, access environment credentials, and save targeting changes.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign up for the 14-day LaunchDarkly free trial and open the initial project and Test environment.",
+      "details": [
+        "No credit card is required.",
+        "After 14 days, the account automatically converts to the free Developer plan unless the developer upgrades."
+      ],
+      "input": "LaunchDarkly signup identity and account details.",
+      "output": "Active account, project, and Test environment.",
+      "success_signal": "The Flags list is accessible for the new account.",
+      "failure_or_wait": "The docs do not state a manual approval wait for self-service signup.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose the language or framework used by the runnable sample and install its LaunchDarkly SDK with the corresponding package manager.",
+      "details": [
+        "The Get Started page provides parallel examples for JavaScript, Node.js, React, Python, Java, .NET, and other supported SDKs."
+      ],
+      "input": "Runnable application, selected SDK, runtime, and package manager.",
+      "output": "LaunchDarkly SDK installed in the application.",
+      "success_signal": "The SDK package imports or loads in the selected runtime.",
+      "failure_or_wait": "The exact package name and installation command depend on the selected SDK.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create the first Boolean feature flag in LaunchDarkly and copy its flag key.",
+      "details": [
+        "The Get Started examples use `my-first-feature-flag`."
+      ],
+      "input": "Project, Test environment, flag name, and key.",
+      "output": "Boolean feature flag with true and false variations.",
+      "success_signal": "The flag appears in the project's Flags list and its key can be copied.",
+      "failure_or_wait": "Insufficient flag permissions block creation.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the Test environment credential appropriate to the SDK: server-side SDK key, client-side ID, or mobile key.",
+      "details": [
+        "Credentials from another project or environment do not authenticate the sample correctly."
+      ],
+      "input": "Selected SDK and Test environment.",
+      "output": "Matching LaunchDarkly SDK credential.",
+      "success_signal": "The credential is available to the sample application.",
+      "failure_or_wait": "Using the wrong credential type or environment produces an authentication or initialization error.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Initialize the selected LaunchDarkly client with the Test credential and define the documented user context.",
+      "details": [
+        "The common example context identifies a user with a stable key and optional name and email.",
+        "Initialization APIs are SDK-specific."
+      ],
+      "input": "SDK package, matching credential, and context fields.",
+      "output": "Configured LaunchDarkly client and evaluation context.",
+      "success_signal": "The application reaches the SDK initialized callback or equivalent ready state.",
+      "failure_or_wait": "Package, async initialization, and credential errors vary by SDK.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the application and confirm the initialization output.",
+      "details": [
+        "The documented JavaScript spine prints `SDK successfully initialized!`."
+      ],
+      "input": "Configured application.",
+      "output": "SDK initialization log.",
+      "success_signal": "The output contains `SDK successfully initialized!` rather than an initialization failure.",
+      "failure_or_wait": "Check the Test environment credential if initialization fails.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Evaluate the first flag for the context with the copied flag key and a `false` fallback, then run the code.",
+      "details": [
+        "The sample prints `Our first feature flag is: true` while the Test flag serves the true variation."
+      ],
+      "input": "Initialized client, context, flag key, and false fallback.",
+      "output": "First flag evaluation result.",
+      "success_signal": "The application prints the documented true result.",
+      "failure_or_wait": "A wrong flag key, context, credential, or fallback path can return an unintended value.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In the Test environment, toggle the flag Off, select Review and save, enter a comment explaining the change, and select Save changes.",
+      "details": [
+        "The save flow commits the new targeting state."
+      ],
+      "input": "Feature flag, Test environment, Off setting, and comment.",
+      "output": "Saved Off targeting configuration.",
+      "success_signal": "The flag list shows Off for the Test environment.",
+      "failure_or_wait": "A missing save or wrong environment leaves the running evaluation unchanged.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the evaluation code again and verify that the saved flag change changes the returned value.",
+      "details": [
+        "The documented terminal output is `Our first feature flag is: false`."
+      ],
+      "input": "Saved Off flag and connected application.",
+      "output": "False flag-evaluation result.",
+      "success_signal": "The application prints `Our first feature flag is: false` after previously printing true.",
+      "failure_or_wait": "If the value does not change, verify initialization, flag key, credential, streaming connectivity, proxy, outbound authorization, and the selected environment.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "A supported SDK is selected.",
+      "path": "Install its package, initialize the LaunchDarkly client with the SDK key, client-side ID, or mobile key appropriate to that SDK, create the documented context, evaluate the quickstart flag with its key and fallback value, run the application, confirm successful initialization, open the flag's Targeting tab and target environment, toggle it On, select Review and save, and verify the application's changed output. For terminating applications, shut down the client so pending events flush.",
+      "effect_on_first_success": "The application serves the LaunchDarkly-selected variation and changes after the saved toggle.",
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "SDK initialization fails or the application does not change.",
+      "path": "Check logs for `SDK failed to initialize`, verify the SDK credential and flag key, confirm the app remains connected, restart it if long-lived streaming was closed, account for HTTPS proxies, and add required outbound authorization before retrying.",
+      "effect_on_first_success": "The documented recovery loop must succeed before a toggle can be observed.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The user is a product manager rather than a software developer.",
+      "path": "Begin with turning flags on and off and targeting variations rather than installing an SDK in a new application.",
+      "effect_on_first_success": "The account must already have a connected application and flag for the UI-only toggle to have a visible result.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "Self-service signup starts a 14-day no-card trial that automatically converts to the free Developer plan unless upgraded.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "SDK type, runtime, and application must be selected before copying the corresponding implementation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "The application must install the selected LaunchDarkly SDK through its dependency manager.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "credential",
+      "description": "Server-side SDK key, client-side ID, or mobile key must match the SDK and environment.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "configuration",
+      "description": "Flag key, context, fallback value, and toggle environment must be consistent between application and UI.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "environment",
+      "description": "Streaming connections, HTTPS proxies, and outbound network authorization can delay or block updates.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "verification",
+      "description": "The application must show the corresponding flag variation after Review and save.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting started in different roles",
+      "url": "https://launchdarkly.com/docs/home/getting-started/roles",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get started as a software developer",
+        "Get started as a product manager",
+        "Get started as a systems architect",
+        "Get started as an account administrator"
+      ],
+      "evidence_supported": [
+        "Role-specific routers",
+        "Developer SDK and first-flag order",
+        "Quickstart and CLI alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Setting up an SDK",
+      "url": "https://launchdarkly.com/docs/home/getting-started/setting-up",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Setting up an SDK",
+        "Adding contexts to LaunchDarkly",
+        "Flag evaluations are always available",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Common five-step SDK lifecycle",
+        "Credential and context differences",
+        "Fallback and streaming behavior",
+        "Shutdown event flush"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Turning flags on and off",
+      "url": "https://launchdarkly.com/docs/home/getting-started/toggle/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Turn on flags",
+        "Turn off flags",
+        "Watch for changes in your application"
+      ],
+      "evidence_supported": [
+        "Toggle and Review and save sequence",
+        "Immediate visible change",
+        "Initialization, credential, streaming, proxy, and authorization recovery"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Onboarding",
+      "url": "https://launchdarkly.com/docs/home/onboarding",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Finding your credentials",
+        "SDKs with onboarding guides",
+        "Other ways to get started"
+      ],
+      "evidence_supported": [
+        "SDK credential types",
+        "Multiple coequal SDK onboarding guides",
+        "Quickstart as first-flag UI route"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Get started",
+      "url": "https://launchdarkly.com/docs/home/getting-started",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign up for a free trial",
+        "Install an SDK for your codebase",
+        "Create your first feature flag",
+        "Initialize the SDK",
+        "Build your first context",
+        "Retrieving your first feature flag",
+        "Turn off the feature flag"
+      ],
+      "evidence_supported": [
+        "Ordered end-to-end Get Started spine",
+        "14-day trial and automatic Developer-plan conversion",
+        "SDK, flag, credential, initialization, context, and evaluation sequence",
+        "SDK successfully initialized output",
+        "True result, toggle, review, comment, save, rerun, and false result"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "LaunchDarkly subscriptions and plans",
+      "url": "https://launchdarkly.com/docs/home/account/plans",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Plan features",
+        "Free trials"
+      ],
+      "evidence_supported": [
+        "Free Developer plan",
+        "No credit card requirement",
+        "Automatic conversion after trial",
+        "Post-trial feature restrictions"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which LaunchDarkly SDK and application stack should define the atomic quickstart?",
+      "impact": "The choice changes package installation, credential type, source files, async initialization, context code, run command, shutdown, and failure recovery.",
+      "reason_unresolved": "LaunchDarkly documents many SDK onboarding guides and makes SDK choice part of getting started.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Targeting rules and segments",
+    "Percentage rollouts",
+    "Experiments",
+    "Integrations and REST API",
+    "Flag lifecycle and cleanup",
+    "Production governance, teams, roles, billing, and observability"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

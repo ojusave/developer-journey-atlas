@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.devrelcon.invalid/platform-first-mile-record.schema.json",
+  "title": "Documented platform first-mile record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "platform",
+    "category",
+    "surface",
+    "research_status",
+    "researched_at",
+    "official_docs_only",
+    "entry_point",
+    "documented_first_success",
+    "prerequisites",
+    "primary_path",
+    "candidate_paths",
+    "candidate_path_gap",
+    "branches",
+    "friction_gates",
+    "time_to_first_success",
+    "sources",
+    "uncertainties",
+    "excluded_after_success"
+  ],
+  "properties": {
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "slug", "organization"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "organization": {"type": "string", "minLength": 1}
+      }
+    },
+    "category": {"type": "string", "minLength": 1},
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "selection_basis", "alternatives_considered"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "selection_basis": {"type": "string", "minLength": 1},
+        "alternatives_considered": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "url", "reason_not_primary"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "url": {"type": "string", "format": "uri"},
+              "reason_not_primary": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "research_status": {
+      "enum": ["complete", "blocked", "needs-human-judgment"]
+    },
+    "researched_at": {"type": "string", "format": "date"},
+    "official_docs_only": {"const": true},
+    "entry_point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["developer_intent", "starting_url", "assumed_prior_state"],
+      "properties": {
+        "developer_intent": {"type": "string", "minLength": 1},
+        "starting_url": {"type": "string", "format": "uri"},
+        "assumed_prior_state": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "documented_first_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "official_milestone",
+        "normalized_outcome",
+        "observable_completion_signal",
+        "boundary_evidence",
+        "why_this_is_the_boundary",
+        "source_ids"
+      ],
+      "properties": {
+        "official_milestone": {"type": "string", "minLength": 1},
+        "normalized_outcome": {"type": "string", "minLength": 1},
+        "observable_completion_signal": {"type": "string", "minLength": 1},
+        "boundary_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "official_label_or_terminal_state", "source_ids"],
+          "properties": {
+            "type": {"enum": ["explicitly-named", "demonstrated-terminal-state", "not-established-by-docs"]},
+            "official_label_or_terminal_state": {"type": "string", "minLength": 1},
+            "source_ids": {"$ref": "#/$defs/sourceIds"}
+          }
+        },
+        "why_this_is_the_boundary": {"type": "string", "minLength": 1},
+        "source_ids": {"$ref": "#/$defs/sourceIds"}
+      }
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["order", "type", "requirement", "required", "source_ids"],
+        "properties": {
+          "order": {"type": "integer", "minimum": 1},
+          "type": {
+            "enum": [
+              "account", "access", "plan", "billing", "hardware", "software",
+              "identity", "permission", "region", "knowledge", "approval",
+              "configuration", "credential", "domain", "environment", "legal",
+              "network", "verification", "other"
+            ]
+          },
+          "requirement": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"},
+          "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "primary_path": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_number", "phase", "actor", "interface", "action", "details",
+          "input", "output", "success_signal", "failure_or_wait", "required",
+          "source_ids"
+        ],
+        "properties": {
+          "step_number": {"type": "integer", "minimum": 1},
+          "phase": {
+            "enum": [
+              "arrive", "access", "account", "install", "prepare", "configure",
+              "connect", "authenticate", "credential", "billing", "build",
+              "execute", "run", "wait", "verify"
+            ]
+          },
+          "actor": {"enum": ["developer", "platform", "system", "administrator", "external-system"]},
+          "interface": {
+            "enum": [
+              "documentation", "console", "web-console", "web-ui", "browser",
+              "desktop-app", "cli", "api", "sdk", "code", "ide", "device",
+              "hardware", "dns", "email", "other"
+            ]
+          },
+          "action": {"type": "string", "minLength": 1},
+          "details": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "input": {"type": "string"},
+          "output": {"type": "string"},
+          "success_signal": {"type": "string"},
+          "failure_or_wait": {"type": "string"},
+          "required": {"type": "boolean"},
+          "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "candidate_paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "name", "selection_basis", "relationship_to_primary_path",
+          "steps", "source_ids"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "name": {"type": "string", "minLength": 1},
+          "selection_basis": {"type": "string", "minLength": 1},
+          "relationship_to_primary_path": {"type": "string", "minLength": 1},
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"$ref": "#/properties/primary_path/items"}
+          },
+          "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "candidate_path_gap": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reason", "impact", "source_ids"],
+          "properties": {
+            "reason": {"type": "string", "minLength": 1},
+            "impact": {"type": "string", "minLength": 1},
+            "source_ids": {"$ref": "#/$defs/sourceIds"}
+          }
+        }
+      ]
+    },
+    "branches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["at_step", "condition", "path", "effect_on_first_success", "source_ids"],
+        "properties": {
+          "at_step": {"type": "integer", "minimum": 1},
+          "condition": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "effect_on_first_success": {"type": "string", "minLength": 1},
+          "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "friction_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["at_step", "type", "description", "documented_requirement", "source_ids"],
+        "properties": {
+          "at_step": {"type": "integer", "minimum": 1},
+          "type": {
+            "enum": [
+              "account", "verification", "billing", "approval", "permission",
+              "installation", "configuration", "credential", "choice", "wait",
+              "environment", "policy", "access", "dns", "domain", "download",
+              "form", "hardware", "knowledge", "legal", "limit", "payment",
+              "rate-limit", "terms", "other"
+            ]
+          },
+          "description": {"type": "string", "minLength": 1},
+          "documented_requirement": {"type": "boolean"},
+          "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "time_to_first_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vendor_claim", "value", "source_ids"],
+      "properties": {
+        "vendor_claim": {"type": "boolean"},
+        "value": {"type": "string", "minLength": 1},
+        "source_ids": {"type": "array", "items": {"type": "string", "pattern": "^S[1-9][0-9]*$"}, "uniqueItems": true}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "title", "url", "official_domain", "source_type",
+          "accessed_at", "last_updated_if_shown", "sections_used", "evidence_supported"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^S[1-9][0-9]*$"},
+          "title": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "format": "uri"},
+          "official_domain": {"const": true},
+          "source_type": {
+            "enum": [
+              "documentation", "tutorial", "quickstart", "installation",
+              "troubleshooting", "api-reference", "official-repository",
+              "official-example-repository", "help-center", "policy", "pricing",
+              "account-setup", "release-note"
+            ]
+          },
+          "accessed_at": {"type": "string", "format": "date"},
+          "last_updated_if_shown": {"type": ["string", "null"]},
+          "sections_used": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "evidence_supported": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "impact", "reason_unresolved", "checked_source_ids"],
+        "properties": {
+          "question": {"type": "string", "minLength": 1},
+          "impact": {"type": "string", "minLength": 1},
+          "reason_unresolved": {"type": "string", "minLength": 1},
+          "checked_source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "excluded_after_success": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "$defs": {
+    "sourceIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^S[1-9][0-9]*$"}
+    }
+  }
+}
