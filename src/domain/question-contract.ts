@@ -1,0 +1,145 @@
+export type InputMode = "short_text" | "long_text" | "single_choice" | "multi_choice" | "adaptive_discriminator";
+
+export interface QuestionContract {
+  id: string;
+  objectiveIds: string[];
+  job: string;
+  inputModes: InputMode[];
+  whyThisMode: string;
+  completionRule: string;
+  followUpTrigger: string;
+  source: "deterministic_intake" | "diagnostic_objective" | "catalog_graph";
+}
+
+export const questionContracts: QuestionContract[] = [
+  {
+    id: "profile-name",
+    objectiveIds: [],
+    job: "Give the session a friendly local form of address",
+    inputModes: ["short_text"],
+    whyThisMode: "Only the attendee can supply it and options would add no meaning",
+    completionRule: "A local name or alias is present",
+    followUpTrigger: "Never",
+    source: "deterministic_intake",
+  },
+  {
+    id: "profile-company",
+    objectiveIds: [],
+    job: "Bound the case to one company, team, project, or alias",
+    inputModes: ["short_text"],
+    whyThisMode: "The value is case-specific and must not trigger a company lookup",
+    completionRule: "A boundary label is present",
+    followUpTrigger: "Never",
+    source: "deterministic_intake",
+  },
+  {
+    id: "profile-platform",
+    objectiveIds: ["D2"],
+    job: "Name the developer surface and select up to two applicable platform archetype groups",
+    inputModes: ["short_text", "multi_choice"],
+    whyThisMode: "A platform name is case-specific, while several platform surfaces can coexist",
+    completionRule: "The platform is named, one or two surface groups are selected, and an unrepresented surface is described",
+    followUpTrigger: "The selected group is Something else or the journey crosses an unrepresented surface",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "profile-role",
+    objectiveIds: ["D9"],
+    job: "Record the attendee's primary operating position",
+    inputModes: ["single_choice", "short_text"],
+    whyThisMode: "One primary role anchors ownership; free text appears only for Something else",
+    completionRule: "A role is selected and custom role text exists when needed",
+    followUpTrigger: "Ownership later conflicts with the selected role",
+    source: "deterministic_intake",
+  },
+  {
+    id: "concern",
+    objectiveIds: ["D1", "D5"],
+    job: "Capture the concerning behavior and rough stopping pattern without choosing a cause",
+    inputModes: ["long_text", "single_choice"],
+    whyThisMode: "The behavior needs the attendee's language; one closest pattern locates the initial evidence boundary",
+    completionRule: "A behavior and one closest pattern are present",
+    followUpTrigger: "The text names only a feature, platform, or cause",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "developer",
+    objectiveIds: ["D3"],
+    job: "Identify the developer cohort and whether a person, agent, or both performed the path",
+    inputModes: ["long_text", "single_choice"],
+    whyThisMode: "The cohort is case-specific; actor type has mutually exclusive routing consequences",
+    completionRule: "A developer cohort and actor type are present",
+    followUpTrigger: "The cohort still combines materially different roles or journeys",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "developer-job",
+    objectiveIds: ["D3"],
+    job: "Separate the developer's job from the platform action",
+    inputModes: ["long_text"],
+    whyThisMode: "Options would anchor the attendee to our taxonomy instead of their real job",
+    completionRule: "The answer contains an accountable job beyond using the product",
+    followUpTrigger: "The answer is only install, call the API, deploy, configure, or use the feature",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "outcome",
+    objectiveIds: ["D4"],
+    job: "Define the first meaningful result and classify whether it is a developer outcome or product event",
+    inputModes: ["long_text", "single_choice"],
+    whyThisMode: "The result is case-specific; the mirror is a mutually exclusive self-check",
+    completionRule: "A result and milestone classification are present",
+    followUpTrigger: "The result is unverifiable, only a product event, or much later than the first mile",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "last-truth",
+    objectiveIds: ["D5", "D6"],
+    job: "Locate where direct observation ends and preserve the actual event",
+    inputModes: ["single_choice", "long_text"],
+    whyThisMode: "A stage choice routes the graph; free text preserves what was actually observed",
+    completionRule: "A last stage is selected, with useful detail when available",
+    followUpTrigger: "The detail is an explanation, combines stages, or relies only on an aggregate",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "explanation-evidence",
+    objectiveIds: ["D7"],
+    job: "Capture the team's current story separately from the evidence supporting it",
+    inputModes: ["long_text", "multi_choice", "long_text"],
+    whyThisMode: "Several evidence sources can coexist, while the explanation and strongest item need case language",
+    completionRule: "An explanation and honest evidence classification are present",
+    followUpTrigger: "The explanation is treated as an observation or evidence is only assumption, anecdote, or absent",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "catalog-discriminator",
+    objectiveIds: ["D8"],
+    job: "Narrow broad catalog families using stage-specific alternatives before any reason-level discrimination",
+    inputModes: ["adaptive_discriminator", "single_choice"],
+    whyThisMode: "Options are allowed only when every choice changes the live hypothesis or evidence state",
+    completionRule: "One observed answer updates unresolved research areas or explicitly requires external evidence",
+    followUpTrigger: "A reviewed reason-level card can separate the remaining explanations using observable evidence",
+    source: "catalog_graph",
+  },
+  {
+    id: "ownership",
+    objectiveIds: ["D9"],
+    job: "Separate control, investigation, influence, decision authority, and unknown ownership",
+    inputModes: ["single_choice", "long_text"],
+    whyThisMode: "The relationship is categorical; the specific action or ask is case-specific",
+    completionRule: "The relationship and a concrete action, ask, or ownership gap are present",
+    followUpTrigger: "Only a vague team is named or the proposed action exceeds the attendee's control",
+    source: "diagnostic_objective",
+  },
+  {
+    id: "next-move",
+    objectiveIds: ["D10"],
+    job: "Choose an evidence-producing investigation, reversible change, handoff, or deliberate non-intervention",
+    inputModes: ["single_choice", "long_text", "long_text"],
+    whyThisMode: "The move class is mutually exclusive; the action and expected developer signal are case-specific",
+    completionRule: "A move type, bounded action, and expected signal or explicit unknown are present",
+    followUpTrigger: "The move is generic, irreversible, ownerless, or cannot change what the team knows",
+    source: "diagnostic_objective",
+  },
+];

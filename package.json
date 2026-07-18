@@ -1,0 +1,54 @@
+{
+  "name": "first-mile-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "catalog:build": "node scripts/build-catalog.mjs",
+    "prebuild": "npm run catalog:build",
+    "dev": "vite --host 127.0.0.1",
+    "dev:server": "ALLOW_IN_MEMORY_STORE=true REASONING_MODE=deterministic node --enable-source-maps --import tsx server/index.ts",
+    "build": "tsc --noEmit && vite build && tsc -p tsconfig.server.json",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "test": "vitest",
+    "pretest:run": "npm run catalog:build",
+    "test:run": "vitest run && npm --prefix workflows test",
+    "test:e2e": "node scripts/e2e-smoke.mjs",
+    "test:load": "node scripts/load-smoke.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "start": "node --enable-source-maps dist-server/server/index.js",
+    "db:migrate": "node --enable-source-maps dist-server/server/migrate.js"
+  },
+  "dependencies": {
+    "@arizeai/openinference-semantic-conventions": "^2.5.0",
+    "@mastra/core": "1.51.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.220.0",
+    "@opentelemetry/resources": "^2.9.0",
+    "@opentelemetry/sdk-trace-base": "^2.9.0",
+    "@opentelemetry/sdk-trace-node": "^2.9.0",
+    "@opentelemetry/semantic-conventions": "^1.43.0",
+    "@renderinc/sdk": "0.6.0",
+    "pg": "8.22.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@types/node": "26.1.1",
+    "@types/pg": "8.16.0",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "jsdom": "29.1.1",
+    "playwright-core": "^1.61.1",
+    "tsx": "^4.23.1",
+    "typescript": "7.0.2",
+    "vite": "8.1.5",
+    "vitest": "4.1.10"
+  }
+}
