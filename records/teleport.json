@@ -1,0 +1,55 @@
+{
+  "platform": {"name": "Teleport", "slug": "teleport", "organization": "Gravitational, Inc."},
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Get Started, Enterprise Cloud route",
+    "selection_basis": "The Get Started guide selects Enterprise Cloud for quick evaluation without provisioning infrastructure, and the Step 1 guide calls it the fastest and easiest way to get started.",
+    "alternatives_considered": [
+      {"name": "Community Edition Linux demo", "url": "https://goteleport.com/docs/get-started/deploy-community/", "reason_not_primary": "The overview recommends this for self-hosting locally or free use, while Enterprise Cloud is selected for quick evaluation."},
+      {"name": "Enterprise Self-Hosted", "url": "https://goteleport.com/docs/get-started/", "reason_not_primary": "The overview says this paid compliance-focused route requires a valid license and contact with Teleport."}
+    ]
+  },
+  "research_status": "blocked",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Launch a Teleport cluster for a quick evaluation.", "starting_url": "https://goteleport.com/docs/get-started/", "assumed_prior_state": ["No Teleport account, tenant, cluster, local user, or recovery codes exist."]},
+  "documented_first_success": {
+    "official_milestone": "Launch your own Teleport Enterprise Cloud cluster and create a local admin user",
+    "normalized_outcome": "The intended Step 1 terminal is a provisioned dedicated Teleport Cloud cluster with a local administrator and saved recovery codes, but the complete signup flow is not documented publicly.",
+    "observable_completion_signal": "Not observable from a complete public route because the guide says only to follow the signup steps, while the public trial page does not expose the required form, activation, MFA, recovery-code, or tenant-provisioning transitions.",
+    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "At this point, you've launched your own Teleport Enterprise Cloud cluster and created a local admin user.", "source_ids": ["S2", "S3"]},
+    "why_this_is_the_boundary": "The Enterprise Cloud Step 1 guide explicitly identifies a launched cluster and local admin user before Step 2 resource enrollment, but its required signup transition is hidden.",
+    "source_ids": ["S2", "S3"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A new Enterprise Cloud trial signup is required for the selected route.", "required": true, "source_ids": ["S2", "S3"]},
+    {"order": 2, "type": "legal", "requirement": "Requesting an activation link on the public trial page constitutes agreement to Teleport's Privacy Policy.", "required": true, "source_ids": ["S3"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Get Started and choose Enterprise Cloud for a quick evaluation without provisioning control-plane infrastructure.", "details": [], "input": "Teleport Get Started URL and evaluation intent", "output": "The Enterprise Cloud Step 1 guide opens.", "success_signal": "The guide identifies Enterprise Cloud as the fastest and easiest route.", "failure_or_wait": "Use Community Edition for a local self-hosted test or contact Teleport for Enterprise Self-Hosted.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 2, "phase": "access", "actor": "developer", "interface": "browser", "action": "Follow the Step 1 link to `goteleport.com/signup`.", "details": [], "input": "Enterprise Cloud trial link", "output": "The public Teleport Enterprise 14-Day Trial page opens.", "success_signal": "The page states that an activation link must be requested and that the Privacy Policy is accepted by requesting it.", "failure_or_wait": "The current public page does not expose the required form or post-request transition to the research client.", "required": true, "source_ids": ["S2", "S3"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": {"reason": "The Enterprise Cloud guide says to follow the sign-up steps, but the public trial page does not enumerate its form fields, activation-link request, email action, local-user setup, MFA and recovery-code steps, tenant naming, or provisioning result.", "impact": "No complete atomic candidate can connect documentation arrival to the explicitly stated launched-cluster and local-admin terminal without inventing required account and security transitions.", "source_ids": ["S2", "S3"]},
+  "branches": [
+    {"at_step": 1, "condition": "The developer prefers a free local self-hosted test.", "path": "Use the Community Edition Linux demo route.", "effect_on_first_success": "Replaces the trial and managed provisioning with Linux or Docker installation and a local welcome-screen checkpoint.", "source_ids": ["S1", "S4"]},
+    {"at_step": 1, "condition": "The organization requires self-hosting for compliance.", "path": "Contact Teleport for Enterprise Self-Hosted and obtain a valid license.", "effect_on_first_success": "Adds a sales and licensing path before deployment.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "choice", "description": "Cloud, Enterprise Self-Hosted, and Community Edition differ in hosting, licensing, and prerequisites.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "account", "description": "The selected route requires the Enterprise Cloud signup and activation flow.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
+    {"at_step": 2, "type": "terms", "description": "Requesting activation agrees to the Privacy Policy.", "documented_requirement": true, "source_ids": ["S3"]},
+    {"at_step": 2, "type": "verification", "description": "The guide states that signup generates recovery codes that must be saved and creates a local user, but the current interactive sequence is not publicly enumerated.", "documented_requirement": true, "source_ids": ["S2"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Get Started with Teleport | Teleport", "url": "https://goteleport.com/docs/get-started/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Choose your Teleport edition"], "evidence_supported": ["edition selection", "Enterprise Cloud evaluation basis", "alternative routes"]},
+    {"id": "S2", "title": "Step 1 - Sign up for Teleport Enterprise Cloud | Teleport", "url": "https://goteleport.com/docs/get-started/deploy-cloud/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Deploy your cluster", "Initial setup", "Save your recovery codes", "Next step: Enroll resources"], "evidence_supported": ["managed provisioning", "signup documentation gap", "local user and roles", "recovery codes", "intended Step 1 terminal"]},
+    {"id": "S3", "title": "Signup for Teleport Enterprise: Unify Access to All Your Environments | Teleport", "url": "https://goteleport.com/signup/", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Teleport Enterprise 14-Day Trial"], "evidence_supported": ["14-day trial", "activation-link language", "Privacy Policy agreement", "public form gap"]},
+    {"id": "S4", "title": "Step 1 - Deploy Teleport Community Edition | Teleport", "url": "https://goteleport.com/docs/get-started/deploy-community/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Prerequisites", "Checkpoint: Verify Teleport is running"], "evidence_supported": ["Community Edition alternative", "self-hosted welcome-screen checkpoint"]}
+  ],
+  "uncertainties": [
+    {"question": "What is the current complete Enterprise Cloud signup, activation, local-user, MFA, recovery-code, tenant, and provisioning sequence?", "impact": "The required action count, wait states, security gates, and transition to the launched cluster cannot be recorded.", "reason_unresolved": "The Step 1 guide delegates to `Follow the sign-up steps`, and the public trial page does not expose those interactive steps.", "checked_source_ids": ["S2", "S3"]}
+  ],
+  "excluded_after_success": ["Backup local user creation", "resource enrollment", "access-control configuration", "audit-log monitoring", "production hardening"]
+}

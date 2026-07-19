@@ -1,0 +1,546 @@
+{
+  "platform": {
+    "name": "FusionAuth",
+    "slug": "fusionauth",
+    "organization": "FusionAuth"
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "5 Minute Intro, Docker route",
+    "selection_basis": "The Get Started page links the 5 Minute Intro for an interactive introduction. That guide presents Docker, FastPath, and Sandbox as conditional peers and calls Docker the best choice when Docker and Docker Compose are installed, which matches the selected prior state.",
+    "alternatives_considered": [
+      {
+        "name": "FastPath 5 Minute route",
+        "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/5-minute-fastpath",
+        "reason_not_primary": "The overview selects this route when a local PostgreSQL or MySQL database is already installed; that is not the selected prior state."
+      },
+      {
+        "name": "Hosted Sandbox 5 Minute route",
+        "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/5-minute-sandbox",
+        "reason_not_primary": "The overview calls this the quickest no-install test drive but warns that it is public, shared, regularly wiped, and unsuitable for private data."
+      },
+      {
+        "name": "Framework-specific QuickStarts",
+        "url": "https://fusionauth.io/docs/get-started/quickstarts/",
+        "reason_not_primary": "These are later framework-specific integrations, while the Get Started page links the 5 Minute Intro as the general introduction."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Add working login to a local Node.js application with FusionAuth.",
+    "starting_url": "https://fusionauth.io/docs/get-started",
+    "assumed_prior_state": [
+      "No FusionAuth instance or FusionAuth administrator account exists.",
+      "Node.js, Docker, and Docker Compose are installed and usable.",
+      "The developer can run containers, edit local files, and open localhost ports 9011 and 3000."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "You've successfully authenticated and stored user data in the express session.",
+    "normalized_outcome": "The registered administrator logs into the sample Express application through FusionAuth and returns to the home page with a personalized greeting.",
+    "observable_completion_signal": "After login, the browser returns to the application home page and displays the user's first name in the greeting.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "You've successfully authenticated and stored user data in the express session.",
+      "source_ids": ["S2"]
+    },
+    "why_this_is_the_boundary": "The 5 Minute Intro says all three installation routes end with a functioning application whose login and logout are provided by FusionAuth, and the Docker guide explicitly identifies the personalized post-login page as successful authentication. Logout and later customization follow this state.",
+    "source_ids": ["S1", "S2"]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "software",
+      "requirement": "Node.js is installed; the guide shows `node -v` and says it was tested with versions 14 and 18.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Docker and Docker Compose are installed and usable; the guide shows `docker -v` and selects this route for that environment.",
+      "required": true,
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "order": 3,
+      "type": "environment",
+      "requirement": "Local ports 9011 and 3000 can be used by FusionAuth and the sample application.",
+      "required": true,
+      "source_ids": ["S2"]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Get Started and follow the 5 Minute Intro.",
+      "details": [],
+      "input": "FusionAuth Get Started URL",
+      "output": "The guide's Docker, FastPath, and Sandbox choices are shown.",
+      "success_signal": "The Docker route is available.",
+      "failure_or_wait": "No navigation recovery is documented.",
+      "required": true,
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Select Docker because Docker and Docker Compose are installed.",
+      "details": [],
+      "input": "Installed Docker environment",
+      "output": "The Docker 5 Minute guide opens.",
+      "success_signal": "Docker Install is the active route.",
+      "failure_or_wait": "Use FastPath only with a local PostgreSQL or MySQL database, or Sandbox only if public shared data is acceptable.",
+      "required": true,
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Download `docker-compose.yml` and `.env` with the two published `curl` commands.",
+      "details": [],
+      "input": "Published file URLs",
+      "output": "Both Docker configuration files exist locally.",
+      "success_signal": "The files can be edited.",
+      "failure_or_wait": "No download recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Edit `.env` to change `DATABASE_PASSWORD` and ensure that `POSTGRES_USER` and `POSTGRES_PASSWORD` are correct.",
+      "details": [],
+      "input": "Local `.env` file and chosen database credentials",
+      "output": "The stock database settings have been reviewed and the documented values corrected.",
+      "success_signal": "The edited file is saved.",
+      "failure_or_wait": "No configuration recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 5,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `docker compose up -d` and then `docker compose logs -f`.",
+      "details": [],
+      "input": "Docker configuration files",
+      "output": "FusionAuth and its dependencies start in containers.",
+      "success_signal": "The logs show the FusionAuth HTTP server starting on ports 9011 and 9012.",
+      "failure_or_wait": "Wait for the installer to finish; no other recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 6,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open `http://localhost:9011` to start the Setup Wizard.",
+      "details": [],
+      "input": "Running local FusionAuth instance",
+      "output": "The Setup Wizard is displayed.",
+      "success_signal": "Administrator and license fields are available.",
+      "failure_or_wait": "No browser recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 7,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Create the administrator, accept the license, record the chosen email and password, and submit the Setup Wizard.",
+      "details": [
+        "Newsletter signup is optional."
+      ],
+      "input": "Administrator identity, password, and license acceptance",
+      "output": "The wizard completes and the administrator is logged into the FusionAuth administrative UI.",
+      "success_signal": "The administrative UI opens.",
+      "failure_or_wait": "Without an email server, the guide says the chosen administrator credentials cannot be recovered, so they must be recorded.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "If the First Time Setup panel appears, click Skip.",
+      "details": [],
+      "input": "Optional First Time Setup panel",
+      "output": "The normal administrative navigation remains available.",
+      "success_signal": "Applications can be opened.",
+      "failure_or_wait": "No recovery is documented.",
+      "required": false,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open Applications, click Add, and give the new Application a display name.",
+      "details": [],
+      "input": "Application display name",
+      "output": "The Application form is ready for OAuth configuration.",
+      "success_signal": "The OAuth tab can be selected.",
+      "failure_or_wait": "No form recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "On the OAuth tab, add `http://localhost:3000/oauth-redirect` as the authorized redirect URL and select its popup value.",
+      "details": [],
+      "input": "Published redirect URL",
+      "output": "The redirect URL is retained by the form.",
+      "success_signal": "The selected value appears in the authorized redirect list.",
+      "failure_or_wait": "The guide warns that merely typing or pasting the URL without clicking the popup does not save it.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Set the Logout URL to `http://localhost:3000/logout`, enable Authorization Code, and set Require registration to complete OAuth authorization to true.",
+      "details": [],
+      "input": "Published OAuth values",
+      "output": "The Application has the required local OAuth settings.",
+      "success_signal": "All four published settings are present.",
+      "failure_or_wait": "No settings recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Save the Application, open its View action, and copy its Client Id and Client Secret.",
+      "details": [],
+      "input": "Completed Application form",
+      "output": "The Application exists and both OAuth credentials are retained locally.",
+      "success_signal": "Client Id and Client Secret are available for the sample app.",
+      "failure_or_wait": "No credential recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open Users, find the Setup Wizard administrator, and click Manage.",
+      "details": [],
+      "input": "Administrator user",
+      "output": "The user's management page opens.",
+      "success_signal": "Add Registration is available.",
+      "failure_or_wait": "Search for the user if it is not immediately visible.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Click Add Registration, select the new Application if prompted, and save without additional registration data.",
+      "details": [],
+      "input": "Administrator user and new Application",
+      "output": "The user is registered for the Application.",
+      "success_signal": "The guide states that the user now has permission to log into the Application.",
+      "failure_or_wait": "An Application choice appears only when multiple options exist.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "If the administrator has no first name, edit the user and add one for the sample greeting.",
+      "details": [],
+      "input": "Administrator profile",
+      "output": "A first name is available to the sample application.",
+      "success_signal": "The profile shows the first name.",
+      "failure_or_wait": "This action is unnecessary when a first name already exists.",
+      "required": false,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 16,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone `fusionauth-example-5-minute-guide` and enter its directory.",
+      "details": [],
+      "input": "Published GitHub repository URL",
+      "output": "The sample Express application exists locally.",
+      "success_signal": "Its `.env.sample` and package files are available.",
+      "failure_or_wait": "No clone recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy `.env.sample` to `.env`.",
+      "details": [],
+      "input": "Sample environment file",
+      "output": "A writable runtime environment file exists.",
+      "success_signal": "`.env` can be edited.",
+      "failure_or_wait": "No file recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 18,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Replace `CLIENT_ID` and `CLIENT_SECRET` in `.env` with the copied values and keep `BASE_URL=http://localhost:9011`.",
+      "details": [],
+      "input": "Application credentials and local FusionAuth URL",
+      "output": "The sample app is configured for the local Application.",
+      "success_signal": "No `CHANGEME` values remain for the two credentials.",
+      "failure_or_wait": "Use the correct non-local base URL only when FusionAuth is not running locally.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 19,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `npm install`.",
+      "details": [],
+      "input": "Sample application's package manifest",
+      "output": "The Express and FusionAuth client dependencies are installed.",
+      "success_signal": "The application is ready to start.",
+      "failure_or_wait": "No install recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 20,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `npm start`.",
+      "details": [],
+      "input": "Configured sample application",
+      "output": "The Node.js server listens for the local application.",
+      "success_signal": "`http://localhost:3000/` can be opened.",
+      "failure_or_wait": "No start recovery is documented.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 21,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open `http://localhost:3000/` in an incognito browser and click Login.",
+      "details": [],
+      "input": "Running sample application",
+      "output": "FusionAuth's login page opens.",
+      "success_signal": "The login form is shown.",
+      "failure_or_wait": "The guide requires incognito because an existing administrator SSO session otherwise redirects automatically without prompting.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 22,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Log in with the administrator credentials created in the Setup Wizard.",
+      "details": [],
+      "input": "Registered administrator email and password",
+      "output": "FusionAuth redirects the browser with an authorization code, and the sample exchanges it, retrieves the user, stores the user in the session, and redirects home.",
+      "success_signal": "The application home page reappears with the user authenticated.",
+      "failure_or_wait": "A valid but unregistered FusionAuth user is sent to the documented error page.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 23,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Verify that the home page greets the authenticated user by first name.",
+      "details": [],
+      "input": "Completed FusionAuth login",
+      "output": "The personalized greeting is visible.",
+      "success_signal": "The guide states that authentication succeeded and user data was stored in the Express session.",
+      "failure_or_wait": "If the user was not registered for the Application, the guide shows an error instead of the greeting.",
+      "required": true,
+      "source_ids": ["S2"]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "A local PostgreSQL or MySQL database exists and the developer wants the full installation experience.",
+      "path": "Use the FastPath guide instead of Docker.",
+      "effect_on_first_success": "The installation and setup steps change, but the guide says the routes converge on the same working login and logout application.",
+      "source_ids": ["S3"]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer wants no installation and accepts a public, shared, regularly wiped environment.",
+      "path": "Use the hosted Sandbox guide.",
+      "effect_on_first_success": "Local FusionAuth installation and Setup Wizard steps are replaced by sandbox login, while the later Application and sample-login flow converges on the same terminal.",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "at_step": 8,
+      "condition": "The First Time Setup panel appears after the Setup Wizard.",
+      "path": "Click Skip before creating the tutorial Application.",
+      "effect_on_first_success": "Adds one optional UI action without changing the terminal.",
+      "source_ids": ["S2"]
+    },
+    {
+      "at_step": 14,
+      "condition": "Multiple Applications are available for registration.",
+      "path": "Select the newly created Application before saving the registration.",
+      "effect_on_first_success": "Adds an explicit Application choice required to grant the correct login permission.",
+      "source_ids": ["S2"]
+    },
+    {
+      "at_step": 15,
+      "condition": "The administrator profile has no first name.",
+      "path": "Edit the user and add a first name.",
+      "effect_on_first_success": "Ensures the terminal greeting can display the name used by the guide.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The developer must choose Docker, FastPath, or the public Sandbox according to the documented environment conditions.",
+      "documented_requirement": true,
+      "source_ids": ["S3"]
+    },
+    {
+      "at_step": 4,
+      "type": "configuration",
+      "description": "The guide says to modify `DATABASE_PASSWORD` and ensure that `POSTGRES_USER` and `POSTGRES_PASSWORD` are correct.",
+      "documented_requirement": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "at_step": 7,
+      "type": "legal",
+      "description": "The self-hosted Setup Wizard requires license acceptance before it creates and logs in the administrator.",
+      "documented_requirement": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "at_step": 12,
+      "type": "credential",
+      "description": "The sample requires the new Application's Client Id and Client Secret.",
+      "documented_requirement": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "at_step": 14,
+      "type": "permission",
+      "description": "The administrator must be registered for the new Application or the guide's login ends on an error page.",
+      "documented_requirement": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "at_step": 19,
+      "type": "installation",
+      "description": "The sample's Node.js dependencies must be installed before it can start.",
+      "documented_requirement": true,
+      "source_ids": ["S2"]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The guide is titled 5 Minute Intro and says its video demonstrates setup in less than five minutes; this is a vendor claim, not an independently measured duration.",
+    "source_ids": ["S2", "S3"]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started | FusionAuth Docs",
+      "url": "https://fusionauth.io/docs/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": ["Getting Started", "Install Options"],
+      "evidence_supported": ["General 5 Minute Intro selection", "installation precedes integration"]
+    },
+    {
+      "id": "S2",
+      "title": "Docker Install | FusionAuth Docs",
+      "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/5-minute-docker",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": ["Requirements", "Install and Start FusionAuth", "Complete the Setup Wizard", "Create an Application and Configure the OAuth settings", "Grant Permissions", "Configure the Backend to Complete the Login", "Store the User Object In The Session", "Test the Application"],
+      "evidence_supported": ["Docker prerequisites", "installation and wait signal", "administrator and license setup", "Application and OAuth configuration", "registration permission", "sample configuration", "login terminal and documented failures", "time claim"]
+    },
+    {
+      "id": "S3",
+      "title": "5 Minute Intro | FusionAuth Docs",
+      "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": ["Choose Your Own Adventure", "Next Steps"],
+      "evidence_supported": ["Docker, FastPath, and Sandbox selection rules", "route convergence", "post-success exclusions"]
+    },
+    {
+      "id": "S4",
+      "title": "Sandbox | FusionAuth Docs",
+      "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/5-minute-sandbox",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": ["Sandbox", "Requirements", "Overview"],
+      "evidence_supported": ["Sandbox public-data and nightly-reset warnings", "no-install alternative"]
+    }
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Logout testing",
+    "self-service registration",
+    "theme customization",
+    "other language QuickStarts",
+    "tenant and role exploration",
+    "MFA and social identity providers",
+    "production deployment and hardening"
+  ]
+}

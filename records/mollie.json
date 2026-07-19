@@ -1,0 +1,76 @@
+{
+  "platform": {"name": "Mollie", "slug": "mollie", "organization": "Mollie B.V."},
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "Payments API with Mollie Checkout",
+    "selection_basis": "Mollie's Set up Mollie page routes advanced custom integrations to the API and the Accepting payments guide defines the simplest payment flow as Payments API, hosted checkout, webhook, and paid-status verification. The account guide lists broad setup stages but does not enumerate the signup form, authentication, business-dependent subforms, review states, or the exact point at which a test website profile and key become available.",
+    "alternatives_considered": [
+      {"name": "Prebuilt integration", "url": "https://docs.mollie.com/docs/prebuilt-integrations", "reason_not_primary": "Mollie recommends these for supported commerce platforms, but each platform has a different installation path."},
+      {"name": "Payment links", "url": "https://docs.mollie.com/docs/payment-links", "reason_not_primary": "This is Mollie's no-code route rather than the general developer API path."},
+      {"name": "Mollie Connect", "url": "https://docs.mollie.com/docs/connect-overview", "reason_not_primary": "This is for platforms and marketplaces that onboard or process for multiple merchants."}
+    ]
+  },
+  "research_status": "blocked",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Mollie account, obtain a Test API key, and process one test payment through Mollie Checkout until the API reports paid.",
+    "starting_url": "https://docs.mollie.com/docs/getting-started",
+    "assumed_prior_state": [
+      "No Mollie account, organization, website profile, enabled payment method, API key, application, payment, webhook, or checkout session is assumed.",
+      "The developer has a public website and bank and identity information because Mollie lists them as account requirements.",
+      "No account, payment, webhook, or external transaction was created during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Not established end to end by public official documentation",
+    "normalized_outcome": "The public sources do not establish the complete no-account path to a paid test payment because the interactive account and initial profile convergence is not documented atomically.",
+    "observable_completion_signal": "Downstream, Mollie calls the webhook, the application retrieves the payment, and payment status `paid` permits confirmation and fulfillment.",
+    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The downstream terminal is payment status `paid`, but account and test-key arrival are not fully established.", "source_ids": ["S2", "S3", "S4"]},
+    "why_this_is_the_boundary": "The payment guide demonstrates a complete API and checkout terminal only after an API credential exists. The account guide summarizes setup at business-stage granularity and omits the interactive signup and branching convergence into a usable test profile and key.",
+    "source_ids": ["S1", "S2", "S3", "S4"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Mollie account and Web app access.", "required": true, "source_ids": ["S1", "S2"]},
+    {"order": 2, "type": "domain", "requirement": "A business website that is online and shows offered products or services, prices, and descriptions.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "identity", "requirement": "Company, stakeholder, website, bank-account, and legal-representative identity information required by account setup.", "required": true, "source_ids": ["S1", "S2"]},
+    {"order": 4, "type": "credential", "requirement": "A Test API key generated for a website profile and used as a Bearer credential.", "required": true, "source_ids": ["S3"]},
+    {"order": 5, "type": "configuration", "requirement": "An application redirect URL and webhook endpoint.", "required": true, "source_ids": ["S4"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Set up Mollie guide.", "details": [], "input": "https://docs.mollie.com/docs/getting-started", "output": "Mollie's no-code, prebuilt, library, API, Connect, and integration-partner routes are shown.", "success_signal": "The page identifies the API Reference as the custom-build route and links account setup and accepting payments.", "failure_or_wait": "No documentation navigation recovery is specified.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Follow the official account link and begin Mollie signup.", "details": ["Mollie says signup continues with additional company, stakeholder, website, bank, and identity information."], "input": "Account and business data", "output": "The interactive account flow begins.", "success_signal": "Public documentation does not enumerate the initial form fields, identity authentication, submit states, conditional business forms, or exact successful arrival in the Web app.", "failure_or_wait": "A complete account transition cannot be reconstructed from the official public pages.", "required": true, "source_ids": ["S1", "S2"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": {
+    "reason": "The hidden account and initial-profile transition prevents a complete candidate. The official downstream route is: log in; click Start setup; provide business, legal representative, and website information; activate a payment method; click Finish setup; upload legal-representative ID; add bank details; create a website profile; open Developers and API access tokens; copy the Test API key; send a Bearer-authenticated create-payment request containing amount, description, redirectUrl, and webhookUrl; store the returned payment id; redirect the customer with HTTP GET, preferably 303 See Other, to `_links.checkout`; select a payment method in Mollie Checkout; complete the test payment; accept Mollie's webhook with 200 OK; retrieve the payment by id from the Payments API; observe status `paid`; and render confirmation only after webhook processing. The account page does not expose the atomic form and convergence states that precede Web app and test-key availability.",
+    "impact": "The first path cannot be counted from no account without inventing mandatory signup and profile states.",
+    "source_ids": ["S1", "S2", "S3", "S4", "S5"]
+  },
+  "branches": [
+    {"at_step": 1, "condition": "The developer uses a supported commerce platform", "path": "Install the corresponding prebuilt Mollie integration.", "effect_on_first_success": "Replaces the custom API implementation with platform-specific module configuration and testing.", "source_ids": ["S1", "S4"]},
+    {"at_step": 1, "condition": "The developer needs no code", "path": "Use Mollie payment links.", "effect_on_first_success": "Replaces application code, API creation, redirect handling, and webhook processing with a Web app flow.", "source_ids": ["S1"]},
+    {"at_step": 1, "condition": "The application manages multiple merchants", "path": "Use Mollie Connect and OAuth rather than a profile API key.", "effect_on_first_success": "Changes authorization, onboarding, and payment ownership.", "source_ids": ["S1", "S3"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "choice", "description": "Mollie offers no-code, prebuilt, API, and Connect routes for different developer contexts.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "account", "description": "An account and Web app access are required before profile API keys are available.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
+    {"at_step": 2, "type": "form", "description": "Account setup requires company, stakeholder, website, bank, and identity details, with business-dependent branches not atomically enumerated in the public guide.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 2, "type": "payment", "description": "Mollie's setup overview says a payment is requested to verify bank details for live operation.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Set up Mollie", "url": "https://docs.mollie.com/docs/getting-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": "Updated 8 months ago", "sections_used": ["Set up Mollie", "Before you begin"], "evidence_supported": ["Route alternatives", "Account prerequisites", "API route selection"]},
+    {"id": "S2", "title": "Create an account", "url": "https://docs.mollie.com/docs/create-an-account", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": "Updated 8 months ago", "sections_used": ["How to create a Mollie account"], "evidence_supported": ["Broad account stages", "Business and identity requirements", "Missing interactive form detail"]},
+    {"id": "S3", "title": "Authentication", "url": "https://docs.mollie.com/reference/authentication", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-18", "last_updated_if_shown": "Updated 17 days ago", "sections_used": ["API keys", "Authentication methods"], "evidence_supported": ["API keys recommended to get started", "Website profile and Test API key prerequisite", "Bearer authentication"]},
+    {"id": "S4", "title": "Accepting payments", "url": "https://docs.mollie.com/docs/accepting-payments", "official_domain": true, "source_type": "tutorial", "accessed_at": "2026-07-18", "last_updated_if_shown": "Updated 9 months ago", "sections_used": ["The basic payment flow", "Working with the Payments API"], "evidence_supported": ["Atomic downstream payment flow", "Webhook handling", "Paid status terminal"]},
+    {"id": "S5", "title": "Create payment", "url": "https://docs.mollie.com/reference/create-payment", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-18", "last_updated_if_shown": "Updated about 2 months ago", "sections_used": ["Create payment", "Responses"], "evidence_supported": ["Create-payment inputs", "201 payment-object response", "Test-mode behavior"]}
+  ],
+  "uncertainties": [
+    {"question": "What exact signup fields, authentication steps, conditional business forms, reviews, and profile states lead from no account to an available Test API key?", "impact": "The prerequisite segment before the fully documented payment flow cannot be counted.", "reason_unresolved": "The official account guide summarizes stages but does not expose the interactive account and profile state machine.", "checked_source_ids": ["S1", "S2", "S3"]}
+  ],
+  "excluded_after_success": [
+    "Live API keys, full account review, payouts, live bank verification, and production payment-method activation occur after the first paid test payment.",
+    "Refunds, recurring payments, custom checkout components, Connect, reconciliation, and order fulfillment are outside the first-success boundary."
+  ]
+}
