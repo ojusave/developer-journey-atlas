@@ -1,0 +1,1417 @@
+{
+  "platform": {
+    "name": "Hetzner Cloud",
+    "slug": "hetzner-cloud",
+    "organization": "Hetzner Online GmbH"
+  },
+  "category": "Cloud and application runtimes",
+  "surface": {
+    "name": "Create a Hetzner Cloud server in Hetzner Console and connect as root over SSH",
+    "selection_basis": "The current account guide lists creating a Cloud server as a typical next step. The server getting-started sequence then orders Creating a Server before Connecting to your Server, where the public-key branch ends with an explicit connected state. This general OS-image path reaches a usable virtual machine without selecting a workload-specific App.",
+    "alternatives_considered": [
+      {
+        "name": "Root-password login",
+        "url": "https://docs.hetzner.com/cloud/servers/getting-started/connecting-to-the-server/",
+        "reason_not_primary": "This is a complete documented branch and avoids local key setup, but the generated password arrives by email and must be changed at first login. The public-key path is the secure, reusable route documented throughout Hetzner's Cloud tutorials."
+      },
+      {
+        "name": "Hetzner Cloud API",
+        "url": "https://docs.hetzner.com/cloud/api/getting-started/generating-api-token/",
+        "reason_not_primary": "The API path requires a Project-scoped Read & Write token and request construction before the first server."
+      },
+      {
+        "name": "hcloud CLI",
+        "url": "https://community.hetzner.com/tutorials/howto-hcloud-cli/",
+        "reason_not_primary": "The official CLI tutorial requires CLI installation, a Project API token, context setup, server-type and image lookup, and a create command."
+      },
+      {
+        "name": "Hetzner Cloud App",
+        "url": "https://docs.hetzner.com/cloud/apps/overview/",
+        "reason_not_primary": "Apps use the same server deployment surface but preinstall workload-specific software and can require app-specific configuration beyond generic server deployment."
+      },
+      {
+        "name": "VNC Console",
+        "url": "https://docs.hetzner.com/cloud/servers/getting-started/vnc-console/",
+        "reason_not_primary": "Hetzner documents VNC as an emergency-access route and recommends SSH for regular management. A key-created server requires a root-password reset before VNC login."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a full Hetzner customer account and Cloud project, provision a first public Linux Cloud server, and open its root shell with an SSH key.",
+    "starting_url": "https://docs.hetzner.com/general/billing-and-account-management/account-getting-started/",
+    "assumed_prior_state": [
+      "The developer has a valid accessible email address and accurate personal or business contact and billing details.",
+      "The developer is not using a VPN for registration and can supply a non-free email address when practical, as Hetzner recommends for fraud prevention.",
+      "The developer can complete an identity-document or own-credit-card prepayment verification if Hetzner requests it before the first order.",
+      "The local device has an OpenSSH client and `ssh-keygen`, and the developer can securely retain the private key and optional passphrase.",
+      "The developer is authorized to select CREATE & BUY NOW and incur retroactive hourly server and separately listed Primary IP charges."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "If you have not set a password, you will automatically be connected",
+    "normalized_outcome": "Hetzner Cloud has created the developer's first public Linux server, and the developer has authenticated to its root shell with the private key selected at creation.",
+    "observable_completion_signal": "After `ssh root@<server-IP>` and any first host-authenticity confirmation, OpenSSH completes authentication and displays the remote root session.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "If you have not set a password, you will automatically be connected",
+      "source_ids": [
+        "S7"
+      ]
+    },
+    "why_this_is_the_boundary": "The server creation guide links directly to Connecting to the Server as its next step. In the public-key branch, the connection guide says the user is automatically connected before it introduces optional local SSH config editing. Application installation and server hardening are outside this first connection.",
+    "source_ids": [
+      "S5",
+      "S7"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "A valid email address, personal or business contact details, and billing address; an optional phone number can support extended verification.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "verification",
+      "requirement": "If Hetzner's fraud controls flag registration or the first order, verification through a valid government ID or prepayment with the account holder's credit card is required before order processing.",
+      "required": false,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "billing",
+      "requirement": "A valid way to pay retroactive invoices. Available methods depend on country and can include supported credit cards, EUR-only SEPA, bank transfer, and manual PayPal.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "configuration",
+      "requirement": "A Hetzner Console Project owned by the full customer account. A light invitation-only account cannot create its own projects or order products until full customer and payment information is added.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S10"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "credential",
+      "requirement": "For the primary path, a local Ed25519 key pair and the public-key text ready to add during server creation.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "network",
+      "requirement": "At least one selected network option. Direct local SSH requires a public Primary IPv4 or IPv6 and an IPv4- or IPv6-capable client connection.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6",
+        "S7"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Hetzner Account Getting Started, follow the Accounts login link, and select Register now.",
+      "details": [],
+      "input": "https://docs.hetzner.com/general/billing-and-account-management/account-getting-started/",
+      "output": "The official customer registration form opens.",
+      "success_signal": "The form requests the required account information.",
+      "failure_or_wait": "An existing full Hetzner customer can log in and skip to Hetzner Console project selection.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter all required registration information.",
+      "details": [],
+      "input": "Valid email, account password, accurate personal or business contact details, billing address, selected EUR or USD currency, and an optional phone number when requested or useful for verification.",
+      "output": "A pending full customer account registration is submitted.",
+      "success_signal": "Hetzner sends an email-confirmation link.",
+      "failure_or_wait": "Incomplete or false details can delay or cause rejection. Hetzner advises avoiding VPN registration and, when possible, free email addresses. Currency cannot be changed after account creation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open Hetzner's email and follow its confirmation link.",
+      "details": [],
+      "input": "Access to the registered email address.",
+      "output": "The email address is confirmed.",
+      "success_signal": "The new account can proceed to login or any requested verification.",
+      "failure_or_wait": "Email confirmation is a documented prerequisite to the next login step; the guide does not document resend or recovery behavior here.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "If Hetzner requests fraud verification before processing the first order, choose the offered identity-document or credit-card prepayment route and complete it.",
+      "details": [],
+      "input": "A valid government-issued ID matching registration details, or a prepayment using the account holder's own credit card.",
+      "output": "The account satisfies the requested fraud check, and any prepayment appears under Transactions.",
+      "success_signal": "Hetzner permits the account or first order to continue.",
+      "failure_or_wait": "The verification trigger, review duration, requested amount, and rejection criteria are not universal. Registration or a large or implausible first order can be delayed, manually reviewed, or rejected.",
+      "required": false,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Log in to the new Hetzner account with the registered email and password.",
+      "details": [],
+      "input": "Confirmed account credentials.",
+      "output": "The account dashboard opens with products, projects, invoices, security information, and customer number.",
+      "success_signal": "The dashboard is visible and the customer number beginning with `K` can be retrieved from the profile menu.",
+      "failure_or_wait": "The documented registration sequence places email confirmation before this login step.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the payment methods available for the account and, if choosing automatic invoice payment, use an eligible credit card or SEPA direct debit.",
+      "details": [],
+      "input": "An account-supported credit card, EUR-only SEPA direct debit, manual bank transfer, or manual PayPal process.",
+      "output": "The developer has identified either an automatic or manual route for paying the retroactive first invoice.",
+      "success_signal": "The method is listed as available in Hetzner Accounts or the developer has the documented manual-payment instructions.",
+      "failure_or_wait": "Not every method is available in every country. Apple Pay, other linked-card wallets, cryptocurrency, partial payments, and payment plans are not accepted.",
+      "required": false,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Hetzner Console, select New project, name the project, and select Add project.",
+      "details": [],
+      "input": "A full Hetzner customer account and a project name.",
+      "output": "A Cloud Project owned and billed by the account is created and opened.",
+      "success_signal": "The Project overview and its resource navigation are visible.",
+      "failure_or_wait": "A light invitation-only account cannot create its own project or order products until upgraded with full customer and payment information. The default project limit is 20.",
+      "required": true,
+      "source_ids": [
+        "S10",
+        "S13"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Generate an Ed25519 SSH key pair if no suitable key exists.",
+      "details": [],
+      "input": "`ssh-keygen -t ed25519`, a default or custom filename, and an optional passphrase.",
+      "output": "A local public and private SSH key pair exists.",
+      "success_signal": "The `.pub` public key can be displayed while the private key remains local.",
+      "failure_or_wait": "The root-password branch can skip key generation, but requires emailed secret handling and a mandatory password change at first login.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "In the Project, open Servers and select Add server.",
+      "details": [],
+      "input": "The active owned Project.",
+      "output": "The Create Server page opens.",
+      "success_signal": "Type, location, image, networking, SSH key, volumes, firewalls, backups, placement groups, labels, cloud config, and name controls are visible.",
+      "failure_or_wait": "Account deactivation, first-order review, or resource limits can block server creation.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose a server Type and displayed plan appropriate for a first development environment.",
+      "details": [],
+      "input": "A Shared Resources cost-optimized or regular-performance plan, or a Dedicated Resources plan.",
+      "output": "Compute, memory, and local disk capacity are assigned.",
+      "success_signal": "The selected plan remains in the order configuration.",
+      "failure_or_wait": "The account's resource limits can restrict selection. Hetzner recommends a smaller Cloud server for a first order.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose the server Location.",
+      "details": [],
+      "input": "A displayed location, generally the one closest to the intended users for a larger project or any preferred location for a small project.",
+      "output": "The server's physical region and compatible plan and Primary IP availability are set.",
+      "success_signal": "The chosen location remains in the order configuration.",
+      "failure_or_wait": "A location can have no free resources or be temporarily restricted for an account, requiring another location or later retry.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose an OS Image such as a current supported Linux distribution.",
+      "details": [],
+      "input": "An OS Image rather than a Snapshot or preinstalled App.",
+      "output": "The server will boot a standard Linux operating system.",
+      "success_signal": "The selected distribution and version appear in the configuration.",
+      "failure_or_wait": "Changing the OS image after creation erases previous disk data. Snapshots duplicate prior state, while Apps preinstall software and therefore are not the generic OS-image path.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select a public network option for direct SSH, choosing IPv4, IPv6, or both.",
+      "details": [],
+      "input": "At least one Primary IP, using an eligible unassigned same-Project and same-location address or allowing Hetzner to create a new Primary IP.",
+      "output": "The server will have a public network interface and reachable address.",
+      "success_signal": "At least one public Primary IP is included in the server order.",
+      "failure_or_wait": "No public IP requires an existing private Network and another public access path. IPv6-only access requires an IPv6-capable local client and internet connection.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Add the public SSH key for root authentication.",
+      "details": [],
+      "input": "The public-key text corresponding to the private key generated in step 8.",
+      "output": "The key will be installed on the server at creation.",
+      "success_signal": "The SSH key is selected in the server order.",
+      "failure_or_wait": "Hetzner Console cannot add an SSH key to an existing server after creation. A lost or incorrect key requires in-server changes or the rescue-system replacement procedure.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review optional Volumes, Firewalls, Backups, Placement Groups, Labels, and Cloud config, and leave them unset unless required for the first connection.",
+      "details": [],
+      "input": "No extra Volume, Firewall, Backup, Placement Group, label, or cloud-init script for the minimal OS server.",
+      "output": "The first server has no workload-specific or separately billed optional resources beyond its selected Primary IP.",
+      "success_signal": "The order summary reflects the deliberate defaults.",
+      "failure_or_wait": "A Firewall whose inbound rules do not allow the SSH connection drops that traffic. Backups add seven slots at 20% of server price, and cloud-init processes uploaded scripts during early initialization.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S8",
+        "S14"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Enter a unique RFC 1123-compatible server name.",
+      "details": [],
+      "input": "A project-unique hostname using allowed letters, digits, minus signs, and periods without spaces.",
+      "output": "The server has a resource name usable in Hetzner commands.",
+      "success_signal": "The name passes validation and is present in the order summary.",
+      "failure_or_wait": "Duplicate, one-character, space-containing, or syntactically invalid names are rejected.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the selected server and separately billed network resources, then select CREATE & BUY NOW.",
+      "details": [],
+      "input": "Plan, location, OS image, public Primary IP, SSH key, optional-resource choices, and unique name.",
+      "output": "Hetzner begins creating the Cloud server and any new Primary IP.",
+      "success_signal": "The server appears in the Project and its public IP can be copied from Hetzner Console.",
+      "failure_or_wait": "Hetzner can delay, manually review, or reject a first order based on account, value, quantity, unpaid invoices, limits, location, or capacity. Billing begins only after creation finishes and access is provided.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S5",
+        "S7",
+        "S8",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Finish provisioning and expose the server's selected public Primary IP in the Project.",
+      "details": [],
+      "input": "The accepted server configuration.",
+      "output": "A booted Linux Cloud server with the selected public key and public address.",
+      "success_signal": "The server is created and its IP address is available to copy. An official Hetzner tutorial describes a basic keyed Cloud instance as ready in less than a minute, but the general server guide gives no universal duration.",
+      "failure_or_wait": "The general server guide publishes no universal provisioning duration. The connection guide begins only after the server has been created and its IP is available.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5",
+        "S7",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `ssh root@<server-IP>` using the corresponding private key and enter `yes` if OpenSSH presents the first host-authenticity prompt.",
+      "details": [],
+      "input": "The copied IPv4 or first address of the assigned IPv6 /64, the matching private key, optional key passphrase, and host-key acceptance.",
+      "output": "An authenticated root session on the first Hetzner Cloud server.",
+      "success_signal": "The remote shell opens, matching the public-key branch's statement that the user is automatically connected when no password was set.",
+      "failure_or_wait": "For IPv6 failure, verify client and internet IPv6 capability. For key failure, use the correct private key or replace it through Rescue. The VNC console is an emergency alternative but may require resetting the root password first.",
+      "required": true,
+      "source_ids": [
+        "S7",
+        "S9",
+        "S12"
+      ]
+    }
+  ],
+  "candidate_paths": [
+    {
+      "id": "console-public-linux-ssh-key",
+      "name": "Create a public Linux Cloud server in Hetzner Console and connect as root with an SSH key",
+      "selection_basis": "Hetzner's current getting-started pages explicitly sequence server creation and connection, and official tutorials recommend Ed25519 for a secure reusable first SSH route.",
+      "relationship_to_primary_path": "This path reaches the general Cloud server's first usable shell without API credentials, CLI setup, a workload-specific App, a private-network jump host, or an emailed root-password rotation.",
+      "steps": [
+        {
+          "step_number": 1,
+          "phase": "arrive",
+          "actor": "developer",
+          "interface": "documentation",
+          "action": "Open Hetzner Account Getting Started, follow the Accounts login link, and select Register now.",
+          "details": [],
+          "input": "https://docs.hetzner.com/general/billing-and-account-management/account-getting-started/",
+          "output": "The official customer registration form opens.",
+          "success_signal": "The form requests the required account information.",
+          "failure_or_wait": "An existing full Hetzner customer can log in and skip to Hetzner Console project selection.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 2,
+          "phase": "account",
+          "actor": "developer",
+          "interface": "browser",
+          "action": "Enter all required registration information.",
+          "details": [],
+          "input": "Valid email, account password, accurate personal or business contact details, billing address, selected EUR or USD currency, and an optional phone number when requested or useful for verification.",
+          "output": "A pending full customer account registration is submitted.",
+          "success_signal": "Hetzner sends an email-confirmation link.",
+          "failure_or_wait": "Incomplete or false details can delay or cause rejection. Hetzner advises avoiding VPN registration and, when possible, free email addresses. Currency cannot be changed after account creation.",
+          "required": true,
+          "source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ]
+        },
+        {
+          "step_number": 3,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "other",
+          "action": "Open Hetzner's email and follow its confirmation link.",
+          "details": [],
+          "input": "Access to the registered email address.",
+          "output": "The email address is confirmed.",
+          "success_signal": "The new account can proceed to login or any requested verification.",
+          "failure_or_wait": "Email confirmation is a documented prerequisite to the next login step; the guide does not document resend or recovery behavior here.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 4,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "other",
+          "action": "If Hetzner requests fraud verification before processing the first order, choose the offered identity-document or credit-card prepayment route and complete it.",
+          "details": [],
+          "input": "A valid government-issued ID matching registration details, or a prepayment using the account holder's own credit card.",
+          "output": "The account satisfies the requested fraud check, and any prepayment appears under Transactions.",
+          "success_signal": "Hetzner permits the account or first order to continue.",
+          "failure_or_wait": "The verification trigger, review duration, requested amount, and rejection criteria are not universal. Registration or a large or implausible first order can be delayed, manually reviewed, or rejected.",
+          "required": false,
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "step_number": 5,
+          "phase": "account",
+          "actor": "developer",
+          "interface": "browser",
+          "action": "Log in to the new Hetzner account with the registered email and password.",
+          "details": [],
+          "input": "Confirmed account credentials.",
+          "output": "The account dashboard opens with products, projects, invoices, security information, and customer number.",
+          "success_signal": "The dashboard is visible and the customer number beginning with `K` can be retrieved from the profile menu.",
+          "failure_or_wait": "The documented registration sequence places email confirmation before this login step.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 6,
+          "phase": "billing",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Review the payment methods available for the account and, if choosing automatic invoice payment, use an eligible credit card or SEPA direct debit.",
+          "details": [],
+          "input": "An account-supported credit card, EUR-only SEPA direct debit, manual bank transfer, or manual PayPal process.",
+          "output": "The developer has identified either an automatic or manual route for paying the retroactive first invoice.",
+          "success_signal": "The method is listed as available in Hetzner Accounts or the developer has the documented manual-payment instructions.",
+          "failure_or_wait": "Not every method is available in every country. Apple Pay, other linked-card wallets, cryptocurrency, partial payments, and payment plans are not accepted.",
+          "required": false,
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "step_number": 7,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Open Hetzner Console, select New project, name the project, and select Add project.",
+          "details": [],
+          "input": "A full Hetzner customer account and a project name.",
+          "output": "A Cloud Project owned and billed by the account is created and opened.",
+          "success_signal": "The Project overview and its resource navigation are visible.",
+          "failure_or_wait": "A light invitation-only account cannot create its own project or order products until upgraded with full customer and payment information. The default project limit is 20.",
+          "required": true,
+          "source_ids": [
+            "S10",
+            "S13"
+          ]
+        },
+        {
+          "step_number": 8,
+          "phase": "prepare",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Generate an Ed25519 SSH key pair if no suitable key exists.",
+          "details": [],
+          "input": "`ssh-keygen -t ed25519`, a default or custom filename, and an optional passphrase.",
+          "output": "A local public and private SSH key pair exists.",
+          "success_signal": "The `.pub` public key can be displayed while the private key remains local.",
+          "failure_or_wait": "The root-password branch can skip key generation, but requires emailed secret handling and a mandatory password change at first login.",
+          "required": true,
+          "source_ids": [
+            "S4"
+          ]
+        },
+        {
+          "step_number": 9,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "In the Project, open Servers and select Add server.",
+          "details": [],
+          "input": "The active owned Project.",
+          "output": "The Create Server page opens.",
+          "success_signal": "Type, location, image, networking, SSH key, volumes, firewalls, backups, placement groups, labels, cloud config, and name controls are visible.",
+          "failure_or_wait": "Account deactivation, first-order review, or resource limits can block server creation.",
+          "required": true,
+          "source_ids": [
+            "S2",
+            "S5",
+            "S10"
+          ]
+        },
+        {
+          "step_number": 10,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Choose a server Type and displayed plan appropriate for a first development environment.",
+          "details": [],
+          "input": "A Shared Resources cost-optimized or regular-performance plan, or a Dedicated Resources plan.",
+          "output": "Compute, memory, and local disk capacity are assigned.",
+          "success_signal": "The selected plan remains in the order configuration.",
+          "failure_or_wait": "The account's resource limits can restrict selection. Hetzner recommends a smaller Cloud server for a first order.",
+          "required": true,
+          "source_ids": [
+            "S2",
+            "S5",
+            "S6",
+            "S10"
+          ]
+        },
+        {
+          "step_number": 11,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Choose the server Location.",
+          "details": [],
+          "input": "A displayed location, generally the one closest to the intended users for a larger project or any preferred location for a small project.",
+          "output": "The server's physical region and compatible plan and Primary IP availability are set.",
+          "success_signal": "The chosen location remains in the order configuration.",
+          "failure_or_wait": "A location can have no free resources or be temporarily restricted for an account, requiring another location or later retry.",
+          "required": true,
+          "source_ids": [
+            "S5",
+            "S10"
+          ]
+        },
+        {
+          "step_number": 12,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Choose an OS Image such as a current supported Linux distribution.",
+          "details": [],
+          "input": "An OS Image rather than a Snapshot or preinstalled App.",
+          "output": "The server will boot a standard Linux operating system.",
+          "success_signal": "The selected distribution and version appear in the configuration.",
+          "failure_or_wait": "Changing the OS image after creation erases previous disk data. Snapshots duplicate prior state, while Apps preinstall software and therefore are not the generic OS-image path.",
+          "required": true,
+          "source_ids": [
+            "S5",
+            "S6"
+          ]
+        },
+        {
+          "step_number": 13,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Select a public network option for direct SSH, choosing IPv4, IPv6, or both.",
+          "details": [],
+          "input": "At least one Primary IP, using an eligible unassigned same-Project and same-location address or allowing Hetzner to create a new Primary IP.",
+          "output": "The server will have a public network interface and reachable address.",
+          "success_signal": "At least one public Primary IP is included in the server order.",
+          "failure_or_wait": "No public IP requires an existing private Network and another public access path. IPv6-only access requires an IPv6-capable local client and internet connection.",
+          "required": true,
+          "source_ids": [
+            "S5",
+            "S6",
+            "S7"
+          ]
+        },
+        {
+          "step_number": 14,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Add the public SSH key for root authentication.",
+          "details": [],
+          "input": "The public-key text corresponding to the private key generated in step 8.",
+          "output": "The key will be installed on the server at creation.",
+          "success_signal": "The SSH key is selected in the server order.",
+          "failure_or_wait": "Hetzner Console cannot add an SSH key to an existing server after creation. A lost or incorrect key requires in-server changes or the rescue-system replacement procedure.",
+          "required": true,
+          "source_ids": [
+            "S5",
+            "S9"
+          ]
+        },
+        {
+          "step_number": 15,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Review optional Volumes, Firewalls, Backups, Placement Groups, Labels, and Cloud config, and leave them unset unless required for the first connection.",
+          "details": [],
+          "input": "No extra Volume, Firewall, Backup, Placement Group, label, or cloud-init script for the minimal OS server.",
+          "output": "The first server has no workload-specific or separately billed optional resources beyond its selected Primary IP.",
+          "success_signal": "The order summary reflects the deliberate defaults.",
+          "failure_or_wait": "A Firewall whose inbound rules do not allow the SSH connection drops that traffic. Backups add seven slots at 20% of server price, and cloud-init processes uploaded scripts during early initialization.",
+          "required": true,
+          "source_ids": [
+            "S5",
+            "S8",
+            "S14"
+          ]
+        },
+        {
+          "step_number": 16,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Enter a unique RFC 1123-compatible server name.",
+          "details": [],
+          "input": "A project-unique hostname using allowed letters, digits, minus signs, and periods without spaces.",
+          "output": "The server has a resource name usable in Hetzner commands.",
+          "success_signal": "The name passes validation and is present in the order summary.",
+          "failure_or_wait": "Duplicate, one-character, space-containing, or syntactically invalid names are rejected.",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "step_number": 17,
+          "phase": "execute",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Review the selected server and separately billed network resources, then select CREATE & BUY NOW.",
+          "details": [],
+          "input": "Plan, location, OS image, public Primary IP, SSH key, optional-resource choices, and unique name.",
+          "output": "Hetzner begins creating the Cloud server and any new Primary IP.",
+          "success_signal": "The server appears in the Project and its public IP can be copied from Hetzner Console.",
+          "failure_or_wait": "Hetzner can delay, manually review, or reject a first order based on account, value, quantity, unpaid invoices, limits, location, or capacity. Billing begins only after creation finishes and access is provided.",
+          "required": true,
+          "source_ids": [
+            "S2",
+            "S3",
+            "S5",
+            "S7",
+            "S8",
+            "S10"
+          ]
+        },
+        {
+          "step_number": 18,
+          "phase": "wait",
+          "actor": "platform",
+          "interface": "web-console",
+          "action": "Finish provisioning and expose the server's selected public Primary IP in the Project.",
+          "details": [],
+          "input": "The accepted server configuration.",
+          "output": "A booted Linux Cloud server with the selected public key and public address.",
+          "success_signal": "The server is created and its IP address is available to copy. An official Hetzner tutorial describes a basic keyed Cloud instance as ready in less than a minute, but the general server guide gives no universal duration.",
+          "failure_or_wait": "The general server guide publishes no universal provisioning duration. The connection guide begins only after the server has been created and its IP is available.",
+          "required": true,
+          "source_ids": [
+            "S4",
+            "S5",
+            "S7",
+            "S8"
+          ]
+        },
+        {
+          "step_number": 19,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Run `ssh root@<server-IP>` using the corresponding private key and enter `yes` if OpenSSH presents the first host-authenticity prompt.",
+          "details": [],
+          "input": "The copied IPv4 or first address of the assigned IPv6 /64, the matching private key, optional key passphrase, and host-key acceptance.",
+          "output": "An authenticated root session on the first Hetzner Cloud server.",
+          "success_signal": "The remote shell opens, matching the public-key branch's statement that the user is automatically connected when no password was set.",
+          "failure_or_wait": "For IPv6 failure, verify client and internet IPv6 capability. For key failure, use the correct private key or replace it through Rescue. The VNC console is an emergency alternative but may require resetting the root password first.",
+          "required": true,
+          "source_ids": [
+            "S7",
+            "S9",
+            "S12"
+          ]
+        }
+      ],
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8",
+        "S9",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 4,
+      "condition": "Fraud-verification request",
+      "path": "Provide a government-issued ID or verify through a prepayment using the account holder's own credit card.",
+      "effect_on_first_success": "Adds an external evidence or payment step and an unbounded review before the first order can proceed.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Country and currency",
+      "path": "Use a supported credit card, EUR-only SEPA direct debit, bank transfer, or manual PayPal according to the methods exposed for the account.",
+      "effect_on_first_success": "The first server is billed retroactively, while payment availability and whether invoice payment is automatic or manual differ.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "Authentication simplicity",
+      "path": "Skip the SSH key. Hetzner emails a generated root password after server creation; enter it at first SSH login and then complete the mandatory password change.",
+      "effect_on_first_success": "Removes key generation and upload but adds email-secret retrieval, password entry, and password rotation before the root session is usable.",
+      "source_ids": [
+        "S7",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "Performance isolation",
+      "path": "Choose Shared Resources cost-optimized or regular-performance, or Dedicated Resources general-purpose.",
+      "effect_on_first_success": "All reach the same OS and SSH boundary, but CPU sharing, performance predictability, price, and first-order fraud risk differ.",
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "Image source",
+      "path": "Use a Snapshot duplicate or choose a preinstalled App instead of an OS Image.",
+      "effect_on_first_success": "A Snapshot inherits prior state; an App can require service-specific activation after the server boots, moving success beyond the generic shell.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "Public address",
+      "path": "Choose IPv4 only, IPv6 only, or both, using an existing eligible Primary IP or allowing automatic creation.",
+      "effect_on_first_success": "IPv4 has a separate fee, IPv6 is free, and IPv6-only SSH depends on the local network.",
+      "source_ids": [
+        "S5",
+        "S6",
+        "S7",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "Private-only server",
+      "path": "Place the server in a private Network with no public IP and connect through a second server with a public IP in the same Network.",
+      "effect_on_first_success": "Adds Network creation, a second billable server, two SSH connections or ProxyJump, and separate credentials.",
+      "source_ids": [
+        "S5",
+        "S6",
+        "S15"
+      ]
+    },
+    {
+      "at_step": 15,
+      "condition": "Security or durability",
+      "path": "Add a Firewall permitting SSH, enable Backups, attach Volumes, or use placement, labels, and cloud-init.",
+      "effect_on_first_success": "Can improve the resulting environment but adds rules, cost, boot work, and failure surfaces before first login.",
+      "source_ids": [
+        "S5",
+        "S8",
+        "S14"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "Provisioning interface",
+      "path": "Generate a Project-scoped Read & Write API token and create the server with the Hetzner Cloud API or hcloud CLI.",
+      "effect_on_first_success": "Adds token security, local installation or HTTP requests, context and parameter selection, then converges on the same public IP and SSH login.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "SSH unavailable",
+      "path": "Open the Project's server, select the VNC console icon, reset the root password under Rescue if needed, and log in as root.",
+      "effect_on_first_success": "Provides emergency access but adds password reset and browser console steps, and is not Hetzner's recommended regular-management path.",
+      "source_ids": [
+        "S12"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "other",
+      "description": "Hetzner advises avoiding VPNs and free email addresses and warns that incomplete or false details can delay or reject registration.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "approval",
+      "description": "A non-universal fraud check can require ID submission or credit-card prepayment, with no published review time or universal trigger.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "billing",
+      "description": "Payment methods and automation vary by country and currency, while billing is retroactive and invoices are due immediately with a ten-day payment window before reminders.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "account",
+      "description": "An invitation-created light account can enter another project but cannot create its own projects or products until it supplies full customer and payment information.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S10"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "choice",
+      "description": "Shared and dedicated server families expose price, CPU isolation, account-limit, and first-order review tradeoffs.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "configuration",
+      "description": "Server price excludes Primary IPs. The user must choose IPv4, IPv6, both, or a private Network, each with different cost and reachability.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 14,
+      "type": "other",
+      "description": "The public key must be selected at server creation because Hetzner Console cannot add one afterward.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "other",
+      "description": "A Firewall restricts traffic, and its inbound rules drop connections not explicitly allowed. A first-path Firewall therefore needs a rule that permits the intended SSH connection.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S14"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "approval",
+      "description": "Limits, unpaid invoices, deactivation, capacity, location restrictions, or a large or implausible first order can stop or delay CREATE & BUY NOW.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S2",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 19,
+      "type": "other",
+      "description": "For a lost SSH key, Hetzner documents Rescue boot, chroot, editing `/root/.ssh/authorized_keys`, and reboot. VNC is available for emergencies after a root-password reset when necessary.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S9",
+        "S12"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "An official Hetzner Community tutorial says a basic Cloud instance with a public SSH key is ready to go in less than a minute. The general account and server docs publish no universal registration-to-shell total, and fraud review can add an unspecified delay.",
+    "source_ids": [
+      "S2",
+      "S4",
+      "S5"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Hetzner Account Getting Started",
+      "url": "https://docs.hetzner.com/general/billing-and-account-management/account-getting-started/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "January 27, 2026",
+      "sections_used": [
+        "Account creation",
+        "Registration",
+        "Navigation on your Hetzner account",
+        "Common next steps"
+      ],
+      "evidence_supported": [
+        "Account requirements",
+        "VPN and free-email advice",
+        "Registration sequence",
+        "Email confirmation",
+        "Dashboard login",
+        "Customer number",
+        "Cloud server and payment next steps"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Fraud prevention FAQ",
+      "url": "https://docs.hetzner.com/general/security-and-identify/fraud-prevention-faq/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "February 24, 2024",
+      "sections_used": [
+        "What should I pay attention to when I register an account?",
+        "Why does Hetzner reject some orders?",
+        "How can I verify my account?"
+      ],
+      "evidence_supported": [
+        "Accurate-information requirement",
+        "VPN and free-email risk",
+        "Order review and rejection",
+        "Small-server first-order recommendation",
+        "ID verification",
+        "Credit-card prepayment verification",
+        "Manual review ambiguity"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Payment Overview",
+      "url": "https://docs.hetzner.com/general/billing-and-account-management/billing-at-hetzner/payment-overview/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "July 7, 2026",
+      "sections_used": [
+        "Accepted payment methods",
+        "Currencies",
+        "General billing model",
+        "Invoice generation",
+        "Due date",
+        "Credit",
+        "Setup fees"
+      ],
+      "evidence_supported": [
+        "Payment-method and regional branches",
+        "Immutable currency",
+        "Retroactive billing",
+        "Hourly rounding and monthly cap",
+        "Invoice payment timing",
+        "Cloud server no-setup-fee rule"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Setting Up a Secure Fedora Webserver in the Hetzner Cloud",
+      "url": "https://community.hetzner.com/tutorials/secure-fedora-webserver/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 21, 2021",
+      "sections_used": [
+        "Step 1: Cloud Instance Creation",
+        "Step 3: First SSH Connection"
+      ],
+      "evidence_supported": [
+        "Project-first path",
+        "Ed25519 generation",
+        "Public-key upload during creation",
+        "Basic-instance less-than-a-minute claim",
+        "IP retrieval",
+        "Keyed SSH connection"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Creating a Server",
+      "url": "https://docs.hetzner.com/cloud/servers/getting-started/creating-a-server/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "December 13, 2021",
+      "sections_used": [
+        "Servers",
+        "Add server",
+        "Create your server",
+        "CREATE & BUY NOW"
+      ],
+      "evidence_supported": [
+        "Primary creation flow",
+        "All wizard fields",
+        "Plan and location guidance",
+        "Image branches",
+        "Network options",
+        "Primary IP behavior",
+        "SSH-key constraint",
+        "Optional resources",
+        "Name validation",
+        "Purchase action"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Cloud Servers Overview",
+      "url": "https://docs.hetzner.com/cloud/servers/overview/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 28, 2022",
+      "sections_used": [
+        "Servers",
+        "Pricing",
+        "Network options",
+        "Operating systems",
+        "Limits"
+      ],
+      "evidence_supported": [
+        "Server definition",
+        "Shared and dedicated categories",
+        "Plan-price exclusion of public IP",
+        "IPv4 and IPv6 price behavior",
+        "Network requirements",
+        "OS list",
+        "Default limits"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Connecting to your Server",
+      "url": "https://docs.hetzner.com/cloud/servers/getting-started/connecting-to-the-server/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "December 13, 2021",
+      "sections_used": [
+        "Connect via IPv4 or IPv6",
+        "CLI warning",
+        "SSH key",
+        "No SSH key",
+        "Change your password",
+        "SSH config"
+      ],
+      "evidence_supported": [
+        "SSH command",
+        "IP copy",
+        "IPv6 first address",
+        "Host authenticity confirmation",
+        "Key-auth success",
+        "Emailed-password branch",
+        "Mandatory first password change",
+        "Explicit connected milestone",
+        "Optional config after boundary"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Cloud Billing FAQ",
+      "url": "https://docs.hetzner.com/cloud/billing/faq/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "July 7, 2020",
+      "sections_used": [
+        "How do you bill your servers?",
+        "Do you bill servers that are off?",
+        "How do you bill for Snapshots and Backups?",
+        "How do you bill for Primary IPs?"
+      ],
+      "evidence_supported": [
+        "Hourly and monthly-cap server billing",
+        "One-hour rounding",
+        "Stopped-server billing",
+        "Creation-complete billing start",
+        "Backup price",
+        "Separate Primary IP billing",
+        "Deletion requirement"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Changing the SSH key",
+      "url": "https://docs.hetzner.com/cloud/servers/how-to-rescue/change-ssh-key/",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 2, 2026",
+      "sections_used": [
+        "Post-creation SSH-key constraint",
+        "Enable rescue system",
+        "Create a chroot environment",
+        "Edit the SSH keys",
+        "Restart the server"
+      ],
+      "evidence_supported": [
+        "No Console key addition after creation",
+        "Rescue recovery",
+        "Authorized-keys edit",
+        "Reboot and restored access"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Hetzner Cloud General FAQ",
+      "url": "https://docs.hetzner.com/cloud/general/faq/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "April 27, 2026",
+      "sections_used": [
+        "What are projects, and how can I use them?",
+        "Light account",
+        "Are there limits to the number of resources I can get?",
+        "Are there limits to the number of projects?",
+        "Why can Cloud instances occasionally not be ordered?"
+      ],
+      "evidence_supported": [
+        "Project ownership and billing",
+        "Light versus full account",
+        "Project roles",
+        "Account-specific limits",
+        "Manual limit review",
+        "Project limit",
+        "Order failure causes"
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "Legal Notice",
+      "url": "https://www.hetzner.com/legal/legal-notice/datenschutzU/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Legal Notice"
+      ],
+      "evidence_supported": [
+        "Hetzner Online GmbH legal identity"
+      ]
+    },
+    {
+      "id": "S12",
+      "title": "Using the console",
+      "url": "https://docs.hetzner.com/cloud/servers/getting-started/vnc-console/",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 28, 2022",
+      "sections_used": [
+        "Open the server console",
+        "Log into your server",
+        "Reset root password"
+      ],
+      "evidence_supported": [
+        "VNC console navigation",
+        "Root login",
+        "Password email",
+        "Root-password reset for key-created servers",
+        "Explicit logged-in signal"
+      ]
+    },
+    {
+      "id": "S13",
+      "title": "Using GMAB to Manage Temporary Hetzner Cloud Instances",
+      "url": "https://community.hetzner.com/tutorials/give-me-a-box-with-hetzner-cloud/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "March 25, 2025",
+      "sections_used": [
+        "Creating a Dedicated Project"
+      ],
+      "evidence_supported": [
+        "New project button",
+        "Project name",
+        "Add project action",
+        "Project becomes active"
+      ]
+    },
+    {
+      "id": "S14",
+      "title": "Creating a Firewall",
+      "url": "https://docs.hetzner.com/cloud/firewalls/getting-started/creating-a-firewall/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "December 13, 2021",
+      "sections_used": [
+        "Rules",
+        "Inbound rules",
+        "Apply to"
+      ],
+      "evidence_supported": [
+        "Firewall traffic restriction",
+        "Inbound allow-list behavior",
+        "Dropped connections without an allow rule",
+        "Server application scope"
+      ]
+    },
+    {
+      "id": "S15",
+      "title": "Connecting to a Server via its private IP",
+      "url": "https://docs.hetzner.com/cloud/servers/getting-started/connecting-via-private-ip/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "August 5, 2022",
+      "sections_used": [
+        "Private-network prerequisites",
+        "Connect to the public server",
+        "Connect to the server without public IPs",
+        "ProxyJump configuration"
+      ],
+      "evidence_supported": [
+        "Second server with public IP requirement",
+        "Same private Network requirement",
+        "Two-stage SSH route",
+        "Optional ProxyJump route"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which exact fields and agreement controls appear in the current direct registration form?",
+      "impact": "The number of registration inputs and clicks cannot be enumerated beyond identity, contact, billing, currency, optional phone, and email confirmation.",
+      "reason_unresolved": "The account guide says to enter all required information but does not list every form field or checkbox.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "question": "Which accounts or first orders trigger ID or credit-card prepayment verification, and how long does review take?",
+      "impact": "This can become the largest pre-server delay or cause rejection.",
+      "reason_unresolved": "The fraud FAQ confirms possible verification and manual review but intentionally does not publish its risk rules, amounts, or timing.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "question": "Is adding a stored payment method mandatory before every first Cloud server, or can some regions order under a manual retroactive invoice method?",
+      "impact": "One billing page may or may not occur before CREATE & BUY NOW.",
+      "reason_unresolved": "The account guide lists payment addition as a common next step, while the payment guide supports both stored automatic and manual invoice methods and does not state one universal pre-order rule.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "question": "Which plan, location, and Linux image should be treated as the universal first-server default?",
+      "impact": "Exact price, architecture, capacity, availability, and operating-system behavior vary.",
+      "reason_unresolved": "The creation guide requires the developer to choose and provides category advice without naming one canonical combination.",
+      "checked_source_ids": [
+        "S2",
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Editing the local SSH config to add a convenient host alias.",
+    "Creating a non-root administrator, hardening SSH, applying package updates, or configuring a host firewall.",
+    "Installing an application, using a preinstalled App, or migrating an existing workload.",
+    "Adding DNS, Load Balancers, Floating IPs, Volumes, Backups, Snapshots, private Networks, or Placement Groups.",
+    "Generating an API token or automating future servers with API, hcloud CLI, Terraform, Packer, or configuration management.",
+    "Deleting the workshop server and any separately created Primary IP to stop billing."
+  ]
+}
