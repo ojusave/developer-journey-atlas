@@ -1,0 +1,1244 @@
+{
+  "platform": {
+    "name": "Scaleway",
+    "slug": "scaleway",
+    "organization": "Scaleway SAS"
+  },
+  "category": "Cloud and application runtimes",
+  "surface": {
+    "name": "Create a Scaleway account, deploy a CPU Instance in the console, and connect over SSH",
+    "selection_basis": "Scaleway's account guide explicitly says account creation gives access to the console and deployment of its products. The current Instances Quickstart requires an account, permissions, and an SSH key, then provides one ordered console flow from Create CPU Instance through the explicit terminal milestone `You are now connected to your Instance.`",
+    "alternatives_considered": [
+      {
+        "name": "Sign up with Google, Microsoft, or GitHub",
+        "url": "https://www.scaleway.com/en/docs/account/how-to/create-an-account",
+        "reason_not_primary": "This is a documented identity branch that can reduce credential creation, but it converges on the same profile, billing, payment, Project, and resource steps."
+      },
+      {
+        "name": "Create an Instance through the API",
+        "url": "https://www.scaleway.com/en/docs/instances/how-to/create-an-instance/",
+        "reason_not_primary": "The API path requires an API key, Project ID, zone, curl, a payload file, separate public-IP attachment, and a power-on action, while the console quickstart creates a connected, powered instance in one wizard."
+      },
+      {
+        "name": "Create an Instance through the Scaleway CLI",
+        "url": "https://www.scaleway.com/en/docs/instances/how-to/create-an-instance/",
+        "reason_not_primary": "The CLI path requires installation, configuration, API credentials, and command parameter selection before the first instance."
+      },
+      {
+        "name": "Windows Instance and PuTTY connection",
+        "url": "https://www.scaleway.com/en/docs/instances/quickstart/",
+        "reason_not_primary": "The quickstart documents Windows and PuTTY as a peer branch, but the Linux and OpenSSH route has fewer platform-specific steps and is the general documented terminal path."
+      }
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Scaleway account, provision a first Linux CPU Instance in the default Project, and establish an authenticated SSH session.",
+    "starting_url": "https://www.scaleway.com/en/docs/account/how-to/create-an-account",
+    "assumed_prior_state": [
+      "The developer has a working email address, or an eligible Google, Microsoft, or GitHub identity.",
+      "The developer can accept Scaleway's Terms and Services and Data Protection Agreement and provide the requested account and billing information.",
+      "The developer has an accepted non-virtual, non-prepaid credit or debit card and can complete bank 3D Secure validation.",
+      "The local computer has an OpenSSH client and `ssh-keygen`, or the developer can use the documented Windows PuTTY route.",
+      "The developer is authorized to incur the estimated pay-as-you-go instance, storage, and public-IP charges displayed at review."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "You are now connected to your Instance",
+    "normalized_outcome": "Scaleway has created the developer's first Linux CPU Instance, and the developer has authenticated as root through SSH with the uploaded Project key.",
+    "observable_completion_signal": "After the user runs `ssh -i ~/.ssh/your_private_key root@your_instance_ip` and accepts the first host-key prompt, an interactive remote terminal opens on the Instance.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "You are now connected to your Instance",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    "why_this_is_the_boundary": "The Instances Quickstart states that a created image-based Instance can be connected to by SSH and ends both desktop connection procedures with `You are now connected to your Instance.` It places deletion afterward and does not require an application deployment before the resource is usable.",
+    "source_ids": [
+      "S6"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "A deliverable email address or Google, Microsoft, or GitHub identity, plus the account-type-specific profile information requested during signup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Acceptance of Scaleway's Terms and Services and Data Protection Agreement.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "verification",
+      "requirement": "An SMS-capable phone is required for Corporate, Startup, and Consultant/Freelancer signup, while the account guide says phone verification is not mandatory for Personal project accounts.",
+      "required": false,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "billing",
+      "requirement": "Billing information and a valid accepted card are required before ordering resources. Scaleway rejects virtual and prepaid cards and initiates a reimbursed €1 authorization plus possible 3D Secure challenge.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "permission",
+      "requirement": "Owner status or IAM permissions allowing instance creation in the intended Organization and Project. A new account automatically receives an Organization and default Project.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "credential",
+      "requirement": "A local Ed25519 SSH key pair, with the public key uploaded to the intended Scaleway Project and the private key retained locally.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open How to create an account and select Sign Up from the Scaleway site.",
+      "details": [],
+      "input": "https://www.scaleway.com/en/docs/account/how-to/create-an-account",
+      "output": "The official account-type and identity-method workflow opens.",
+      "success_signal": "Corporate, Startup, Consultant/Freelancer, and Personal project choices are visible.",
+      "failure_or_wait": "An existing account owner can log in and skip to payment, Project key, or Instance setup as needed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Select the account type that matches the intended use.",
+      "details": [],
+      "input": "Corporate, Startup, Consultant/Freelancer, or Personal project.",
+      "output": "The account flow is scoped to the selected profile type.",
+      "success_signal": "The signup-method choices are available.",
+      "failure_or_wait": "The account type changes the requested information and whether phone verification is mandatory.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Choose Sign up with email, enter an email address, accept the Terms and Services and Data Protection Agreement, and select Confirm email address.",
+      "details": [],
+      "input": "Email address and agreement acceptance.",
+      "output": "A verification link is sent to the supplied mailbox.",
+      "success_signal": "The interface directs the developer to validate the email.",
+      "failure_or_wait": "Google, Microsoft, or GitHub SSO is a documented branch. An invalid email or unaccepted agreement prevents progression.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open the validation link, fill in the requested profile form, and select Create account.",
+      "details": [],
+      "input": "The verified email link and account-type-specific personal or business information.",
+      "output": "A Scaleway account, owner Organization, and default Project are created.",
+      "success_signal": "The signup flow advances to phone or billing setup and the Organization can be opened in the console.",
+      "failure_or_wait": "The account guide does not document validation-link delivery time, link expiry, or form-recovery behavior.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "When required by the selected account type, enter a phone number, select Send code, enter the six-digit SMS code, and select Verify phone number.",
+      "details": [],
+      "input": "An SMS-capable phone number and its verification code.",
+      "output": "Phone verification completes.",
+      "success_signal": "The signup flow advances to billing information.",
+      "failure_or_wait": "The guide does not document SMS delivery time or recovery behavior. Personal project users may skip this non-mandatory step.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Fill the required billing-address fields and select Add billing address.",
+      "details": [],
+      "input": "Invoice identity and postal-address information.",
+      "output": "A billing address is stored for the Organization's invoices.",
+      "success_signal": "The payment-method step becomes available.",
+      "failure_or_wait": "The account guide permits Add later for billing information, but still requires a valid credit card before ordering Scaleway resources.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Enter an accepted credit or debit card, select Add payment method, and complete any 3D Secure challenge.",
+      "details": [],
+      "input": "Visa, MasterCard, CB, UnionPay, or American Express card details and, when requested, an SMS or banking-app confirmation.",
+      "output": "A valid payment method is attached to the account.",
+      "success_signal": "The card appears in Payment Methods and the account can order resources.",
+      "failure_or_wait": "Virtual and prepaid cards are not accepted. Scaleway sends a €1 authorization charge that is automatically reimbursed within two days, and initiates 3D Secure validation through the cardholder's bank.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Generate an Ed25519 key pair for the Linux Instance.",
+      "details": [],
+      "input": "`ssh-keygen -t ed25519 -C \"login@example.com\"`, a default or custom save path, and an optional but recommended passphrase.",
+      "output": "A private key and corresponding `.pub` public key exist locally.",
+      "success_signal": "The public key can be displayed with `cat ~/.ssh/id_ed25519.pub`, while the private key remains protected on the local machine.",
+      "failure_or_wait": "The same guide documents a 4096-bit RSA command for Windows-based Instances and recommends Ed25519 for Linux. The private key must remain secure and must not be shared.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the default Project dashboard, select Add SSH key, name the key, paste the public-key text, and select Add SSH key.",
+      "details": [],
+      "input": "The copied public key and a recognizable key name.",
+      "output": "The public key is stored in the selected Project for transfer to new Instances during boot.",
+      "success_signal": "The key appears on the Project dashboard with its name and fingerprint.",
+      "failure_or_wait": "SSH keys are Project-scoped, so a key added to another Project is not the key selected for this Instance. Only the public-key content belongs in the Console; the private key remains local.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "From Compute, open CPU & GPU Instances, select Create Instance, then Create CPU Instance.",
+      "details": [],
+      "input": "The active Organization and default Project with sufficient permissions and an SSH key.",
+      "output": "The Instance creation wizard opens.",
+      "success_signal": "Instance range and configuration options are visible.",
+      "failure_or_wait": "The selected docs require the correct Project, Owner status or sufficient IAM permissions, an SSH key, and a payment method before resource ordering.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select an Instance range and a displayed Instance configuration.",
+      "details": [],
+      "input": "A range and size based on current price, processing power, memory, storage, and bandwidth. The pricing page positions Development Instances for lightweight, low-traffic environments.",
+      "output": "The compute shape and base estimated price are selected.",
+      "success_signal": "The selected configuration opens its Availability Zone prompt.",
+      "failure_or_wait": "Pricing varies by range and Availability Zone, and the guides do not name one universal first configuration.",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select an Availability Zone and choose Configure Instance.",
+      "details": [],
+      "input": "A zone with the chosen Instance configuration available.",
+      "output": "The wizard opens instance-specific name, image, storage, networking, cloud-init, and SSH-key settings.",
+      "success_signal": "The detailed configuration step is visible.",
+      "failure_or_wait": "The quickstart requires an Availability Zone choice but does not name a universal first zone.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Name the Instance or retain its generated name, optionally add tags, and choose a supported Linux operating-system image.",
+      "details": [],
+      "input": "Instance name, optional tags, and a Linux image rather than an InstantApp or custom image.",
+      "output": "The resource identity and boot image are set.",
+      "success_signal": "A generated or custom name and an operating-system image are selected before storage configuration.",
+      "failure_or_wait": "InstantApps and custom images are documented branches and can change configuration, initialization, and login behavior.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the automatically provided block system volume and keep it at or above the documented 10 GB minimum for a standard OS image.",
+      "details": [],
+      "input": "Default block volume with 5,000 IOPS, or a customized system volume of at least 10 GB.",
+      "output": "The Instance has a bootable system volume.",
+      "success_signal": "The volume configuration passes the OS minimum and remains the primary boot volume.",
+      "failure_or_wait": "The docs require at least 10 GB for the OS image and warn that booting from a volume without an OS, or from multiple volumes with identical operating systems, can produce inconsistent boot outcomes.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Keep the default public IPv4 and public IPv6 checkboxes enabled for the primary SSH route, and leave cloud-init at its default values.",
+      "details": [],
+      "input": "A newly allocated or existing public IPv4, the default public IPv6 selection, and default cloud-init configuration.",
+      "output": "The Instance will have public IPv4 and IPv6 connectivity with no additional bootstrap script.",
+      "success_signal": "A public IPv4 is included in the configuration.",
+      "failure_or_wait": "Removing public IPv4 requires an alternative IPv6 or private-network route. Public IPv4 is priced separately from the base Instance.",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Verify that the intended Project SSH key is selected for Instance access.",
+      "details": [],
+      "input": "The public key uploaded in step 9.",
+      "output": "The key is scheduled for transfer to the root account during the Instance boot process.",
+      "success_signal": "The intended key appears in the SSH keys section of the wizard.",
+      "failure_or_wait": "A missing or mismatched public key causes `Permission denied (publickey)` after boot. The corresponding private key must remain available locally.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select Review, verify the order summary and estimated cost, then select Create Instance.",
+      "details": [],
+      "input": "The selected compute, zone, image, volume, public IP, cloud-init, and SSH-key configuration.",
+      "output": "Scaleway begins creating and booting the billable Instance.",
+      "success_signal": "The platform informs the developer when the Instance is ready and redirects to its Overview tab.",
+      "failure_or_wait": "The quickstart does not publish a universal creation duration. The developer waits for the platform's ready notification, and the reviewed order shows the estimated cost of the selected resources.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "On the Instance Overview tab, copy the displayed Public IP and SSH command.",
+      "details": [],
+      "input": "The ready Instance's Overview information.",
+      "output": "The exact address and connection pattern for the first Instance are available.",
+      "success_signal": "The Overview shows the public IP and an SSH command.",
+      "failure_or_wait": "Wait for the platform's ready notification and Overview redirect before using the displayed connection information; the guide does not publish a universal duration.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `ssh -i ~/.ssh/your_private_key root@your_instance_ip` and type `yes` if OpenSSH asks to trust the host key.",
+      "details": [],
+      "input": "The local private-key path, Instance public IP, and first-connection host-key confirmation.",
+      "output": "An authenticated root SSH terminal on the first Scaleway Instance.",
+      "success_signal": "The remote shell opens, matching the quickstart milestone `You are now connected to your Instance.`",
+      "failure_or_wait": "`Permission denied (publickey)` indicates a key mismatch. Confirm the matching public key is in the correct Project, then reboot the Instance or run `scw-fetch-ssh-keys --upgrade` from a working session to refresh uploaded keys.",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    }
+  ],
+  "candidate_paths": [
+    {
+      "id": "console-linux-instance-ssh",
+      "name": "Create a Linux CPU Instance in the Scaleway console and connect as root over SSH",
+      "selection_basis": "The current Instances Quickstart provides an end-to-end browser path, requires an SSH key, reports readiness, exposes the Public IP and SSH command, and explicitly states when the user is connected.",
+      "relationship_to_primary_path": "This is the full general first-use path with the fewest additional automation prerequisites and no workload-specific application setup.",
+      "steps": [
+        {
+          "step_number": 1,
+          "phase": "arrive",
+          "actor": "developer",
+          "interface": "documentation",
+          "action": "Open How to create an account and select Sign Up from the Scaleway site.",
+          "details": [],
+          "input": "https://www.scaleway.com/en/docs/account/how-to/create-an-account",
+          "output": "The official account-type and identity-method workflow opens.",
+          "success_signal": "Corporate, Startup, Consultant/Freelancer, and Personal project choices are visible.",
+          "failure_or_wait": "An existing account owner can log in and skip to payment, Project key, or Instance setup as needed.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 2,
+          "phase": "account",
+          "actor": "developer",
+          "interface": "browser",
+          "action": "Select the account type that matches the intended use.",
+          "details": [],
+          "input": "Corporate, Startup, Consultant/Freelancer, or Personal project.",
+          "output": "The account flow is scoped to the selected profile type.",
+          "success_signal": "The signup-method choices are available.",
+          "failure_or_wait": "The account type changes the requested information and whether phone verification is mandatory.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 3,
+          "phase": "account",
+          "actor": "developer",
+          "interface": "browser",
+          "action": "Choose Sign up with email, enter an email address, accept the Terms and Services and Data Protection Agreement, and select Confirm email address.",
+          "details": [],
+          "input": "Email address and agreement acceptance.",
+          "output": "A verification link is sent to the supplied mailbox.",
+          "success_signal": "The interface directs the developer to validate the email.",
+          "failure_or_wait": "Google, Microsoft, or GitHub SSO is a documented branch. An invalid email or unaccepted agreement prevents progression.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 4,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "other",
+          "action": "Open the validation link, fill in the requested profile form, and select Create account.",
+          "details": [],
+          "input": "The verified email link and account-type-specific personal or business information.",
+          "output": "A Scaleway account, owner Organization, and default Project are created.",
+          "success_signal": "The signup flow advances to phone or billing setup and the Organization can be opened in the console.",
+          "failure_or_wait": "The account guide does not document validation-link delivery time, link expiry, or form-recovery behavior.",
+          "required": true,
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "step_number": 5,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "other",
+          "action": "When required by the selected account type, enter a phone number, select Send code, enter the six-digit SMS code, and select Verify phone number.",
+          "details": [],
+          "input": "An SMS-capable phone number and its verification code.",
+          "output": "Phone verification completes.",
+          "success_signal": "The signup flow advances to billing information.",
+          "failure_or_wait": "The guide does not document SMS delivery time or recovery behavior. Personal project users may skip this non-mandatory step.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 6,
+          "phase": "billing",
+          "actor": "developer",
+          "interface": "browser",
+          "action": "Fill the required billing-address fields and select Add billing address.",
+          "details": [],
+          "input": "Invoice identity and postal-address information.",
+          "output": "A billing address is stored for the Organization's invoices.",
+          "success_signal": "The payment-method step becomes available.",
+          "failure_or_wait": "The account guide permits Add later for billing information, but still requires a valid credit card before ordering Scaleway resources.",
+          "required": true,
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "step_number": 7,
+          "phase": "billing",
+          "actor": "developer",
+          "interface": "other",
+          "action": "Enter an accepted credit or debit card, select Add payment method, and complete any 3D Secure challenge.",
+          "details": [],
+          "input": "Visa, MasterCard, CB, UnionPay, or American Express card details and, when requested, an SMS or banking-app confirmation.",
+          "output": "A valid payment method is attached to the account.",
+          "success_signal": "The card appears in Payment Methods and the account can order resources.",
+          "failure_or_wait": "Virtual and prepaid cards are not accepted. Scaleway sends a €1 authorization charge that is automatically reimbursed within two days, and initiates 3D Secure validation through the cardholder's bank.",
+          "required": true,
+          "source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ]
+        },
+        {
+          "step_number": 8,
+          "phase": "prepare",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Generate an Ed25519 key pair for the Linux Instance.",
+          "details": [],
+          "input": "`ssh-keygen -t ed25519 -C \"login@example.com\"`, a default or custom save path, and an optional but recommended passphrase.",
+          "output": "A private key and corresponding `.pub` public key exist locally.",
+          "success_signal": "The public key can be displayed with `cat ~/.ssh/id_ed25519.pub`, while the private key remains protected on the local machine.",
+          "failure_or_wait": "The same guide documents a 4096-bit RSA command for Windows-based Instances and recommends Ed25519 for Linux. The private key must remain secure and must not be shared.",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "step_number": 9,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Open the default Project dashboard, select Add SSH key, name the key, paste the public-key text, and select Add SSH key.",
+          "details": [],
+          "input": "The copied public key and a recognizable key name.",
+          "output": "The public key is stored in the selected Project for transfer to new Instances during boot.",
+          "success_signal": "The key appears on the Project dashboard with its name and fingerprint.",
+          "failure_or_wait": "SSH keys are Project-scoped, so a key added to another Project is not the key selected for this Instance. Only the public-key content belongs in the Console; the private key remains local.",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "step_number": 10,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "From Compute, open CPU & GPU Instances, select Create Instance, then Create CPU Instance.",
+          "details": [],
+          "input": "The active Organization and default Project with sufficient permissions and an SSH key.",
+          "output": "The Instance creation wizard opens.",
+          "success_signal": "Instance range and configuration options are visible.",
+          "failure_or_wait": "The selected docs require the correct Project, Owner status or sufficient IAM permissions, an SSH key, and a payment method before resource ordering.",
+          "required": true,
+          "source_ids": [
+            "S2",
+            "S5",
+            "S6"
+          ]
+        },
+        {
+          "step_number": 11,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Select an Instance range and a displayed Instance configuration.",
+          "details": [],
+          "input": "A range and size based on current price, processing power, memory, storage, and bandwidth. The pricing page positions Development Instances for lightweight, low-traffic environments.",
+          "output": "The compute shape and base estimated price are selected.",
+          "success_signal": "The selected configuration opens its Availability Zone prompt.",
+          "failure_or_wait": "Pricing varies by range and Availability Zone, and the guides do not name one universal first configuration.",
+          "required": true,
+          "source_ids": [
+            "S6",
+            "S8"
+          ]
+        },
+        {
+          "step_number": 12,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Select an Availability Zone and choose Configure Instance.",
+          "details": [],
+          "input": "A zone with the chosen Instance configuration available.",
+          "output": "The wizard opens instance-specific name, image, storage, networking, cloud-init, and SSH-key settings.",
+          "success_signal": "The detailed configuration step is visible.",
+          "failure_or_wait": "The quickstart requires an Availability Zone choice but does not name a universal first zone.",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "step_number": 13,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Name the Instance or retain its generated name, optionally add tags, and choose a supported Linux operating-system image.",
+          "details": [],
+          "input": "Instance name, optional tags, and a Linux image rather than an InstantApp or custom image.",
+          "output": "The resource identity and boot image are set.",
+          "success_signal": "A generated or custom name and an operating-system image are selected before storage configuration.",
+          "failure_or_wait": "InstantApps and custom images are documented branches and can change configuration, initialization, and login behavior.",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "step_number": 14,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Review the automatically provided block system volume and keep it at or above the documented 10 GB minimum for a standard OS image.",
+          "details": [],
+          "input": "Default block volume with 5,000 IOPS, or a customized system volume of at least 10 GB.",
+          "output": "The Instance has a bootable system volume.",
+          "success_signal": "The volume configuration passes the OS minimum and remains the primary boot volume.",
+          "failure_or_wait": "The docs require at least 10 GB for the OS image and warn that booting from a volume without an OS, or from multiple volumes with identical operating systems, can produce inconsistent boot outcomes.",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "step_number": 15,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Keep the default public IPv4 and public IPv6 checkboxes enabled for the primary SSH route, and leave cloud-init at its default values.",
+          "details": [],
+          "input": "A newly allocated or existing public IPv4, the default public IPv6 selection, and default cloud-init configuration.",
+          "output": "The Instance will have public IPv4 and IPv6 connectivity with no additional bootstrap script.",
+          "success_signal": "A public IPv4 is included in the configuration.",
+          "failure_or_wait": "Removing public IPv4 requires an alternative IPv6 or private-network route. Public IPv4 is priced separately from the base Instance.",
+          "required": true,
+          "source_ids": [
+            "S6",
+            "S8"
+          ]
+        },
+        {
+          "step_number": 16,
+          "phase": "configure",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Verify that the intended Project SSH key is selected for Instance access.",
+          "details": [],
+          "input": "The public key uploaded in step 9.",
+          "output": "The key is scheduled for transfer to the root account during the Instance boot process.",
+          "success_signal": "The intended key appears in the SSH keys section of the wizard.",
+          "failure_or_wait": "A missing or mismatched public key causes `Permission denied (publickey)` after boot. The corresponding private key must remain available locally.",
+          "required": true,
+          "source_ids": [
+            "S5",
+            "S6",
+            "S7"
+          ]
+        },
+        {
+          "step_number": 17,
+          "phase": "execute",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "Select Review, verify the order summary and estimated cost, then select Create Instance.",
+          "details": [],
+          "input": "The selected compute, zone, image, volume, public IP, cloud-init, and SSH-key configuration.",
+          "output": "Scaleway begins creating and booting the billable Instance.",
+          "success_signal": "The platform informs the developer when the Instance is ready and redirects to its Overview tab.",
+          "failure_or_wait": "The quickstart does not publish a universal creation duration. The developer waits for the platform's ready notification, and the reviewed order shows the estimated cost of the selected resources.",
+          "required": true,
+          "source_ids": [
+            "S3",
+            "S6",
+            "S8"
+          ]
+        },
+        {
+          "step_number": 18,
+          "phase": "prepare",
+          "actor": "developer",
+          "interface": "web-console",
+          "action": "On the Instance Overview tab, copy the displayed Public IP and SSH command.",
+          "details": [],
+          "input": "The ready Instance's Overview information.",
+          "output": "The exact address and connection pattern for the first Instance are available.",
+          "success_signal": "The Overview shows the public IP and an SSH command.",
+          "failure_or_wait": "Wait for the platform's ready notification and Overview redirect before using the displayed connection information; the guide does not publish a universal duration.",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "step_number": 19,
+          "phase": "verify",
+          "actor": "developer",
+          "interface": "cli",
+          "action": "Run `ssh -i ~/.ssh/your_private_key root@your_instance_ip` and type `yes` if OpenSSH asks to trust the host key.",
+          "details": [],
+          "input": "The local private-key path, Instance public IP, and first-connection host-key confirmation.",
+          "output": "An authenticated root SSH terminal on the first Scaleway Instance.",
+          "success_signal": "The remote shell opens, matching the quickstart milestone `You are now connected to your Instance.`",
+          "failure_or_wait": "`Permission denied (publickey)` indicates a key mismatch. Confirm the matching public key is in the correct Project, then reboot the Instance or run `scw-fetch-ssh-keys --upgrade` from a working session to refresh uploaded keys.",
+          "required": true,
+          "source_ids": [
+            "S6",
+            "S7"
+          ]
+        }
+      ],
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8",
+        "S9"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Account purpose",
+      "path": "Choose Corporate, Startup, Consultant/Freelancer, or Personal project.",
+      "effect_on_first_success": "Changes profile fields and whether the phone step is mandatory, but all account types converge on billing and console access.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Signup identity",
+      "path": "Choose Google, Microsoft, or GitHub, accept the agreements, confirm the provider email, fill the requested form, and create the account.",
+      "effect_on_first_success": "Removes the direct-email validation-link step but preserves profile, phone when applicable, billing, and payment gates.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "Personal project account",
+      "path": "Skip phone verification because the account guide marks it non-mandatory for this type.",
+      "effect_on_first_success": "Removes the SMS step from the personal path; other account types retain it.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "SEPA payment preference",
+      "path": "After adding a credit card and successfully completing KYC, add a SEPA mandate from Payment Methods.",
+      "effect_on_first_success": "Adds identity verification and bank-mandate fields, so it is not the shortest first-order path.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "Compute requirement",
+      "path": "Choose another Instance range or size based on workload, price, CPU model, RAM, storage, and bandwidth.",
+      "effect_on_first_success": "The wizard remains similar, but availability, cost, and resource limits change.",
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "Image source",
+      "path": "Choose an InstantApp or custom image instead of a Linux operating system.",
+      "effect_on_first_success": "Can add application-specific configuration, longer initialization, or different login behavior, so the generic shell boundary may move.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 15,
+      "condition": "Network exposure",
+      "path": "Disable public IPv4 and connect over public IPv6 or an added private-network access route.",
+      "effect_on_first_success": "Removes the separately billed IPv4 but changes the local connectivity and SSH command requirements.",
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "Automation interface",
+      "path": "Use the documented API or CLI creation tab instead of the console.",
+      "effect_on_first_success": "Requires API credentials and local tooling. The API creates the Instance powered off and without public connectivity by default, adding explicit IP-attachment and power-on actions.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "Windows client",
+      "path": "Use PuTTY, select the private key, connect to the public IP, accept the host, and enter `root`.",
+      "effect_on_first_success": "Reaches the same explicit connected milestone with a GUI SSH client.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Signup begins with an account-type decision that changes required profile and phone fields.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "verification",
+      "description": "Direct email signup requires opening a validation link before account creation can finish.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "verification",
+      "description": "Phone verification is mandatory outside the Personal project account type and adds SMS delivery and code-entry dependency.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "billing",
+      "description": "A valid card is mandatory before the first resource order, virtual and prepaid cards are rejected, a reimbursed €1 authorization is made, and 3D Secure can add an external bank step.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "other",
+      "description": "Passwordless access requires local key generation, private-key storage, and an optional passphrase decision before any Instance configuration.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "other",
+      "description": "SSH keys are Project-scoped, so selecting or uploading to the wrong Project creates a later authentication failure.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "choice",
+      "description": "Instance range and size decisions expose price, performance, memory, storage, bandwidth, zone availability, and capacity tradeoffs before first use.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 14,
+      "type": "other",
+      "description": "The system volume must be at least 10 GB for a standard OS, and multiple volumes with operating systems can produce inconsistent boot outcomes.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 19,
+      "type": "other",
+      "description": "For public-key rejection, Scaleway directs users to verify the Project key and either reboot the Instance or refresh keys with `scw-fetch-ssh-keys --upgrade` from an existing session.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S7"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "How to create an account",
+      "url": "https://www.scaleway.com/en/docs/account/how-to/create-an-account",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed August 11, 2025",
+      "sections_used": [
+        "How to create an account",
+        "Sign-up with SSO",
+        "Sign-up with your email address",
+        "Add your phone number",
+        "Add your billing information",
+        "Add your payment method"
+      ],
+      "evidence_supported": [
+        "Account-type choices",
+        "Email and SSO branches",
+        "Agreement acceptance",
+        "Email validation",
+        "Profile form",
+        "Phone rule",
+        "Billing deferral",
+        "Valid-card deploy gate",
+        "€1 authorization",
+        "3D Secure",
+        "Virtual-card exclusion"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Billing - Quickstart",
+      "url": "https://www.scaleway.com/en/docs/billing/quickstart/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed September 09, 2025",
+      "sections_used": [
+        "How to add a payment method",
+        "How to add a credit card",
+        "How to add a SEPA mandate"
+      ],
+      "evidence_supported": [
+        "Payment required before resource order",
+        "Payment navigation",
+        "Card details and 3D Secure",
+        "SEPA and KYC branch"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Billing FAQ",
+      "url": "https://www.scaleway.com/en/docs/billing/faq/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed September 09, 2025",
+      "sections_used": [
+        "Which payment methods does Scaleway accept?",
+        "How can I pay my invoice?"
+      ],
+      "evidence_supported": [
+        "Accepted and rejected payment methods",
+        "Credit-card prerequisite for SEPA",
+        "Invoice payment behavior"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Organizations and Projects - Concepts",
+      "url": "https://www.scaleway.com/en/docs/organizations-and-projects/concepts/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed October 29, 2025",
+      "sections_used": [
+        "Default Project",
+        "Organization",
+        "Project"
+      ],
+      "evidence_supported": [
+        "Automatic owner Organization",
+        "Automatic default Project",
+        "Organization and Project hierarchy"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "How to generate an SSH key pair",
+      "url": "https://www.scaleway.com/en/docs/organizations-and-projects/how-to/create-ssh-key/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed January 23, 2026",
+      "sections_used": [
+        "How to generate an Ed25519 SSH key pair",
+        "How to upload the public SSH key to the Scaleway interface",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "Ed25519 recommendation",
+        "Key-generation command",
+        "Passphrase decision",
+        "Private-key handling",
+        "Public-key copy",
+        "Project-scoped upload",
+        "Boot-time transfer",
+        "Refresh recovery"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Instances - Quickstart",
+      "url": "https://www.scaleway.com/en/docs/instances/quickstart/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed January 29, 2026",
+      "sections_used": [
+        "Before you start",
+        "How to create an Instance",
+        "How to connect to an Instance",
+        "How to delete an Instance"
+      ],
+      "evidence_supported": [
+        "Primary first-resource selection",
+        "Complete Instance wizard",
+        "Range and zone",
+        "Image and volume",
+        "Networking and cloud-init",
+        "SSH-key verification",
+        "Cost review",
+        "Create and ready signal",
+        "Overview data",
+        "SSH commands",
+        "Explicit connected milestone",
+        "Windows branch",
+        "Deletion"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Troubleshooting SSH connection issues to Instances",
+      "url": "https://www.scaleway.com/en/docs/instances/troubleshooting/cant-connect-ssh/",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed August 19, 2025",
+      "sections_used": [
+        "Permission denied (publickey)",
+        "Upload the public key",
+        "Refresh Instance SSH keys"
+      ],
+      "evidence_supported": [
+        "Key-mismatch diagnosis",
+        "Correct-Project upload",
+        "Reboot recovery",
+        "`scw-fetch-ssh-keys --upgrade` recovery"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Virtual Instances Pricing",
+      "url": "https://www.scaleway.com/en/pricing/virtual-instances/",
+      "official_domain": true,
+      "source_type": "pricing",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Development Instances",
+        "Pricing table",
+        "Legal notice"
+      ],
+      "evidence_supported": [
+        "Current zone-specific hourly and approximate monthly prices",
+        "Development positioning",
+        "Base-price exclusions",
+        "Separate public IPv4 and storage cost"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Legal Notice",
+      "url": "https://www.scaleway.com/en/legal-notice/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Publisher",
+        "Intellectual Property"
+      ],
+      "evidence_supported": [
+        "Scaleway SAS publisher and owner"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Billing - Concepts",
+      "url": "https://www.scaleway.com/en/docs/billing/concepts/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed August 25, 2025",
+      "sections_used": [
+        "Billing cycle",
+        "KYC",
+        "Pay-as-you-go",
+        "Payment methods"
+      ],
+      "evidence_supported": [
+        "Monthly billing cycle",
+        "KYC definition",
+        "Fixed-hourly pay-as-you-go model",
+        "Payment-method behavior"
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "How to verify your identity",
+      "url": "https://www.scaleway.com/en/docs/account/how-to/verify-identity/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Reviewed February 04, 2026",
+      "sections_used": [
+        "Before you start",
+        "Identity-verification procedure",
+        "Completion and timeout"
+      ],
+      "evidence_supported": [
+        "Optional dashboard label",
+        "Payment-method prerequisite",
+        "Quota-unlock purpose",
+        "Identity document and face check",
+        "15-minute completion window",
+        "Manual-support fallback"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which profile fields are requested for each account type after email or provider confirmation?",
+      "impact": "The exact number and burden of signup form pages cannot be normalized from the reviewed text alone.",
+      "reason_unresolved": "The current account guide says to fill the requested information but does not enumerate every field for all four account types.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "When does optional identity verification become mandatory because of quota, risk, or product rules for a first CPU Instance?",
+      "impact": "Some users could encounter an identity-document and face-verification gate not present in the universal credit-card quick path.",
+      "reason_unresolved": "The identity guide says verification unlocks quotas and products and is required for SEPA, but does not define a universal trigger for the first CPU Instance.",
+      "checked_source_ids": [
+        "S2",
+        "S11"
+      ]
+    },
+    {
+      "question": "How long does account setup, payment authorization, and Instance readiness take?",
+      "impact": "No docs-backed total time-to-first-success can be calculated.",
+      "reason_unresolved": "The docs publish the €1 reimbursement window and say the user is informed when the Instance is ready, but give no universal end-to-end or provisioning duration.",
+      "checked_source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "question": "Which zone and plan should be treated as the universally available lowest-friction first Instance?",
+      "impact": "Exact price, capacity, architecture, resource limits, and plan availability vary.",
+      "reason_unresolved": "The quickstart requires a live choice and the pricing page is zone-specific; development guidance supplies a family-level recommendation rather than one universal SKU.",
+      "checked_source_ids": [
+        "S6",
+        "S8"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Installing or deploying an application on the Instance.",
+    "Creating additional Projects or IAM policies beyond the automatically created owner and default Project.",
+    "Configuring production firewall rules, Private Networks, Public Gateways, DNS, TLS, load balancing, backups, snapshots, monitoring, or additional volumes.",
+    "Using cloud-init, InstantApps, custom images, API, or CLI automation for subsequent deployments.",
+    "Hardening the root account, rotating keys, or adding application users after the first authenticated session.",
+    "Deleting the test Instance and its volumes after the workshop measurement."
+  ]
+}
