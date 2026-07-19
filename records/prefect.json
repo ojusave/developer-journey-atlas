@@ -1,0 +1,79 @@
+{
+  "platform": {"name": "Prefect", "slug": "prefect", "organization": "Prefect Technologies, Inc."},
+  "category": "Data pipelines and workflow automation",
+  "surface": {
+    "name": "Prefect 3 Create your first workflow Quickstart, with an Open Source local candidate",
+    "selection_basis": "Prefect's Getting Started page selects the Quickstart for creating a first deployable workflow, but the Quickstart asks developers to choose Cloud or Open Source. The Open Source branch is retained as a complete candidate through the page's explicit first local-flow success because it avoids the undocumented browser-account continuation in the peer Cloud route.",
+    "alternatives_considered": [
+      {"name": "Prefect Cloud Quickstart branch", "url": "https://docs.prefect.io/v3/get-started/quickstart", "reason_not_primary": "It is the first tab and the page says Cloud is easier for getting started, but `prefect-cloud login` opens a browser signup or login flow whose intermediate account states are not documented on the Quickstart page."},
+      {"name": "Prefect Cloud GitHub Quickstart", "url": "https://docs.prefect.io/v3/get-started/github-quickstart", "reason_not_primary": "It is a separate script-from-GitHub deployment path with GitHub connection and remote execution, not the general Quickstart's shared first workflow."},
+      {"name": "Installation verification", "url": "https://docs.prefect.io/v3/get-started/install", "reason_not_primary": "`prefect version` verifies installation but the main Quickstart explicitly continues to a completed first flow."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Follow Prefect's official Quickstart to create and successfully run the first tracked workflow.",
+    "starting_url": "https://docs.prefect.io/v3/get-started",
+    "assumed_prior_state": ["A workstation, terminal, editor, Git, and outbound package and repository access are available.", "No Prefect account, API server, package, flow, task, repository clone, deployment, or Cloud connection is assumed."]
+  },
+  "documented_first_success": {
+    "official_milestone": "Successfully run a Prefect flow locally.",
+    "normalized_outcome": "In the Open Source candidate, the quickstart flow runs locally and the terminal provides a link to the execution graph in the local Prefect UI.",
+    "observable_completion_signal": "The terminal prints a Prefect UI execution-graph link followed by state changes and logs, after which the Quickstart states that the flow has run successfully locally.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "At this point, you've successfully run a Prefect flow locally", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "Both Quickstart branches run the same task-and-flow example before moving to deployment and scheduling. The page explicitly declares the local run successful at that transition, so later infrastructure and schedule work is after the first success.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "other", "requirement": "Choose Prefect Cloud or Prefect Open Source; the two Quickstart tabs have different account and server setup.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "software", "requirement": "For the Open Source candidate, use Python 3.10 or newer and install Prefect, preferably in a virtual environment.", "required": true, "source_ids": ["S2"]},
+    {"order": 3, "type": "software", "requirement": "Have Git available to clone the official Prefect quickstart repository.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "environment", "requirement": "Keep the self-hosted Prefect server running while executing the flow.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Prefect Getting Started and select Quickstart.", "details": [], "input": "https://docs.prefect.io/v3/get-started", "output": "The Create your first workflow Quickstart opens.", "success_signal": "The page frames the tutorial around code, execution location, and timing.", "failure_or_wait": "None documented for this step.", "required": true, "source_ids": ["S1", "S3"]},
+    {"step_number": 2, "phase": "prepare", "actor": "developer", "interface": "documentation", "action": "Choose Cloud or Open Source before setting up the API backend and running the shared example.", "details": ["The candidate below uses Open Source because its first local success can be reconstructed without an account transition."], "input": "Managed-cloud versus self-hosted preference", "output": "One backend and execution route is selected.", "success_signal": "The chosen tab's setup instructions are visible.", "failure_or_wait": "The choice changes account, authentication, installation, server, command, and UI destination.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [
+    {
+      "id": "open-source-local-first-flow",
+      "name": "Prefect Open Source local first flow",
+      "selection_basis": "The Open Source tab is fully public and explicitly declares a successful local Prefect flow before its later deployment and scheduling sections.",
+      "relationship_to_primary_path": "It instantiates the unresolved backend choice and stops at the earliest explicit shared first-flow success.",
+      "steps": [
+        {"step_number": 1, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Create and activate a Python 3.10-or-newer virtual environment if needed.", "details": ["Prefect recommends, but does not require, a virtual environment."], "input": "Python 3.10 or newer", "output": "An isolated Python environment", "success_signal": "The intended environment is active.", "failure_or_wait": "Windows may require adding the Python Scripts directory to PATH after installation.", "required": false, "source_ids": ["S2"]},
+        {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Run `pip install -U prefect`.", "details": [], "input": "Python environment and package-index access", "output": "The Prefect package and CLI are installed.", "success_signal": "pip completes the installation.", "failure_or_wait": "No pip-install recovery is documented on the selected page.", "required": true, "source_ids": ["S2"]},
+        {"step_number": 3, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run `prefect version`.", "details": [], "input": "Installed Prefect package", "output": "Prefect, API, Python, build, OS, profile, server, and dependency version information", "success_signal": "The command prints the installed Prefect version information.", "failure_or_wait": "If the command is not found on Windows, review the Python Scripts path noted by the installation page.", "required": true, "source_ids": ["S2"]},
+        {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `prefect server start` and keep the process running.", "details": [], "input": "Installed Prefect CLI", "output": "A self-hosted Prefect API server and UI", "success_signal": "The server is available at `http://localhost:4200`.", "failure_or_wait": "The page offers a Docker command as an alternate server branch.", "required": true, "source_ids": ["S1"]},
+        {"step_number": 5, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "In a new terminal, run `git clone https://github.com/PrefectHQ/quickstart && cd quickstart`.", "details": [], "input": "Git and repository access", "output": "A local copy of the official quickstart repository", "success_signal": "The shell is in the cloned `quickstart` directory with `01_getting_started.py`.", "failure_or_wait": "No clone recovery is documented on the page.", "required": true, "source_ids": ["S1"]},
+        {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `python 01_getting_started.py`.", "details": ["The script decorates its entrypoint with `@flow`, two functions with `@task`, obtains ten customer IDs, and maps processing across them."], "input": "Running local server, installed Prefect, and cloned script", "output": "A dynamically tracked flow and mapped task runs", "success_signal": "The terminal prints a Prefect UI graph link followed by state changes and logs, and the Quickstart then states that the Prefect flow has run successfully locally.", "failure_or_wait": "The Quickstart does not document a run-recovery action before this terminal.", "required": true, "source_ids": ["S1"]}
+      ],
+      "source_ids": ["S1", "S2", "S3"]
+    }
+  ],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "Choose Prefect Cloud", "path": "Install `uv`, run `uvx prefect-cloud login`, complete the browser create-or-login path, clone the quickstart repository, and run `uv run 01_getting_started.py`.", "effect_on_first_success": "Uses Prefect's hosted metadata database and prints a Cloud UI link, but adds an incompletely documented browser account flow.", "source_ids": ["S1"]},
+    {"at_step": 4, "condition": "Run Prefect Open Source server in Docker", "path": "Run `docker run -p 4200:4200 -d --rm prefecthq/prefect:3-python3.12 prefect server start --host 0.0.0.0` instead of the local CLI server command.", "effect_on_first_success": "Replaces the host Python server process with a container while retaining `localhost:4200`.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "Install with uv instead of pip", "path": "Use the documented uv virtual-environment or project commands rather than `pip install -U prefect`.", "effect_on_first_success": "Changes environment creation and package installation but not the selected local flow terminal.", "source_ids": ["S2"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "choice", "description": "Cloud and Open Source are peer Quickstart approaches with different account, API-server, and command paths.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "environment", "description": "Prefect requires Python 3.10 or newer.", "documented_requirement": true, "source_ids": ["S2"]},
+    {"at_step": 2, "type": "environment", "description": "The self-hosted API server must remain running for the local flow and UI tracking.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "account", "description": "The Cloud branch opens a browser to create or access a free Prefect Cloud account, but its intermediate signup states are not enumerated in the Quickstart.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Quickstart - Prefect", "url": "https://docs.prefect.io/v3/get-started/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Create your first workflow", "Cloud", "Open Source", "Install Prefect and start the server", "What code should run?", "Where should it run?"], "evidence_supported": ["Peer Cloud and Open Source routes", "Cloud browser login gate", "Server commands", "Shared example code", "Repository and run commands", "State logs", "Explicit local success boundary", "Post-success deployment and schedule work"]},
+    {"id": "S2", "title": "Install Prefect - Prefect", "url": "https://docs.prefect.io/v3/get-started/install", "official_domain": true, "source_type": "installation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Install Prefect", "pip", "uv", "Windows installation", "Next steps"], "evidence_supported": ["Python 3.10 requirement", "Virtual-environment recommendation", "pip command", "Version verification", "uv alternatives", "Windows PATH note", "Cloud and self-hosted API-server choices"]},
+    {"id": "S3", "title": "Introduction - Prefect", "url": "https://docs.prefect.io/v3/get-started", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Quickstart"], "evidence_supported": ["General getting-started surface", "First deployable workflow framing", "Installation handoff"]}
+  ],
+  "uncertainties": [
+    {"question": "Should Prefect Cloud or Prefect Open Source define the platform-wide first mile?", "impact": "The choice changes account creation, API backend, installation, commands, UI destination, and later deployment model.", "reason_unresolved": "The Quickstart presents both as preferred approaches. It calls hosted Cloud easier for getting started but still requires the developer to choose, and the Open Source route is a complete peer.", "checked_source_ids": ["S1", "S2"]},
+    {"question": "What exact browser states create or connect a new Prefect Cloud account after `uvx prefect-cloud login`?", "impact": "The Cloud candidate's account chronology and page count cannot be reconstructed.", "reason_unresolved": "The Quickstart says the browser prompts the developer to create or log in to a free account but does not enumerate the form, identity alternatives, verification, workspace, or return transition.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Adding `.serve()`, creating a deployment, remote Serverless execution, scheduling, work pools, concurrency, production infrastructure, automations, and later workflow features occur after the explicit first local-flow success."]
+}

@@ -56,7 +56,7 @@ than choosing silently.
 
 ## Contents
 
-- `roster.json`: the current 183-platform research roster, including the first 78 independently audited records from the 100-platform scale run.
+- `roster.json`: the complete 205-platform research roster, including all 100 independently audited records from the scale run.
 - `record.schema.json`: machine-checkable record contract.
 - `record.template.json`: copyable starting shape for each independent agent.
 - `candidate-path-audit.json`: records flagged because their shared spine stops before an executable candidate route.
