@@ -6,8 +6,8 @@
   },
   "category": "Data, databases, and search",
   "surface": {
-    "name": "ClickHouse Cloud quick start through the web SQL Console",
-    "selection_basis": "ClickHouse calls Cloud the quickest and easiest way to get up and running and sequences service creation, SQL Console connection, and a SHOW databases verification query. The required public signup URL does not expose its form content, while the docs do not enumerate the fields, agreements, or full intermediate sequence for all six signup methods.",
+    "name": "ClickHouse Playground accountless cURL query",
+    "selection_basis": "Under the workshop policy, the official Playground takes priority over Cloud: it runs queries instantly without an account, server, or cluster, and publishes a one-command cURL example.",
     "alternatives_considered": [
       {
         "name": "ClickHouse Playground",
@@ -41,12 +41,12 @@
       }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a trial ClickHouse Cloud service and verify it by running the quick start's SHOW databases query in the browser SQL Console.",
-    "starting_url": "https://clickhouse.com/docs/getting-started/quick-start/cloud",
+    "developer_intent": "Run the official ClickHouse Playground cURL example and receive a query result without creating an account.",
+    "starting_url": "https://clickhouse.com/docs/getting-started/playground",
     "assumed_prior_state": [
       "No ClickHouse Cloud account, organization, service, billing instrument, or database is assumed.",
       "The developer can receive an email-verification link or authenticate through one of the named SSO or marketplace routes.",
@@ -55,21 +55,19 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established by public official documentation",
-    "normalized_outcome": "No complete ClickHouse Cloud first-success outcome can be established because the required account-creation transition is undocumented.",
-    "observable_completion_signal": "The unauthenticated static signup response is an application shell and does not document the rendered account form or its transition into the service onboarding wizard.",
+    "official_milestone": "Run a query instantly in ClickHouse Playground.",
+    "normalized_outcome": "The public Playground executes `SELECT 'Play ClickHouse'` through HTTPS.",
+    "observable_completion_signal": "The cURL command prints `Play ClickHouse`.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The required signup-to-onboarding transition is not established by public official documentation.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The official HTTPS example returns `Play ClickHouse`.",
       "source_ids": [
-        "S1",
-        "S7"
+        "S4"
       ]
     },
-    "why_this_is_the_boundary": "The post-signup quick start explicitly demonstrates a running service and a SHOW databases query returning four databases plus any added ones. However, the complete first-user route cannot be established from public official documentation because the quick start does not enumerate the account form fields, agreements, password rules, or full convergence of the six account methods, and the unauthenticated static signup response contains only the application shell.",
+    "why_this_is_the_boundary": "The printed value is the terminal of the official one-command accountless example.",
     "source_ids": [
-      "S1",
-      "S7"
+      "S4"
     ]
   },
   "prerequisites": [
@@ -120,50 +118,12 @@
     }
   ],
   "primary_path": [
-    {
-      "step_number": 1,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open ClickHouse Cloud quick start and follow its sign-up page link, the first required action under Create a ClickHouse service.",
-      "details": [],
-      "input": "https://clickhouse.com/docs/getting-started/quick-start/cloud",
-      "output": "The browser navigates to the official ClickHouse Cloud signup application.",
-      "success_signal": "The console.clickhouse.cloud signUp URL is reached.",
-      "failure_or_wait": "No navigation failure or recovery behavior is documented.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 2,
-      "phase": "access",
-      "actor": "platform",
-      "interface": "browser",
-      "action": "Return the static HTML shell for the client-rendered ClickHouse Cloud signup application.",
-      "details": [],
-      "input": "https://console.clickhouse.cloud/signUp",
-      "output": "The unauthenticated static response contains the application shell but no rendered signup form content.",
-      "success_signal": "The public static response does not establish the rendered account fields or post-submit transition.",
-      "failure_or_wait": "The docs list six signup methods and the email verification rule, but do not publish form fields, required agreements, password rules, social or marketplace intermediate actions, or the transition into the onboarding wizard.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S7"
-      ]
-    }
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the official ClickHouse Playground guide.", "details": [], "input": "https://clickhouse.com/docs/getting-started/playground", "output": "The accountless credentials, limitations, and examples are visible.", "success_signal": "The HTTPS cURL example is displayed.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 2, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `curl \"https://play.clickhouse.com/?user=explorer\" --data-binary \"SELECT 'Play ClickHouse'\"`.", "details": ["The public `explorer` user has an empty password and read-only access."], "input": "cURL and network access", "output": "The Playground executes the SELECT query.", "success_signal": "The command returns a response.", "failure_or_wait": "DDL and INSERT are not allowed; usage quotas apply.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 3, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Read the command output.", "details": [], "input": "Playground response", "output": "`Play ClickHouse` is printed.", "success_signal": "The output exactly contains `Play ClickHouse`.", "failure_or_wait": "Retry after checking network access and the published endpoint.", "required": true, "source_ids": ["S4"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete public-doc candidate can be reconstructed from the quick start's Sign up entry through its explicit SQL terminal. The unauthenticated static console response contains only the application shell, while official docs do not enumerate the email form fields, agreements and password rules or the intermediate and convergence steps for Google SSO, Microsoft SSO, AWS Marketplace, Google Cloud, and Microsoft Azure. The post-gate service and SHOW databases sequence is documented in S1 but is not an end-to-end first-user candidate.",
-    "impact": "The documented post-signup service and SHOW databases sequence cannot form an end-to-end first-user candidate without inventing hidden account states.",
-    "source_ids": [
-      "S1",
-      "S7"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
@@ -455,8 +415,7 @@
     }
   ],
   "excluded_after_success": [
-    "No complete first-success boundary is claimed while account creation remains hidden.",
-    "Creating helloworld, creating my_first_table, inserting four rows, and selecting them are after the SHOW databases terminal.",
+    "Creating a ClickHouse Cloud account or service is outside the selected accountless route.",
     "ClickPipes, file uploads, ClickHouse client installation, application drivers, credentials, query endpoints, API keys, CLI automation, IP filters, production tiers, and pay-as-you-go continuation are outside the blocked first path."
   ]
 }

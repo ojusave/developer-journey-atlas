@@ -6,8 +6,8 @@
   },
   "category": "Cloud and application runtimes",
   "surface": {
-    "name": "Google Cloud documentation get-started router",
-    "selection_basis": "Google Cloud's official Get started page is the platform-level entry point, but it routes developers into six job-function setup paths and many product-specific quickstarts. It does not identify one canonical platform journey or one terminal first-success state.",
+    "name": "Deploy and open a sample Cloud Run container",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Deploy and open a sample Cloud Run container. The general Google Cloud router does not establish one product outcome. Its application-development path links product quickstarts, and the Cloud Run sample-container quickstart provides a complete console route from project and billing prerequisites through a running public URL. Prior surface before policy commit: Google Cloud documentation get-started router.",
     "alternatives_considered": [
       {
         "name": "Application development setup",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Start using Google Cloud after choosing the platform but before choosing a product or job-function journey.",
@@ -47,8 +47,8 @@
     "normalized_outcome": "Human selection of a bounded Google Cloud job or product journey is required before a documented first-success outcome can be reconstructed.",
     "observable_completion_signal": "No single completion signal applies across the platform-level IT administration, FinOps, security, DevOps, application development, and data analysis routes.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The official platform get-started page presents six separate job-function sequences and numerous product links. The API, CLI, and Cloud Run documentation each define different paths and terminal states; none is named as the universal Google Cloud first-success boundary.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The browser displays the response from the deployed Cloud Run sample container.",
       "source_ids": [
         "S1",
         "S2",
@@ -106,21 +106,240 @@
     },
     {
       "step_number": 2,
-      "phase": "configure",
+      "phase": "access",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose one of the six documented job-function routes or a product-specific quickstart.",
+      "interface": "console",
+      "action": "Sign in to a Google Cloud account or create one if new to Google Cloud.",
       "details": [
-        "The six platform routes are IT administration, FinOps administration, security engineering, DevOps engineering, application development, and data analysis.",
-        "Different routes lead to different setup actions and outcomes."
+        "New customers are offered $300 in Welcome credit for 90 days through the Free Trial."
       ],
-      "input": "Developer role and intended workload",
-      "output": "A bounded Google Cloud journey",
-      "success_signal": "A human has selected the journey whose first success should be researched.",
-      "failure_or_wait": "The official documentation does not select one route for a general Google Cloud developer.",
+      "input": "Google identity",
+      "output": "Google Cloud console access",
+      "success_signal": "The project selector is available.",
+      "failure_or_wait": "Account identity, organization policy, or login recovery can block console access.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "If using the optional Free Trial route for billing, start the trial, provide the requested name, address, and payment method for identity verification, and complete any work-account one-time-passcode email challenge.",
+      "details": [
+        "The Cloud Run quickstart requires a billing-enabled project, but it does not require Free Trial enrollment. A developer with an existing active billing account skips this step.",
+        "The payment method is used for identity verification; covered trial usage is not billed unless the developer later upgrades to pay as you go."
+      ],
+      "input": "Billing identity and supported payment method",
+      "output": "Free Trial billing account with $300 Welcome credit",
+      "success_signal": "For the optional Free Trial route, the billing account is active and the Welcome credit is available.",
+      "failure_or_wait": "Payment validation can require another supported method or a retry after 24 hours. A pending authorization can remain for 1 to 14 business days depending on the bank.",
+      "required": false,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On the project selector page, select an existing project or create a new Google Cloud project.",
+      "details": [
+        "Creating a project requires roles/resourcemanager.projectCreator and resourcemanager.projects.create; selecting a project requires only an existing granted role."
+      ],
+      "input": "Project name or existing project access",
+      "output": "Selected Google Cloud project",
+      "success_signal": "The intended project is active in the console selector.",
+      "failure_or_wait": "Without Project Creator, ask an administrator to create the project or grant the required role.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify that billing is enabled for the selected project.",
+      "details": [
+        "The quickstart requires billing even when Free Trial credit is used."
+      ],
+      "input": "Selected project and active billing account",
+      "output": "Billing-enabled project",
+      "success_signal": "The project is linked to an active billing account.",
+      "failure_or_wait": "Link an authorized billing account or obtain billing permission before Cloud Run deployment.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify the developer has Cloud Run Admin on the service, Service Account User on the service identity, and Logs Viewer on the project.",
+      "details": [],
+      "input": "Project IAM policy",
+      "output": "Deployment and log-view permissions",
+      "success_signal": "All three required roles are granted directly or through equivalent custom or predefined roles.",
+      "failure_or_wait": "Ask an administrator to grant missing roles before attempting deployment.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Cloud Run page in the Google Cloud console.",
+      "details": [],
+      "input": "Selected billing-enabled project",
+      "output": "Cloud Run console",
+      "success_signal": "The Cloud Run navigation and Services view are available.",
+      "failure_or_wait": "Wrong project selection, disabled access, or missing permission must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Services, then select Deploy container.",
+      "details": [],
+      "input": "Cloud Run console",
+      "output": "Create service form",
+      "success_signal": "The deployment-source and service settings are visible.",
+      "failure_or_wait": "Missing Cloud Run permission can prevent service creation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Ensure Deploy one revision from an existing container image is selected.",
+      "details": [],
+      "input": "Create service form",
+      "output": "Existing-container deployment mode",
+      "success_signal": "The Container image URL control is enabled.",
+      "failure_or_wait": "Selecting source or continuous deployment creates a different journey.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In Container image URL, select Test with a sample container.",
+      "details": [],
+      "input": "Existing-container deployment mode",
+      "output": "Google sample container image",
+      "success_signal": "The sample image URL populates the field.",
+      "failure_or_wait": "A custom image requires its own registry, build, and access path and is outside this candidate.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a service name or keep the default.",
+      "details": [],
+      "input": "Cloud Run service name",
+      "output": "Named service configuration",
+      "success_signal": "The service-name field is valid.",
+      "failure_or_wait": "Invalid or conflicting names must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Keep the default europe-west1 region or select the intended Cloud Run region.",
+      "details": [
+        "Cloud Run is regional; the guide says latency, availability, durability, colocated products, and cost can affect the choice."
+      ],
+      "input": "Region decision",
+      "output": "Regional service configuration",
+      "success_signal": "A supported region is selected.",
+      "failure_or_wait": "Organization constraints or unavailable service features can require another allowed region.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In Authentication, select Allow public access.",
+      "details": [],
+      "input": "Public sample-service intent",
+      "output": "Unauthenticated invocation setting",
+      "success_signal": "Allow public access is selected.",
+      "failure_or_wait": "A domain restriction organization policy can forbid unauthenticated invocation; the developer must use the documented private-service testing route instead.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Create and wait for Cloud Run to deploy the container.",
+      "details": [],
+      "input": "Completed service form",
+      "output": "Cloud Run service and revision",
+      "success_signal": "Deployment completes and a URL appears beside URL:.",
+      "failure_or_wait": "Build, image, billing, IAM, quota, organization-policy, or regional errors must be corrected and deployment retried.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the displayed service URL, paste it into a browser, and open it.",
+      "details": [],
+      "input": "Deployed service URL",
+      "output": "Running sample container response",
+      "success_signal": "The browser displays the response from the deployed Cloud Run sample container.",
+      "failure_or_wait": "If public access is restricted, authenticate and test the private service using the linked private-service instructions; otherwise inspect deployment and service logs.",
+      "required": true,
+      "source_ids": [
+        "S4"
       ]
     }
   ],
@@ -367,30 +586,6 @@
   "excluded_after_success": [
     "Any product-specific account, billing, project, API, CLI, deployment, or data-analysis steps until a human selects the bounded Google Cloud route"
   ],
-  "candidate_paths": [
-    {
-      "id": "cloud-run-sample-container-console",
-      "name": "Deploy and open a sample Cloud Run container",
-      "selection_basis": "The general Google Cloud router does not establish one product outcome. Its application-development path links product quickstarts, and the Cloud Run sample-container quickstart provides a complete console route from project and billing prerequisites through a running public URL.",
-      "relationship_to_primary_path": "Continues after primary_path step 2 by selecting a deployed-application outcome and the Cloud Run sample-container console quickstart.",
-      "steps": [
-        {"step_number":1,"phase":"access","actor":"developer","interface":"console","action":"Sign in to a Google Cloud account or create one if new to Google Cloud.","details":["New customers are offered $300 in Welcome credit for 90 days through the Free Trial."],"input":"Google identity","output":"Google Cloud console access","success_signal":"The project selector is available.","failure_or_wait":"Account identity, organization policy, or login recovery can block console access.","required":true,"source_ids":["S4","S5"]},
-        {"step_number":2,"phase":"access","actor":"developer","interface":"console","action":"If using the optional Free Trial route for billing, start the trial, provide the requested name, address, and payment method for identity verification, and complete any work-account one-time-passcode email challenge.","details":["The Cloud Run quickstart requires a billing-enabled project, but it does not require Free Trial enrollment. A developer with an existing active billing account skips this step.","The payment method is used for identity verification; covered trial usage is not billed unless the developer later upgrades to pay as you go."],"input":"Billing identity and supported payment method","output":"Free Trial billing account with $300 Welcome credit","success_signal":"For the optional Free Trial route, the billing account is active and the Welcome credit is available.","failure_or_wait":"Payment validation can require another supported method or a retry after 24 hours. A pending authorization can remain for 1 to 14 business days depending on the bank.","required":false,"source_ids":["S4","S5"]},
-        {"step_number":3,"phase":"configure","actor":"developer","interface":"console","action":"On the project selector page, select an existing project or create a new Google Cloud project.","details":["Creating a project requires roles/resourcemanager.projectCreator and resourcemanager.projects.create; selecting a project requires only an existing granted role."],"input":"Project name or existing project access","output":"Selected Google Cloud project","success_signal":"The intended project is active in the console selector.","failure_or_wait":"Without Project Creator, ask an administrator to create the project or grant the required role.","required":true,"source_ids":["S4"]},
-        {"step_number":4,"phase":"authenticate","actor":"developer","interface":"console","action":"Verify that billing is enabled for the selected project.","details":["The quickstart requires billing even when Free Trial credit is used."],"input":"Selected project and active billing account","output":"Billing-enabled project","success_signal":"The project is linked to an active billing account.","failure_or_wait":"Link an authorized billing account or obtain billing permission before Cloud Run deployment.","required":true,"source_ids":["S4","S5"]},
-        {"step_number":5,"phase":"authenticate","actor":"developer","interface":"console","action":"Verify the developer has Cloud Run Admin on the service, Service Account User on the service identity, and Logs Viewer on the project.","details":[],"input":"Project IAM policy","output":"Deployment and log-view permissions","success_signal":"All three required roles are granted directly or through equivalent custom or predefined roles.","failure_or_wait":"Ask an administrator to grant missing roles before attempting deployment.","required":true,"source_ids":["S4"]},
-        {"step_number":6,"phase":"arrive","actor":"developer","interface":"console","action":"Open the Cloud Run page in the Google Cloud console.","details":[],"input":"Selected billing-enabled project","output":"Cloud Run console","success_signal":"The Cloud Run navigation and Services view are available.","failure_or_wait":"Wrong project selection, disabled access, or missing permission must be corrected.","required":true,"source_ids":["S4"]},
-        {"step_number":7,"phase":"configure","actor":"developer","interface":"console","action":"Select Services, then select Deploy container.","details":[],"input":"Cloud Run console","output":"Create service form","success_signal":"The deployment-source and service settings are visible.","failure_or_wait":"Missing Cloud Run permission can prevent service creation.","required":true,"source_ids":["S4"]},
-        {"step_number":8,"phase":"configure","actor":"developer","interface":"console","action":"Ensure Deploy one revision from an existing container image is selected.","details":[],"input":"Create service form","output":"Existing-container deployment mode","success_signal":"The Container image URL control is enabled.","failure_or_wait":"Selecting source or continuous deployment creates a different journey.","required":true,"source_ids":["S4"]},
-        {"step_number":9,"phase":"configure","actor":"developer","interface":"console","action":"In Container image URL, select Test with a sample container.","details":[],"input":"Existing-container deployment mode","output":"Google sample container image","success_signal":"The sample image URL populates the field.","failure_or_wait":"A custom image requires its own registry, build, and access path and is outside this candidate.","required":true,"source_ids":["S4"]},
-        {"step_number":10,"phase":"configure","actor":"developer","interface":"console","action":"Enter a service name or keep the default.","details":[],"input":"Cloud Run service name","output":"Named service configuration","success_signal":"The service-name field is valid.","failure_or_wait":"Invalid or conflicting names must be corrected.","required":true,"source_ids":["S4"]},
-        {"step_number":11,"phase":"configure","actor":"developer","interface":"console","action":"Keep the default europe-west1 region or select the intended Cloud Run region.","details":["Cloud Run is regional; the guide says latency, availability, durability, colocated products, and cost can affect the choice."],"input":"Region decision","output":"Regional service configuration","success_signal":"A supported region is selected.","failure_or_wait":"Organization constraints or unavailable service features can require another allowed region.","required":true,"source_ids":["S4"]},
-        {"step_number":12,"phase":"configure","actor":"developer","interface":"console","action":"In Authentication, select Allow public access.","details":[],"input":"Public sample-service intent","output":"Unauthenticated invocation setting","success_signal":"Allow public access is selected.","failure_or_wait":"A domain restriction organization policy can forbid unauthenticated invocation; the developer must use the documented private-service testing route instead.","required":true,"source_ids":["S4"]},
-        {"step_number":13,"phase":"execute","actor":"developer","interface":"console","action":"Select Create and wait for Cloud Run to deploy the container.","details":[],"input":"Completed service form","output":"Cloud Run service and revision","success_signal":"Deployment completes and a URL appears beside URL:.","failure_or_wait":"Build, image, billing, IAM, quota, organization-policy, or regional errors must be corrected and deployment retried.","required":true,"source_ids":["S4"]},
-        {"step_number":14,"phase":"verify","actor":"developer","interface":"console","action":"Copy the displayed service URL, paste it into a browser, and open it.","details":[],"input":"Deployed service URL","output":"Running sample container response","success_signal":"The browser displays the response from the deployed Cloud Run sample container.","failure_or_wait":"If public access is restricted, authenticate and test the private service using the linked private-service instructions; otherwise inspect deployment and service logs.","required":true,"source_ids":["S4"]}
-      ],
-      "source_ids": ["S4", "S5"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

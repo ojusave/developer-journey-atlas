@@ -6,8 +6,8 @@
   },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Stripe-hosted Checkout quickstart, implementation branch not selected",
-    "selection_basis": "Stripe's current Get started page directly recommends the Checkout quickstart when a developer is ready to build. That quickstart explicitly ends with a working basic Checkout integration, but it renders coequal Node, Ruby, Java, Python, PHP, Go, .NET, React, and Next.js paths. The platform docs do not choose one implementation branch.",
+    "name": "Build and complete Stripe-hosted Checkout with Next.js",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Build and complete Stripe-hosted Checkout with Next.js. The Checkout quickstart has peer language tabs, and its Next.js tab provides a complete client, Route Handler, hosted-payment, and success-route path ending in the guide's explicit congratulations statement. Prior surface before policy commit: Stripe-hosted Checkout quickstart, implementation branch not selected.",
     "alternatives_considered": [
       {
         "name": "Stripe-hosted Checkout in Node",
@@ -21,8 +21,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Build the first Stripe-hosted test checkout from the recommended platform getting-started route.",
@@ -104,18 +104,184 @@
     },
     {
       "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or sign in to a Stripe account and open its test mode or sandbox context.",
+      "details": [
+        "The normal human path supplies test credentials; a coding agent can instead provision an anonymous sandbox with the documented Stripe CLI route."
+      ],
+      "input": "Stripe identity and account access.",
+      "output": "Stripe test environment.",
+      "success_signal": "The test-mode or sandbox Dashboard is accessible.",
+      "failure_or_wait": "Account, sign-in, or sandbox access must be resolved before keys are available.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Retrieve the test publishable key and test secret key for the selected Stripe environment.",
+      "details": [
+        "Only test credentials are used for the documented simulated payment."
+      ],
+      "input": "Accessible Stripe test environment.",
+      "output": "Test publishable and secret keys.",
+      "success_signal": "Both keys are available for local environment configuration.",
+      "failure_or_wait": "Wrong-mode, missing, or inaccessible keys prevent Checkout Session creation or client initialization.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create or enter the Next.js project and install `stripe`, `@stripe/stripe-js`, and `next` as documented.",
+      "details": [
+        "The selected tab determines the project files and package commands."
+      ],
+      "input": "Supported Node.js and npm environment.",
+      "output": "Next.js project with Stripe dependencies.",
+      "success_signal": "The packages install and the project can compile.",
+      "failure_or_wait": "Package, runtime, network, lockfile, or project errors stop implementation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
       "phase": "configure",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose one language or framework tab before executing the tutorial.",
+      "interface": "other",
+      "action": "Set the documented publishable-key and secret-key environment variables in the Next.js project.",
       "details": [
-        "The tabs have different SDK installation, file, environment-variable, server, client, and run instructions.",
-        "All implement a Checkout Session, hosted redirect, success handling, and test payment."
+        "The secret key stays on the server side."
       ],
-      "input": "Human-selected runtime and starting project.",
-      "output": "One bounded atomic implementation path.",
-      "success_signal": "The selected branch can be followed without mixing code from other tabs.",
-      "failure_or_wait": "Without this choice, official ordering and required commands cannot be represented as one complete journey.",
+      "input": "Stripe test keys.",
+      "output": "Configured local Stripe credentials.",
+      "success_signal": "The Next.js server and client can read their respective variables.",
+      "failure_or_wait": "Missing, swapped, live-mode, or exposed secret-key configuration prevents the test integration or creates a security problem.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create the Next.js Route Handler that initializes Stripe and creates a Checkout Session with product or price data, payment mode, and a publicly accessible `success_url`.",
+      "details": [
+        "Stripe explicitly requires the success page URL to be publicly accessible so it can redirect customers to it.",
+        "The success URL carries the Checkout Session identifier for the success route."
+      ],
+      "input": "Secret key, product data, payment mode, and publicly accessible success URL.",
+      "output": "Server endpoint that returns or redirects to the hosted Checkout Session.",
+      "success_signal": "The Route Handler compiles and can create a session in test mode.",
+      "failure_or_wait": "Invalid key, product data, mode, server code, or a success URL that Stripe cannot reach prevents the documented redirect loop.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Implement the order preview and checkout request, then implement the success route that retrieves the completed Checkout Session.",
+      "details": [
+        "The success route renders confirmation for the customer email after the hosted redirect."
+      ],
+      "input": "Client UI, publishable key, Checkout endpoint, and session-retrieval logic.",
+      "output": "Local order, checkout, and success pages.",
+      "success_signal": "The Next.js project compiles all three pieces.",
+      "failure_or_wait": "Client request, redirect, route, environment-variable, or session-retrieval errors block the full browser loop.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `npm run dev` and open the documented local application URL.",
+      "details": [
+        "If the sample reports the documented OpenSSL error, set `NODE_OPTIONS=--openssl-legacy-provider` and restart."
+      ],
+      "input": "Configured Next.js application.",
+      "output": "Running local Checkout sample.",
+      "success_signal": "The order preview loads in the browser.",
+      "failure_or_wait": "Compile, port, environment, or OpenSSL errors require correction and restart.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Checkout and verify that the browser redirects to Stripe-hosted Checkout.",
+      "details": [
+        "The redirect uses the Checkout Session created by the server Route Handler."
+      ],
+      "input": "Running order preview and Checkout action.",
+      "output": "Stripe-hosted test Checkout page.",
+      "success_signal": "The hosted payment form opens for the test session.",
+      "failure_or_wait": "Session-creation, client, redirect, or key errors prevent hosted Checkout from opening.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the successful test card `4242424242424242` and submit the payment.",
+      "details": [
+        "The 3DS test branch uses `4000002500003155` and requires authentication.",
+        "The decline test branch uses `4000000000009995` and produces a declined payment.",
+        "Both are documented alternatives, not the simple-success route."
+      ],
+      "input": "Hosted test Checkout and card number `4242424242424242`.",
+      "output": "Completed simulated payment and redirect.",
+      "success_signal": "Checkout accepts the test payment and redirects to the configured success URL.",
+      "failure_or_wait": "Card `4000000000009995` is declined; card `4000002500003155` adds 3DS authentication before success; invalid details must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify the success route and the quickstart's completion statement.",
+      "details": [
+        "The success page retrieves the Checkout Session and renders the customer confirmation."
+      ],
+      "input": "Successful hosted Checkout redirect.",
+      "output": "Working basic Checkout integration.",
+      "success_signal": "The success page renders and the guide reaches `Congratulations! You have a basic Checkout integration working.`",
+      "failure_or_wait": "A missing success page or failed session retrieval means the browser loop has not reached the documented boundary.",
       "required": true,
       "source_ids": [
         "S2"
@@ -325,26 +491,6 @@
     "Production activation and live API keys",
     "Subscriptions, Connect, Terminal, invoicing, and other product quickstarts"
   ],
-  "candidate_paths": [
-    {
-      "id": "nextjs-hosted-checkout",
-      "name": "Build and complete Stripe-hosted Checkout with Next.js",
-      "selection_basis": "The Checkout quickstart has peer language tabs, and its Next.js tab provides a complete client, Route Handler, hosted-payment, and success-route path ending in the guide's explicit congratulations statement.",
-      "relationship_to_primary_path": "This is the Next.js implementation selected at primary step 2 and the normal human-account route, expanded from account access through the successful test-card return.",
-      "steps": [
-        {"step_number": 1, "phase": "access", "actor": "developer", "interface": "console", "action": "Create or sign in to a Stripe account and open its test mode or sandbox context.", "details": ["The normal human path supplies test credentials; a coding agent can instead provision an anonymous sandbox with the documented Stripe CLI route."], "input": "Stripe identity and account access.", "output": "Stripe test environment.", "success_signal": "The test-mode or sandbox Dashboard is accessible.", "failure_or_wait": "Account, sign-in, or sandbox access must be resolved before keys are available.", "required": true, "source_ids": ["S1", "S3"]},
-        {"step_number": 2, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Retrieve the test publishable key and test secret key for the selected Stripe environment.", "details": ["Only test credentials are used for the documented simulated payment."], "input": "Accessible Stripe test environment.", "output": "Test publishable and secret keys.", "success_signal": "Both keys are available for local environment configuration.", "failure_or_wait": "Wrong-mode, missing, or inaccessible keys prevent Checkout Session creation or client initialization.", "required": true, "source_ids": ["S1", "S2"]},
-        {"step_number": 3, "phase": "install", "actor": "developer", "interface": "cli", "action": "Create or enter the Next.js project and install `stripe`, `@stripe/stripe-js`, and `next` as documented.", "details": ["The selected tab determines the project files and package commands."], "input": "Supported Node.js and npm environment.", "output": "Next.js project with Stripe dependencies.", "success_signal": "The packages install and the project can compile.", "failure_or_wait": "Package, runtime, network, lockfile, or project errors stop implementation.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "other", "action": "Set the documented publishable-key and secret-key environment variables in the Next.js project.", "details": ["The secret key stays on the server side."], "input": "Stripe test keys.", "output": "Configured local Stripe credentials.", "success_signal": "The Next.js server and client can read their respective variables.", "failure_or_wait": "Missing, swapped, live-mode, or exposed secret-key configuration prevents the test integration or creates a security problem.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 5, "phase": "configure", "actor": "developer", "interface": "other", "action": "Create the Next.js Route Handler that initializes Stripe and creates a Checkout Session with product or price data, payment mode, and a publicly accessible `success_url`.", "details": ["Stripe explicitly requires the success page URL to be publicly accessible so it can redirect customers to it.", "The success URL carries the Checkout Session identifier for the success route."], "input": "Secret key, product data, payment mode, and publicly accessible success URL.", "output": "Server endpoint that returns or redirects to the hosted Checkout Session.", "success_signal": "The Route Handler compiles and can create a session in test mode.", "failure_or_wait": "Invalid key, product data, mode, server code, or a success URL that Stripe cannot reach prevents the documented redirect loop.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 6, "phase": "configure", "actor": "developer", "interface": "other", "action": "Implement the order preview and checkout request, then implement the success route that retrieves the completed Checkout Session.", "details": ["The success route renders confirmation for the customer email after the hosted redirect."], "input": "Client UI, publishable key, Checkout endpoint, and session-retrieval logic.", "output": "Local order, checkout, and success pages.", "success_signal": "The Next.js project compiles all three pieces.", "failure_or_wait": "Client request, redirect, route, environment-variable, or session-retrieval errors block the full browser loop.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `npm run dev` and open the documented local application URL.", "details": ["If the sample reports the documented OpenSSL error, set `NODE_OPTIONS=--openssl-legacy-provider` and restart."], "input": "Configured Next.js application.", "output": "Running local Checkout sample.", "success_signal": "The order preview loads in the browser.", "failure_or_wait": "Compile, port, environment, or OpenSSL errors require correction and restart.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 8, "phase": "execute", "actor": "developer", "interface": "console", "action": "Select Checkout and verify that the browser redirects to Stripe-hosted Checkout.", "details": ["The redirect uses the Checkout Session created by the server Route Handler."], "input": "Running order preview and Checkout action.", "output": "Stripe-hosted test Checkout page.", "success_signal": "The hosted payment form opens for the test session.", "failure_or_wait": "Session-creation, client, redirect, or key errors prevent hosted Checkout from opening.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 9, "phase": "execute", "actor": "developer", "interface": "console", "action": "Enter the successful test card `4242424242424242` and submit the payment.", "details": ["The 3DS test branch uses `4000002500003155` and requires authentication.", "The decline test branch uses `4000000000009995` and produces a declined payment.", "Both are documented alternatives, not the simple-success route."], "input": "Hosted test Checkout and card number `4242424242424242`.", "output": "Completed simulated payment and redirect.", "success_signal": "Checkout accepts the test payment and redirects to the configured success URL.", "failure_or_wait": "Card `4000000000009995` is declined; card `4000002500003155` adds 3DS authentication before success; invalid details must be corrected.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 10, "phase": "verify", "actor": "developer", "interface": "console", "action": "Verify the success route and the quickstart's completion statement.", "details": ["The success page retrieves the Checkout Session and renders the customer confirmation."], "input": "Successful hosted Checkout redirect.", "output": "Working basic Checkout integration.", "success_signal": "The success page renders and the guide reaches `Congratulations! You have a basic Checkout integration working.`", "failure_or_wait": "A missing success page or failed session retrieval means the browser loop has not reached the documented boundary.", "required": true, "source_ids": ["S2"]}
-      ],
-      "source_ids": ["S1", "S2", "S3"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

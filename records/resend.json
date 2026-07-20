@@ -6,8 +6,8 @@
   },
   "category": "Communications, media, and social",
   "surface": {
-    "name": "Resend Get started setup plus quickstart selector",
-    "selection_basis": "Resend's Introduction defines the common setup as a verified owned domain plus an API key, then presents fourteen quickstart surfaces across languages, frameworks, and CLI. All quickstarts target a first transactional email, but no one implementation route is labeled the platform default, so human route selection is required.",
+    "name": "Node.js SDK first transactional email",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Node.js SDK first transactional email. The Node.js quickstart is a complete officially documented implementation of Resend's named first-email milestone. It is a representative candidate, not a default over the other thirteen language, framework, and CLI quickstarts. Prior surface before policy commit: Resend Get started setup plus quickstart selector.",
     "alternatives_considered": [
       {
         "name": "Node.js Quickstart",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Set up Resend and send the first transactional email after selecting the platform.",
@@ -48,15 +48,15 @@
     "normalized_outcome": "After common key and domain setup, the developer uses a selected Resend quickstart to send a transactional email and receives that route's success response.",
     "observable_completion_signal": "The fully inspected Node.js route logs the data returned by resend.emails.send after sending Hello World from onboarding@resend.dev to delivered@resend.dev; an error is logged instead if the send fails.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "Resend names sending the first transactional email as the quickstart outcome, but its Introduction offers fourteen co-equal implementation quickstarts with different setup and execution paths and no universal default.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Resend SDK returns and logs data for the Hello World send to delivered@resend.dev.",
       "source_ids": [
         "S1",
         "S4",
         "S5"
       ]
     },
-    "why_this_is_the_boundary": "The email-send boundary is documented, but the canonical platform path is not established until a language, framework, CLI, or AI route is selected. Choosing Node.js would be researcher judgment.",
+    "why_this_is_the_boundary": "Terminal taken from the committed official getting-started route under workshop fastest/most-used policy.",
     "source_ids": [
       "S1",
       "S4",
@@ -246,24 +246,6 @@
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
-      "action": "Open the Domains page and select Add Domain.",
-      "details": [
-        "API, CLI, and MCP domain routes also exist, but Dashboard steps are documented."
-      ],
-      "input": "Owned domain and Dashboard access",
-      "output": "Add-domain form",
-      "success_signal": "Domain and region fields are visible.",
-      "failure_or_wait": "Without owning a domain, the guide requires purchasing one before continuing.",
-      "required": true,
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "web-console",
       "action": "Enter an owned domain, preferably a purpose-specific subdomain.",
       "details": [
         "Resend strongly recommends a subdomain such as notifications.example.com rather than the root domain.",
@@ -279,7 +261,7 @@
       ]
     },
     {
-      "step_number": 10,
+      "step_number": 9,
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
@@ -295,7 +277,7 @@
       ]
     },
     {
-      "step_number": 11,
+      "step_number": 10,
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
@@ -311,7 +293,7 @@
       ]
     },
     {
-      "step_number": 12,
+      "step_number": 11,
       "phase": "configure",
       "actor": "developer",
       "interface": "dns",
@@ -331,7 +313,7 @@
       ]
     },
     {
-      "step_number": 13,
+      "step_number": 12,
       "phase": "wait",
       "actor": "platform",
       "interface": "web-console",
@@ -350,24 +332,108 @@
       ]
     },
     {
-      "step_number": 14,
-      "phase": "configure",
+      "step_number": 13,
+      "phase": "install",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose one of the official transactional-email quickstarts.",
+      "interface": "cli",
+      "action": "In the Node.js project, install the resend package with npm install resend.",
       "details": [
-        "Choices are Node.js, Next.js, Express, PHP, Laravel, Python, Ruby, Rails, Go, Rust, Elixir, Java, .NET, and CLI.",
-        "AI developers can instead choose MCP, CLI, quick-start prompts, skills, Chat SDK, builder guides, or integrations."
+        "The guide also offers yarn, pnpm, and bun commands; npm is selected for this candidate."
       ],
-      "input": "Language, framework, CLI, or AI-tool preference",
-      "output": "Route-specific send guide",
-      "success_signal": "A human selects the canonical implementation route.",
-      "failure_or_wait": "Resend does not label one implementation as the platform default.",
+      "input": "Node.js project and npm",
+      "output": "Installed Resend Node.js SDK",
+      "success_signal": "resend is present in the project dependencies.",
+      "failure_or_wait": "Package, network, lockfile, or permission errors must be corrected before the SDK can be imported.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S5",
-        "S6"
+        "S4"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create the project's .env file and set RESEND_API_KEY to the one-time re_ key saved in the shared path.",
+      "details": [
+        "Ensure the runtime loads the environment file and do not commit it to version control."
+      ],
+      "input": "Securely stored Resend API key",
+      "output": "Authenticated Node.js environment",
+      "success_signal": "process.env.RESEND_API_KEY resolves to the intended active key.",
+      "failure_or_wait": "A missing, truncated, revoked, wrong-scope, domain-restricted, or unloaded key causes authentication or sending failure.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create server.ts, import Resend, and initialize new Resend(process.env.RESEND_API_KEY).",
+      "details": [],
+      "input": "Installed SDK and loaded environment",
+      "output": "Initialized Resend client",
+      "success_signal": "server.ts can construct the client without a missing environment value.",
+      "failure_or_wait": "TypeScript, module, or environment-loading errors must be corrected before execution.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "In server.ts call resend.emails.send with from Acme <onboarding@resend.dev>, to delivered@resend.dev, subject Hello World, and HTML <strong>It works!</strong>.",
+      "details": [
+        "Destructure data and error; log error and return on failure, otherwise log data."
+      ],
+      "input": "Initialized Resend client and official test message",
+      "output": "Executable first-send script",
+      "success_signal": "The message fields and success-or-error handling match the quickstart.",
+      "failure_or_wait": "Syntax or message-field errors must be corrected before the request can be submitted.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Execute server.ts using the Node.js or TypeScript runner configured for the project.",
+      "details": [
+        "The guide supplies the script but does not prescribe one universal TypeScript runner command for every Node project."
+      ],
+      "input": "Configured executable server.ts",
+      "output": "Resend email-send API request",
+      "success_signal": "The program completes the resend.emails.send call.",
+      "failure_or_wait": "Runtime, authentication, key-scope, sender-domain, quota, network, or API errors are logged through the documented error branch; correct the reported problem and rerun.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify that the program logs the returned data object rather than error.",
+      "details": [],
+      "input": "Completed send request",
+      "output": "Successful first transactional-email response",
+      "success_signal": "The Resend SDK returns and logs data for the Hello World send to delivered@resend.dev.",
+      "failure_or_wait": "If error is logged, no first-send success is recorded; use the returned error to correct the request, credential, domain, or account state and retry.",
+      "required": true,
+      "source_ids": [
+        "S4"
       ]
     }
   ],
@@ -653,22 +719,6 @@
     "Marketing Broadcasts and contact import",
     "Production key rotation and multi-tenant domains"
   ],
-  "candidate_paths": [
-    {
-      "id": "nodejs-first-transactional-email",
-      "name": "Node.js SDK first transactional email",
-      "selection_basis": "The Node.js quickstart is a complete officially documented implementation of Resend's named first-email milestone. It is a representative candidate, not a default over the other thirteen language, framework, and CLI quickstarts.",
-      "relationship_to_primary_path": "Continues after primary_path step 14. The shared path already creates the human account, API key, and verified domain; this candidate covers every Node.js-specific action through the send response.",
-      "steps": [
-        {"step_number":1,"phase":"install","actor":"developer","interface":"cli","action":"In the Node.js project, install the resend package with npm install resend.","details":["The guide also offers yarn, pnpm, and bun commands; npm is selected for this candidate."],"input":"Node.js project and npm","output":"Installed Resend Node.js SDK","success_signal":"resend is present in the project dependencies.","failure_or_wait":"Package, network, lockfile, or permission errors must be corrected before the SDK can be imported.","required":true,"source_ids":["S4"]},
-        {"step_number":2,"phase":"authenticate","actor":"developer","interface":"other","action":"Create the project's .env file and set RESEND_API_KEY to the one-time re_ key saved in the shared path.","details":["Ensure the runtime loads the environment file and do not commit it to version control."],"input":"Securely stored Resend API key","output":"Authenticated Node.js environment","success_signal":"process.env.RESEND_API_KEY resolves to the intended active key.","failure_or_wait":"A missing, truncated, revoked, wrong-scope, domain-restricted, or unloaded key causes authentication or sending failure.","required":true,"source_ids":["S2","S4"]},
-        {"step_number":3,"phase":"configure","actor":"developer","interface":"other","action":"Create server.ts, import Resend, and initialize new Resend(process.env.RESEND_API_KEY).","details":[],"input":"Installed SDK and loaded environment","output":"Initialized Resend client","success_signal":"server.ts can construct the client without a missing environment value.","failure_or_wait":"TypeScript, module, or environment-loading errors must be corrected before execution.","required":true,"source_ids":["S4"]},
-        {"step_number":4,"phase":"configure","actor":"developer","interface":"other","action":"In server.ts call resend.emails.send with from Acme <onboarding@resend.dev>, to delivered@resend.dev, subject Hello World, and HTML <strong>It works!</strong>.","details":["Destructure data and error; log error and return on failure, otherwise log data."],"input":"Initialized Resend client and official test message","output":"Executable first-send script","success_signal":"The message fields and success-or-error handling match the quickstart.","failure_or_wait":"Syntax or message-field errors must be corrected before the request can be submitted.","required":true,"source_ids":["S4"]},
-        {"step_number":5,"phase":"execute","actor":"developer","interface":"cli","action":"Execute server.ts using the Node.js or TypeScript runner configured for the project.","details":["The guide supplies the script but does not prescribe one universal TypeScript runner command for every Node project."],"input":"Configured executable server.ts","output":"Resend email-send API request","success_signal":"The program completes the resend.emails.send call.","failure_or_wait":"Runtime, authentication, key-scope, sender-domain, quota, network, or API errors are logged through the documented error branch; correct the reported problem and rerun.","required":true,"source_ids":["S4"]},
-        {"step_number":6,"phase":"verify","actor":"developer","interface":"cli","action":"Verify that the program logs the returned data object rather than error.","details":[],"input":"Completed send request","output":"Successful first transactional-email response","success_signal":"The Resend SDK returns and logs data for the Hello World send to delivered@resend.dev.","failure_or_wait":"If error is logged, no first-send success is recorded; use the returned error to correct the request, credential, domain, or account state and retry.","required":true,"source_ids":["S4"]}
-      ],
-      "source_ids": ["S2", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

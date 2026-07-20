@@ -1,77 +1,466 @@
 {
-  "platform": {"name": "Dwolla", "slug": "dwolla", "organization": "Dwolla"},
+  "platform": {
+    "name": "Dwolla",
+    "slug": "dwolla",
+    "organization": "Dwolla"
+  },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Dwolla Quickstart through the first authenticated API request",
-    "selection_basis": "The developer portal labels Quickstart as its Getting Started route and explicitly promises an access token plus a successful sandbox Root response before the developer chooses a funds flow.",
+    "name": "cURL token exchange and Root request",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: cURL token exchange and Root request. The Quickstart displays cURL first alongside four SDK implementations; this candidate preserves one complete official implementation without claiming it is the sole default. Prior surface before policy commit: Dwolla Quickstart through the first authenticated API request.",
     "alternatives_considered": [
-      {"name": "Send Money", "url": "https://developers.dwolla.com/docs/send-money", "reason_not_primary": "The Quickstart places Send Money after the first authenticated request and asks the developer to choose a funds flow next."},
-      {"name": "Receive Money from Users", "url": "https://developers.dwolla.com/docs/receive-money", "reason_not_primary": "This is another post-Quickstart funds-flow choice."}
+      {
+        "name": "Send Money",
+        "url": "https://developers.dwolla.com/docs/send-money",
+        "reason_not_primary": "The Quickstart places Send Money after the first authenticated request and asks the developer to choose a funds flow next."
+      },
+      {
+        "name": "Receive Money from Users",
+        "url": "https://developers.dwolla.com/docs/receive-money",
+        "reason_not_primary": "This is another post-Quickstart funds-flow choice."
+      }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
-  "entry_point": {"developer_intent": "Make the first authenticated Dwolla sandbox API request.", "starting_url": "https://developers.dwolla.com/docs/quickstart", "assumed_prior_state": ["No Dwolla Sandbox account", "A valid email address is available"]},
+  "entry_point": {
+    "developer_intent": "Make the first authenticated Dwolla sandbox API request.",
+    "starting_url": "https://developers.dwolla.com/docs/quickstart",
+    "assumed_prior_state": [
+      "No Dwolla Sandbox account",
+      "A valid email address is available"
+    ]
+  },
   "documented_first_success": {
     "official_milestone": "Make your first authenticated Dwolla API call in under 5 minutes",
     "normalized_outcome": "The developer authenticates to the Dwolla sandbox and receives the Root resource links, including the Platform Account URL.",
     "observable_completion_signal": "The Root response contains `_links.account.href` and `_links.customers.href`, followed by the guide's `You did it` section.",
-    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "You've authenticated against the Dwolla API and made your first request", "source_ids": ["S1"]},
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "You've authenticated against the Dwolla API and made your first request",
+      "source_ids": [
+        "S1"
+      ]
+    },
     "why_this_is_the_boundary": "The Quickstart explicitly ends at the successful Root response and then directs the developer to select a separate funds flow.",
-    "source_ids": ["S1"]
+    "source_ids": [
+      "S1"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "identity", "requirement": "Use a valid email address to create the free sandbox account.", "required": true, "source_ids": ["S1", "S2"]},
-    {"order": 2, "type": "legal", "requirement": "Agree to the Dwolla Developer Terms and Service during sandbox signup.", "required": true, "source_ids": ["S2"]},
-    {"order": 3, "type": "software", "requirement": "For the cURL candidate, use a shell with cURL and a way to Base64-encode `client_id:client_secret`.", "required": true, "source_ids": ["S1"]}
-  ],
-  "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the official Dwolla Quickstart.", "details": [], "input": "Intent to make the first authenticated API call", "output": "The four-step sandbox route", "success_signal": "The Quickstart is visible.", "failure_or_wait": "No navigation failure is documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open Create your sandbox account, provide a valid email address, and agree to the Dwolla Developer Terms and Service.", "details": [], "input": "Valid email address and terms agreement", "output": "A verification email", "success_signal": "Dwolla sends an email asking the developer to verify the address.", "failure_or_wait": "Without email verification, API calls return HTTP 401 with `InvalidAccountStatus`.", "required": true, "source_ids": ["S1", "S2", "S3"]},
-    {"step_number": 3, "phase": "verify", "actor": "developer", "interface": "email", "action": "Open the Dwolla email and verify the email address.", "details": [], "input": "Email verification message", "output": "A verified sandbox account", "success_signal": "The developer is redirected to the Sandbox Dashboard.", "failure_or_wait": "Failure to verify keeps the account invalid for API calls.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 4, "phase": "wait", "actor": "platform", "interface": "web-console", "action": "Create the sandbox account, application, Superhero Savings Bank funding source, and test balance.", "details": ["The Quickstart states a $5,000 test balance."], "input": "Verified email address", "output": "Provisioned sandbox account and application", "success_signal": "The Sandbox Dashboard is available.", "failure_or_wait": "No post-verification provisioning failure is documented.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 5, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "In the Sandbox Dashboard, open Applications and locate the `client_id` and `client_secret`.", "details": ["Treat the client secret like a password and do not commit it or expose it client-side."], "input": "Authenticated sandbox session", "output": "Application client ID and secret", "success_signal": "Both credential values are available.", "failure_or_wait": "No credential-retrieval failure is documented.", "required": true, "source_ids": ["S1"]}
-  ],
-  "candidate_paths": [
     {
-      "id": "curl-root-request",
-      "name": "cURL token exchange and Root request",
-      "selection_basis": "The Quickstart displays cURL first alongside four SDK implementations; this candidate preserves one complete official implementation without claiming it is the sole default.",
-      "relationship_to_primary_path": "Repeats the shared account and credential spine, then uses the cURL variant through the explicit Root-response terminal.",
-      "steps": [
-        {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Dwolla Quickstart.", "details": [], "input": "First-request intent", "output": "Quickstart steps", "success_signal": "The guide is open.", "failure_or_wait": "No failure is documented.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Provide a valid email address and agree to the Developer Terms and Service in sandbox signup.", "details": [], "input": "Email and terms agreement", "output": "Verification email", "success_signal": "The verification email is sent.", "failure_or_wait": "An unverified account returns HTTP 401 `InvalidAccountStatus` for API calls.", "required": true, "source_ids": ["S1", "S2", "S3"]},
-        {"step_number": 3, "phase": "verify", "actor": "developer", "interface": "email", "action": "Verify the email address from the received message.", "details": [], "input": "Verification message", "output": "Verified sandbox account", "success_signal": "The browser redirects to the Sandbox Dashboard.", "failure_or_wait": "The account remains unusable for API calls until verification.", "required": true, "source_ids": ["S1", "S2"]},
-        {"step_number": 4, "phase": "wait", "actor": "platform", "interface": "web-console", "action": "Provision the sandbox account, application, test funding source, and $5,000 balance.", "details": [], "input": "Verified account", "output": "Ready sandbox dashboard", "success_signal": "The automatically created application is available.", "failure_or_wait": "No provisioning failure is documented.", "required": true, "source_ids": ["S1", "S2"]},
-        {"step_number": 5, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Open Applications and retrieve the `client_id` and `client_secret`.", "details": ["Keep the client secret out of source control and client-side code."], "input": "Sandbox dashboard", "output": "Client credentials", "success_signal": "Both values are visible.", "failure_or_wait": "No failure is documented.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 6, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Base64-encode `client_id:client_secret` for HTTP Basic authentication.", "details": [], "input": "Client ID and secret", "output": "Basic authorization value", "success_signal": "The encoded credential is available for the request header.", "failure_or_wait": "No encoding failure is documented.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 7, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "POST to `https://api-sandbox.dwolla.com/token` with Basic authorization, form content type, and `grant_type=client_credentials`.", "details": [], "input": "Encoded client credentials", "output": "OAuth token response", "success_signal": "The JSON response contains `access_token`, `token_type`, and `expires_in`.", "failure_or_wait": "The documented token is valid for one hour and must be replaced after expiration.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 8, "phase": "execute", "actor": "developer", "interface": "cli", "action": "GET `https://api-sandbox.dwolla.com/` with the HAL+JSON Accept header and bearer access token.", "details": [], "input": "Bearer access token", "output": "Dwolla Root response", "success_signal": "The request returns a JSON Root resource.", "failure_or_wait": "An account whose email was not verified receives HTTP 401 `InvalidAccountStatus`.", "required": true, "source_ids": ["S1", "S2"]},
-        {"step_number": 9, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Read the account and customers links from the Root response.", "details": [], "input": "Root JSON", "output": "Platform Account URL and Customers collection URL", "success_signal": "`_links.account.href` and `_links.customers.href` are present, reaching the guide's You did it terminal.", "failure_or_wait": "No additional wait is documented after a successful Root response.", "required": true, "source_ids": ["S1"]}
-      ],
-      "source_ids": ["S1", "S2", "S3"]
+      "order": 1,
+      "type": "identity",
+      "requirement": "Use a valid email address to create the free sandbox account.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Agree to the Dwolla Developer Terms and Service during sandbox signup.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "For the cURL candidate, use a shell with cURL and a way to Base64-encode `client_id:client_secret`.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the official Dwolla Quickstart.",
+      "details": [],
+      "input": "Intent to make the first authenticated API call",
+      "output": "The four-step sandbox route",
+      "success_signal": "The Quickstart is visible.",
+      "failure_or_wait": "No navigation failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open Create your sandbox account, provide a valid email address, and agree to the Dwolla Developer Terms and Service.",
+      "details": [],
+      "input": "Valid email address and terms agreement",
+      "output": "A verification email",
+      "success_signal": "Dwolla sends an email asking the developer to verify the address.",
+      "failure_or_wait": "Without email verification, API calls return HTTP 401 with `InvalidAccountStatus`.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the Dwolla email and verify the email address.",
+      "details": [],
+      "input": "Email verification message",
+      "output": "A verified sandbox account",
+      "success_signal": "The developer is redirected to the Sandbox Dashboard.",
+      "failure_or_wait": "Failure to verify keeps the account invalid for API calls.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Create the sandbox account, application, Superhero Savings Bank funding source, and test balance.",
+      "details": [
+        "The Quickstart states a $5,000 test balance."
+      ],
+      "input": "Verified email address",
+      "output": "Provisioned sandbox account and application",
+      "success_signal": "The Sandbox Dashboard is available.",
+      "failure_or_wait": "No post-verification provisioning failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "In the Sandbox Dashboard, open Applications and locate the `client_id` and `client_secret`.",
+      "details": [
+        "Treat the client secret like a password and do not commit it or expose it client-side."
+      ],
+      "input": "Authenticated sandbox session",
+      "output": "Application client ID and secret",
+      "success_signal": "Both credential values are available.",
+      "failure_or_wait": "No credential-retrieval failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Dwolla Quickstart.",
+      "details": [],
+      "input": "First-request intent",
+      "output": "Quickstart steps",
+      "success_signal": "The guide is open.",
+      "failure_or_wait": "No failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Provide a valid email address and agree to the Developer Terms and Service in sandbox signup.",
+      "details": [],
+      "input": "Email and terms agreement",
+      "output": "Verification email",
+      "success_signal": "The verification email is sent.",
+      "failure_or_wait": "An unverified account returns HTTP 401 `InvalidAccountStatus` for API calls.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Verify the email address from the received message.",
+      "details": [],
+      "input": "Verification message",
+      "output": "Verified sandbox account",
+      "success_signal": "The browser redirects to the Sandbox Dashboard.",
+      "failure_or_wait": "The account remains unusable for API calls until verification.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Provision the sandbox account, application, test funding source, and $5,000 balance.",
+      "details": [],
+      "input": "Verified account",
+      "output": "Ready sandbox dashboard",
+      "success_signal": "The automatically created application is available.",
+      "failure_or_wait": "No provisioning failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Applications and retrieve the `client_id` and `client_secret`.",
+      "details": [
+        "Keep the client secret out of source control and client-side code."
+      ],
+      "input": "Sandbox dashboard",
+      "output": "Client credentials",
+      "success_signal": "Both values are visible.",
+      "failure_or_wait": "No failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Base64-encode `client_id:client_secret` for HTTP Basic authentication.",
+      "details": [],
+      "input": "Client ID and secret",
+      "output": "Basic authorization value",
+      "success_signal": "The encoded credential is available for the request header.",
+      "failure_or_wait": "No encoding failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "POST to `https://api-sandbox.dwolla.com/token` with Basic authorization, form content type, and `grant_type=client_credentials`.",
+      "details": [],
+      "input": "Encoded client credentials",
+      "output": "OAuth token response",
+      "success_signal": "The JSON response contains `access_token`, `token_type`, and `expires_in`.",
+      "failure_or_wait": "The documented token is valid for one hour and must be replaced after expiration.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "GET `https://api-sandbox.dwolla.com/` with the HAL+JSON Accept header and bearer access token.",
+      "details": [],
+      "input": "Bearer access token",
+      "output": "Dwolla Root response",
+      "success_signal": "The request returns a JSON Root resource.",
+      "failure_or_wait": "An account whose email was not verified receives HTTP 401 `InvalidAccountStatus`.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Read the account and customers links from the Root response.",
+      "details": [],
+      "input": "Root JSON",
+      "output": "Platform Account URL and Customers collection URL",
+      "success_signal": "`_links.account.href` and `_links.customers.href` are present, reaching the guide's You did it terminal.",
+      "failure_or_wait": "No additional wait is documented after a successful Root response.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 5, "condition": "Use an official SDK instead of cURL", "path": "Choose the TypeScript, Python, PHP, or Ruby tab, configure the documented sandbox client with environment variables, and let the SDK request or cache the token as shown before calling Root.", "effect_on_first_success": "Changes installation and authentication actions while preserving the same Root-response terminal.", "source_ids": ["S1"]},
-    {"at_step": 5, "condition": "The access token has expired", "path": "Request a new token after the documented one-hour lifetime.", "effect_on_first_success": "Adds another token exchange before the Root request.", "source_ids": ["S1"]}
+    {
+      "at_step": 5,
+      "condition": "Use an official SDK instead of cURL",
+      "path": "Choose the TypeScript, Python, PHP, or Ruby tab, configure the documented sandbox client with environment variables, and let the SDK request or cache the token as shown before calling Root.",
+      "effect_on_first_success": "Changes installation and authentication actions while preserving the same Root-response terminal.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The access token has expired",
+      "path": "Request a new token after the documented one-hour lifetime.",
+      "effect_on_first_success": "Adds another token exchange before the Root request.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "terms", "description": "Sandbox signup requires agreement to the Dwolla Developer Terms and Service.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 3, "type": "verification", "description": "Email verification is mandatory; otherwise API calls return 401 InvalidAccountStatus.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
-    {"at_step": 5, "type": "credential", "description": "The client secret must be protected like a password.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 5, "type": "choice", "description": "The Quickstart provides cURL and four SDK routes without declaring one sole implementation path.", "documented_requirement": true, "source_ids": ["S1"]}
+    {
+      "at_step": 2,
+      "type": "terms",
+      "description": "Sandbox signup requires agreement to the Dwolla Developer Terms and Service.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "verification",
+      "description": "Email verification is mandatory; otherwise API calls return 401 InvalidAccountStatus.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "credential",
+      "description": "The client secret must be protected like a password.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "choice",
+      "description": "The Quickstart provides cURL and four SDK routes without declaring one sole implementation path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": true, "value": "under 5 minutes", "source_ids": ["S1"]},
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "under 5 minutes",
+    "source_ids": [
+      "S1"
+    ]
+  },
   "sources": [
-    {"id": "S1", "title": "Quickstart", "url": "https://developers.dwolla.com/docs/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["What you'll do", "Create a sandbox account", "Grab your API key and secret", "Request an access token", "Make your first API call", "You did it"], "evidence_supported": ["Under-five-minute claim", "Account and credential spine", "cURL and SDK choices", "Token response", "Root response and terminal"]},
-    {"id": "S2", "title": "Testing in the Sandbox", "url": "https://developers.dwolla.com/docs/testing", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Sandbox account setup"], "evidence_supported": ["Valid-email requirement", "Terms agreement", "Email verification", "InvalidAccountStatus failure", "Automatic application, funding source, and balance"]},
-    {"id": "S3", "title": "Dwolla Sandbox sign up", "url": "https://accounts-sandbox.dwolla.com/sign-up", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public account entry"], "evidence_supported": ["Current official sandbox signup destination"]}
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://developers.dwolla.com/docs/quickstart",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What you'll do",
+        "Create a sandbox account",
+        "Grab your API key and secret",
+        "Request an access token",
+        "Make your first API call",
+        "You did it"
+      ],
+      "evidence_supported": [
+        "Under-five-minute claim",
+        "Account and credential spine",
+        "cURL and SDK choices",
+        "Token response",
+        "Root response and terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Testing in the Sandbox",
+      "url": "https://developers.dwolla.com/docs/testing",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sandbox account setup"
+      ],
+      "evidence_supported": [
+        "Valid-email requirement",
+        "Terms agreement",
+        "Email verification",
+        "InvalidAccountStatus failure",
+        "Automatic application, funding source, and balance"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Dwolla Sandbox sign up",
+      "url": "https://accounts-sandbox.dwolla.com/sign-up",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public account entry"
+      ],
+      "evidence_supported": [
+        "Current official sandbox signup destination"
+      ]
+    }
   ],
   "uncertainties": [
-    {"question": "Which implementation tab should be treated as the canonical first-request route?", "impact": "The selected route changes setup, credential handling, and token-exchange actions.", "reason_unresolved": "The Quickstart presents cURL, TypeScript, Python, PHP, and Ruby variants without naming one as the sole default.", "checked_source_ids": ["S1"]}
+    {
+      "question": "Which implementation tab should be treated as the canonical first-request route?",
+      "impact": "The selected route changes setup, credential handling, and token-exchange actions.",
+      "reason_unresolved": "The Quickstart presents cURL, TypeScript, Python, PHP, and Ruby variants without naming one as the sole default.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "excluded_after_success": ["Choosing and implementing Send Money, Receive Money, Transfer Between Users, or Me-to-Me", "Creating customers and funding sources", "Initiating or processing a transfer", "Webhooks and production go-live"]
+  "excluded_after_success": [
+    "Choosing and implementing Send Money, Receive Money, Transfer Between Users, or Me-to-Me",
+    "Creating customers and funding sources",
+    "Initiating or processing a transfer",
+    "Webhooks and production go-live"
+  ]
 }

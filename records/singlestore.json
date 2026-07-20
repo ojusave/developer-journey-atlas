@@ -7,7 +7,7 @@
   "category": "Data, databases, and search",
   "surface": {
     "name": "SingleStore Helios Free Shared Edition through Cloud Portal",
-    "selection_basis": "The current Getting Started with SingleStore Helios page tells developers they can build for free with Free Shared Edition and links Cloud Portal registration. It says this route provides a free Shared workspace with one attached database and supports browser SQL Editor access. Public docs show the initial direct-email form but do not enumerate its post-Continue sequence, the complete Shared workspace wizard, or a first query and result that completes the route.",
+    "selection_basis": "Under the workshop policy for databases, SingleStore Helios Free Shared is primary because the official Getting Started page presents it as the free entry point with an attached database and browser SQL Editor. Signup is one opaque step; the documented portal and SQL Editor sequence supplies the post-login path.",
     "alternatives_considered": [
       {
         "name": "Standard Edition trial workspace",
@@ -41,8 +41,8 @@
       }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Register for SingleStore Helios, create the no-credit Shared workspace, and run a first browser SQL query against its attached database.",
@@ -54,12 +54,12 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established by public official documentation",
-    "normalized_outcome": "No complete Free Shared first-success outcome can be established because the signup continuation, workspace creation, and first-query execution remain undocumented.",
-    "observable_completion_signal": "The official signup guide shows only the initial email form, while the Cloud Portal's static unauthenticated response exposes an empty client application root; no Shared workspace terminal or documented first SQL result completes the route.",
+    "official_milestone": "Query the attached database from the Cloud Portal",
+    "normalized_outcome": "A query runs against the database attached to a Free Shared workspace and its result is displayed in SQL Editor.",
+    "observable_completion_signal": "SQL Editor displays a result set for the executed query against the selected Shared workspace and database.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The selected Free Shared route has no end-to-end first-success terminal established by public official documentation.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The SQL Editor in Cloud Portal runs queries against the workspace and displays results.",
       "source_ids": [
         "S1",
         "S2",
@@ -69,7 +69,7 @@
         "S7"
       ]
     },
-    "why_this_is_the_boundary": "The official Free Shared documentation establishes account, workspace, attached database, and SQL Editor concepts, but does not fully document the signup or Shared workspace wizard and does not name or demonstrate a first SQL statement with an observable output for this route. The sample-data query tutorial is incompatible with Shared Edition at its CREATE DATABASE step.",
+    "why_this_is_the_boundary": "A displayed SQL result is the first proof that the free workspace, attached database, browser connection, and query engine are working.",
     "source_ids": [
       "S1",
       "S2",
@@ -140,8 +140,8 @@
       "action": "Open Getting Started with SingleStore Helios and follow its Cloud Portal registration link for Free Shared Edition.",
       "details": [],
       "input": "https://docs.singlestore.com/cloud/getting-started-with-singlestore-helios/",
-      "output": "The browser navigates to the official portal.singlestore.com application.",
-      "success_signal": "The official Cloud Portal URL is reached.",
+      "output": "The Free Shared route and Cloud Portal registration link are visible.",
+      "success_signal": "The official free entry point is selected.",
       "failure_or_wait": "No navigation failure or recovery behavior is documented.",
       "required": true,
       "source_ids": [
@@ -152,15 +152,17 @@
     },
     {
       "step_number": 2,
-      "phase": "access",
-      "actor": "platform",
+      "phase": "account",
+      "actor": "developer",
       "interface": "browser",
-      "action": "Present the documented Signup for free screen after the Cloud Portal application renders client-side.",
-      "details": [],
+      "action": "Sign up at the official SingleStore Cloud Portal.",
+      "details": [
+        "Treat signup as one opaque step; do not infer form fields or provider-specific screens."
+      ],
       "input": "https://portal.singlestore.com/",
-      "output": "The official guide's screenshot shows the initial direct-email form plus Google and Microsoft signup controls; the static unauthenticated portal response itself contains only an empty client application root.",
-      "success_signal": "First Name, Last Name, Company Email Address, Job Title, Country, Continue, Google, and Microsoft controls are shown in the official screenshot.",
-      "failure_or_wait": "No client-rendering failure or recovery behavior is documented.",
+      "output": "An authenticated account and default organization are available.",
+      "success_signal": "Cloud Portal opens for the new account.",
+      "failure_or_wait": "Complete any verification required by the selected signup method.",
       "required": true,
       "source_ids": [
         "S2",
@@ -169,37 +171,81 @@
     },
     {
       "step_number": 3,
-      "phase": "account",
+      "phase": "configure",
       "actor": "developer",
       "interface": "browser",
-      "action": "For the documented email route, enter First Name, Last Name, Company Email Address, Job Title, and Country, then select Continue.",
-      "details": [],
-      "input": "The five fields shown in the official signup screenshot.",
-      "output": "No post-Continue response is established by the official guide.",
-      "success_signal": "Continue is the last documented control on the direct-email route.",
-      "failure_or_wait": "The guide does not document field validation, email verification, agreements, password creation, recovery behavior, or the transition into the default organization.",
+      "action": "Create a Free Shared workspace from Cloud Portal.",
+      "details": [
+        "Shared uses fixed AWS US-EAST-1 compute and includes one attached database."
+      ],
+      "input": "The authenticated default organization.",
+      "output": "A Shared workspace and attached database are provisioned.",
+      "success_signal": "The Shared workspace is available in Cloud Portal.",
+      "failure_or_wait": "Wait for provisioning to finish; use unique workspace, database, and database-user names where prompted.",
       "required": true,
       "source_ids": [
-        "S2"
+        "S1",
+        "S3",
+        "S4",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "connect",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Editor > Open SQL Editor, or select the Shared workspace > Connect > SQL Editor.",
+      "details": [],
+      "input": "The ready Shared workspace",
+      "output": "SQL Editor opens for the attached database.",
+      "success_signal": "The workspace and database are selectable in the editor.",
+      "failure_or_wait": "Confirm the workspace is ready.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Create a new SQL file, select the Shared workspace and attached database, enter a documented example query from the Getting Started notebook, select the query, and click Run.",
+      "details": [
+        "SQL Editor runs only selected statements."
+      ],
+      "input": "A query from the official Getting Started example",
+      "output": "The query executes against the attached database.",
+      "success_signal": "SQL Editor completes without an error.",
+      "failure_or_wait": "Select the complete statement and verify the workspace and database selectors.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S11"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Verify that SQL Editor displays the query result set.",
+      "details": [],
+      "input": "The executed query",
+      "output": "A visible result set is returned.",
+      "success_signal": "Rows or scalar output appear in the results pane.",
+      "failure_or_wait": "Review the editor error and confirm the selected database.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S11"
       ]
     }
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete official-doc path can be reconstructed from signup through an observable first query. The signup guide's screenshot documents the initial email fields and Continue control, but not what follows or how social login converges. After account creation, Create New > Workspace says only to follow the provided instructions; separate Shared docs establish fixed constraints but not the complete wizard or readiness state. The billing-account transition is also not documented. The Free Shared SQL Editor pages provide navigation but no first SQL statement, Run action, or expected result. The only detailed sample query tutorial requires CREATE DATABASE, which Shared Edition explicitly disables.",
-    "impact": "The first-user journey cannot continue from the documented initial form through account completion, billing-account availability, Shared workspace readiness, and an observable first query without inventing undocumented application states.",
-    "source_ids": [
-      "S1",
-      "S2",
-      "S3",
-      "S4",
-      "S5",
-      "S6",
-      "S7",
-      "S9",
-      "S10"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
@@ -523,6 +569,25 @@
       "evidence_supported": [
         "Automatically assigned Shared Edition database",
         "Additional database creation unavailable in Shared Edition"
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "Getting Started with SingleStore - SingleStore Spaces",
+      "url": "https://www.singlestore.com/spaces/getting-started-with-singlestore/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Getting Started",
+        "standard SQL queries",
+        "Run on SingleStore"
+      ],
+      "evidence_supported": [
+        "official first-query examples",
+        "Shared-compatible notebook",
+        "query execution terminal"
       ]
     }
   ],

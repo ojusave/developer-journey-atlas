@@ -6,8 +6,8 @@
   },
   "category": "API infrastructure and developer tooling",
   "surface": {
-    "name": "Pulumi product, infrastructure provider, and language not selected",
-    "selection_basis": "Pulumi's Get Started router presents Infrastructure as Code, Secrets and Configuration, Insights and Governance, and several solution tutorials. IaC then offers AWS, Azure, Google Cloud, and Kubernetes, each with coequal language choices. The docs establish deploy-first-infrastructure outcomes inside those branches but not one platform-wide path.",
+    "name": "Deploy and verify the first AWS S3 bucket with Pulumi TypeScript",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Deploy and verify the first AWS S3 bucket with Pulumi TypeScript. The product and provider router has no default, but the AWS IaC tutorial documents a first deploy that creates an empty S3 bucket and verifies it through the exported `bucketName` before the later website update. Prior surface before policy commit: Pulumi product, infrastructure provider, and language not selected.",
     "alternatives_considered": [
       {
         "name": "AWS IaC first S3 bucket deployment",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach a first Pulumi result without a preselected Pulumi product, infrastructure provider, or programming language.",
@@ -49,18 +49,18 @@
   },
   "documented_first_success": {
     "official_milestone": "No Pulumi platform-wide first-success milestone is selected by the Get Started router.",
-    "normalized_outcome": "Unresolved until a human selects IaC versus another Pulumi product, then a provider and language. The first AWS IaC candidate deploys an empty S3 bucket and verifies it through the exported `bucketName`.",
-    "observable_completion_signal": "For AWS, the first `pulumi up` reports the S3 bucket created, prints `bucketName`, and `aws s3 ls s3://$(pulumi stack output bucketName)` successfully lists the new empty bucket.",
+    "normalized_outcome": "AWS CLI reaches the new bucket and returns an empty listing without error.",
+    "observable_completion_signal": "AWS CLI reaches the new bucket and returns an empty listing without error.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The top-level page tells the reader to select among products, providers, and solution tutorials. Each provider page separately promises to deploy first infrastructure.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "AWS CLI reaches the new bucket and returns an empty listing without error.",
       "source_ids": [
         "S1",
         "S2",
         "S3"
       ]
     },
-    "why_this_is_the_boundary": "A deploy boundary is documented inside candidate tutorials, but selecting one provider, workload, and language as universal Pulumi success would be researcher judgment.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -137,6 +137,170 @@
         "S1",
         "S2",
         "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or obtain access to the AWS account that will own the tutorial resources.",
+      "details": [
+        "The selected identity must be allowed to create the generated S3 bucket and AWS use can incur provider charges."
+      ],
+      "input": "AWS identity, account, and required permissions.",
+      "output": "Authorized AWS account context.",
+      "success_signal": "The developer can obtain working AWS credentials.",
+      "failure_or_wait": "Missing account, billing, policy, or S3 permission blocks the deployment.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the TypeScript runtime prerequisites, Pulumi CLI, and AWS CLI used by the verification command.",
+      "details": [
+        "Other supported language routes use Python, Go, C#, Java, or YAML instead."
+      ],
+      "input": "Supported workstation and install permission.",
+      "output": "Node.js package tools, Pulumi CLI, and AWS CLI.",
+      "success_signal": "The selected runtime, `pulumi`, and `aws` commands run locally.",
+      "failure_or_wait": "A missing or unsupported tool stops project creation or verification.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Authenticate Pulumi CLI to Pulumi Cloud or another supported state backend.",
+      "details": [
+        "The backend stores the project stack state used by `pulumi up`."
+      ],
+      "input": "Pulumi account or selected backend credentials.",
+      "output": "Authenticated Pulumi backend session.",
+      "success_signal": "Pulumi can create and address a stack.",
+      "failure_or_wait": "Backend account, token, URL, or network failure prevents stack creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Configure AWS credentials for the target account and verify that the local AWS access works.",
+      "details": [
+        "Pulumi uses the configured AWS identity when creating resources."
+      ],
+      "input": "AWS access credentials and region context.",
+      "output": "Working AWS provider authentication.",
+      "success_signal": "The AWS access check succeeds for the intended account.",
+      "failure_or_wait": "Expired, wrong-account, denied, or incomplete AWS credentials must be corrected before deployment.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create the AWS TypeScript Pulumi project and stack with the tutorial's `pulumi new` flow and answer its prompts.",
+      "details": [
+        "The generated starter program declares one S3 bucket and exports its name."
+      ],
+      "input": "Authenticated Pulumi backend, AWS credentials, project name, stack name, and region prompt values.",
+      "output": "Generated Pulumi project and configured stack.",
+      "success_signal": "The project files and stack configuration are present.",
+      "failure_or_wait": "Template, backend, package installation, prompt, name, or region errors prevent project creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Inspect the generated TypeScript program and confirm that it declares the S3 bucket and `bucketName` stack output.",
+      "details": [
+        "Website configuration and `index.html` are intentionally deferred to the tutorial's later update page."
+      ],
+      "input": "Generated Pulumi program.",
+      "output": "Confirmed first-deploy resource definition.",
+      "success_signal": "The program contains the bucket resource and output used by verification.",
+      "failure_or_wait": "A different or modified template changes the documented first resource and should be reconciled before continuing.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `pulumi up`, inspect the preview, and select `yes` to approve the update.",
+      "details": [
+        "The preview shows the S3 bucket resource that will be created."
+      ],
+      "input": "Configured project, stack, backend, and AWS credentials.",
+      "output": "Approved Pulumi update.",
+      "success_signal": "The update starts after approval.",
+      "failure_or_wait": "Preview errors, unexpected resources, denied approval, configuration, credential, or policy failures stop the update.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Wait for Pulumi to create the AWS resource and finish the stack update.",
+      "details": [
+        "The update summary reports the bucket created and prints the `bucketName` output."
+      ],
+      "input": "Approved stack update.",
+      "output": "Created AWS S3 bucket and stack output.",
+      "success_signal": "Pulumi reports the S3 bucket created and emits `bucketName`.",
+      "failure_or_wait": "AWS provisioning, permission, name, quota, network, or state errors require correction and another update.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `aws s3 ls s3://$(pulumi stack output bucketName)`.",
+      "details": [
+        "The first bucket is intentionally empty."
+      ],
+      "input": "Completed stack, AWS CLI, and exported bucket name.",
+      "output": "Successful empty-bucket listing.",
+      "success_signal": "AWS CLI reaches the new bucket and returns an empty listing without error.",
+      "failure_or_wait": "A missing output, wrong AWS identity, permission error, or unavailable bucket means the documented verification has not succeeded.",
+      "required": true,
+      "source_ids": [
+        "S4"
       ]
     }
   ],
@@ -336,25 +500,6 @@
     "No common after-success scope is selected while provider and language remain unresolved.",
     "Updating infrastructure, reusable components, destroying resources, policy, CI/CD, migrations, production hardening, and Pulumi Deployments are excluded."
   ],
-  "candidate_paths": [
-    {
-      "id": "aws-typescript-s3-bucket",
-      "name": "Deploy and verify the first AWS S3 bucket with Pulumi TypeScript",
-      "selection_basis": "The product and provider router has no default, but the AWS IaC tutorial documents a first deploy that creates an empty S3 bucket and verifies it through the exported `bucketName` before the later website update.",
-      "relationship_to_primary_path": "This selects IaC, AWS, and TypeScript at primary step 2, expanded from cloud and Pulumi access through empty-bucket verification.",
-      "steps": [
-        {"step_number": 1, "phase": "access", "actor": "developer", "interface": "console", "action": "Create or obtain access to the AWS account that will own the tutorial resources.", "details": ["The selected identity must be allowed to create the generated S3 bucket and AWS use can incur provider charges."], "input": "AWS identity, account, and required permissions.", "output": "Authorized AWS account context.", "success_signal": "The developer can obtain working AWS credentials.", "failure_or_wait": "Missing account, billing, policy, or S3 permission blocks the deployment.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the TypeScript runtime prerequisites, Pulumi CLI, and AWS CLI used by the verification command.", "details": ["Other supported language routes use Python, Go, C#, Java, or YAML instead."], "input": "Supported workstation and install permission.", "output": "Node.js package tools, Pulumi CLI, and AWS CLI.", "success_signal": "The selected runtime, `pulumi`, and `aws` commands run locally.", "failure_or_wait": "A missing or unsupported tool stops project creation or verification.", "required": true, "source_ids": ["S2", "S4"]},
-        {"step_number": 3, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Authenticate Pulumi CLI to Pulumi Cloud or another supported state backend.", "details": ["The backend stores the project stack state used by `pulumi up`."], "input": "Pulumi account or selected backend credentials.", "output": "Authenticated Pulumi backend session.", "success_signal": "Pulumi can create and address a stack.", "failure_or_wait": "Backend account, token, URL, or network failure prevents stack creation.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 4, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Configure AWS credentials for the target account and verify that the local AWS access works.", "details": ["Pulumi uses the configured AWS identity when creating resources."], "input": "AWS access credentials and region context.", "output": "Working AWS provider authentication.", "success_signal": "The AWS access check succeeds for the intended account.", "failure_or_wait": "Expired, wrong-account, denied, or incomplete AWS credentials must be corrected before deployment.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 5, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Create the AWS TypeScript Pulumi project and stack with the tutorial's `pulumi new` flow and answer its prompts.", "details": ["The generated starter program declares one S3 bucket and exports its name."], "input": "Authenticated Pulumi backend, AWS credentials, project name, stack name, and region prompt values.", "output": "Generated Pulumi project and configured stack.", "success_signal": "The project files and stack configuration are present.", "failure_or_wait": "Template, backend, package installation, prompt, name, or region errors prevent project creation.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 6, "phase": "configure", "actor": "developer", "interface": "other", "action": "Inspect the generated TypeScript program and confirm that it declares the S3 bucket and `bucketName` stack output.", "details": ["Website configuration and `index.html` are intentionally deferred to the tutorial's later update page."], "input": "Generated Pulumi program.", "output": "Confirmed first-deploy resource definition.", "success_signal": "The program contains the bucket resource and output used by verification.", "failure_or_wait": "A different or modified template changes the documented first resource and should be reconciled before continuing.", "required": true, "source_ids": ["S2", "S4"]},
-        {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `pulumi up`, inspect the preview, and select `yes` to approve the update.", "details": ["The preview shows the S3 bucket resource that will be created."], "input": "Configured project, stack, backend, and AWS credentials.", "output": "Approved Pulumi update.", "success_signal": "The update starts after approval.", "failure_or_wait": "Preview errors, unexpected resources, denied approval, configuration, credential, or policy failures stop the update.", "required": true, "source_ids": ["S4"]},
-        {"step_number": 8, "phase": "verify", "actor": "platform", "interface": "cli", "action": "Wait for Pulumi to create the AWS resource and finish the stack update.", "details": ["The update summary reports the bucket created and prints the `bucketName` output."], "input": "Approved stack update.", "output": "Created AWS S3 bucket and stack output.", "success_signal": "Pulumi reports the S3 bucket created and emits `bucketName`.", "failure_or_wait": "AWS provisioning, permission, name, quota, network, or state errors require correction and another update.", "required": true, "source_ids": ["S4"]},
-        {"step_number": 9, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run `aws s3 ls s3://$(pulumi stack output bucketName)`.", "details": ["The first bucket is intentionally empty."], "input": "Completed stack, AWS CLI, and exported bucket name.", "output": "Successful empty-bucket listing.", "success_signal": "AWS CLI reaches the new bucket and returns an empty listing without error.", "failure_or_wait": "A missing output, wrong AWS identity, permission error, or unavailable bucket means the documented verification has not succeeded.", "required": true, "source_ids": ["S4"]}
-      ],
-      "source_ids": ["S2", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

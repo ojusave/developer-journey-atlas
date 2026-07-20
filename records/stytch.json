@@ -3,7 +3,7 @@
   "category": "Identity, security, and networking",
   "surface": {
     "name": "Authentication Quickstart through a working login or signup flow",
-    "selection_basis": "Stytch's official general Quickstart is an interactive router rather than a single implementation. It requires the developer to select UI, headless, or backend-only integration, then a framework, then Multi-tenant or Consumer Authentication. Each resulting guide requires a Stytch account and project credentials, but the public dashboard does not expose the account-creation or initial project-convergence sequence.",
+    "selection_basis": "Under the workshop policy, the first-listed prebuilt Stytch UI route with React and Consumer Authentication is primary because it minimizes custom authentication code and is the quickest documented path to a working login/signup flow. Dashboard signup is one opaque step.",
     "alternatives_considered": [
       {"name": "Stytch UI", "url": "https://stytch.com/docs/consumer-auth/build-auth/login-or-signup", "reason_not_primary": "The Quickstart presents Stytch UI as a peer implementation type alongside Headless and Backend only, and it still requires a framework and Consumer versus Multi-tenant choice."},
       {"name": "Headless frontend SDK", "url": "https://stytch.com/docs/consumer-auth/build-auth/custom/via-sdk", "reason_not_primary": "This is a peer route for developers who want their own UI; the general Quickstart does not rank it above the other implementation types."},
@@ -11,8 +11,8 @@
       {"name": "Multi-tenant Authentication", "url": "https://stytch.com/docs/multi-tenant-auth/overview", "reason_not_primary": "Stytch presents Multi-tenant Authentication for organization/member applications and Consumer Authentication for individual users as peer project types."}
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create a Stytch account and project, select an official authentication implementation, and test it until the guide's login or signup flow produces an authenticated session.",
@@ -24,11 +24,11 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established end to end by public official documentation",
-    "normalized_outcome": "No universal Stytch first-success route can be established because required implementation choices remain open and the prerequisite account and initial project transition is hidden.",
-    "observable_completion_signal": "The public dashboard response is a client application shell and spinner; it does not establish account fields, verification, workspace creation, default project state, or successful access to project credentials.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The backend Consumer candidate demonstrates a protected dashboard response of `You're logged in.`, but the required account and project transition is not publicly established.", "source_ids": ["S1", "S3", "S4"]},
-    "why_this_is_the_boundary": "Individual implementation guides demonstrate authenticated-session terminals, but they begin with project credentials and configuration. Those downstream terminals cannot establish an end-to-end first-user path while the prerequisite dashboard transition remains hidden and the general Quickstart does not choose a route.",
+    "official_milestone": "Add login or signup with Stytch UI",
+    "normalized_outcome": "The local React app renders Stytch UI and completes a Consumer Authentication login or signup, producing session and user data.",
+    "observable_completion_signal": "After the user completes the Stytch UI flow, the application receives an authenticated session and user object.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "Handle session and user data after login or signup", "source_ids": ["S6"]},
+    "why_this_is_the_boundary": "An authenticated session is the first proof that project configuration, frontend SDK, Stytch UI, and the selected auth method work end to end.",
     "source_ids": ["S1", "S2", "S3", "S4"]
   },
   "prerequisites": [
@@ -39,15 +39,15 @@
   ],
   "primary_path": [
     {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Stytch's general Quickstart.", "details": [], "input": "https://stytch.com/docs/get-started/quickstart", "output": "The three-stage route selector opens.", "success_signal": "Implementation type, framework, and authentication project-type controls are displayed.", "failure_or_wait": "No navigation recovery behavior is documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "prepare", "actor": "developer", "interface": "documentation", "action": "Select Stytch UI, Headless, or Backend only; select a supported framework; then select Multi-tenant Auth or Consumer Auth.", "details": ["Stytch UI exposes React, Next.js, and Vanilla JS.", "Headless also exposes iOS, Android, and React Native.", "Backend only exposes Node, Python, Go, Ruby, and Java."], "input": "Application architecture, framework, and tenant model", "output": "The corresponding implementation-specific quickstart opens.", "success_signal": "No single combination is selected by the official documentation for all developers.", "failure_or_wait": "The next actions change materially with the three choices.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for the Stytch account required to obtain project credentials.", "details": ["The API Keys documentation links account signup to the Stytch dashboard."], "input": "Account information not publicly enumerated", "output": "The client-rendered dashboard account sequence begins.", "success_signal": "No public official source establishes successful account, workspace, and initial-project convergence.", "failure_or_wait": "The public response exposes no signup recovery behavior.", "required": true, "source_ids": ["S2", "S3"]}
+    {"step_number": 2, "phase": "prepare", "actor": "developer", "interface": "documentation", "action": "Select Stytch UI, React, and Consumer Authentication.", "details": ["This is the first-listed prebuilt UI route."], "input": "A browser-based consumer app", "output": "The Add login or signup guide opens.", "success_signal": "The React Stytch UI instructions are visible.", "failure_or_wait": "", "required": true, "source_ids": ["S1", "S6"]},
+    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up through the official Stytch dashboard.", "details": ["Treat signup, workspace creation, and initial project provisioning as one opaque step."], "input": "https://stytch.com/dashboard", "output": "An authenticated Consumer Authentication project is available.", "success_signal": "The dashboard exposes the Test environment public token.", "failure_or_wait": "Complete any account verification requested by Stytch.", "required": true, "source_ids": ["S2", "S3", "S5"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Enable Frontend SDKs, authorize the local development domain, and copy the Test public token.", "details": [], "input": "The Consumer project", "output": "The project permits the local frontend.", "success_signal": "The public token and authorized domain are configured.", "failure_or_wait": "Correct the domain or environment selection.", "required": true, "source_ids": ["S2", "S6"]},
+    {"step_number": 5, "phase": "build", "actor": "developer", "interface": "code", "action": "Install the Stytch React SDK, initialize the provider with the public token, and render the documented Stytch UI login/signup component.", "details": [], "input": "A React app and Test public token", "output": "The local app renders Stytch UI.", "success_signal": "The login/signup form appears.", "failure_or_wait": "Check package installation, provider setup, token, and domain authorization.", "required": true, "source_ids": ["S6"]},
+    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "browser", "action": "Run the app and complete a login or signup through the rendered Stytch UI.", "details": [], "input": "A test end-user identity", "output": "Stytch authenticates the user.", "success_signal": "The auth flow completes and returns to the app.", "failure_or_wait": "Follow the selected method's verification prompt.", "required": true, "source_ids": ["S6"]},
+    {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "browser", "action": "Verify the React app receives and displays authenticated session or user data.", "details": [], "input": "Completed authentication", "output": "A working authenticated session exists.", "success_signal": "Session and user hooks return authenticated data.", "failure_or_wait": "Inspect the SDK error and project settings.", "required": true, "source_ids": ["S6"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "A full candidate cannot cross the hidden account and project gate. For one downstream official candidate, the developer selects Backend only, Node, and Consumer Auth; has project_id and secret from a Stytch project and environment; adds `http://localhost:3000/authenticate` as a redirect URL; installs `stytch`, `express`, and `express-session`; stores STYTCH_PROJECT_ID and STYTCH_SECRET in .env; initializes the client and Express session middleware; creates POST `/login` to call email login_or_create with login and signup redirect URLs; adds GET `/authenticate` to exchange the query token for a 60-minute session and redirect to `/dashboard`; adds GET `/dashboard` to authenticate the stored session JWT and return `You're logged in.` for status 200; starts the server; sends POST `/login` with an email; receives the magic link; and clicks it to finish login or signup. The account fields, verification, workspace creation, initial project choice, and credential-arrival transitions before these documented actions remain unavailable.",
-    "impact": "Neither the complete account step nor a universal implementation path can be counted without inventing hidden states and choosing among peer architecture and tenant models.",
-    "source_ids": ["S1", "S2", "S3", "S4", "S5"]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {"at_step": 2, "condition": "Choose Stytch UI", "path": "Select React, Next.js, or Vanilla JS and follow the relevant prebuilt login/signup component guide using the environment public_token, enabled Frontend SDKs, and an authorized domain.", "effect_on_first_success": "Uses a prebuilt UI and frontend session hooks instead of backend routes and secret-key authentication.", "source_ids": ["S1", "S6"]},
     {"at_step": 2, "condition": "Choose Headless", "path": "Select a supported web or mobile framework and build the UI using the headless frontend SDK route.", "effect_on_first_success": "Adds developer-owned UI state and changes SDK, configuration, and testing steps.", "source_ids": ["S1"]},
@@ -70,10 +70,7 @@
     {"id": "S6", "title": "Add login or signup", "url": "https://stytch.com/docs/consumer-auth/build-auth/login-or-signup", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Quickstart", "Before you start", "Handle session and user data"], "evidence_supported": ["Stytch UI prerequisites", "Frontend framework branches", "Session-data terminal"]},
     {"id": "S7", "title": "Authentication and authorization", "url": "https://stytch.com/docs/get-started/guides/authentication", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Start building", "Quickstarts"], "evidence_supported": ["Vendor claim that the first auth flow can work in under 10 minutes"]}
   ],
-  "uncertainties": [
-    {"question": "What exact identity methods, fields, verification, legal acceptance, workspace creation, project initialization, and post-submit states currently lead from Stytch signup to project credentials?", "impact": "The mandatory account and project portion cannot be reconstructed or counted.", "reason_unresolved": "The API Keys page says to sign up and the dashboard response is a client-rendered application shell without public signup states.", "checked_source_ids": ["S2", "S3", "S5"]},
-    {"question": "Which implementation type, framework, and authentication project type should define Stytch's universal first mile?", "impact": "Credentials, configuration, code, user interaction, and terminal state differ materially.", "reason_unresolved": "The official Quickstart explicitly asks the developer to make all three choices and does not rank one combination as universal.", "checked_source_ids": ["S1", "S4", "S6"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "No complete end-to-end success is claimed while the account and initial project transition remains hidden.",
     "Production-domain authorization, Live credentials, additional authentication methods, MFA, SSO, SCIM, RBAC, fraud controls, production session policy, and deployment occur after the first working authentication flow."

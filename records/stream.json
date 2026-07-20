@@ -6,8 +6,8 @@
   },
   "category": "Communications, media, and social",
   "surface": {
-    "name": "Stream product and SDK documentation selector",
-    "selection_basis": "Stream presents five co-equal developer products before implementation begins: Chat Messaging, Video & Audio, Activity Feeds, AI Moderation, and Vision Agents. Each product then presents multiple SDK, UI, use-case, or integration routes, and Stream does not establish one platform-wide first-success journey.",
+    "name": "React Chat connected client with tutorial credentials",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: React Chat connected client with tutorial credentials. The current React Chat tutorial provides generated credentials and an explicit earliest connection checkpoint before channel and message UI work. It is a complete low-dependency candidate, not a platform-wide default over Stream's other products or SDKs. Prior surface before policy commit: Stream product and SDK documentation selector.",
     "alternatives_considered": [
       {
         "name": "Chat Messaging",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach Stream's first useful documented developer success after selecting Stream as the platform.",
@@ -49,12 +49,12 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established platform-wide; route milestones include a connected chat client, joined video call, added feed activity, moderation recommendation, or browser voice-agent greeting.",
+    "official_milestone": "The page displays Chat with client is ready! and the Network panel shows the secure WebSocket connection.",
     "normalized_outcome": "The developer first chooses a Stream product and implementation route, then completes that route's distinct observable success.",
     "observable_completion_signal": "Signals differ by route: a secure chat WebSocket and rendered ready state, a joined call with rendered participants, a created feed plus added Hello Stream Feeds activity, a keep/flag/remove moderation result, or a voice agent that greets the developer in the browser.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The documentation navigation treats five products as peers and each product exposes multiple implementation paths. No page labels one of their outcomes as Stream's universal first success.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The page displays Chat with client is ready! and the Network panel shows the secure WebSocket connection.",
       "source_ids": [
         "S1",
         "S2",
@@ -245,6 +245,128 @@
       "source_ids": [
         "S8",
         "S9"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Confirm a React 19-compatible local toolchain and npm are available for the versions tested by the tutorial.",
+      "details": [
+        "The tutorial states it was tested with React ^19 and Stream Chat SDK ^14; a configured CodeSandbox is an alternative."
+      ],
+      "input": "Local Node.js React environment",
+      "output": "Eligible React tutorial environment",
+      "success_signal": "The Vite React TypeScript scaffold can run locally.",
+      "failure_or_wait": "Use the linked sandbox or correct the local Node, npm, or React environment before continuing.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm create vite chat-example -- --template react-ts, then cd chat-example.",
+      "details": [],
+      "input": "npm and writable local directory",
+      "output": "Vite React TypeScript project",
+      "success_signal": "The shell is inside the generated chat-example project.",
+      "failure_or_wait": "Package, network, template, or filesystem errors must be corrected and the scaffold rerun.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm i stream-chat stream-chat-react.",
+      "details": [],
+      "input": "Generated React project",
+      "output": "Installed Stream Chat client and React component packages",
+      "success_signal": "Both packages are installed in chat-example.",
+      "failure_or_wait": "npm, network, lockfile, or permissions errors must be corrected before imports resolve.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Use the tutorial-generated apiKey, userId, userToken, and optional userName values shown with the code sample.",
+      "details": [
+        "The API key identifies the generated Stream application; userId and userToken authorize the chat user.",
+        "Using an own Stream app and JWT generator is a separate branch."
+      ],
+      "input": "Current generated tutorial credentials",
+      "output": "Temporary Chat application and user credentials",
+      "success_signal": "All required placeholder values can be replaced in App.tsx.",
+      "failure_or_wait": "Expired, missing, copied incorrectly, or mismatched generated credentials prevent the client connection; refresh the tutorial values or use an own app and valid JWT.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Replace src/App.tsx with the tutorial's initial Client Setup code and substitute the generated credentials.",
+      "details": [
+        "The code imports Chat and useCreateChatClient, calls the hook once with apiKey, tokenOrProvider, and userData, renders Setting up client & connection... until ready, then renders Chat with the text Chat with client is ready!.",
+        "The tutorial warns that the client must establish a connection before it is passed to Chat."
+      ],
+      "input": "Installed packages and generated credentials",
+      "output": "React app that creates and renders a connected Stream Chat client",
+      "success_signal": "App.tsx has no remaining credential placeholders and matches the initial setup.",
+      "failure_or_wait": "TypeScript, imports, placeholder, or credential errors must be corrected before the app can connect.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm run dev.",
+      "details": [],
+      "input": "Configured chat-example app",
+      "output": "Vite development server and Stream connection attempt",
+      "success_signal": "Vite prints a local site URL and the application loads without a terminal build error.",
+      "failure_or_wait": "Build, dependency, port, or runtime errors must be corrected and the server restarted.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Vite site and verify both the ready text and a secure WebSocket connection to Stream in browser developer tools.",
+      "details": [
+        "Stop at this first connected-client checkpoint; channels, message UI, styling, attachments, and channel lists are later tutorial sections."
+      ],
+      "input": "Running configured React app",
+      "output": "First connected Stream Chat client",
+      "success_signal": "The page displays Chat with client is ready! and the Network panel shows the secure WebSocket connection.",
+      "failure_or_wait": "If the page remains on Setting up client & connection... or no secure WebSocket appears, inspect browser errors, network access, package versions, and all generated credential values, then retry.",
+      "required": true,
+      "source_ids": [
+        "S4"
       ]
     }
   ],
@@ -812,23 +934,6 @@
     "Vision Agent voice, video, provider, RAG, telephony, and deployment extensions after the first greeting",
     "Plan limits, production capacity, enterprise contracting, and pricing optimization"
   ],
-  "candidate_paths": [
-    {
-      "id": "react-chat-generated-credentials",
-      "name": "React Chat connected client with tutorial credentials",
-      "selection_basis": "The current React Chat tutorial provides generated credentials and an explicit earliest connection checkpoint before channel and message UI work. It is a complete low-dependency candidate, not a platform-wide default over Stream's other products or SDKs.",
-      "relationship_to_primary_path": "Continues after primary_path step 2 by selecting Chat Messaging, React, and the tutorial-generated-credential route. It deliberately bypasses optional primary_path steps 3 through 5 for creating an own Stream account and app.",
-      "steps": [
-        {"step_number":1,"phase":"verify","actor":"developer","interface":"documentation","action":"Confirm a React 19-compatible local toolchain and npm are available for the versions tested by the tutorial.","details":["The tutorial states it was tested with React ^19 and Stream Chat SDK ^14; a configured CodeSandbox is an alternative."],"input":"Local Node.js React environment","output":"Eligible React tutorial environment","success_signal":"The Vite React TypeScript scaffold can run locally.","failure_or_wait":"Use the linked sandbox or correct the local Node, npm, or React environment before continuing.","required":true,"source_ids":["S4"]},
-        {"step_number":2,"phase":"install","actor":"developer","interface":"cli","action":"Run npm create vite chat-example -- --template react-ts, then cd chat-example.","details":[],"input":"npm and writable local directory","output":"Vite React TypeScript project","success_signal":"The shell is inside the generated chat-example project.","failure_or_wait":"Package, network, template, or filesystem errors must be corrected and the scaffold rerun.","required":true,"source_ids":["S4"]},
-        {"step_number":3,"phase":"install","actor":"developer","interface":"cli","action":"Run npm i stream-chat stream-chat-react.","details":[],"input":"Generated React project","output":"Installed Stream Chat client and React component packages","success_signal":"Both packages are installed in chat-example.","failure_or_wait":"npm, network, lockfile, or permissions errors must be corrected before imports resolve.","required":true,"source_ids":["S4"]},
-        {"step_number":4,"phase":"authenticate","actor":"developer","interface":"documentation","action":"Use the tutorial-generated apiKey, userId, userToken, and optional userName values shown with the code sample.","details":["The API key identifies the generated Stream application; userId and userToken authorize the chat user.","Using an own Stream app and JWT generator is a separate branch."],"input":"Current generated tutorial credentials","output":"Temporary Chat application and user credentials","success_signal":"All required placeholder values can be replaced in App.tsx.","failure_or_wait":"Expired, missing, copied incorrectly, or mismatched generated credentials prevent the client connection; refresh the tutorial values or use an own app and valid JWT.","required":true,"source_ids":["S4"]},
-        {"step_number":5,"phase":"configure","actor":"developer","interface":"other","action":"Replace src/App.tsx with the tutorial's initial Client Setup code and substitute the generated credentials.","details":["The code imports Chat and useCreateChatClient, calls the hook once with apiKey, tokenOrProvider, and userData, renders Setting up client & connection... until ready, then renders Chat with the text Chat with client is ready!.","The tutorial warns that the client must establish a connection before it is passed to Chat."],"input":"Installed packages and generated credentials","output":"React app that creates and renders a connected Stream Chat client","success_signal":"App.tsx has no remaining credential placeholders and matches the initial setup.","failure_or_wait":"TypeScript, imports, placeholder, or credential errors must be corrected before the app can connect.","required":true,"source_ids":["S4"]},
-        {"step_number":6,"phase":"execute","actor":"developer","interface":"cli","action":"Run npm run dev.","details":[],"input":"Configured chat-example app","output":"Vite development server and Stream connection attempt","success_signal":"Vite prints a local site URL and the application loads without a terminal build error.","failure_or_wait":"Build, dependency, port, or runtime errors must be corrected and the server restarted.","required":true,"source_ids":["S4"]},
-        {"step_number":7,"phase":"verify","actor":"developer","interface":"console","action":"Open the Vite site and verify both the ready text and a secure WebSocket connection to Stream in browser developer tools.","details":["Stop at this first connected-client checkpoint; channels, message UI, styling, attachments, and channel lists are later tutorial sections."],"input":"Running configured React app","output":"First connected Stream Chat client","success_signal":"The page displays Chat with client is ready! and the Network panel shows the secure WebSocket connection.","failure_or_wait":"If the page remains on Setting up client & connection... or no secure WebSocket appears, inspect browser errors, network access, package versions, and all generated credential values, then retry.","required":true,"source_ids":["S4"]}
-      ],
-      "source_ids": ["S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

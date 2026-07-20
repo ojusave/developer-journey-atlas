@@ -6,8 +6,8 @@
   },
   "category": "Identity, security, and networking",
   "surface": {
-    "name": "Unresolved at Microsoft identity platform outcome, application type, and runtime selection",
-    "selection_basis": "The Microsoft identity platform documentation directs developers to choose among user sign-in, API protection, non-interactive API access, Microsoft Graph, external identity, and other outcomes. The sign-in path then requires one of six application types and a language or framework. The docs do not identify one universal first-success journey for Microsoft Entra ID.",
+    "name": "Register and run an ASP.NET Core web app with Microsoft sign-in",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Register and run an ASP.NET Core web app with Microsoft sign-in. The official web-app quickstart provides a bounded route from tenant and runtime prerequisites through a completed local Microsoft sign-in flow. Prior surface before policy commit: Unresolved at Microsoft identity platform outcome, application type, and runtime selection.",
     "alternatives_considered": [
       {
         "name": "ASP.NET Core web app sign-in quickstart",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Integrate Microsoft Entra ID and choose the identity outcome, application architecture, and runtime whose first mile should be measured.",
@@ -44,18 +44,18 @@
   },
   "documented_first_success": {
     "official_milestone": "No single cross-scenario first-success milestone is established by the Microsoft identity platform documentation.",
-    "normalized_outcome": "Unresolved: success may be a signed-in user, an accepted access token at a protected API, an application-only token, or a successful Microsoft Graph request.",
-    "observable_completion_signal": "The selected quickstart supplies its own terminal signal, such as a signed-in web page, returned user information, an acquired token, or an authorized API response.",
+    "normalized_outcome": "The user is redirected back to the app after sign-in without an Entra error.",
+    "observable_completion_signal": "The user is redirected back to the app after sign-in without an Entra error.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The documentation first asks the developer to select an app type and outcome, then offers different quickstarts for SPA, web app, web API, desktop, mobile, and background service scenarios.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The user is redirected back to the app after sign-in without an Entra error.",
       "source_ids": [
         "S1",
         "S3",
         "S4"
       ]
     },
-    "why_this_is_the_boundary": "Choosing one sample would impose an architecture and success definition that Microsoft presents as a developer decision. That choice changes tenant and app-registration fields, credentials, OAuth flow, libraries, code, and verification.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -175,24 +175,164 @@
     },
     {
       "step_number": 5,
-      "phase": "configure",
+      "phase": "access",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose a language, framework, and corresponding Microsoft Authentication Library quickstart.",
+      "interface": "console",
+      "action": "Sign in to a Microsoft Entra tenant and confirm that the .NET 9 SDK is installed locally.",
       "details": [
-        "Available implementations vary by app type and include .NET, JavaScript, Node.js, Java, Python, Android, and iOS options.",
-        "Microsoft recommends MSAL for supported authentication scenarios."
+        "The quickstart requires an Entra tenant, permission to register an application, and the .NET 9 SDK."
       ],
-      "input": "Existing project runtime or a declared sample runtime.",
-      "output": "An executable quickstart with concrete registration, code, and verification steps.",
-      "success_signal": "A runtime-specific guide is selected.",
-      "failure_or_wait": "Research stops here rather than inventing a runtime and treating its result as the platform-wide first success.",
+      "input": "An eligible Microsoft identity and a local development environment.",
+      "output": "Tenant access and a compatible .NET runtime.",
+      "success_signal": "The Entra admin center or Azure portal is accessible and dotnet is available.",
+      "failure_or_wait": "A user without an Entra tenant must obtain one before continuing; tenant creation is linked but not decomposed in this quickstart.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3",
-        "S4",
-        "S6"
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Microsoft Entra ID, go to App registrations, and select New registration.",
+      "details": [
+        "This begins the app identity required by the local sample."
+      ],
+      "input": "Authenticated tenant access with app-registration permission.",
+      "output": "The Register an application form.",
+      "success_signal": "The registration form is visible.",
+      "failure_or_wait": "Insufficient tenant permissions block registration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a display name, select the supported account type, and add a Web redirect URI of https://localhost:5001/signin-oidc.",
+      "details": [
+        "The redirect URI and account type determine which sign-ins the app accepts."
+      ],
+      "input": "The app name, intended account audience, and documented local callback URI.",
+      "output": "A completed app-registration form.",
+      "success_signal": "The form contains the Web callback exactly as documented.",
+      "failure_or_wait": "A different callback later produces AADSTS50011 redirect URI mismatch.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Register the application and copy its Application client ID and Directory tenant ID.",
+      "details": [
+        "Both identifiers are required by the generated app configuration."
+      ],
+      "input": "The completed registration form.",
+      "output": "A registered app plus client and tenant identifiers.",
+      "success_signal": "The app Overview page shows both identifiers and they are copied.",
+      "failure_or_wait": "An incorrect client ID later produces AADSTS700016.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Scaffold the sample with dotnet new webapp --auth SingleOrg --name MyWebApp, then enter the MyWebApp directory.",
+      "details": [
+        "The SingleOrg authentication option generates the Microsoft identity integration structure."
+      ],
+      "input": "The .NET 9 SDK.",
+      "output": "A new ASP.NET Core web app project.",
+      "success_signal": "The MyWebApp directory and project files are created.",
+      "failure_or_wait": "SDK or template errors must be resolved before configuration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Update appsettings.json with the tenant ID, client ID, and callback path from the registration.",
+      "details": [
+        "Set TenantId and ClientId to the copied values and CallbackPath to /signin-oidc."
+      ],
+      "input": "The scaffolded project and copied Entra identifiers.",
+      "output": "A project configured for the registered tenant application.",
+      "success_signal": "The Microsoft identity configuration matches the Entra registration.",
+      "failure_or_wait": "An incorrect Instance or TenantId causes an invalid authority configuration; an incorrect client ID produces AADSTS700016.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the application with dotnet run.",
+      "details": [
+        "The local server hosts the configured web app."
+      ],
+      "input": "The configured ASP.NET Core project.",
+      "output": "A running local web application.",
+      "success_signal": "The command reports that the app is listening locally.",
+      "failure_or_wait": "Build, certificate, or port errors prevent the browser test.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open https://localhost:5001 and select Sign in.",
+      "details": [
+        "The app redirects the browser to the Microsoft identity sign-in experience."
+      ],
+      "input": "The running local app and a tenant user account.",
+      "output": "A Microsoft sign-in prompt and redirect flow.",
+      "success_signal": "The Microsoft sign-in prompt appears, which the quick check treats as correct basic configuration.",
+      "failure_or_wait": "AADSTS50011 indicates the portal redirect URI does not exactly match the app callback.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Complete Microsoft sign-in and confirm the browser returns to the local application as an authenticated user.",
+      "details": [
+        "The quickstart's run-and-test section requires the sign-in flow to complete successfully."
+      ],
+      "input": "Valid credentials for an account accepted by the app registration.",
+      "output": "An authenticated local application session.",
+      "success_signal": "The user is redirected back to the app after sign-in without an Entra error.",
+      "failure_or_wait": "Consent, tenant-policy, account-type, or configuration errors mean the first sign-in has not succeeded.",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
@@ -436,160 +576,6 @@
   "excluded_after_success": [
     "No implementation-specific downstream work can be excluded until the identity outcome, application type, runtime, and terminal success are selected."
   ],
-  "candidate_paths": [
-    {
-      "id": "aspnet-core-first-sign-in",
-      "name": "Register and run an ASP.NET Core web app with Microsoft sign-in",
-      "selection_basis": "The official web-app quickstart provides a bounded route from tenant and runtime prerequisites through a completed local Microsoft sign-in flow.",
-      "relationship_to_primary_path": "This is one complete peer route after the shared Entra documentation spine selects a server-side web app and ASP.NET Core.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Sign in to a Microsoft Entra tenant and confirm that the .NET 9 SDK is installed locally.",
-          "details": [
-            "The quickstart requires an Entra tenant, permission to register an application, and the .NET 9 SDK."
-          ],
-          "input": "An eligible Microsoft identity and a local development environment.",
-          "output": "Tenant access and a compatible .NET runtime.",
-          "success_signal": "The Entra admin center or Azure portal is accessible and dotnet is available.",
-          "failure_or_wait": "A user without an Entra tenant must obtain one before continuing; tenant creation is linked but not decomposed in this quickstart.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 2,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open Microsoft Entra ID, go to App registrations, and select New registration.",
-          "details": [
-            "This begins the app identity required by the local sample."
-          ],
-          "input": "Authenticated tenant access with app-registration permission.",
-          "output": "The Register an application form.",
-          "success_signal": "The registration form is visible.",
-          "failure_or_wait": "Insufficient tenant permissions block registration.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 3,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Enter a display name, select the supported account type, and add a Web redirect URI of https://localhost:5001/signin-oidc.",
-          "details": [
-            "The redirect URI and account type determine which sign-ins the app accepts."
-          ],
-          "input": "The app name, intended account audience, and documented local callback URI.",
-          "output": "A completed app-registration form.",
-          "success_signal": "The form contains the Web callback exactly as documented.",
-          "failure_or_wait": "A different callback later produces AADSTS50011 redirect URI mismatch.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 4,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Register the application and copy its Application client ID and Directory tenant ID.",
-          "details": [
-            "Both identifiers are required by the generated app configuration."
-          ],
-          "input": "The completed registration form.",
-          "output": "A registered app plus client and tenant identifiers.",
-          "success_signal": "The app Overview page shows both identifiers and they are copied.",
-          "failure_or_wait": "An incorrect client ID later produces AADSTS700016.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 5,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Scaffold the sample with dotnet new webapp --auth SingleOrg --name MyWebApp, then enter the MyWebApp directory.",
-          "details": [
-            "The SingleOrg authentication option generates the Microsoft identity integration structure."
-          ],
-          "input": "The .NET 9 SDK.",
-          "output": "A new ASP.NET Core web app project.",
-          "success_signal": "The MyWebApp directory and project files are created.",
-          "failure_or_wait": "SDK or template errors must be resolved before configuration.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 6,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "ide",
-          "action": "Update appsettings.json with the tenant ID, client ID, and callback path from the registration.",
-          "details": [
-            "Set TenantId and ClientId to the copied values and CallbackPath to /signin-oidc."
-          ],
-          "input": "The scaffolded project and copied Entra identifiers.",
-          "output": "A project configured for the registered tenant application.",
-          "success_signal": "The Microsoft identity configuration matches the Entra registration.",
-          "failure_or_wait": "An incorrect Instance or TenantId causes an invalid authority configuration; an incorrect client ID produces AADSTS700016.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 7,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run the application with dotnet run.",
-          "details": [
-            "The local server hosts the configured web app."
-          ],
-          "input": "The configured ASP.NET Core project.",
-          "output": "A running local web application.",
-          "success_signal": "The command reports that the app is listening locally.",
-          "failure_or_wait": "Build, certificate, or port errors prevent the browser test.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 8,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Open https://localhost:5001 and select Sign in.",
-          "details": [
-            "The app redirects the browser to the Microsoft identity sign-in experience."
-          ],
-          "input": "The running local app and a tenant user account.",
-          "output": "A Microsoft sign-in prompt and redirect flow.",
-          "success_signal": "The Microsoft sign-in prompt appears, which the quick check treats as correct basic configuration.",
-          "failure_or_wait": "AADSTS50011 indicates the portal redirect URI does not exactly match the app callback.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 9,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Complete Microsoft sign-in and confirm the browser returns to the local application as an authenticated user.",
-          "details": [
-            "The quickstart's run-and-test section requires the sign-in flow to complete successfully."
-          ],
-          "input": "Valid credentials for an account accepted by the app registration.",
-          "output": "An authenticated local application session.",
-          "success_signal": "The user is redirected back to the app after sign-in without an Entra error.",
-          "failure_or_wait": "Consent, tenant-policy, account-type, or configuration errors mean the first sign-in has not succeeded.",
-          "required": true,
-          "source_ids": ["S2"]
-        }
-      ],
-      "source_ids": ["S2"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

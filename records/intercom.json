@@ -1,16 +1,32 @@
 {
-  "platform": {"name": "Intercom", "slug": "intercom", "organization": "Intercom, Inc."},
+  "platform": {
+    "name": "Intercom",
+    "slug": "intercom",
+    "organization": "Intercom, Inc."
+  },
   "category": "B2B SaaS and enterprise ecosystems",
   "surface": {
     "name": "Intercom workspace and app setup through the first Contacts API call",
-    "selection_basis": "Intercom's Get Started guide explicitly sequences workspace creation, app creation, access-token retrieval, and a first API call that creates a contact. It covers both public-app development workspaces and private apps in paid workspaces.",
+    "selection_basis": "Under the workshop policy, Intercom’s first-listed developer quickstart is primary. The free development-workspace route is the quickest documented path for a new developer and ends with a concrete Contacts API response. Signup is one opaque step at the official developer signup URL; all post-login actions come from the official guide.",
     "alternatives_considered": [
-      {"name": "Public app OAuth installation", "url": "https://developers.intercom.com/docs/build-an-integration/learn-more/authentication", "reason_not_primary": "OAuth is required when a public app accesses other customers' data, while the getting-started guide first creates and pre-installs the developer's app in the developer's own workspace and uses its token for the first call."},
-      {"name": "Messenger app", "url": "https://developers.intercom.com/docs/build-an-integration/getting-started/build-an-app-for-messenger", "reason_not_primary": "The workspace guide lists Messenger app work as a later next step after the first Contacts API call."},
-      {"name": "Inbox app", "url": "https://developers.intercom.com/docs/build-an-integration/getting-started/build-an-inbox-app", "reason_not_primary": "The workspace guide lists Inbox app work after the initial workspace, app, and API call sequence."}
+      {
+        "name": "Public app OAuth installation",
+        "url": "https://developers.intercom.com/docs/build-an-integration/learn-more/authentication",
+        "reason_not_primary": "OAuth is required when a public app accesses other customers' data, while the getting-started guide first creates and pre-installs the developer's app in the developer's own workspace and uses its token for the first call."
+      },
+      {
+        "name": "Messenger app",
+        "url": "https://developers.intercom.com/docs/build-an-integration/getting-started/build-an-app-for-messenger",
+        "reason_not_primary": "The workspace guide lists Messenger app work as a later next step after the first Contacts API call."
+      },
+      {
+        "name": "Inbox app",
+        "url": "https://developers.intercom.com/docs/build-an-integration/getting-started/build-an-inbox-app",
+        "reason_not_primary": "The workspace guide lists Inbox app work after the initial workspace, app, and API call sequence."
+      }
     ]
   },
-  "research_status": "blocked",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -26,55 +42,401 @@
     "official_milestone": "Step 3: Make your first API Call by creating a new Intercom contact.",
     "normalized_outcome": "The intended terminal is a successful `POST https://api.intercom.io/contacts` for the guide's sample email using the app's token and API version 2.11.",
     "observable_completion_signal": "The response is a contact object containing a generated contact ID, the selected workspace ID, role `user`, and the submitted email address.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The first contact response is demonstrated, but no complete public path establishes the chosen account and workspace, authenticated Developer Hub state, and app creation from no account.", "source_ids": ["S1", "S2", "S3", "S4", "S5"]},
-    "why_this_is_the_boundary": "The Get Started guide numbers this as the first API call and places additional app types and API exploration in Step 4. The path remains blocked earlier because public and private developers enter different account routes, the public signup ends at form submission, and the Developer Hub requires authenticated application state.",
-    "source_ids": ["S1", "S2", "S3", "S4", "S5"]
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The `POST /contacts` request returns the demonstrated contact object with an ID, workspace ID, role, and submitted email.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "configuration", "requirement": "Decide whether the app is public for multiple customers or private for the developer's own paid workspace.", "required": true, "source_ids": ["S1", "S2"]},
-    {"order": 2, "type": "account", "requirement": "For a public app, create an Intercom developer account and a free development workspace; for a private app, have a paid Intercom workspace and sign in.", "required": true, "source_ids": ["S1", "S3", "S4"]},
-    {"order": 3, "type": "region", "requirement": "Use compatible workspace regions; development workspaces are US-only and apps cannot be installed across regions.", "required": true, "source_ids": ["S1", "S4"]},
-    {"order": 4, "type": "configuration", "requirement": "Create an app in Developer Hub, name it, select the workspace, and let Intercom pre-install it.", "required": true, "source_ids": ["S1"]},
-    {"order": 5, "type": "credential", "requirement": "Retrieve the app's access token from Configure > Authentication for the first call in the developer's own workspace.", "required": true, "source_ids": ["S1", "S2"]}
+    {
+      "order": 1,
+      "type": "configuration",
+      "requirement": "Decide whether the app is public for multiple customers or private for the developer's own paid workspace.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "account",
+      "requirement": "For a public app, create an Intercom developer account and a free development workspace; for a private app, have a paid Intercom workspace and sign in.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "region",
+      "requirement": "Use compatible workspace regions; development workspaces are US-only and apps cannot be installed across regions.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "configuration",
+      "requirement": "Create an app in Developer Hub, name it, select the workspace, and let Intercom pre-install it.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "credential",
+      "requirement": "Retrieve the app's access token from Configure > Authentication for the first call in the developer's own workspace.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Set up a Workspace and review its public/private decision, app creation, access token, and first API call.", "details": ["The guide gives public developers a free development workspace and directs private developers to an existing paid workspace."], "input": "https://developers.intercom.com/docs/build-an-integration/getting-started", "output": "The common app and first-contact terminal plus two account branches are identified.", "success_signal": "Steps 1 through 4 and the sample contact response are visible.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "prepare", "actor": "developer", "interface": "documentation", "action": "Determine whether the app is public or private before selecting an account route.", "details": ["Public apps are shared with multiple customers and require a new development workspace.", "Private apps use a paid Intercom workspace owned by the developer's team."], "input": "Intended app audience and workspace ownership", "output": "The required public signup or private sign-in entry is selected.", "success_signal": "Official docs do not choose this product-intent decision for the developer.", "failure_or_wait": "A wrong choice changes workspace type, region constraints, and later authentication requirements.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open the official public developer signup or private workspace sign-in entry.", "details": ["Developer signup offers Google or a form with work email, full name, password, and company name, followed by Sign up and legal acknowledgement.", "Private sign-in requires an account region, Google or work-email authentication, and may offer SAML SSO."], "input": "Chosen public or private account route", "output": "The initial signup or sign-in screen is visible.", "success_signal": "No public source exposes the post-submit or post-authentication workspace and Developer Hub convergence.", "failure_or_wait": "Research stops before submitting credentials, accepting terms, or entering an authenticated workspace.", "required": true, "source_ids": ["S1", "S3", "S4", "S5"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Intercom’s Set up a Workspace guide.",
+      "details": [],
+      "input": "https://developers.intercom.com/docs/build-an-integration/getting-started",
+      "output": "The free development-workspace and first-call route is visible.",
+      "success_signal": "Steps 1 through 3 are shown.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create the Intercom developer account and development workspace as one opaque signup step.",
+      "details": [],
+      "input": "https://app.intercom.com/admins/sign_up/developer",
+      "output": "An authenticated free US development workspace is available.",
+      "success_signal": "Developer Hub is accessible for the workspace.",
+      "failure_or_wait": "Complete any signup or verification requested by Intercom; individual form fields are outside this record.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "In Developer Hub, open Your Apps and select New App.",
+      "details": [],
+      "input": "Authenticated development workspace",
+      "output": "The new-app dialog opens.",
+      "success_signal": "App name and workspace controls are visible.",
+      "failure_or_wait": "The development workspace is US-only.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Name the app, select the development workspace, and choose Create app.",
+      "details": [],
+      "input": "App name and workspace",
+      "output": "Intercom creates and pre-installs the app.",
+      "success_signal": "The app’s configuration pages open.",
+      "failure_or_wait": "The app and workspace must be in the same region.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Authentication and copy the app access token.",
+      "details": [],
+      "input": "Created app",
+      "output": "A bearer token is available for the app’s own workspace.",
+      "success_signal": "The token is displayed.",
+      "failure_or_wait": "Treat the token as a secret.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the guide’s `POST https://api.intercom.io/contacts` cURL request with the token and sample email.",
+      "details": [],
+      "input": "Access token and published request",
+      "output": "Intercom creates a contact.",
+      "success_signal": "The API returns a contact object.",
+      "failure_or_wait": "Invalid credentials or payload return an API error.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify the returned contact fields.",
+      "details": [],
+      "input": "Contacts API response",
+      "output": "The first Intercom API call is complete.",
+      "success_signal": "The response contains a generated contact ID, workspace ID, role `user`, and `joebloggs@intercom.io`.",
+      "failure_or_wait": "A non-contact error response is not success.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete public-doc candidate crosses either Intercom account route into an authenticated workspace and Developer Hub. After that hidden boundary, the guide documents opening Your Apps, clicking New App, entering an app name, selecting or creating a development workspace, clicking Create app, receiving a pre-installed app, opening Authentication, copying the access token, substituting it into the published cURL request, posting the sample email to `/contacts` with Intercom-Version 2.11, and checking the returned contact ID, workspace ID, role, and email.",
-    "impact": "The downstream app and API path is explicit, but the first-user page count, account verification, workspace creation or paid-workspace access, region outcome, and successful Developer Hub arrival cannot be verified without inventing authenticated states.",
-    "source_ids": ["S1", "S2", "S3", "S4", "S5"]
-  },
+  "candidate_path_gap": null,
   "branches": [
-    {"at_step": 2, "condition": "Build a public app for multiple customers", "path": "Create a developer account and a new free US development workspace, then create and pre-install the app there; configure OAuth later for customer installations.", "effect_on_first_success": "Provides a development-only workspace with documented limitations and adds OAuth work after the first own-workspace call.", "source_ids": ["S1", "S2", "S3"]},
-    {"at_step": 2, "condition": "Build a private app for the developer's paid workspace", "path": "Select the account region, sign in to the paid workspace, then open Developer Hub and create the app for that workspace.", "effect_on_first_success": "Avoids public OAuth for own-team data but requires an existing paid workspace and compatible region.", "source_ids": ["S1", "S2", "S4"]},
-    {"at_step": 3, "condition": "Use Google for developer signup or private sign-in", "path": "Continue through Google's external authorization and return to Intercom.", "effect_on_first_success": "Replaces password-based identity entry, but provider consent and Intercom convergence are not documented publicly.", "source_ids": ["S3", "S4"]},
-    {"at_step": 3, "condition": "The account and compatible workspace already exist", "path": "Open Developer Hub, create and pre-install an app, copy its access token, and run the contact request.", "effect_on_first_success": "Bypasses the blocked first-user account route and reaches the documented downstream sequence.", "source_ids": ["S1", "S2"]}
+    {
+      "at_step": 2,
+      "condition": "Build a public app for multiple customers",
+      "path": "Create a developer account and a new free US development workspace, then create and pre-install the app there; configure OAuth later for customer installations.",
+      "effect_on_first_success": "Provides a development-only workspace with documented limitations and adds OAuth work after the first own-workspace call.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Build a private app for the developer's paid workspace",
+      "path": "Select the account region, sign in to the paid workspace, then open Developer Hub and create the app for that workspace.",
+      "effect_on_first_success": "Avoids public OAuth for own-team data but requires an existing paid workspace and compatible region.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Use Google for developer signup or private sign-in",
+      "path": "Continue through Google's external authorization and return to Intercom.",
+      "effect_on_first_success": "Replaces password-based identity entry, but provider consent and Intercom convergence are not documented publicly.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The account and compatible workspace already exist",
+      "path": "Open Developer Hub, create and pre-install an app, copy its access token, and run the contact request.",
+      "effect_on_first_success": "Bypasses the blocked first-user account route and reaches the documented downstream sequence.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "choice", "description": "Public and private app intent changes the required workspace and later authentication model.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
-    {"at_step": 3, "type": "form", "description": "Developer signup requests work email, full name, password, and company name, or Google authentication.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 3, "type": "legal", "description": "Submitting developer signup agrees to Intercom's Terms of Service, Developer Terms, and Privacy Policy.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 3, "type": "choice", "description": "Development workspaces are US-only, and private sign-in requires selecting United States, Europe, or Australia before authentication.", "documented_requirement": true, "source_ids": ["S1", "S4"]},
-    {"at_step": 3, "type": "limit", "description": "Development workspaces are limited to 20 users or leads and omit production functionality including outbound email and push notifications.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 3, "type": "credential", "description": "The access token grants access to private Intercom data and must not be shared with third parties.", "documented_requirement": true, "source_ids": ["S2"]}
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Public and private app intent changes the required workspace and later authentication model.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "form",
+      "description": "Developer signup requests work email, full name, password, and company name, or Google authentication.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "legal",
+      "description": "Submitting developer signup agrees to Intercom's Terms of Service, Developer Terms, and Privacy Policy.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "Development workspaces are US-only, and private sign-in requires selecting United States, Europe, or Australia before authentication.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "limit",
+      "description": "Development workspaces are limited to 20 users or leads and omit production functionality including outbound email and push notifications.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "The access token grants access to private Intercom data and must not be shared with third parties.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Set up a Workspace | Intercom and Fin Developer Platform", "url": "https://developers.intercom.com/docs/build-an-integration/getting-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Step 1: Create an Intercom workspace", "Step 2: Create an app", "Step 3: Make your first API Call", "Step 4: Learn more"], "evidence_supported": ["Public and private branches", "Development workspace limits", "App creation and pre-installation", "Access token location", "Exact first contact request", "Sample success response", "Later next steps"]},
-    {"id": "S2", "title": "Authentication | Intercom and Fin Developer Platform", "url": "https://developers.intercom.com/docs/build-an-integration/learn-more/authentication", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Access Tokens", "How to get your Access Token", "OAuth", "How to use the token"], "evidence_supported": ["Private access-token use", "Public OAuth use", "Token availability after app creation", "Developer Hub locations", "Bearer authentication", "Token secrecy"]},
-    {"id": "S3", "title": "Intercom | The easiest way to see and talk to your users", "url": "https://app.intercom.com/admins/sign_up/developer", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Create your developer account"], "evidence_supported": ["Google signup", "Developer signup fields", "Legal acknowledgement", "No post-submit public transition"]},
-    {"id": "S4", "title": "Intercom | The easiest way to see and talk to your users", "url": "https://app.intercom.com/admins/sign_in", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Sign in to your account"], "evidence_supported": ["Region selection", "Google and work-email sign-in", "SAML SSO", "No authenticated workspace transition"]},
-    {"id": "S5", "title": "Intercom", "url": "https://app.intercom.com/developers/_", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Public Developer Hub response"], "evidence_supported": ["Developer Hub requires supported browser and authenticated application state", "No public app-creation form"]}
+    {
+      "id": "S1",
+      "title": "Set up a Workspace | Intercom and Fin Developer Platform",
+      "url": "https://developers.intercom.com/docs/build-an-integration/getting-started",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Step 1: Create an Intercom workspace",
+        "Step 2: Create an app",
+        "Step 3: Make your first API Call",
+        "Step 4: Learn more"
+      ],
+      "evidence_supported": [
+        "Public and private branches",
+        "Development workspace limits",
+        "App creation and pre-installation",
+        "Access token location",
+        "Exact first contact request",
+        "Sample success response",
+        "Later next steps"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Authentication | Intercom and Fin Developer Platform",
+      "url": "https://developers.intercom.com/docs/build-an-integration/learn-more/authentication",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Access Tokens",
+        "How to get your Access Token",
+        "OAuth",
+        "How to use the token"
+      ],
+      "evidence_supported": [
+        "Private access-token use",
+        "Public OAuth use",
+        "Token availability after app creation",
+        "Developer Hub locations",
+        "Bearer authentication",
+        "Token secrecy"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Intercom | The easiest way to see and talk to your users",
+      "url": "https://app.intercom.com/admins/sign_up/developer",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create your developer account"
+      ],
+      "evidence_supported": [
+        "Google signup",
+        "Developer signup fields",
+        "Legal acknowledgement",
+        "No post-submit public transition"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Intercom | The easiest way to see and talk to your users",
+      "url": "https://app.intercom.com/admins/sign_in",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign in to your account"
+      ],
+      "evidence_supported": [
+        "Region selection",
+        "Google and work-email sign-in",
+        "SAML SSO",
+        "No authenticated workspace transition"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Intercom",
+      "url": "https://app.intercom.com/developers/_",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public Developer Hub response"
+      ],
+      "evidence_supported": [
+        "Developer Hub requires supported browser and authenticated application state",
+        "No public app-creation form"
+      ]
+    }
   ],
-  "uncertainties": [
-    {"question": "Is the intended integration public for multiple customers or private for one paid workspace?", "impact": "The answer changes account eligibility, workspace type, region constraints, and the authentication model after the first own-workspace call.", "reason_unresolved": "The official guide presents both routes and the research brief does not supply app audience or paid-workspace ownership.", "checked_source_ids": ["S1", "S2"]},
-    {"question": "What verification, onboarding, workspace-naming, and successful Developer Hub states follow developer signup submission?", "impact": "The public-app first-user path and page count cannot be reconstructed.", "reason_unresolved": "The public form stops at Sign up and official docs resume after a development workspace exists.", "checked_source_ids": ["S1", "S3", "S5"]},
-    {"question": "What exact authenticated transitions take a private user from regional sign-in into the correct paid workspace and Developer Hub?", "impact": "Workspace availability, app installation region, and token access cannot be verified.", "reason_unresolved": "The public sign-in page exposes only initial authentication choices, while the guide assumes the paid workspace already exists.", "checked_source_ids": ["S1", "S2", "S4", "S5"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "Customer-facing OAuth installation, app review and App Store publication, Messenger or Inbox UI, webhooks, additional contacts, production secret rotation, regional rollout, and paid-workspace production behavior occur after the first contact response."
   ]

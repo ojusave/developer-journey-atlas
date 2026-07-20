@@ -6,8 +6,8 @@
   },
   "category": "Observability, testing, and release engineering",
   "surface": {
-    "name": "Sentry account and project setup, with a Node.js CommonJS error-monitoring candidate",
-    "selection_basis": "Sentry documents a shared account and project-creation spine, then requires the developer to choose an SDK. The platform index lists many co-equal SDK families and does not identify a platform-wide default. The Node.js CommonJS route is retained as a candidate, but its current official verification snippet calls Sentry in app.js after the documented CommonJS setup binds Sentry only inside instrument.js.",
+    "name": "Node.js CommonJS Error Monitoring candidate",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Node.js CommonJS Error Monitoring candidate. Node.js is a fully documented SDK family and a useful server-side candidate, but Sentry does not rank it above the other SDKs. The current CommonJS verification instructions are preserved exactly, including their unresolved binding gap. Prior surface before policy commit: Sentry account and project setup, with a Node.js CommonJS error-monitoring candidate.",
     "alternatives_considered": [
       {
         "name": "Other Sentry SDK quick starts",
@@ -21,8 +21,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create a Sentry account and project, select the application's SDK, instrument it, and verify the first captured issue.",
@@ -34,16 +34,23 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established platform-wide; the Node.js candidate intends to complete Verify Your Setup and display an issue",
-    "normalized_outcome": "The shared documented spine creates an account and Sentry project. A candidate SDK must then send an event and display it in Sentry, but the recorded CommonJS Node.js instructions contain an unresolved binding gap before the test event can be sent.",
+    "official_milestone": "A new error appears in Issues and opens to show full details and context.",
+    "normalized_outcome": "A new error appears in Issues and opens to show full details and context.",
     "observable_completion_signal": "No platform-wide completion signal is established. The Node.js guide's intended signal is a new error in Issues that opens to show full details and context, but the documented CommonJS sequence does not make its Sentry identifier available in app.js for the verification call.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "Sentry requires a platform-specific SDK choice and lists many co-equal SDK families. The Node.js guide demonstrates an intended Issues terminal but is internally incomplete for its CommonJS verification snippet.",
-      "source_ids": ["S4", "S5"]
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "A new error appears in Issues and opens to show full details and context.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
     },
     "why_this_is_the_boundary": "The shared journey can be recorded through project setup. Human selection is required to designate a representative SDK, and the selected Node.js CommonJS candidate cannot be marked complete without official evidence that closes its verification binding gap.",
-    "source_ids": ["S3", "S4", "S5"]
+    "source_ids": [
+      "S3",
+      "S4",
+      "S5"
+    ]
   },
   "prerequisites": [
     {
@@ -51,28 +58,38 @@
       "type": "identity",
       "requirement": "A name, organization name, email address, and password, or an identity accepted by Google, GitHub, or Azure DevOps signup.",
       "required": true,
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "order": 2,
       "type": "region",
       "requirement": "A decision between US and EU Data Storage Location. Sentry says it cannot be changed after the organization is created; switching later requires a new organization.",
       "required": true,
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "order": 3,
       "type": "permission",
       "requirement": "Permission to create a Sentry project. If member project creation is disabled, the project-creation API requires org:write scope.",
       "required": true,
-      "source_ids": ["S3", "S6"]
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
     },
     {
       "order": 4,
       "type": "software",
       "requirement": "For the Node.js candidate, an application already running on Node.js 18.0.0 or later, with npm and a writable CommonJS project.",
       "required": true,
-      "source_ids": ["S5"]
+      "source_ids": [
+        "S5"
+      ]
     }
   ],
   "primary_path": [
@@ -82,13 +99,17 @@
       "actor": "developer",
       "interface": "console",
       "action": "Open Sentry's Create your free account page.",
-      "details": ["The page advertises unlimited volume and every feature for 14 days, then automatic movement to the Free plan with no forced upgrade."],
+      "details": [
+        "The page advertises unlimited volume and every feature for 14 days, then automatic movement to the Free plan with no forced upgrade."
+      ],
       "input": "Browser with JavaScript enabled",
       "output": "Signup form",
       "success_signal": "Fields for Name, Organization, Email, Password, and Data Storage Location are visible.",
       "failure_or_wait": "The signup page states that JavaScript must be enabled.",
       "required": true,
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
@@ -96,13 +117,17 @@
       "actor": "developer",
       "interface": "console",
       "action": "Enter Name, Organization, Email, and Password.",
-      "details": ["Google, GitHub, and Azure DevOps are documented alternative signup providers."],
+      "details": [
+        "Google, GitHub, and Azure DevOps are documented alternative signup providers."
+      ],
       "input": "Identity and organization details",
       "output": "Completed identity fields",
       "success_signal": "The required identity fields are accepted.",
       "failure_or_wait": "Invalid, missing, or already-associated values can prevent submission; the public page does not enumerate every validation message.",
       "required": true,
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
@@ -110,13 +135,19 @@
       "actor": "developer",
       "interface": "console",
       "action": "Choose US or EU as the organization's Data Storage Location.",
-      "details": ["US data is physically stored in Iowa and EU data in Frankfurt.", "The selection applies to at-rest customer data; Sentry documents exceptions for certain global metadata and services."],
+      "details": [
+        "US data is physically stored in Iowa and EU data in Frankfurt.",
+        "The selection applies to at-rest customer data; Sentry documents exceptions for certain global metadata and services."
+      ],
       "input": "Immutable region decision",
       "output": "Selected organization region",
       "success_signal": "Exactly one storage location is selected.",
       "failure_or_wait": "Sentry says this value cannot be changed after organization creation. A later switch requires creating a new organization.",
       "required": true,
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "step_number": 4,
@@ -124,13 +155,17 @@
       "actor": "developer",
       "interface": "console",
       "action": "Choose whether to receive occasional updates, accept the Terms of Service and Privacy Policy, complete reCAPTCHA, and select Get set up.",
-      "details": ["A promo-code field is optional."],
+      "details": [
+        "A promo-code field is optional."
+      ],
       "input": "Consent and anti-abuse check",
       "output": "Submitted account and organization request",
       "success_signal": "Sentry accepts the signup and enters the organization setup experience.",
       "failure_or_wait": "Terms acceptance and reCAPTCHA are required; anti-abuse or form validation can block submission.",
       "required": true,
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 5,
@@ -144,7 +179,10 @@
       "success_signal": "The platform, alert-frequency, project-name, and team controls are available.",
       "failure_or_wait": "Organization policy may disable member project creation; an authorized user with org:write scope must create the project or change the policy.",
       "required": true,
-      "source_ids": ["S3", "S6"]
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
     },
     {
       "step_number": 6,
@@ -152,194 +190,236 @@
       "actor": "developer",
       "interface": "console",
       "action": "Choose the application's platform and continue on that platform-specific setup route.",
-      "details": ["The project guide demonstrates React as an example, while the platform index lists Android, Apple, Dart, Elixir, Go, Godot, Java, JavaScript, Kotlin, Native, .NET, Nintendo Switch, PHP, PlayStation, PowerShell, Python, React Native, Ruby, Rust, Unity, Unreal, Xbox, and community SDKs."],
+      "details": [
+        "The project guide demonstrates React as an example, while the platform index lists Android, Apple, Dart, Elixir, Go, Godot, Java, JavaScript, Kotlin, Native, .NET, Nintendo Switch, PHP, PlayStation, PowerShell, Python, React Native, Ruby, Rust, Unity, Unreal, Xbox, and community SDKs."
+      ],
       "input": "Actual application language and framework",
       "output": "Selected SDK route",
       "success_signal": "A platform-specific setup flow is selected.",
       "failure_or_wait": "Sentry does not designate a canonical platform. The journey cannot continue reproducibly until the target application platform is known.",
       "required": true,
-      "source_ids": ["S3", "S4"]
-    }
-  ],
-  "candidate_paths": [
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
     {
-      "id": "nodejs-commonjs-error-monitoring",
-      "name": "Node.js CommonJS Error Monitoring candidate",
-      "selection_basis": "Node.js is a fully documented SDK family and a useful server-side candidate, but Sentry does not rank it above the other SDKs. The current CommonJS verification instructions are preserved exactly, including their unresolved binding gap.",
-      "relationship_to_primary_path": "Continues after primary_path step 6 by selecting Node.js. It includes project creation, SDK setup, and the intended verification sequence, but is blocked before its observable terminal because the official steps do not bind Sentry in app.js.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "On Create Project, choose Node.js as the application platform.",
-          "details": ["The generic project guide says to select the platform based on the application's code."],
-          "input": "Existing Node.js application",
-          "output": "Node.js project setup route",
-          "success_signal": "Node.js is the selected platform.",
-          "failure_or_wait": "Selecting another platform changes the entire SDK candidate.",
-          "required": true,
-          "source_ids": ["S3", "S5"]
-        },
-        {
-          "step_number": 2,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Choose the alert frequency, enter a project name, assign an existing team or create a new team, then select Create Project.",
-          "details": ["The project guide demonstrates Alert me on high priority issues as its alert-frequency selection."],
-          "input": "Alert preference, project name, and team",
-          "output": "Created Sentry project",
-          "success_signal": "Sentry displays the new project's setup instructions and unique DSN.",
-          "failure_or_wait": "Missing required values, naming conflicts, team access, or the member-creation policy can block creation.",
-          "required": true,
-          "source_ids": ["S3", "S6"]
-        },
-        {
-          "step_number": 3,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Copy the project's unique DSN, then select Take me to Issues.",
-          "details": ["The DSN is the project-specific value used by SDK initialization."],
-          "input": "Created project",
-          "output": "Project DSN and Issues view",
-          "success_signal": "The developer has the DSN and can view the project's empty or existing Issues list.",
-          "failure_or_wait": "Losing or substituting the DSN can send no events or send them to the wrong project.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 4,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "documentation",
-          "action": "Confirm the application is already running on Node.js 18.0.0 or later and uses CommonJS for this candidate.",
-          "details": ["Node.js 18.19.0 or 19.9.0 and later is recommended for full TracingChannel support."],
-          "input": "Existing Node.js application",
-          "output": "Eligible CommonJS target",
-          "success_signal": "The application runs on a documented Node.js version and can load CommonJS modules.",
-          "failure_or_wait": "An older runtime requires an upgrade or a separately verified compatible SDK version; ESM uses a different loading route.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 5,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "documentation",
-          "action": "In the interactive quick start, retain Issues and do not enable optional Logs, Tracing, or Profiling for the minimal error-monitoring candidate.",
-          "details": ["Issues are always enabled; optional toggles change packages, initialization, and verification."],
-          "input": "Feature selection",
-          "output": "Error-monitoring-only instructions",
-          "success_signal": "The guide shows the @sentry/node install and Issues verification instructions.",
-          "failure_or_wait": "Enabling other features expands the setup and terminal checks.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 6,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "From the application directory, run npm install @sentry/node.",
-          "details": [],
-          "input": "Node.js project and npm",
-          "output": "Installed Sentry Node SDK",
-          "success_signal": "@sentry/node is added to the project.",
-          "failure_or_wait": "Package-manager, network, lockfile, permission, or compatibility failures block setup.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 7,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Create instrument.js in the project root.",
-          "details": [],
-          "input": "Writable project root",
-          "output": "Instrumentation module",
-          "success_signal": "instrument.js exists where the later require path resolves it.",
-          "failure_or_wait": "A different location requires a matching require path.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 8,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "other",
-          "action": "In instrument.js, bind const Sentry = require('@sentry/node') and call Sentry.init with the project DSN and sendDefaultPii: true, plus only configuration produced by the selected feature toggles.",
-          "details": ["sendDefaultPii: true appears inside the current official initialization example; it is not documented as a separate selector in this route."],
-          "input": "Project DSN",
-          "output": "Initialized SDK inside instrument.js",
-          "success_signal": "instrument.js contains the documented require and init call.",
-          "failure_or_wait": "A missing or wrong DSN prevents delivery to the intended project. Enabling default PII has privacy implications that the developer must evaluate.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 9,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Add require('./instrument') at the very beginning of app.js, before requiring any other modules.",
-          "details": ["The documented statement loads instrument.js for side effects but does not assign its local Sentry binding in app.js."],
-          "input": "CommonJS application entry point",
-          "output": "Instrumentation loaded before application modules",
-          "success_signal": "require('./instrument') is the first module load.",
-          "failure_or_wait": "Loading it later can prevent automatic instrumentation from working correctly.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 10,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "documentation",
-          "action": "Skip the optional source-map wizard and proceed to Verify Your Setup.",
-          "details": ["Source maps improve stack-trace readability but are explicitly optional."],
-          "input": "Loaded SDK",
-          "output": "Minimal route without source maps",
-          "success_signal": "The Issues verification snippet is visible.",
-          "failure_or_wait": "The eventual stack can be less readable without source maps.",
-          "required": false,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 11,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Attempt to add the official Issues verification snippet in app.js, which waits 99 milliseconds, calls undefined foo(), catches the exception, and calls Sentry.captureException(e).",
-          "details": ["The preceding CommonJS steps bind Sentry only as a local constant inside instrument.js.", "require('./instrument') in app.js does not assign a Sentry identifier and the documented instrument.js example does not export one."],
-          "input": "Official verification snippet and documented CommonJS setup",
-          "output": "Blocked verification implementation",
-          "success_signal": "No documented success signal is reachable at this step because Sentry is not in scope in app.js.",
-          "failure_or_wait": "Executing the snippet as documented reaches Sentry.captureException with no documented Sentry binding in app.js. Additional official evidence or a corrected guide is required; this record does not invent a binding.",
-          "required": true,
-          "source_ids": ["S5"]
-        },
-        {
-          "step_number": 12,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "console",
-          "action": "After the binding gap is resolved by an officially documented method, start or restart the app, wait a couple of moments, open Issues, select the new error, and inspect its details and context.",
-          "details": ["This is the guide's intended downstream terminal, not a completed step in the currently documented CommonJS sequence."],
-          "input": "A valid captured exception, which the preceding official CommonJS sequence does not currently produce",
-          "output": "Intended first opened Sentry issue",
-          "success_signal": "A new error appears in Issues and opens to show full details and context.",
-          "failure_or_wait": "This step remains unreachable from the preceding documented steps. Once reachable, the guide says captured data can take a couple of moments to appear.",
-          "required": true,
-          "source_ids": ["S5"]
-        }
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Create Project, choose Node.js as the application platform.",
+      "details": [
+        "The generic project guide says to select the platform based on the application's code."
       ],
-      "source_ids": ["S3", "S5", "S6"]
+      "input": "Existing Node.js application",
+      "output": "Node.js project setup route",
+      "success_signal": "Node.js is the selected platform.",
+      "failure_or_wait": "Selecting another platform changes the entire SDK candidate.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose the alert frequency, enter a project name, assign an existing team or create a new team, then select Create Project.",
+      "details": [
+        "The project guide demonstrates Alert me on high priority issues as its alert-frequency selection."
+      ],
+      "input": "Alert preference, project name, and team",
+      "output": "Created Sentry project",
+      "success_signal": "Sentry displays the new project's setup instructions and unique DSN.",
+      "failure_or_wait": "Missing required values, naming conflicts, team access, or the member-creation policy can block creation.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the project's unique DSN, then select Take me to Issues.",
+      "details": [
+        "The DSN is the project-specific value used by SDK initialization."
+      ],
+      "input": "Created project",
+      "output": "Project DSN and Issues view",
+      "success_signal": "The developer has the DSN and can view the project's empty or existing Issues list.",
+      "failure_or_wait": "Losing or substituting the DSN can send no events or send them to the wrong project.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Confirm the application is already running on Node.js 18.0.0 or later and uses CommonJS for this candidate.",
+      "details": [
+        "Node.js 18.19.0 or 19.9.0 and later is recommended for full TracingChannel support."
+      ],
+      "input": "Existing Node.js application",
+      "output": "Eligible CommonJS target",
+      "success_signal": "The application runs on a documented Node.js version and can load CommonJS modules.",
+      "failure_or_wait": "An older runtime requires an upgrade or a separately verified compatible SDK version; ESM uses a different loading route.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "In the interactive quick start, retain Issues and do not enable optional Logs, Tracing, or Profiling for the minimal error-monitoring candidate.",
+      "details": [
+        "Issues are always enabled; optional toggles change packages, initialization, and verification."
+      ],
+      "input": "Feature selection",
+      "output": "Error-monitoring-only instructions",
+      "success_signal": "The guide shows the @sentry/node install and Issues verification instructions.",
+      "failure_or_wait": "Enabling other features expands the setup and terminal checks.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "From the application directory, run npm install @sentry/node.",
+      "details": [],
+      "input": "Node.js project and npm",
+      "output": "Installed Sentry Node SDK",
+      "success_signal": "@sentry/node is added to the project.",
+      "failure_or_wait": "Package-manager, network, lockfile, permission, or compatibility failures block setup.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create instrument.js in the project root.",
+      "details": [],
+      "input": "Writable project root",
+      "output": "Instrumentation module",
+      "success_signal": "instrument.js exists where the later require path resolves it.",
+      "failure_or_wait": "A different location requires a matching require path.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "other",
+      "action": "In instrument.js, bind const Sentry = require('@sentry/node') and call Sentry.init with the project DSN and sendDefaultPii: true, plus only configuration produced by the selected feature toggles.",
+      "details": [
+        "sendDefaultPii: true appears inside the current official initialization example; it is not documented as a separate selector in this route."
+      ],
+      "input": "Project DSN",
+      "output": "Initialized SDK inside instrument.js",
+      "success_signal": "instrument.js contains the documented require and init call.",
+      "failure_or_wait": "A missing or wrong DSN prevents delivery to the intended project. Enabling default PII has privacy implications that the developer must evaluate.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Add require('./instrument') at the very beginning of app.js, before requiring any other modules.",
+      "details": [
+        "The documented statement loads instrument.js for side effects but does not assign its local Sentry binding in app.js."
+      ],
+      "input": "CommonJS application entry point",
+      "output": "Instrumentation loaded before application modules",
+      "success_signal": "require('./instrument') is the first module load.",
+      "failure_or_wait": "Loading it later can prevent automatic instrumentation from working correctly.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Skip the optional source-map wizard and proceed to Verify Your Setup.",
+      "details": [
+        "Source maps improve stack-trace readability but are explicitly optional."
+      ],
+      "input": "Loaded SDK",
+      "output": "Minimal route without source maps",
+      "success_signal": "The Issues verification snippet is visible.",
+      "failure_or_wait": "The eventual stack can be less readable without source maps.",
+      "required": false,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Attempt to add the official Issues verification snippet in app.js, which waits 99 milliseconds, calls undefined foo(), catches the exception, and calls Sentry.captureException(e).",
+      "details": [
+        "The preceding CommonJS steps bind Sentry only as a local constant inside instrument.js.",
+        "require('./instrument') in app.js does not assign a Sentry identifier and the documented instrument.js example does not export one."
+      ],
+      "input": "Official verification snippet and documented CommonJS setup",
+      "output": "Blocked verification implementation",
+      "success_signal": "No documented success signal is reachable at this step because Sentry is not in scope in app.js.",
+      "failure_or_wait": "Executing the snippet as documented reaches Sentry.captureException with no documented Sentry binding in app.js. Additional official evidence or a corrected guide is required; this record does not invent a binding.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "After the binding gap is resolved by an officially documented method, start or restart the app, wait a couple of moments, open Issues, select the new error, and inspect its details and context.",
+      "details": [
+        "This is the guide's intended downstream terminal, not a completed step in the currently documented CommonJS sequence."
+      ],
+      "input": "A valid captured exception, which the preceding official CommonJS sequence does not currently produce",
+      "output": "Intended first opened Sentry issue",
+      "success_signal": "A new error appears in Issues and opens to show full details and context.",
+      "failure_or_wait": "This step remains unreachable from the preceding documented steps. Once reachable, the guide says captured data can take a couple of moments to appear.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
     }
   ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
     {
@@ -347,42 +427,54 @@
       "condition": "The developer uses social signup.",
       "path": "Choose Google, GitHub, or Azure DevOps instead of entering the password-based form, then complete the provider flow and return to Sentry setup.",
       "effect_on_first_success": "Replaces the direct identity-entry action with an external identity-provider handoff.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "at_step": 3,
       "condition": "The organization later needs the other Data Storage Location.",
       "path": "Create a new organization in the desired region; the existing organization's region cannot be changed.",
       "effect_on_first_success": "Forces a new organization journey and migration rather than an in-place correction.",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S2"
+      ]
     },
     {
       "at_step": 5,
       "condition": "Member project creation is disabled.",
       "path": "Ask a user authorized with org:write to create the project or change the organization policy, then return to the SDK setup.",
       "effect_on_first_success": "Adds an administrator or elevated-permission dependency before a DSN exists.",
-      "source_ids": ["S6"]
+      "source_ids": [
+        "S6"
+      ]
     },
     {
       "at_step": 6,
       "condition": "The application is not Node.js CommonJS.",
       "path": "Choose the actual language and framework from the SDK index and follow its own complete quick start.",
       "effect_on_first_success": "Replaces every candidate-specific package, file, initialization, execution, and verification action.",
-      "source_ids": ["S4"]
+      "source_ids": [
+        "S4"
+      ]
     },
     {
       "at_step": 6,
       "condition": "The Node.js application uses ESM.",
       "path": "Use instrument.mjs and the documented node --import ./instrument.mjs app.mjs route, with Node.js 18.19.0 or later for --import.",
       "effect_on_first_success": "Replaces the CommonJS loading action and may avoid or alter the CommonJS-specific binding inconsistency, but requires its own end-to-end validation.",
-      "source_ids": ["S5"]
+      "source_ids": [
+        "S5"
+      ]
     },
     {
       "at_step": 6,
       "condition": "Logs, Tracing, Profiling, or readable source maps are required in the first session.",
       "path": "Enable the relevant quick-start toggles and follow the generated extra package, initialization, test-code, wizard, and product-page verification instructions.",
       "effect_on_first_success": "Expands the candidate beyond the minimal Issues route and can introduce additional terminals.",
-      "source_ids": ["S5"]
+      "source_ids": [
+        "S5"
+      ]
     }
   ],
   "friction_gates": [
@@ -391,42 +483,55 @@
       "type": "choice",
       "description": "The data-storage region is immutable for the organization.",
       "documented_requirement": true,
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "at_step": 4,
       "type": "verification",
       "description": "Terms acceptance and reCAPTCHA must be completed before signup submission.",
       "documented_requirement": true,
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "at_step": 5,
       "type": "permission",
       "description": "Organization policy can prevent members from creating the required project; the elevated API scope is org:write.",
       "documented_requirement": true,
-      "source_ids": ["S6"]
+      "source_ids": [
+        "S6"
+      ]
     },
     {
       "at_step": 6,
       "type": "choice",
       "description": "Sentry requires an SDK platform choice and does not document one platform-wide default.",
       "documented_requirement": true,
-      "source_ids": ["S4"]
+      "source_ids": [
+        "S4"
+      ]
     },
     {
       "at_step": 6,
       "type": "environment",
       "description": "The recorded candidate requires an existing supported Node.js application and changes by module system and selected features.",
       "documented_requirement": true,
-      "source_ids": ["S5"]
+      "source_ids": [
+        "S5"
+      ]
     },
     {
       "at_step": 6,
       "type": "other",
       "description": "The current CommonJS quick-start verification references Sentry in app.js without documenting a binding there.",
       "documented_requirement": false,
-      "source_ids": ["S5"]
+      "source_ids": [
+        "S5"
+      ]
     }
   ],
   "time_to_first_success": {
@@ -443,8 +548,19 @@
       "source_type": "account-setup",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Create your free account", "Signup form", "Data Storage Location", "Social signup options"],
-      "evidence_supported": ["Signup fields", "Terms and reCAPTCHA", "Region selector", "Trial and Free-plan transition", "Google, GitHub, and Azure DevOps alternatives"]
+      "sections_used": [
+        "Create your free account",
+        "Signup form",
+        "Data Storage Location",
+        "Social signup options"
+      ],
+      "evidence_supported": [
+        "Signup fields",
+        "Terms and reCAPTCHA",
+        "Region selector",
+        "Trial and Free-plan transition",
+        "Google, GitHub, and Azure DevOps alternatives"
+      ]
     },
     {
       "id": "S2",
@@ -454,8 +570,18 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Choosing Your Data Storage Location", "Changing Your Data Storage Location", "Physical locations", "Data Scope"],
-      "evidence_supported": ["US and EU choice", "Immutable organization region", "New-organization recovery", "Physical regions and data-scope caveats"]
+      "sections_used": [
+        "Choosing Your Data Storage Location",
+        "Changing Your Data Storage Location",
+        "Physical locations",
+        "Data Scope"
+      ],
+      "evidence_supported": [
+        "US and EU choice",
+        "Immutable organization region",
+        "New-organization recovery",
+        "Physical regions and data-scope caveats"
+      ]
     },
     {
       "id": "S3",
@@ -465,8 +591,21 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Create a New Project", "Choose platform", "Alert frequency", "Project name and team", "Copy DSN", "Take me to Issues"],
-      "evidence_supported": ["Project-creation UI sequence", "Platform choice", "Alert, name, and team fields", "DSN", "Issues navigation"]
+      "sections_used": [
+        "Create a New Project",
+        "Choose platform",
+        "Alert frequency",
+        "Project name and team",
+        "Copy DSN",
+        "Take me to Issues"
+      ],
+      "evidence_supported": [
+        "Project-creation UI sequence",
+        "Platform choice",
+        "Alert, name, and team fields",
+        "DSN",
+        "Issues navigation"
+      ]
     },
     {
       "id": "S4",
@@ -476,8 +615,16 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Choose your SDK", "Platform SDK list", "Community SDKs"],
-      "evidence_supported": ["Co-equal SDK families", "No documented platform-wide SDK default", "Boundary evidence"]
+      "sections_used": [
+        "Choose your SDK",
+        "Platform SDK list",
+        "Community SDKs"
+      ],
+      "evidence_supported": [
+        "Co-equal SDK families",
+        "No documented platform-wide SDK default",
+        "Boundary evidence"
+      ]
     },
     {
       "id": "S5",
@@ -487,8 +634,23 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Prerequisites", "Install", "Configure", "Apply Instrumentation to Your App", "Source Maps", "Verify Your Setup", "Issues", "View Captured Data in Sentry"],
-      "evidence_supported": ["Node.js candidate steps", "CommonJS and ESM loading", "sendDefaultPii configuration", "Verification binding inconsistency", "Intended issue terminal and wait"]
+      "sections_used": [
+        "Prerequisites",
+        "Install",
+        "Configure",
+        "Apply Instrumentation to Your App",
+        "Source Maps",
+        "Verify Your Setup",
+        "Issues",
+        "View Captured Data in Sentry"
+      ],
+      "evidence_supported": [
+        "Node.js candidate steps",
+        "CommonJS and ESM loading",
+        "sendDefaultPii configuration",
+        "Verification binding inconsistency",
+        "Intended issue terminal and wait"
+      ]
     },
     {
       "id": "S6",
@@ -498,8 +660,14 @@
       "source_type": "api-reference",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Create a Project for an Organization", "Scopes"],
-      "evidence_supported": ["Member project-creation policy", "org:write requirement"]
+      "sections_used": [
+        "Create a Project for an Organization",
+        "Scopes"
+      ],
+      "evidence_supported": [
+        "Member project-creation policy",
+        "org:write requirement"
+      ]
     }
   ],
   "uncertainties": [
@@ -507,13 +675,19 @@
       "question": "Which SDK should represent Sentry in the cross-platform comparison?",
       "impact": "The prerequisites, package, runtime, files, credential placement, event trigger, waits, and terminal page all change by SDK.",
       "reason_unresolved": "The official platform index presents many co-equal SDK routes and does not establish a canonical first SDK.",
-      "checked_source_ids": ["S3", "S4", "S5"]
+      "checked_source_ids": [
+        "S3",
+        "S4",
+        "S5"
+      ]
     },
     {
       "question": "What official CommonJS action makes Sentry available to the verification snippet in app.js?",
       "impact": "Without a documented binding, the candidate cannot execute Sentry.captureException or reach its first issue.",
       "reason_unresolved": "The current guide binds Sentry locally in instrument.js, then only requires that file for side effects in app.js before showing a snippet that calls Sentry in app.js. No export, assignment, or second binding is documented in the sequence.",
-      "checked_source_ids": ["S5"]
+      "checked_source_ids": [
+        "S5"
+      ]
     }
   ],
   "excluded_after_success": [

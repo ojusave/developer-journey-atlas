@@ -6,8 +6,8 @@
   },
   "category": "Observability, testing, and release engineering",
   "surface": {
-    "name": "Grafana Cloud data source and telemetry route not selected",
-    "selection_basis": "Grafana Cloud's official Get started page says there are several ways to begin and makes the developer choose externally managed data versus data sent and managed in Grafana Cloud. Metrics, logs, traces, profiles, frontend observability, synthetic monitoring, and integrations each have distinct collectors and first dashboards. The Linux integration is a complete candidate example but is not selected platform-wide.",
+    "name": "Send Linux host metrics to a Grafana Cloud dashboard",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Send Linux host metrics to a Grafana Cloud dashboard. Grafana Cloud presents multiple data routes, but its official integration quickstart supplies a complete Linux path from account and host prerequisites through Grafana Alloy installation to visible host metrics in a preconfigured dashboard. Prior surface before policy commit: Grafana Cloud data source and telemetry route not selected.",
     "alternatives_considered": [
       {
         "name": "Linux server integration",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "View a first real telemetry signal in Grafana Cloud without a preselected signal type or source.",
@@ -44,18 +44,18 @@
   },
   "documented_first_success": {
     "official_milestone": "No single Grafana Cloud first-data milestone is selected by the general Get started page.",
-    "normalized_outcome": "Unresolved until a human chooses connect versus send, telemetry type, and source. The Linux integration candidate ends with host metrics visible on the preconfigured Nodes dashboard.",
-    "observable_completion_signal": "For the Linux candidate, after Grafana Alloy's first scrape, CPU, load, memory, disk, and network metrics populate the preconfigured Linux Node dashboard.",
+    "normalized_outcome": "Recent metrics for the named host are visible in the dashboard.",
+    "observable_completion_signal": "Recent metrics for the named host are visible in the dashboard.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "Get started explicitly offers externally managed data or sent data. The separate integration tutorial demonstrates a dashboard only after Linux is chosen.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Recent metrics for the named host are visible in the dashboard.",
       "source_ids": [
         "S1",
         "S2",
         "S3"
       ]
     },
-    "why_this_is_the_boundary": "The candidate has a demonstrated first-data signal, but choosing Linux metrics as universal Grafana Cloud success would ignore the platform router's coequal data paths.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -144,6 +144,165 @@
         "S1",
         "S2",
         "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create or sign into a free Grafana Cloud account and open its Grafana Cloud stack.",
+      "details": [
+        "New accounts begin with a 14-day unlimited-data and unlimited-user trial and later transition to the restricted free-forever plan."
+      ],
+      "input": "Account identity and Grafana Cloud signup details.",
+      "output": "Authenticated Grafana Cloud stack.",
+      "success_signal": "The Grafana Cloud stack opens.",
+      "failure_or_wait": "Signup, sign-in, or stack-provisioning failure prevents access to Connections.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Prepare the Linux machine with terminal and administrator access, and configure its firewall to allow outbound HTTPS on port 443 to `*.grafana.net`.",
+      "details": [
+        "The firewall rule is an explicit prerequisite in the official Linux integration guide."
+      ],
+      "input": "Linux host, administrator privileges, terminal, and control of its outbound firewall rules.",
+      "output": "Eligible monitored host.",
+      "success_signal": "The developer can administer the host and its firewall permits outbound HTTPS on port 443 to `*.grafana.net`.",
+      "failure_or_wait": "Missing host access, privileges, or a firewall rule permitting outbound HTTPS on port 443 to `*.grafana.net` blocks Alloy installation or telemetry delivery.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In the Grafana Cloud stack, open Connections, search for Linux, select the Linux integration tile, and open Configuration details.",
+      "details": [],
+      "input": "Authenticated stack and Linux integration selection.",
+      "output": "Generated Linux integration configuration flow.",
+      "success_signal": "Configuration details for the Linux integration are visible.",
+      "failure_or_wait": "Insufficient stack access or failure to find the integration stops configuration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose and enter the hostname label that will identify this machine in Grafana Cloud.",
+      "details": [
+        "The label is required by the integration and is used to distinguish the host in dashboards."
+      ],
+      "input": "Hostname label.",
+      "output": "Host-specific integration configuration.",
+      "success_signal": "The configuration accepts the hostname value.",
+      "failure_or_wait": "A missing or unsuitable hostname prevents the generated configuration from representing the host correctly.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Keep the reduced metric set or open Advanced integration and choose the full metric set.",
+      "details": [
+        "The official flow allows either reduced or full metrics before generating the collector configuration."
+      ],
+      "input": "Metric-coverage choice.",
+      "output": "Selected Linux metric configuration.",
+      "success_signal": "The desired metric option is reflected in the generated setup.",
+      "failure_or_wait": "Selecting a different metric set changes what the first dashboard can display.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy and run the generated commands on the Linux machine to install, configure, and start Grafana Alloy.",
+      "details": [
+        "The generated configuration sends the selected Linux metrics to the current Grafana Cloud stack."
+      ],
+      "input": "Generated integration commands and administrator access.",
+      "output": "Running Grafana Alloy collector.",
+      "success_signal": "The installation and service-start commands finish successfully.",
+      "failure_or_wait": "Package, privilege, configuration, service, credential, or network errors prevent collection.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Dashboards and select the Nodes dashboard in the Linux Node folder.",
+      "details": [],
+      "input": "Running Alloy integration and Grafana Cloud stack.",
+      "output": "Preconfigured Linux Nodes dashboard.",
+      "success_signal": "The Nodes dashboard opens.",
+      "failure_or_wait": "The dashboard can initially be empty before the first scrape arrives.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "wait",
+      "actor": "system",
+      "interface": "console",
+      "action": "Wait for Grafana Alloy to complete its first scrape and send the host metrics.",
+      "details": [
+        "The integration guide explicitly notes that the dashboard is initially empty."
+      ],
+      "input": "Running collector and open Nodes dashboard.",
+      "output": "First Linux telemetry batch in Grafana Cloud.",
+      "success_signal": "Dashboard panels begin populating.",
+      "failure_or_wait": "A prolonged empty dashboard indicates a collector, configuration, connectivity, or scrape problem.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify that the Nodes dashboard displays recent metrics for the configured Linux host.",
+      "details": [
+        "The preconfigured dashboard exposes host signals such as CPU, load, memory, disk, and network metrics according to the selected metric set."
+      ],
+      "input": "Completed first scrape.",
+      "output": "Visible Linux host telemetry.",
+      "success_signal": "Recent metrics for the named host are visible in the dashboard.",
+      "failure_or_wait": "Missing host series or empty panels mean the documented first success has not been reached.",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
@@ -389,156 +548,6 @@
     "No common after-success scope is selected while signal and source remain unresolved.",
     "Alerting, dashboards beyond the preconfigured view, logs, traces, profiles, SLOs, synthetic monitoring, cost optimization, and production collector management are excluded."
   ],
-  "candidate_paths": [
-    {
-      "id": "linux-integration-first-host-metrics",
-      "name": "Send Linux host metrics to a Grafana Cloud dashboard",
-      "selection_basis": "Grafana Cloud presents multiple data routes, but its official integration quickstart supplies a complete Linux path from account and host prerequisites through Grafana Alloy installation to visible host metrics in a preconfigured dashboard.",
-      "relationship_to_primary_path": "This selects the Linux server integration at primary step 2 and expands it from account access through the first successful telemetry scrape.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Create or sign into a free Grafana Cloud account and open its Grafana Cloud stack.",
-          "details": [
-            "New accounts begin with a 14-day unlimited-data and unlimited-user trial and later transition to the restricted free-forever plan."
-          ],
-          "input": "Account identity and Grafana Cloud signup details.",
-          "output": "Authenticated Grafana Cloud stack.",
-          "success_signal": "The Grafana Cloud stack opens.",
-          "failure_or_wait": "Signup, sign-in, or stack-provisioning failure prevents access to Connections.",
-          "required": true,
-          "source_ids": ["S2", "S4"]
-        },
-        {
-          "step_number": 2,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Prepare the Linux machine with terminal and administrator access, and configure its firewall to allow outbound HTTPS on port 443 to `*.grafana.net`.",
-          "details": [
-            "The firewall rule is an explicit prerequisite in the official Linux integration guide."
-          ],
-          "input": "Linux host, administrator privileges, terminal, and control of its outbound firewall rules.",
-          "output": "Eligible monitored host.",
-          "success_signal": "The developer can administer the host and its firewall permits outbound HTTPS on port 443 to `*.grafana.net`.",
-          "failure_or_wait": "Missing host access, privileges, or a firewall rule permitting outbound HTTPS on port 443 to `*.grafana.net` blocks Alloy installation or telemetry delivery.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 3,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "In the Grafana Cloud stack, open Connections, search for Linux, select the Linux integration tile, and open Configuration details.",
-          "details": [],
-          "input": "Authenticated stack and Linux integration selection.",
-          "output": "Generated Linux integration configuration flow.",
-          "success_signal": "Configuration details for the Linux integration are visible.",
-          "failure_or_wait": "Insufficient stack access or failure to find the integration stops configuration.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 4,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Choose and enter the hostname label that will identify this machine in Grafana Cloud.",
-          "details": [
-            "The label is required by the integration and is used to distinguish the host in dashboards."
-          ],
-          "input": "Hostname label.",
-          "output": "Host-specific integration configuration.",
-          "success_signal": "The configuration accepts the hostname value.",
-          "failure_or_wait": "A missing or unsuitable hostname prevents the generated configuration from representing the host correctly.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 5,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Keep the reduced metric set or open Advanced integration and choose the full metric set.",
-          "details": [
-            "The official flow allows either reduced or full metrics before generating the collector configuration."
-          ],
-          "input": "Metric-coverage choice.",
-          "output": "Selected Linux metric configuration.",
-          "success_signal": "The desired metric option is reflected in the generated setup.",
-          "failure_or_wait": "Selecting a different metric set changes what the first dashboard can display.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 6,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Copy and run the generated commands on the Linux machine to install, configure, and start Grafana Alloy.",
-          "details": [
-            "The generated configuration sends the selected Linux metrics to the current Grafana Cloud stack."
-          ],
-          "input": "Generated integration commands and administrator access.",
-          "output": "Running Grafana Alloy collector.",
-          "success_signal": "The installation and service-start commands finish successfully.",
-          "failure_or_wait": "Package, privilege, configuration, service, credential, or network errors prevent collection.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 7,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open Dashboards and select the Nodes dashboard in the Linux Node folder.",
-          "details": [],
-          "input": "Running Alloy integration and Grafana Cloud stack.",
-          "output": "Preconfigured Linux Nodes dashboard.",
-          "success_signal": "The Nodes dashboard opens.",
-          "failure_or_wait": "The dashboard can initially be empty before the first scrape arrives.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 8,
-          "phase": "wait",
-          "actor": "system",
-          "interface": "console",
-          "action": "Wait for Grafana Alloy to complete its first scrape and send the host metrics.",
-          "details": [
-            "The integration guide explicitly notes that the dashboard is initially empty."
-          ],
-          "input": "Running collector and open Nodes dashboard.",
-          "output": "First Linux telemetry batch in Grafana Cloud.",
-          "success_signal": "Dashboard panels begin populating.",
-          "failure_or_wait": "A prolonged empty dashboard indicates a collector, configuration, connectivity, or scrape problem.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 9,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Verify that the Nodes dashboard displays recent metrics for the configured Linux host.",
-          "details": [
-            "The preconfigured dashboard exposes host signals such as CPU, load, memory, disk, and network metrics according to the selected metric set."
-          ],
-          "input": "Completed first scrape.",
-          "output": "Visible Linux host telemetry.",
-          "success_signal": "Recent metrics for the named host are visible in the dashboard.",
-          "failure_or_wait": "Missing host series or empty panels mean the documented first success has not been reached.",
-          "required": true,
-          "source_ids": ["S2"]
-        }
-      ],
-      "source_ids": ["S2", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

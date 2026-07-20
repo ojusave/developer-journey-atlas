@@ -6,8 +6,8 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Replicate Get started route selector",
-    "selection_basis": "Replicate's documentation home presents five co-equal Get started cards. For the common run-a-public-model intent, Node.js, Google Colab, and Python are separate top-level routes, and the page does not label one as the default or recommendation. Human selection is required before one atomic journey can be canonical.",
+    "name": "Manual Node.js FLUX.1 Schnell run",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Manual Node.js FLUX.1 Schnell run. The Node.js slowstart exposes every local action and ends with two explicit console messages plus output.png. It is chosen as a transparent complete candidate, not as a platform-wide default over scaffold, Python, Colab, fine-tuning, or custom deployment routes. Prior surface before policy commit: Replicate Get started route selector.",
     "alternatives_considered": [
       {
         "name": "Run a model from Node.js",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Run a public AI model on Replicate after selecting the platform.",
@@ -48,12 +48,12 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established for one platform-wide path",
+    "official_milestone": "Both the exact success message and output.png are present.",
     "normalized_outcome": "The route selector must be resolved before the canonical outcome is either a generated output.png from FLUX.1 Schnell in Node.js or Python, or a successful public-model result in the linked Colab notebook.",
     "observable_completion_signal": "Node.js shows Running the model followed by Image saved as output.png and says the developer is up and running. Python prints Image saved as output.png. The public Replicate Colab documentation page does not itself demonstrate the notebook's final output.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The docs home offers three run-model Get started surfaces with different setup and verification, plus fine-tune and custom-deploy surfaces for different intents, without identifying one universal route.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Both the exact success message and output.png are present.",
       "source_ids": [
         "S1",
         "S2",
@@ -152,6 +152,211 @@
         "S2",
         "S3",
         "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install or verify Node.js 16 or later.",
+      "details": [],
+      "input": "Local development environment",
+      "output": "Supported Node.js runtime",
+      "success_signal": "node reports version 16 or greater.",
+      "failure_or_wait": "An older or unavailable Node.js runtime must be upgraded before the quickstart.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a Replicate account or log in.",
+      "details": [
+        "Account creation produces a default API token."
+      ],
+      "input": "Replicate identity",
+      "output": "Authenticated Replicate account",
+      "success_signal": "Account settings and the API tokens page are accessible.",
+      "failure_or_wait": "Identity or login recovery must complete before a token can be copied.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "If Replicate prompts for billing for this model or account, complete the assigned billing setup before running the prediction.",
+      "details": [
+        "Some models allow limited free use. Prepaid accounts add a payment method and credit; payment-in-arrears accounts retain a payment method and are charged for usage later."
+      ],
+      "input": "Billing prompt, if any",
+      "output": "Account permitted to run the selected model",
+      "success_signal": "The account can submit black-forest-labs/flux-schnell predictions.",
+      "failure_or_wait": "A prepaid account with zero balance cannot start new work. Add credit and confirm the balance updates before retrying.",
+      "required": false,
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the API tokens page and copy the default token or create and copy a dedicated token.",
+      "details": [
+        "Replicate tokens are 40 characters and begin with r8_. A dedicated token should be named for its application or environment."
+      ],
+      "input": "Authenticated account",
+      "output": "Replicate API token",
+      "success_signal": "The full token has been copied and stored securely.",
+      "failure_or_wait": "A token that has been exposed must be disabled and replaced before use.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export the copied value as REPLICATE_API_TOKEN in the shell.",
+      "details": [],
+      "input": "Replicate API token",
+      "output": "Authenticated shell environment",
+      "success_signal": "REPLICATE_API_TOKEN is set for the Node.js process.",
+      "failure_or_wait": "A missing, malformed, disabled, or wrong-account token causes authentication failure and must be replaced or re-exported.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create my-replicate-app and change into it.",
+      "details": [],
+      "input": "Writable local directory",
+      "output": "Empty project directory",
+      "success_signal": "The shell is inside my-replicate-app.",
+      "failure_or_wait": "Filesystem or permission errors must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm init -y, then npm pkg set type=module.",
+      "details": [],
+      "input": "Empty project directory",
+      "output": "ES module Node.js project",
+      "success_signal": "package.json exists and declares type module.",
+      "failure_or_wait": "npm or filesystem errors block package initialization.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm install replicate.",
+      "details": [],
+      "input": "Initialized Node.js project",
+      "output": "Installed Replicate client library",
+      "success_signal": "replicate is present in package.json and node_modules.",
+      "failure_or_wait": "Package, network, lockfile, or permission errors must be corrected before code execution.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create index.js with the quickstart code that imports Replicate and fs, initializes Replicate, prints Running the model..., calls black-forest-labs/flux-schnell with the astronaut riding a rainbow unicorn prompt, writes the returned image to output.png, and prints Image saved as output.png.",
+      "details": [],
+      "input": "Official Node.js quickstart code",
+      "output": "Executable prediction script",
+      "success_signal": "index.js contains the model call, output stream handling, file write, and both log statements.",
+      "failure_or_wait": "Syntax, model identifier, prompt, or file-write errors must be corrected before execution.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run node index.js.",
+      "details": [],
+      "input": "Configured shell and prediction script",
+      "output": "Submitted FLUX.1 Schnell prediction",
+      "success_signal": "The terminal prints Running the model....",
+      "failure_or_wait": "Authentication, billing, model, network, API, or JavaScript errors stop the run. Correct the reported issue and rerun; failed-run charges depend on the model and deployment type.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "api",
+      "action": "Wait for Replicate to run the model and return its image output.",
+      "details": [],
+      "input": "Accepted prediction",
+      "output": "Generated image stream",
+      "success_signal": "The script receives output and completes the file write.",
+      "failure_or_wait": "Prediction execution is an external wait. A failed or canceled prediction requires reviewing its error and retrying after the underlying problem is fixed.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify the terminal prints Image saved as output.png and that output.png exists in my-replicate-app.",
+      "details": [
+        "The quickstart says this means the developer is up and running."
+      ],
+      "input": "Completed prediction and file write",
+      "output": "First locally saved Replicate image",
+      "success_signal": "Both the exact success message and output.png are present.",
+      "failure_or_wait": "If the model completed but no file exists, inspect stream handling and filesystem errors, correct index.js, and rerun.",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
@@ -502,28 +707,6 @@
     "Fine-tuning and custom deployment unless selected as the intended first outcome",
     "Production token rotation and auto-reload configuration"
   ],
-  "candidate_paths": [
-    {
-      "id": "nodejs-slowstart-flux-schnell",
-      "name": "Manual Node.js FLUX.1 Schnell run",
-      "selection_basis": "The Node.js slowstart exposes every local action and ends with two explicit console messages plus output.png. It is chosen as a transparent complete candidate, not as a platform-wide default over scaffold, Python, Colab, fine-tuning, or custom deployment routes.",
-      "relationship_to_primary_path": "Continues after primary_path step 2 by selecting the Node.js slowstart and follows the official manual sequence through a saved generated image.",
-      "steps": [
-        {"step_number":1,"phase":"verify","actor":"developer","interface":"cli","action":"Install or verify Node.js 16 or later.","details":[],"input":"Local development environment","output":"Supported Node.js runtime","success_signal":"node reports version 16 or greater.","failure_or_wait":"An older or unavailable Node.js runtime must be upgraded before the quickstart.","required":true,"source_ids":["S2"]},
-        {"step_number":2,"phase":"access","actor":"developer","interface":"console","action":"Create a Replicate account or log in.","details":["Account creation produces a default API token."],"input":"Replicate identity","output":"Authenticated Replicate account","success_signal":"Account settings and the API tokens page are accessible.","failure_or_wait":"Identity or login recovery must complete before a token can be copied.","required":true,"source_ids":["S2","S5"]},
-        {"step_number":3,"phase":"access","actor":"developer","interface":"console","action":"If Replicate prompts for billing for this model or account, complete the assigned billing setup before running the prediction.","details":["Some models allow limited free use. Prepaid accounts add a payment method and credit; payment-in-arrears accounts retain a payment method and are charged for usage later."],"input":"Billing prompt, if any","output":"Account permitted to run the selected model","success_signal":"The account can submit black-forest-labs/flux-schnell predictions.","failure_or_wait":"A prepaid account with zero balance cannot start new work. Add credit and confirm the balance updates before retrying.","required":false,"source_ids":["S6","S7"]},
-        {"step_number":4,"phase":"authenticate","actor":"developer","interface":"console","action":"Open the API tokens page and copy the default token or create and copy a dedicated token.","details":["Replicate tokens are 40 characters and begin with r8_. A dedicated token should be named for its application or environment."],"input":"Authenticated account","output":"Replicate API token","success_signal":"The full token has been copied and stored securely.","failure_or_wait":"A token that has been exposed must be disabled and replaced before use.","required":true,"source_ids":["S5"]},
-        {"step_number":5,"phase":"authenticate","actor":"developer","interface":"cli","action":"Export the copied value as REPLICATE_API_TOKEN in the shell.","details":[],"input":"Replicate API token","output":"Authenticated shell environment","success_signal":"REPLICATE_API_TOKEN is set for the Node.js process.","failure_or_wait":"A missing, malformed, disabled, or wrong-account token causes authentication failure and must be replaced or re-exported.","required":true,"source_ids":["S2","S5"]},
-        {"step_number":6,"phase":"configure","actor":"developer","interface":"cli","action":"Create my-replicate-app and change into it.","details":[],"input":"Writable local directory","output":"Empty project directory","success_signal":"The shell is inside my-replicate-app.","failure_or_wait":"Filesystem or permission errors must be corrected.","required":true,"source_ids":["S2"]},
-        {"step_number":7,"phase":"configure","actor":"developer","interface":"cli","action":"Run npm init -y, then npm pkg set type=module.","details":[],"input":"Empty project directory","output":"ES module Node.js project","success_signal":"package.json exists and declares type module.","failure_or_wait":"npm or filesystem errors block package initialization.","required":true,"source_ids":["S2"]},
-        {"step_number":8,"phase":"install","actor":"developer","interface":"cli","action":"Run npm install replicate.","details":[],"input":"Initialized Node.js project","output":"Installed Replicate client library","success_signal":"replicate is present in package.json and node_modules.","failure_or_wait":"Package, network, lockfile, or permission errors must be corrected before code execution.","required":true,"source_ids":["S2"]},
-        {"step_number":9,"phase":"configure","actor":"developer","interface":"other","action":"Create index.js with the quickstart code that imports Replicate and fs, initializes Replicate, prints Running the model..., calls black-forest-labs/flux-schnell with the astronaut riding a rainbow unicorn prompt, writes the returned image to output.png, and prints Image saved as output.png.","details":[],"input":"Official Node.js quickstart code","output":"Executable prediction script","success_signal":"index.js contains the model call, output stream handling, file write, and both log statements.","failure_or_wait":"Syntax, model identifier, prompt, or file-write errors must be corrected before execution.","required":true,"source_ids":["S2"]},
-        {"step_number":10,"phase":"execute","actor":"developer","interface":"cli","action":"Run node index.js.","details":[],"input":"Configured shell and prediction script","output":"Submitted FLUX.1 Schnell prediction","success_signal":"The terminal prints Running the model....","failure_or_wait":"Authentication, billing, model, network, API, or JavaScript errors stop the run. Correct the reported issue and rerun; failed-run charges depend on the model and deployment type.","required":true,"source_ids":["S2","S6"]},
-        {"step_number":11,"phase":"execute","actor":"platform","interface":"api","action":"Wait for Replicate to run the model and return its image output.","details":[],"input":"Accepted prediction","output":"Generated image stream","success_signal":"The script receives output and completes the file write.","failure_or_wait":"Prediction execution is an external wait. A failed or canceled prediction requires reviewing its error and retrying after the underlying problem is fixed.","required":true,"source_ids":["S2","S6"]},
-        {"step_number":12,"phase":"verify","actor":"developer","interface":"cli","action":"Verify the terminal prints Image saved as output.png and that output.png exists in my-replicate-app.","details":["The quickstart says this means the developer is up and running."],"input":"Completed prediction and file write","output":"First locally saved Replicate image","success_signal":"Both the exact success message and output.png are present.","failure_or_wait":"If the model completed but no file exists, inspect stream handling and filesystem errors, correct index.js, and rerun.","required":true,"source_ids":["S2"]}
-      ],
-      "source_ids": ["S2", "S5", "S6", "S7"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

@@ -6,8 +6,8 @@
   },
   "category": "Data, databases, and search",
   "surface": {
-    "name": "Weaviate Cloud free cluster through Python Movie collection import",
-    "selection_basis": "Weaviate calls the no-card free cluster the easiest way to get started. Its current database quickstart recommends vectorizing during import and provides a Python path that creates a Movie collection, imports three named objects, and prints an explicit imported-and-vectorized message. However, the official account guide replaces signup instructions with an embedded interactive frame, and the public signup URL redirects to a client-rendered sign-in shell without exposing the complete registration form or state transitions.",
+    "name": "Locally hosted Weaviate with Docker Compose and Python",
+    "selection_basis": "Under the workshop policy, the official local Docker quickstart takes priority over Weaviate Cloud signup. It requires no account, starts Weaviate and Ollama with Docker Compose, and preserves the same explicit three-object Movie import terminal.",
     "alternatives_considered": [
       {
         "name": "Weaviate Cloud Jeopardy quickstart",
@@ -25,9 +25,9 @@
         "reason_not_primary": "The selected quickstart explicitly uses an official client to create and populate a collection."
       },
       {
-        "name": "Local self-hosted quickstart",
-        "url": "https://docs.weaviate.io/weaviate/quickstart/local",
-        "reason_not_primary": "The roster platform is Weaviate Cloud, and the Cloud quickstart is the official managed-service route."
+        "name": "Weaviate Cloud free cluster",
+        "url": "https://docs.weaviate.io/weaviate/quickstart",
+        "reason_not_primary": "The managed route requires account, cluster, and API-key creation; policy prioritizes the complete no-account local Docker quickstart."
       },
       {
         "name": "Shared Cloud cluster",
@@ -41,12 +41,12 @@
       }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Weaviate Cloud account, provision the free cluster, and run the official Python quickstart until three movie objects are imported and vectorized.",
-    "starting_url": "https://docs.weaviate.io/weaviate/quickstart",
+    "developer_intent": "Start Weaviate and Ollama locally with Docker Compose, then create and populate the Movie collection with Python.",
+    "starting_url": "https://docs.weaviate.io/weaviate/quickstart/local",
     "assumed_prior_state": [
       "No Weaviate Cloud account, organization, cluster, API key, endpoint, collection, billing instrument, local client, or data is assumed.",
       "The developer has an email address and can create a password, but the complete current signup inputs and validations are not assumed.",
@@ -56,138 +56,39 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established by public official documentation",
-    "normalized_outcome": "No complete Weaviate Cloud first-success outcome can be established because the current account registration form and transitions remain incompletely documented.",
-    "observable_completion_signal": "The public signup URL redirects to a client-rendered shell that does not reveal the complete required registration fields, validations, or transitions.",
+    "official_milestone": "Step 1: Create a collection and import data.",
+    "normalized_outcome": "A local Movie collection contains three objects vectorized by the local Ollama embedding model.",
+    "observable_completion_signal": "The Python program prints `Imported & vectorized 3 objects into the Movie collection`.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The required account registration transition is not established by public official documentation.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Imported & vectorized 3 objects into the Movie collection",
       "source_ids": [
         "S2",
         "S5",
-        "S8"
+        "S9"
       ]
     },
-    "why_this_is_the_boundary": "The post-account quickstart explicitly creates a Movie collection, imports three named objects, and prints `Imported & vectorized 3 objects into the Movie collection`. A complete first-user route cannot be established because the public account guide exposes no written signup steps and the public signup response redirects to a client-rendered shell that does not reveal the complete required registration fields or transitions.",
+    "why_this_is_the_boundary": "This is the first explicit successful data operation in the local quickstart. Semantic search and RAG follow as later steps.",
     "source_ids": [
       "S2",
       "S5",
-      "S8"
+      "S9"
     ]
   },
   "prerequisites": [
-    {
-      "order": 1,
-      "type": "account",
-      "requirement": "Create a Weaviate Cloud user account identified by an email address and create the password used for console login. The account guide does not publicly enumerate the complete registration form.",
-      "required": true,
-      "source_ids": [
-        "S4",
-        "S5",
-        "S6",
-        "S8"
-      ]
-    },
-    {
-      "order": 2,
-      "type": "legal",
-      "requirement": "Select a registration country or equivalent mechanism because it determines whether the self-serve agreement is with Weaviate LLC or Weaviate B.V.; the current public form sequence is not documented.",
-      "required": true,
-      "source_ids": [
-        "S7",
-        "S8"
-      ]
-    },
-    {
-      "order": 3,
-      "type": "legal",
-      "requirement": "Review and accept the self-serve Terms of Service through the registration checkbox or other mechanism.",
-      "required": true,
-      "source_ids": [
-        "S7"
-      ]
-    },
-    {
-      "order": 4,
-      "type": "configuration",
-      "requirement": "Create the one-per-user free cluster, using the automatic Cost Optimized profile, GCP default, and unchanged optional advanced settings for the selected route.",
-      "required": true,
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "order": 5,
-      "type": "credential",
-      "requirement": "Create an API key with the admin role, copy it at its one-time display, and copy the cluster REST endpoint.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "order": 6,
-      "type": "software",
-      "requirement": "Have Python and pip available to install the official client and execute the published quickstart.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    }
+    {"order": 1, "type": "software", "requirement": "Install Docker with Docker Compose.", "required": true, "source_ids": ["S9"]},
+    {"order": 2, "type": "hardware", "requirement": "Use a modern computer with at least 8 GB RAM; 16 GB or more is preferred.", "required": true, "source_ids": ["S9"]},
+    {"order": 3, "type": "software", "requirement": "Have Python and pip available.", "required": true, "source_ids": ["S9"]}
   ],
   "primary_path": [
-    {
-      "step_number": 1,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open the Weaviate Cloud database quickstart and follow its free-cluster link to the console.",
-      "details": [],
-      "input": "https://docs.weaviate.io/weaviate/quickstart",
-      "output": "The Weaviate Cloud account application opens.",
-      "success_signal": "The official console domain is reached.",
-      "failure_or_wait": "Cluster creation cannot begin until an account exists; no navigation recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S5"
-      ]
-    },
-    {
-      "step_number": 2,
-      "phase": "access",
-      "actor": "platform",
-      "interface": "browser",
-      "action": "Redirect the signup URL to the client-rendered account application.",
-      "details": [],
-      "input": "https://console.weaviate.cloud/signup",
-      "output": "The public response redirects to `/signin?next=%2Fsignup` and exposes only a loading shell plus client scripts.",
-      "success_signal": "No complete signup form, validation rules, or registration transition is publicly inspectable in the response.",
-      "failure_or_wait": "Official prose establishes account creation, email identity, password creation, country-dependent contracting entity, and terms acceptance, but does not enumerate all current form inputs or post-submit states.",
-      "required": true,
-      "source_ids": [
-        "S5",
-        "S6",
-        "S7",
-        "S8"
-      ]
-    }
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the locally hosted Docker quickstart.", "details": [], "input": "https://docs.weaviate.io/weaviate/quickstart/local", "output": "The Docker Compose and Python route is visible.", "success_signal": "Start Weaviate and Ollama with Docker Compose is reached.", "failure_or_wait": "", "required": true, "source_ids": ["S9"]},
+    {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "code", "action": "Save the published Compose definition as `docker-compose.yml`.", "details": ["It runs Weaviate 1.38.1 and Ollama 0.12.9, enables anonymous local access, and configures the Ollama vectorizer and generator modules."], "input": "The official docker-compose.yml listing", "output": "A local Compose project is configured.", "success_signal": "The file defines `weaviate` and `ollama` services.", "failure_or_wait": "", "required": true, "source_ids": ["S9"]},
+    {"step_number": 3, "phase": "run", "actor": "developer", "interface": "cli", "action": "Start both services and pull the two documented Ollama models.", "details": [], "input": "docker-compose up -d; docker compose exec ollama ollama pull nomic-embed-text; docker compose exec ollama ollama pull llama3.2", "output": "Weaviate and Ollama run locally with the embedding and generative models.", "success_signal": "Both model pulls complete successfully.", "failure_or_wait": "Wait for containers to start and model downloads to finish.", "required": true, "source_ids": ["S9"]},
+    {"step_number": 4, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the official Python client.", "details": [], "input": "pip install -U \"weaviate-client[agents]\"", "output": "The Weaviate client is installed.", "success_signal": "pip completes successfully.", "failure_or_wait": "", "required": true, "source_ids": ["S9"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published Python example that connects locally, creates `Movie`, and imports the three sample objects with `text2vec-ollama`.", "details": ["The objects are The Matrix, Spirited Away, and The Lord of the Rings: The Fellowship of the Ring."], "input": "The Step 1 Python listing", "output": "Three objects are stored and vectorized.", "success_signal": "The program prints `Imported & vectorized 3 objects into the Movie collection`.", "failure_or_wait": "Confirm Weaviate and Ollama are reachable and the embedding model is present.", "required": true, "source_ids": ["S9"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete public-doc candidate can be reconstructed from account entry through the movie import. The account guide delegates signup to an embedded interactive frame, the direct signup URL redirects into a client-rendered shell, and official prose does not enumerate all current registration fields, validations, or post-submit states. Official sources do document the post-gate continuation: login, free-cluster configuration and provisioning, admin API-key creation, endpoint and environment setup, Python client installation, Movie collection creation, three-object import, and the explicit imported-and-vectorized signal.",
-    "impact": "The documented free-cluster, credential, client, collection, and three-object import continuation cannot form an end-to-end first-user candidate without inventing hidden registration inputs and transitions.",
-    "source_ids": [
-      "S2",
-      "S3",
-      "S4",
-      "S5",
-      "S6",
-      "S7",
-      "S8"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
@@ -523,6 +424,17 @@
         "Redirect to sign-in with signup continuation",
         "Client-rendered loading shell without publicly inspectable registration form"
       ]
+    },
+    {
+      "id": "S9",
+      "title": "Quickstart: Locally hosted with Docker",
+      "url": "https://docs.weaviate.io/weaviate/quickstart/local",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Prerequisites", "Start Weaviate and Ollama with Docker Compose", "Install a client library", "Step 1: Create a collection and import data"],
+      "evidence_supported": ["Workshop-policy local route selection", "Docker Compose configuration", "Ollama model commands", "Python client installation", "Movie import terminal"]
     }
   ],
   "uncertainties": [

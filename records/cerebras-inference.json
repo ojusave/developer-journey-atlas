@@ -7,7 +7,7 @@
   "category": "AI, ML, and agents",
   "surface": {
     "name": "Cerebras Inference Quickstart through the first Python chat completion",
-    "selection_basis": "The official Quickstart says it makes the developer's first Cerebras API call in minutes and provides a Python path from API key setup through a printed chat-completion response. The complete first-user path is blocked because the guide requires a Cerebras account but only says to sign up or log in, while the public Cloud Console response does not expose the registration fields or transitions.",
+    "selection_basis": "Under the workshop policy, the official Python Quickstart is the fastest documented route: it promises a first Cerebras API call in minutes and ends with a printed chat-completion response.",
     "alternatives_considered": [
       {
         "name": "Developer Playground",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create a Cerebras account and API key, then run the official Python Quickstart until a chat-completion message is printed.",
@@ -45,19 +45,19 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established end to end by public official documentation",
-    "normalized_outcome": "No complete Cerebras Inference first-success path can be established because required account registration is not publicly enumerated.",
-    "observable_completion_signal": "The public Cloud Console response identifies Cerebras Cloud but does not expose the required signup fields or post-submit transition.",
+    "official_milestone": "Make the first Cerebras API request.",
+    "normalized_outcome": "The Python SDK returns and prints a `gpt-oss-120b` chat completion.",
+    "observable_completion_signal": "The terminal prints answer text to `Why is fast inference important?`.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The required account-registration transition is not established by public official documentation.",
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The Quickstart's `Make your first API request` example prints response text.",
       "source_ids": [
         "S1",
         "S4",
         "S5"
       ]
     },
-    "why_this_is_the_boundary": "The Quickstart demonstrates a printed chat-completion response as the terminal of its first-request path, but that downstream terminal cannot establish an end-to-end first-user route while account registration remains hidden.",
+    "why_this_is_the_boundary": "The printed completion is the terminal of the guide's explicitly named first-request section.",
     "source_ids": [
       "S1",
       "S4",
@@ -111,11 +111,11 @@
       "phase": "arrive",
       "actor": "developer",
       "interface": "documentation",
-      "action": "Open the official Cerebras Inference Quickstart and follow its Cloud Console link.",
+      "action": "Open the official Cerebras Inference Quickstart.",
       "details": [],
       "input": "https://inference-docs.cerebras.ai/quickstart",
-      "output": "The Cerebras Cloud application opens.",
-      "success_signal": "The official cloud.cerebras.ai domain is reached.",
+      "output": "The account, key, SDK, and first-request sequence is visible.",
+      "success_signal": "The `Make your first API request` section is available.",
       "failure_or_wait": "No navigation failure or recovery behavior is documented.",
       "required": true,
       "source_ids": [
@@ -125,34 +125,30 @@
     },
     {
       "step_number": 2,
-      "phase": "access",
-      "actor": "platform",
+      "phase": "account",
+      "actor": "developer",
       "interface": "browser",
-      "action": "Present the Cerebras Cloud client application for signup or login.",
-      "details": [],
+      "action": "Sign up for Cerebras Cloud using the official Cloud Console.",
+      "details": ["Treat signup as one opaque prerequisite under the workshop policy."],
       "input": "https://cloud.cerebras.ai/",
-      "output": "The public response provides the Cerebras Cloud application shell without an inspectable registration contract.",
-      "success_signal": "No complete signup fields, validations, agreements, authentication alternatives, or post-submit states are established by public official documentation.",
-      "failure_or_wait": "The Quickstart and console overview only instruct the developer to sign up or log in.",
+      "output": "An authenticated Cerebras Cloud account is available.",
+      "success_signal": "The Cloud Console opens.",
+      "failure_or_wait": "Signup fields are not publicly enumerated.",
       "required": true,
       "source_ids": [
         "S1",
         "S4",
         "S5"
       ]
-    }
+    },
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Open API Keys in the left navigation, create a key, and copy it.", "details": [], "input": "Authenticated Cloud Console", "output": "A Cerebras API key is available.", "success_signal": "The new key is displayed.", "failure_or_wait": "Paid accounts can require project selection.", "required": true, "source_ids": ["S1", "S2", "S4"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Export the key as `CEREBRAS_API_KEY` and run `echo $CEREBRAS_API_KEY`.", "details": [], "input": "Copied key", "output": "The key is present in the shell.", "success_signal": "The echo command prints the value.", "failure_or_wait": "Set it in the same shell that runs the code.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "install", "actor": "developer", "interface": "cli", "action": "Run `pip install --upgrade cerebras_cloud_sdk`.", "details": [], "input": "Python and pip", "output": "The Cerebras SDK is installed.", "success_signal": "Installation completes.", "failure_or_wait": "Resolve Python environment errors before continuing.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "build", "actor": "developer", "interface": "code", "action": "Save the Quickstart's Python chat-completion example.", "details": ["Use model `gpt-oss-120b` and the published prompt."], "input": "Published Python sample", "output": "A runnable first-request script exists.", "success_signal": "The script prints the first choice's message content.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run the Python script.", "details": [], "input": "Script and environment key", "output": "A chat completion is returned.", "success_signal": "The terminal prints response text.", "failure_or_wait": "The guide documents 401, 404, and 429 recovery.", "required": true, "source_ids": ["S1"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete public-doc candidate can be reconstructed from account registration to the demonstrated response. After the hidden account gate, official docs do specify navigating to API Keys, generating a named key, setting and confirming `CEREBRAS_API_KEY`, installing `cerebras_cloud_sdk`, running the published `gpt-oss-120b` chat request, and seeing a printed answer, but the required initial signup sequence is not enumerated.",
-    "impact": "The documented API-key and first-request continuation cannot form an end-to-end first-user candidate without inventing account fields or transitions.",
-    "source_ids": [
-      "S1",
-      "S2",
-      "S4",
-      "S5"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
@@ -362,7 +358,6 @@
     }
   ],
   "excluded_after_success": [
-    "No complete first-success boundary is claimed while account registration remains incompletely documented.",
     "Streaming, tool calling, structured outputs, reasoning, model selection, integrations, paid tiers, monitoring, and production design are outside the blocked selected path."
   ]
 }

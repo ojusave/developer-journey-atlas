@@ -1,76 +1,218 @@
 {
-  "platform": {"name": "Chronosphere", "slug": "chronosphere", "organization": "Chronosphere"},
+  "platform": {
+    "name": "Chronosphere",
+    "slug": "chronosphere",
+    "organization": "Chronosphere, Inc."
+  },
   "category": "Observability, testing, and release engineering",
   "surface": {
-    "name": "Chronosphere Observability Platform role-based getting-started routes",
-    "selection_basis": "The official general getting-started page first requires organization-specific authentication, then presents different administrator and developer task families. It does not name one universal first task or terminal, and several routes require telemetry already flowing or resources already created by an administrator.",
+    "name": "Chronosphere developer metrics query with Query Builder",
+    "selection_basis": "Workshop selection policy (2026-07-19): select the first developer path when one exists rather than an administrator-only route. The general guide lists Query telemetry data first for developers and recommends Query Builder; a returned graph or table is the fastest documented developer terminal.",
     "alternatives_considered": [
-      {"name": "Administrator telemetry ingestion", "url": "https://docs.chronosphere.io/ingest", "reason_not_primary": "This requires selecting metrics, traces, or logs and an organization-specific ingestion route."},
-      {"name": "Developer telemetry query", "url": "https://docs.chronosphere.io/investigate/querying/query-builder", "reason_not_primary": "This assumes a tenant with telemetry and is one of several developer routes."},
-      {"name": "Dashboard creation", "url": "https://docs.chronosphere.io/observe/dashboards", "reason_not_primary": "This assumes access and data, and the general guide does not promote it over alerts, services, queries, or integration work."}
+      {
+        "name": "OpenTelemetry Collector",
+        "url": "https://docs.chronosphere.io/ingest/metrics-traces/otel",
+        "reason_not_primary": "Docs recommend Chronosphere Collector for Prometheus discovery/scrape workloads."
+      },
+      {
+        "name": "Kubernetes DaemonSet Collector",
+        "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector/install/kubernetes",
+        "reason_not_primary": "Recommended inside Kubernetes, but requires a cluster; standalone is faster when Kubernetes is not already available."
+      },
+      {
+        "name": "Administrator Collector ingestion",
+        "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector",
+        "reason_not_primary": "This requires SysAdmin access, service-account credentials, Collector installation, and telemetry configuration; the policy explicitly prefers the first developer path."
+      }
     ]
   },
-  "research_status": "needs-human-judgment",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Start without assuming a Chronosphere tenant, user account, role, team, permissions, telemetry, dashboard, monitor, or saved resource, and identify the platform-wide first documented value outcome.",
+    "developer_intent": "Authenticate to an existing Observability Platform tenant and run a first Prometheus metric query with Query Builder.",
     "starting_url": "https://docs.chronosphere.io/overview/get-started",
     "assumed_prior_state": [
-      "No organization tenant URL, administrator invitation, account, SSO identity, personal access token, team membership, telemetry, dashboard, alert, service, notebook, favorite, or pinned scope is assumed.",
-      "A supported browser, email access, and network connection are available.",
-      "No invitation was requested or accepted, authentication was completed, telemetry was ingested or queried, or resource was created during research."
+      "An Observability Platform tenant exists or can be obtained through Chronosphere's commercial onboarding.",
+      "Prometheus metrics are already ingested and visible to the developer."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "No single platform-wide first success is established by the general Observability Platform documentation.",
-    "normalized_outcome": "A human must choose an administrator or developer objective and provide an organization tenant with the required access and telemetry context before a first-success route can be selected.",
-    "observable_completion_signal": "No universal signal is named. Possible results include successful access, flowing telemetry, a dashboard, an alert, a service view, a query result, an integration, a favorite, or a pinned scope.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The general guide lists shared navigation actions, then splits into administrator tasks for access, ingestion, monitoring, and telemetry control, and developer tasks for querying, observing, integrating, and configuring resources.", "source_ids": ["S1", "S2"]},
-    "why_this_is_the_boundary": "The choice changes the actor, prerequisites, data dependencies, steps, and terminal. Selecting one without a stated role and outcome would substitute researcher judgment for the official general documentation.",
-    "source_ids": ["S1", "S2"]
+    "official_milestone": "Query telemetry data with Query Builder.",
+    "normalized_outcome": "The developer selects an available Prometheus metric and runs a query in Metrics Explorer.",
+    "observable_completion_signal": "The Results section displays matching series and values in Table and Graph.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Click Run to run the query; the graph updates.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    "why_this_is_the_boundary": "The policy resolves the role choice by taking the first developer path. A returned query result is the earliest demonstrated developer value; saving, dashboarding, alerting, and deeper investigation follow later.",
+    "source_ids": [
+      "S1",
+      "S4",
+      "S5"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "access", "requirement": "Have access to an organization-specific Chronosphere Observability Platform tenant URL.", "required": true, "source_ids": ["S2"]},
-    {"order": 2, "type": "identity", "requirement": "Have an administrator-provisioned user account or organization-enabled SSO identity.", "required": true, "source_ids": ["S2", "S3"]},
-    {"order": 3, "type": "permission", "requirement": "Have the role and team permissions required for the selected administrator or developer task.", "required": true, "source_ids": ["S1", "S3"]},
-    {"order": 4, "type": "environment", "requirement": "Have metrics, traces, logs, or change-event data available when the selected outcome depends on observing or querying telemetry.", "required": true, "source_ids": ["S1"]}
+    {
+      "order": 1,
+      "type": "access",
+      "requirement": "Access to an organization-specific Chronosphere Observability Platform tenant.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "Developer permission to use Metrics Explorer and query at least one metric.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "environment",
+      "requirement": "Prometheus metrics are already ingested into the tenant.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Get started with Observability Platform and review the common, administrator, and developer routes.", "details": ["Common actions include authentication, home navigation, dashboards, monitors, queries, and service exploration.", "Administrator work covers access, ingestion, monitoring, and control; developer work covers queries, observation, integrations, and resource configuration."], "input": "https://docs.chronosphere.io/overview/get-started", "output": "The role-based task families and their dependencies are visible.", "success_signal": "The official page makes the required role and objective choice explicit.", "failure_or_wait": "", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "access", "actor": "developer", "interface": "documentation", "action": "Stop before selecting a task or attempting authentication because no universal tenant, role, data context, or first-success outcome is established.", "details": ["Interactive authentication is configured per organization as SSO, email and password, or both.", "Email-and-password users must be invited by an administrator; SSO users depend on the organization's identity provider."], "input": "The unresolved organization, role, access, telemetry, and outcome context", "output": "No route is selected and no external state changes.", "success_signal": "The record preserves the official decision boundary.", "failure_or_wait": "A human must choose the intended task and provide the organization access and data context.", "required": true, "source_ids": ["S1", "S2", "S3"]}
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Get started with Observability Platform and select the first developer task, Query telemetry data.", "details": [], "input": "https://docs.chronosphere.io/overview/get-started", "output": "The Metrics Explorer and Query Builder route is selected.", "success_signal": "Query Builder is recommended for constructing PromQL.", "failure_or_wait": "", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "access", "actor": "developer", "interface": "browser", "action": "Obtain organization-provisioned access and authenticate at the tenant URL.", "details": ["Account enrollment is one opaque access step under policy; no unlisted signup fields are asserted."], "input": "The organization tenant URL and provisioned identity", "output": "The Observability Platform home page opens.", "success_signal": "The authenticated home page is displayed.", "failure_or_wait": "An administrator must provision the user or enable the SSO identity.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "prepare", "actor": "developer", "interface": "web-ui", "action": "Open Metrics Explorer and click Builder for a query.", "details": ["The route assumes Prometheus metrics are already ingested."], "input": "An authenticated tenant with metric data", "output": "Query Builder opens.", "success_signal": "Metric, label, function, and rollup controls are available.", "failure_or_wait": "Ask an administrator to ingest or grant access to metrics if none are available.", "required": true, "source_ids": ["S4", "S5"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Select an available metric and any desired labels or rollup.", "details": ["The builder suggests metric names, labels, values, and functions."], "input": "One available Prometheus metric", "output": "A valid PromQL expression is constructed.", "success_signal": "The expression appears in the query field.", "failure_or_wait": "If type information is unavailable, select the rollup manually.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "web-ui", "action": "Click Run.", "details": [], "input": "The constructed query", "output": "Chronosphere evaluates the query.", "success_signal": "The graph updates and Results shows matching series and values in Graph and Table.", "failure_or_wait": "Adjust the metric, labels, time range, or expression and run again.", "required": true, "source_ids": ["S4", "S5"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The official guide requires a choice among controlling access, ingesting metrics, traces, or logs, creating dashboards, alerts, or services after data flows, controlling telemetry, querying data, observing existing telemetry, integrating command-line tools or APIs, or configuring favorites and pinned scopes. Access also depends on an organization tenant and either an administrator invitation with signup, email verification, and password sign-in, or an organization-configured SSO redirect. The docs do not choose one of these routes as the platform-wide first success.",
-    "impact": "There is no single chronological path, input set, or completion signal to encode. A human must define the role, tenant, telemetry state, and desired value outcome before one route can be researched end to end.",
-    "source_ids": ["S1", "S2", "S3"]
-  },
-  "branches": [
-    {"at_step": 2, "condition": "The organization uses SSO", "path": "Open the tenant login URL, click Log in with Single Sign On, authenticate with the external provider, and return to the Observability Platform.", "effect_on_first_success": "Introduces an external identity-provider boundary before the chosen task.", "source_ids": ["S2"]},
-    {"at_step": 2, "condition": "The organization uses email and password", "path": "Receive an administrator invitation, open its link, enter account details including a password, click Sign Up, open the verification email, click its link, then sign in at the tenant login URL.", "effect_on_first_success": "Adds administrator provisioning, email verification, and password authentication before the chosen task.", "source_ids": ["S2", "S3"]},
-    {"at_step": 2, "condition": "The user is an administrator", "path": "Choose access control, telemetry ingestion, dashboards and alerts, services, or telemetry-control work.", "effect_on_first_success": "Changes the first result to an administrative, ingestion, monitoring, or cost-control outcome.", "source_ids": ["S1"]},
-    {"at_step": 2, "condition": "The user is a developer", "path": "Choose query, investigation, dashboard or Lens observation, tool integration, favorite, or pinned-scope work.", "effect_on_first_success": "Changes the first result to a query, visualization, integration, or personal-configuration outcome.", "source_ids": ["S1"]}
-  ],
+  "candidate_path_gap": null,
+  "branches": [],
   "friction_gates": [
-    {"at_step": 2, "type": "choice", "description": "The general guide requires a role and task choice before a specific route can be followed.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "access", "description": "The user needs an organization-specific tenant URL and account access.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 2, "type": "approval", "description": "Email-and-password accounts are requested by an organization administrator.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
-    {"at_step": 2, "type": "verification", "description": "The email-and-password route requires opening a verification email link after signup.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 2, "type": "environment", "description": "Dashboard, alert, service, query, and investigation outcomes depend on telemetry already being ingested.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "permission", "description": "Teams and roles determine access to platform resources and administrative capabilities.", "documented_requirement": true, "source_ids": ["S3"]}
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A provisioned tenant is required; public docs start after authenticate rather than self-serve signup fields.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "permission",
+      "description": "Creating the service-account API token requires SysAdmin team membership.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Get started with Observability Platform - Chronosphere Documentation", "url": "https://docs.chronosphere.io/overview/get-started", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["To get started", "Administrators", "Control access", "Ingest telemetry data", "Monitor telemetry data", "Control telemetry data", "Developers", "Query telemetry data", "Observe telemetry data", "Integrate tools", "Configure resources"], "evidence_supported": ["Common entry actions", "Administrator routes", "Developer routes", "Telemetry dependency", "Role-dependent outcomes", "No universal first terminal"]},
-    {"id": "S2", "title": "Authenticate with Observability Platform as a user - Chronosphere Documentation", "url": "https://docs.chronosphere.io/overview/authenticating", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Sign in interactively", "Use single sign-on", "Use an email and password", "Authenticate with a personal access token"], "evidence_supported": ["Account requirement", "Organization tenant login URL", "Supported browsers", "SSO steps", "Administrator invitation", "Signup details", "Verification email", "Password sign-in", "Home-page redirect", "Personal access token alternative"]},
-    {"id": "S3", "title": "User accounts - Chronosphere Documentation", "url": "https://docs.chronosphere.io/administer/accounts-teams/user-accounts", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Grant System Administrator (SysAdmin) privileges to users", "Add a user account", "Users of Okta with SCIM"], "evidence_supported": ["Administrator provisioning", "User email invitation", "Team assignment", "Default viewer access", "SSO account management"]}
+    {
+      "id": "S1",
+      "title": "Get started with Observability Platform",
+      "url": "https://docs.chronosphere.io/overview/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "authenticate",
+        "Administrators ingest telemetry"
+      ],
+      "evidence_supported": [
+        "authenticate first",
+        "admin ingest card"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Chronosphere Collector",
+      "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get started",
+        "Chronosphere Collector or OpenTelemetry Collector"
+      ],
+      "evidence_supported": [
+        "recommended for Prometheus scrape",
+        "verify streaming step"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Standalone Collector installation to retrieve metrics",
+      "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector/install/standalone",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create an API token",
+        "Download the Collector binary",
+        "Define the Collector configuration file",
+        "Run the Collector"
+      ],
+      "evidence_supported": [
+        "SysAdmin service account",
+        "gateway TENANT:443",
+        "binary/Docker run commands"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create PromQL queries with the query builder",
+      "url": "https://docs.chronosphere.io/investigate/querying/metrics/query-builder",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Create the query", "Query actions"],
+      "evidence_supported": ["Builder entry", "Metric and label suggestions", "Rollup behavior", "Run action", "Graph terminal"]
+    },
+    {
+      "id": "S5",
+      "title": "Metrics Explorer",
+      "url": "https://docs.chronosphere.io/investigate/querying/metrics/explorer",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Metrics Explorer"],
+      "evidence_supported": ["Prometheus metric prerequisite", "Query Builder link", "Query execution", "Graph and Table results"]
+    }
   ],
   "uncertainties": [
-    {"question": "Which administrator or developer outcome should define Chronosphere first success?", "impact": "It changes the actor, prerequisites, telemetry dependency, steps, and terminal.", "reason_unresolved": "The official general page presents multiple task families without selecting one universal route.", "checked_source_ids": ["S1"]},
-    {"question": "What tenant, authentication method, permissions, and telemetry would the developer have?", "impact": "These determine whether the user can enter the platform and which tasks are possible.", "reason_unresolved": "Chronosphere documents organization-specific access and role-dependent resources, but no general visitor has that context.", "checked_source_ids": ["S1", "S2", "S3"]}
+    {
+      "question": "How is a new Observability Platform tenant provisioned for a developer with no existing Chronosphere access?",
+      "impact": "The path assumes an existing tenant and authenticated session before Collector install.",
+      "reason_unresolved": "Public get-started docs begin at authenticate and do not publish a self-serve tenant signup sequence.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
   ],
   "excluded_after_success": [
-    "No after-success scope is excluded because a platform-wide first-success outcome has not been selected."
+    "Service discovery tuning",
+    "Collector optimizations",
+    "Dashboard and alert creation"
   ]
 }

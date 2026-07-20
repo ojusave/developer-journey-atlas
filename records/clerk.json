@@ -6,8 +6,8 @@
   },
   "category": "Identity, security, and networking",
   "surface": {
-    "name": "Clerk SDK, application stack, and integration model not selected",
-    "selection_basis": "Clerk's official Quickstarts page requires a stack choice across full-stack, frontend, mobile, extension, and backend SDKs, including Next.js, Astro, Nuxt, React Router, TanStack Start, React, Expo, Android, iOS, JavaScript, Vue, Express, and Fastify. Its Core concepts page also offers Account Portal, recommended prebuilt components, or custom API flows. The Next.js App Router page is only the default for new Next.js apps, not for Clerk platform users generally.",
+    "name": "Use the Clerk CLI to scaffold Next.js and create the first signed-in user",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Use the Clerk CLI to scaffold Next.js and create the first signed-in user. The platform router has no universal SDK default, but Clerk's current official Next.js AI prompt defines a CLI-first sequence. This candidate selects its fresh empty-directory npm branch, authenticated Clerk account path, visible prebuilt controls, doctor check, and first-user profile-icon terminal. Prior surface before policy commit: Clerk SDK, application stack, and integration model not selected.",
     "alternatives_considered": [
       {
         "name": "Next.js App Router quickstart",
@@ -26,8 +26,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach a first Clerk authentication result without a selected application stack, SDK, hosted or embedded UI model, or authentication method.",
@@ -39,11 +39,11 @@
   },
   "documented_first_success": {
     "official_milestone": "No single Clerk first-user path is selected by the Quickstarts router.",
-    "normalized_outcome": "Unresolved until a human selects a Clerk integration model and SDK. The documented Next.js App Router candidate ends when the local application completes sign-up and creates its first user in the Clerk development instance.",
-    "observable_completion_signal": "For the Next.js candidate, `http://localhost:3000` shows Sign up while signed out; completing authentication creates the user and switches the UI to its signed-in state with the UserButton.",
+    "normalized_outcome": "The profile icon is visible in place of Sign in and Sign up.",
+    "observable_completion_signal": "The profile icon is visible in place of Sign in and Sign up.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The Quickstarts page lists multiple full-stack, frontend, mobile, extension, and backend SDK guides. `Create your first user` is explicit inside several stack-specific guides but the router does not select a stack.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The profile icon is visible in place of Sign in and Sign up.",
       "source_ids": [
         "S1",
         "S2",
@@ -51,7 +51,7 @@
         "S4"
       ]
     },
-    "why_this_is_the_boundary": "A first authenticated user is a common candidate, but stack choice changes application scaffolding, package manager, SDK, keys, middleware, provider, UI, local URL, native permissions, and runtime. Selecting Next.js would be an analyst choice.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -141,6 +141,248 @@
         "S2",
         "S3",
         "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open an empty writable project directory and select npm as the package manager for the fresh Next.js route.",
+      "details": [
+        "The current Next.js CLI prompt says an empty directory must choose a package manager; npm is the default when there is no preference."
+      ],
+      "input": "Empty directory and local npm environment.",
+      "output": "Fresh-project CLI context.",
+      "success_signal": "The shell is in the intended empty directory and npm is available.",
+      "failure_or_wait": "A nonempty directory follows the existing-project `clerk init` branch; a leftover lockfile or package-manager configuration changes the package-manager choice.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `command -v clerk && clerk --version || echo \"Clerk CLI not installed\"`.",
+      "details": [],
+      "input": "Shell environment.",
+      "output": "Installed Clerk CLI path and version, or the documented not-installed message.",
+      "success_signal": "The CLI state is known before setup continues.",
+      "failure_or_wait": "A shell that cannot run the check must be corrected before the install or update decision.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "If the CLI is missing, run `npm install -g clerk`; if it is already available, run `clerk update --yes`.",
+      "details": [
+        "pnpm, yarn, bun, Homebrew, and curl are official install alternatives, but this candidate selects npm."
+      ],
+      "input": "The CLI state from the preceding check.",
+      "output": "Installed or updated Clerk CLI.",
+      "success_signal": "`clerk` is available at the current version.",
+      "failure_or_wait": "Package download, permissions, network, or updater errors must be corrected before authentication.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `clerk auth login` from the project directory.",
+      "details": [
+        "The current Next.js CLI prompt requires this immediately after install or update and before app listing or initialization."
+      ],
+      "input": "Current Clerk CLI and browser-capable environment.",
+      "output": "Clerk browser authentication handoff.",
+      "success_signal": "The CLI opens or provides the browser login flow.",
+      "failure_or_wait": "Browser launch, callback, network, or CLI session errors block the authenticated route.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Complete the Clerk login flow in the browser and return control to the CLI.",
+      "details": [
+        "If the developer lacks a Clerk identity, account creation is an access gate, but the CLI-first prompt does not enumerate its current form fields.",
+        "No completion duration is documented."
+      ],
+      "input": "Clerk identity and the browser authentication flow.",
+      "output": "Authenticated Clerk CLI session.",
+      "success_signal": "The CLI confirms authentication and can proceed to initialization.",
+      "failure_or_wait": "Uncompleted account creation, login, browser callback, or identity recovery leaves the CLI unauthenticated.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `clerk init --framework next --pm npm` in the empty directory.",
+      "details": [
+        "Do not add `--app` by default and do not list applications before init. Only use `--app <application_id>` when the developer already supplied an ID or explicitly chose an existing application."
+      ],
+      "input": "Empty directory, npm, and authenticated Clerk CLI session.",
+      "output": "Next.js and Clerk initialization session.",
+      "success_signal": "The CLI begins scaffolding the fresh Next.js project and Clerk integration.",
+      "failure_or_wait": "Project-generation, framework, package-manager, application-linking, network, or filesystem errors can stop initialization.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Let `clerk init` scaffold Next.js, install `@clerk/nextjs`, link the project to a Clerk application, pull environment variables, and apply the Next.js provider, middleware, and authentication setup.",
+      "details": [
+        "If init explicitly asks for an existing application but no ID was supplied, run `clerk apps list --json`, show the names and IDs, and let the developer choose.",
+        "For Next.js 16 or later the middleware file is `proxy.ts`; for Next.js 15 or earlier it is `middleware.ts`."
+      ],
+      "input": "Authenticated init session and any prompt responses requested by the CLI.",
+      "output": "Generated account-linked Clerk Next.js project.",
+      "success_signal": "Initialization completes and reports that Clerk is set up in the project.",
+      "failure_or_wait": "If init errors or does not finish, the documented fallback is `npm install @clerk/nextjs`, a correctly named file exporting `clerkMiddleware()`, and `ClerkProvider` using the full Next.js quickstart.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Ensure the layout visibly renders `SignInButton` and `SignUpButton` inside `Show when=\"signed-out\"`, and `UserButton` inside `Show when=\"signed-in\"`, all within `ClerkProvider` inside the body.",
+      "details": [
+        "Reuse generated controls when they are already present instead of duplicating them.",
+        "Never expose `CLERK_SECRET_KEY` in client code."
+      ],
+      "input": "Generated Next.js Clerk layout.",
+      "output": "Visible signed-out and signed-in authentication controls.",
+      "success_signal": "The project contains the provider and the three state-appropriate controls without duplicate UI.",
+      "failure_or_wait": "Wrong imports, provider placement, missing controls, or exposed secret configuration must be corrected before runtime testing.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `clerk doctor`.",
+      "details": [],
+      "input": "Generated and reviewed Clerk integration.",
+      "output": "Clerk diagnostic result.",
+      "success_signal": "Doctor reports no unresolved integration issue.",
+      "failure_or_wait": "Fix every issue reported by the CLI, then rerun doctor before starting the app.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `npm run dev` from the generated Next.js project.",
+      "details": [],
+      "input": "Doctor-clean generated project.",
+      "output": "Running Next.js development server.",
+      "success_signal": "The app starts without build, environment, or runtime errors.",
+      "failure_or_wait": "Compile, dependency, environment, port, or runtime errors must be corrected and the server restarted.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open `http://localhost:3000` and confirm that the signed-out sign-in and sign-up controls are visible.",
+      "details": [],
+      "input": "Running local Next.js app without a user session.",
+      "output": "Signed-out Clerk UI.",
+      "success_signal": "Sign in and Sign up are visible before authentication.",
+      "failure_or_wait": "Missing controls indicate an init, environment, provider, component, middleware, or runtime problem that must be fixed before signup.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Sign up and complete the Clerk-hosted authentication flow to create the first test user.",
+      "details": [
+        "The exact identifier, verification, or social-provider screens depend on the Clerk development application's configuration and are not fixed by the CLI-first prompt."
+      ],
+      "input": "Test-user identity and access to the configured verification method.",
+      "output": "First Clerk user and active application session.",
+      "success_signal": "Signup succeeds and the browser returns to the app in the signed-in state.",
+      "failure_or_wait": "Identity verification, provider, callback, browser, session, or application-configuration failure blocks first-user creation; no universal wait or recovery transcript is documented.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify that the signed-out controls are replaced by the profile icon rendered by `UserButton`.",
+      "details": [
+        "The current CLI-first prompt names successful signup plus the visible profile icon as its completion signal."
+      ],
+      "input": "Completed signup and active Clerk session.",
+      "output": "Verified first signed-in Clerk user in the Next.js application.",
+      "success_signal": "The profile icon is visible in place of Sign in and Sign up.",
+      "failure_or_wait": "Signup without the signed-in profile icon does not establish the documented terminal; inspect the session, keys, provider, middleware, callback, and browser state.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
       ]
     }
   ],
@@ -447,29 +689,6 @@
     "Webhooks and backend data sync",
     "Production domains, key rotation, security hardening, and deployment"
   ],
-  "candidate_paths": [
-    {
-      "id": "nextjs-cli-first-first-user",
-      "name": "Use the Clerk CLI to scaffold Next.js and create the first signed-in user",
-      "selection_basis": "The platform router has no universal SDK default, but Clerk's current official Next.js AI prompt defines a CLI-first sequence. This candidate selects its fresh empty-directory npm branch, authenticated Clerk account path, visible prebuilt controls, doctor check, and first-user profile-icon terminal.",
-      "relationship_to_primary_path": "Continues after primary step 1 by selecting Next.js App Router, the authenticated Clerk CLI route, npm, an empty starting directory, and a prebuilt sign-up experience.",
-      "steps": [
-        {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "cli", "action": "Open an empty writable project directory and select npm as the package manager for the fresh Next.js route.", "details": ["The current Next.js CLI prompt says an empty directory must choose a package manager; npm is the default when there is no preference."], "input": "Empty directory and local npm environment.", "output": "Fresh-project CLI context.", "success_signal": "The shell is in the intended empty directory and npm is available.", "failure_or_wait": "A nonempty directory follows the existing-project `clerk init` branch; a leftover lockfile or package-manager configuration changes the package-manager choice.", "required": true, "source_ids": ["S6"]},
-        {"step_number": 2, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run `command -v clerk && clerk --version || echo \"Clerk CLI not installed\"`.", "details": [], "input": "Shell environment.", "output": "Installed Clerk CLI path and version, or the documented not-installed message.", "success_signal": "The CLI state is known before setup continues.", "failure_or_wait": "A shell that cannot run the check must be corrected before the install or update decision.", "required": true, "source_ids": ["S6"]},
-        {"step_number": 3, "phase": "install", "actor": "developer", "interface": "cli", "action": "If the CLI is missing, run `npm install -g clerk`; if it is already available, run `clerk update --yes`.", "details": ["pnpm, yarn, bun, Homebrew, and curl are official install alternatives, but this candidate selects npm."], "input": "The CLI state from the preceding check.", "output": "Installed or updated Clerk CLI.", "success_signal": "`clerk` is available at the current version.", "failure_or_wait": "Package download, permissions, network, or updater errors must be corrected before authentication.", "required": true, "source_ids": ["S4", "S6"]},
-        {"step_number": 4, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Run `clerk auth login` from the project directory.", "details": ["The current Next.js CLI prompt requires this immediately after install or update and before app listing or initialization."], "input": "Current Clerk CLI and browser-capable environment.", "output": "Clerk browser authentication handoff.", "success_signal": "The CLI opens or provides the browser login flow.", "failure_or_wait": "Browser launch, callback, network, or CLI session errors block the authenticated route.", "required": true, "source_ids": ["S4", "S6"]},
-        {"step_number": 5, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Complete the Clerk login flow in the browser and return control to the CLI.", "details": ["If the developer lacks a Clerk identity, account creation is an access gate, but the CLI-first prompt does not enumerate its current form fields.", "No completion duration is documented."], "input": "Clerk identity and the browser authentication flow.", "output": "Authenticated Clerk CLI session.", "success_signal": "The CLI confirms authentication and can proceed to initialization.", "failure_or_wait": "Uncompleted account creation, login, browser callback, or identity recovery leaves the CLI unauthenticated.", "required": true, "source_ids": ["S3", "S6"]},
-        {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `clerk init --framework next --pm npm` in the empty directory.", "details": ["Do not add `--app` by default and do not list applications before init. Only use `--app <application_id>` when the developer already supplied an ID or explicitly chose an existing application."], "input": "Empty directory, npm, and authenticated Clerk CLI session.", "output": "Next.js and Clerk initialization session.", "success_signal": "The CLI begins scaffolding the fresh Next.js project and Clerk integration.", "failure_or_wait": "Project-generation, framework, package-manager, application-linking, network, or filesystem errors can stop initialization.", "required": true, "source_ids": ["S4", "S6"]},
-        {"step_number": 7, "phase": "configure", "actor": "platform", "interface": "cli", "action": "Let `clerk init` scaffold Next.js, install `@clerk/nextjs`, link the project to a Clerk application, pull environment variables, and apply the Next.js provider, middleware, and authentication setup.", "details": ["If init explicitly asks for an existing application but no ID was supplied, run `clerk apps list --json`, show the names and IDs, and let the developer choose.", "For Next.js 16 or later the middleware file is `proxy.ts`; for Next.js 15 or earlier it is `middleware.ts`."], "input": "Authenticated init session and any prompt responses requested by the CLI.", "output": "Generated account-linked Clerk Next.js project.", "success_signal": "Initialization completes and reports that Clerk is set up in the project.", "failure_or_wait": "If init errors or does not finish, the documented fallback is `npm install @clerk/nextjs`, a correctly named file exporting `clerkMiddleware()`, and `ClerkProvider` using the full Next.js quickstart.", "required": true, "source_ids": ["S4", "S5", "S6"]},
-        {"step_number": 8, "phase": "configure", "actor": "developer", "interface": "ide", "action": "Ensure the layout visibly renders `SignInButton` and `SignUpButton` inside `Show when=\"signed-out\"`, and `UserButton` inside `Show when=\"signed-in\"`, all within `ClerkProvider` inside the body.", "details": ["Reuse generated controls when they are already present instead of duplicating them.", "Never expose `CLERK_SECRET_KEY` in client code."], "input": "Generated Next.js Clerk layout.", "output": "Visible signed-out and signed-in authentication controls.", "success_signal": "The project contains the provider and the three state-appropriate controls without duplicate UI.", "failure_or_wait": "Wrong imports, provider placement, missing controls, or exposed secret configuration must be corrected before runtime testing.", "required": true, "source_ids": ["S5", "S6"]},
-        {"step_number": 9, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run `clerk doctor`.", "details": [], "input": "Generated and reviewed Clerk integration.", "output": "Clerk diagnostic result.", "success_signal": "Doctor reports no unresolved integration issue.", "failure_or_wait": "Fix every issue reported by the CLI, then rerun doctor before starting the app.", "required": true, "source_ids": ["S4", "S6"]},
-        {"step_number": 10, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `npm run dev` from the generated Next.js project.", "details": [], "input": "Doctor-clean generated project.", "output": "Running Next.js development server.", "success_signal": "The app starts without build, environment, or runtime errors.", "failure_or_wait": "Compile, dependency, environment, port, or runtime errors must be corrected and the server restarted.", "required": true, "source_ids": ["S5", "S6"]},
-        {"step_number": 11, "phase": "verify", "actor": "developer", "interface": "console", "action": "Open `http://localhost:3000` and confirm that the signed-out sign-in and sign-up controls are visible.", "details": [], "input": "Running local Next.js app without a user session.", "output": "Signed-out Clerk UI.", "success_signal": "Sign in and Sign up are visible before authentication.", "failure_or_wait": "Missing controls indicate an init, environment, provider, component, middleware, or runtime problem that must be fixed before signup.", "required": true, "source_ids": ["S5", "S6"]},
-        {"step_number": 12, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Select Sign up and complete the Clerk-hosted authentication flow to create the first test user.", "details": ["The exact identifier, verification, or social-provider screens depend on the Clerk development application's configuration and are not fixed by the CLI-first prompt."], "input": "Test-user identity and access to the configured verification method.", "output": "First Clerk user and active application session.", "success_signal": "Signup succeeds and the browser returns to the app in the signed-in state.", "failure_or_wait": "Identity verification, provider, callback, browser, session, or application-configuration failure blocks first-user creation; no universal wait or recovery transcript is documented.", "required": true, "source_ids": ["S3", "S5", "S6"]},
-        {"step_number": 13, "phase": "verify", "actor": "developer", "interface": "console", "action": "Verify that the signed-out controls are replaced by the profile icon rendered by `UserButton`.", "details": ["The current CLI-first prompt names successful signup plus the visible profile icon as its completion signal."], "input": "Completed signup and active Clerk session.", "output": "Verified first signed-in Clerk user in the Next.js application.", "success_signal": "The profile icon is visible in place of Sign in and Sign up.", "failure_or_wait": "Signup without the signed-in profile icon does not establish the documented terminal; inspect the session, keys, provider, middleware, callback, and browser state.", "required": true, "source_ids": ["S5", "S6"]}
-      ],
-      "source_ids": ["S3", "S4", "S5", "S6"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

@@ -6,8 +6,8 @@
   },
   "category": "Communications, media, and social",
   "surface": {
-    "name": "Common trial-account path, unresolved at product quickstart selection",
-    "selection_basis": "Twilio General Usage explicitly tells new developers to choose the product they are most interested in: Programmable SMS, Programmable Voice, or 2FA with Verify. The Docs home exposes still more products. A free-trial account journey is common, but the docs do not define one universal product success after the Console opens.",
+    "name": "Send and receive a first Twilio SMS with Python and Virtual Phone",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Send and receive a first Twilio SMS with Python and Virtual Phone. The official Messaging quickstart provides a testable trial route that ends with an SMS received on Twilio's Virtual Phone, avoiding an inferred real-recipient configuration. Prior surface before policy commit: Common trial-account path, unresolved at product quickstart selection.",
     "alternatives_considered": [
       {
         "name": "Programmable Messaging quickstart",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create the common Twilio trial account, reach the Console, then choose the communications product whose first success should be measured.",
@@ -49,17 +49,17 @@
   },
   "documented_first_success": {
     "official_milestone": "No single cross-product first-success milestone is established by Twilio Docs.",
-    "normalized_outcome": "Unresolved after common onboarding: the product outcome could be a sent SMS, completed voice call, validated verification token, email delivery, WhatsApp interaction, or another Twilio product result.",
-    "observable_completion_signal": "The common path ends at a product-adapted Console home, but product success requires choosing and completing one quickstart.",
+    "normalized_outcome": "The expected SMS text is visible as a received message.",
+    "observable_completion_signal": "The expected SMS text is visible as a received message.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "Twilio General Usage says to choose the product most interesting to you and names Programmable SMS, Programmable Voice, and 2FA with Verify; the trial guide says Console options depend on the product selected during signup.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The expected SMS text is visible as a received message.",
       "source_ids": [
         "S2",
         "S3"
       ]
     },
-    "why_this_is_the_boundary": "A researcher-selected channel would change phone-number, sender, regulatory, credential, code, and verification gates. The common trial account is only access, not a vendor-declared product success.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -222,6 +222,243 @@
       "source_ids": [
         "S2",
         "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Start a Twilio free-trial registration and choose Continue with trial when prompted for a plan.",
+      "details": [
+        "Twilio states that the trial requires no credit card and expires after 30 days."
+      ],
+      "input": "An email identity and a personal phone number.",
+      "output": "The Twilio trial verification flow.",
+      "success_signal": "The registration advances to identity verification.",
+      "failure_or_wait": "Trial availability and supported geography can constrain registration; choosing a paid plan changes this route.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open Twilio's verification email and verify the account email address.",
+      "details": [
+        "Email verification is part of the documented trial signup."
+      ],
+      "input": "The Twilio verification email.",
+      "output": "A verified account email.",
+      "success_signal": "Twilio accepts the email verification.",
+      "failure_or_wait": "A missing or expired message blocks signup; the guide does not give a delivery time.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Complete the verification challenge for the personal phone number.",
+      "details": [
+        "The trial uses a personal phone number as an additional verification gate."
+      ],
+      "input": "A reachable supported phone number and the delivered challenge.",
+      "output": "A verified personal phone number.",
+      "success_signal": "Twilio accepts the phone verification.",
+      "failure_or_wait": "Unsupported geography or inability to receive the challenge blocks the trial.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Answer the project-customization questions and complete signup.",
+      "details": [
+        "Twilio adapts the Console home to the selected project information, but the guide does not enumerate the current fields."
+      ],
+      "input": "Answers describing the intended Messaging project.",
+      "output": "A customized Twilio trial account.",
+      "success_signal": "The Twilio Console home opens.",
+      "failure_or_wait": "The questions can alter the Console presentation; their current field-level form is not documented.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Confirm Python 3.8 through 3.13, install ngrok, then install Flask and the Twilio SDK with pip install flask twilio.",
+      "details": [
+        "The Messaging quickstart lists Python 3.8 through 3.13, ngrok, Flask, and the Twilio Python SDK as prerequisites."
+      ],
+      "input": "A supported Python and pip environment plus the documented ngrok installation route.",
+      "output": "ngrok plus the Flask and Twilio Python packages in the development environment.",
+      "success_signal": "ngrok is available and pip installs both Flask and Twilio without error.",
+      "failure_or_wait": "An unsupported runtime or failure to install ngrok, Flask, or Twilio leaves the documented prerequisite set incomplete.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Obtain an SMS-capable Twilio phone number from the Console.",
+      "details": [
+        "Use Get a phone number on the dashboard or Phone Numbers, Manage, Buy a number."
+      ],
+      "input": "The active Twilio trial account.",
+      "output": "An SMS-capable Twilio sender number.",
+      "success_signal": "The number appears in the account and can be selected by the Messaging quickstart.",
+      "failure_or_wait": "Number availability and capabilities vary; a number without SMS capability cannot send this message.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the Account SID and Auth Token from the Twilio Console.",
+      "details": [
+        "These credentials authenticate the Python client."
+      ],
+      "input": "The trial Console home.",
+      "output": "The account SID and authentication token.",
+      "success_signal": "Both credential values are available for local configuration.",
+      "failure_or_wait": "Missing or incorrect credentials cause authentication failure when the script runs.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Store the SID and token as TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN environment variables.",
+      "details": [
+        "The guide recommends environment variables instead of hard-coded credentials."
+      ],
+      "input": "The copied Twilio credentials.",
+      "output": "Credential environment variables in the shell used for the sample.",
+      "success_signal": "The Python process can read both variables.",
+      "failure_or_wait": "Unset or stale variables cause client authentication failure.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Send an SMS Console page, select Send to Virtual Phone, choose the Twilio number, and open Virtual Phone.",
+      "details": [
+        "The Virtual Phone supplies the documented test destination +18777804236."
+      ],
+      "input": "The SMS-capable Twilio sender number.",
+      "output": "An open Virtual Phone destination ready to display the test SMS.",
+      "success_signal": "Virtual Phone is visible and the sender number is selected.",
+      "failure_or_wait": "Without a selected SMS-capable number, the documented send configuration is incomplete.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Create send_sms.py with the documented Twilio Client and messages.create call.",
+      "details": [
+        "Read the SID and token from the environment, set the message body, use the Twilio number as from_, and use +18777804236 as to."
+      ],
+      "input": "The official Python sample, sender number, and Virtual Phone destination.",
+      "output": "A runnable SMS script.",
+      "success_signal": "The sample contains the authenticated client and complete message parameters.",
+      "failure_or_wait": "A wrong sender, destination, or credential reference prevents delivery.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run python send_sms.py.",
+      "details": [
+        "The script asks Twilio Messaging to create and send the SMS."
+      ],
+      "input": "The configured script, credentials, and network access.",
+      "output": "A created message request or a Twilio error.",
+      "success_signal": "The command completes without an authentication or request error.",
+      "failure_or_wait": "Trial restrictions, invalid credentials, an incapable sender, or malformed message parameters can reject the request.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "device",
+      "action": "Process and deliver the SMS to Virtual Phone.",
+      "details": [
+        "The quickstart says delivery may take a few moments."
+      ],
+      "input": "The accepted Messaging request.",
+      "output": "A message delivered to the Virtual Phone interface.",
+      "success_signal": "The new SMS appears in Virtual Phone.",
+      "failure_or_wait": "Delivery is an explicit wait; absence of the message means the terminal success is not yet established.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Verify that Virtual Phone displays the SMS body sent by the Python script.",
+      "details": [
+        "Receiving the expected content is the observable end-to-end result."
+      ],
+      "input": "The Virtual Phone message list.",
+      "output": "A confirmed first Twilio SMS delivery.",
+      "success_signal": "The expected SMS text is visible as a received message.",
+      "failure_or_wait": "A missing or different message does not satisfy first success.",
+      "required": true,
+      "source_ids": [
+        "S6"
       ]
     }
   ],
@@ -483,224 +720,6 @@
   "excluded_after_success": [
     "No product-specific downstream actions can be excluded until the Twilio product boundary is chosen."
   ],
-  "candidate_paths": [
-    {
-      "id": "python-sms-to-virtual-phone",
-      "name": "Send and receive a first Twilio SMS with Python and Virtual Phone",
-      "selection_basis": "The official Messaging quickstart provides a testable trial route that ends with an SMS received on Twilio's Virtual Phone, avoiding an inferred real-recipient configuration.",
-      "relationship_to_primary_path": "This is one complete peer route after the shared Twilio spine selects Programmable Messaging, SMS, Python, and the Virtual Phone test destination.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Start a Twilio free-trial registration and choose Continue with trial when prompted for a plan.",
-          "details": [
-            "Twilio states that the trial requires no credit card and expires after 30 days."
-          ],
-          "input": "An email identity and a personal phone number.",
-          "output": "The Twilio trial verification flow.",
-          "success_signal": "The registration advances to identity verification.",
-          "failure_or_wait": "Trial availability and supported geography can constrain registration; choosing a paid plan changes this route.",
-          "required": true,
-          "source_ids": ["S3", "S6"]
-        },
-        {
-          "step_number": 2,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "email",
-          "action": "Open Twilio's verification email and verify the account email address.",
-          "details": [
-            "Email verification is part of the documented trial signup."
-          ],
-          "input": "The Twilio verification email.",
-          "output": "A verified account email.",
-          "success_signal": "Twilio accepts the email verification.",
-          "failure_or_wait": "A missing or expired message blocks signup; the guide does not give a delivery time.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 3,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "device",
-          "action": "Complete the verification challenge for the personal phone number.",
-          "details": [
-            "The trial uses a personal phone number as an additional verification gate."
-          ],
-          "input": "A reachable supported phone number and the delivered challenge.",
-          "output": "A verified personal phone number.",
-          "success_signal": "Twilio accepts the phone verification.",
-          "failure_or_wait": "Unsupported geography or inability to receive the challenge blocks the trial.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 4,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Answer the project-customization questions and complete signup.",
-          "details": [
-            "Twilio adapts the Console home to the selected project information, but the guide does not enumerate the current fields."
-          ],
-          "input": "Answers describing the intended Messaging project.",
-          "output": "A customized Twilio trial account.",
-          "success_signal": "The Twilio Console home opens.",
-          "failure_or_wait": "The questions can alter the Console presentation; their current field-level form is not documented.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 5,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Confirm Python 3.8 through 3.13, install ngrok, then install Flask and the Twilio SDK with pip install flask twilio.",
-          "details": [
-            "The Messaging quickstart lists Python 3.8 through 3.13, ngrok, Flask, and the Twilio Python SDK as prerequisites."
-          ],
-          "input": "A supported Python and pip environment plus the documented ngrok installation route.",
-          "output": "ngrok plus the Flask and Twilio Python packages in the development environment.",
-          "success_signal": "ngrok is available and pip installs both Flask and Twilio without error.",
-          "failure_or_wait": "An unsupported runtime or failure to install ngrok, Flask, or Twilio leaves the documented prerequisite set incomplete.",
-          "required": true,
-          "source_ids": ["S6"]
-        },
-        {
-          "step_number": 6,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Obtain an SMS-capable Twilio phone number from the Console.",
-          "details": [
-            "Use Get a phone number on the dashboard or Phone Numbers, Manage, Buy a number."
-          ],
-          "input": "The active Twilio trial account.",
-          "output": "An SMS-capable Twilio sender number.",
-          "success_signal": "The number appears in the account and can be selected by the Messaging quickstart.",
-          "failure_or_wait": "Number availability and capabilities vary; a number without SMS capability cannot send this message.",
-          "required": true,
-          "source_ids": ["S6"]
-        },
-        {
-          "step_number": 7,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Copy the Account SID and Auth Token from the Twilio Console.",
-          "details": [
-            "These credentials authenticate the Python client."
-          ],
-          "input": "The trial Console home.",
-          "output": "The account SID and authentication token.",
-          "success_signal": "Both credential values are available for local configuration.",
-          "failure_or_wait": "Missing or incorrect credentials cause authentication failure when the script runs.",
-          "required": true,
-          "source_ids": ["S3", "S6"]
-        },
-        {
-          "step_number": 8,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Store the SID and token as TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN environment variables.",
-          "details": [
-            "The guide recommends environment variables instead of hard-coded credentials."
-          ],
-          "input": "The copied Twilio credentials.",
-          "output": "Credential environment variables in the shell used for the sample.",
-          "success_signal": "The Python process can read both variables.",
-          "failure_or_wait": "Unset or stale variables cause client authentication failure.",
-          "required": true,
-          "source_ids": ["S6"]
-        },
-        {
-          "step_number": 9,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open the Send an SMS Console page, select Send to Virtual Phone, choose the Twilio number, and open Virtual Phone.",
-          "details": [
-            "The Virtual Phone supplies the documented test destination +18777804236."
-          ],
-          "input": "The SMS-capable Twilio sender number.",
-          "output": "An open Virtual Phone destination ready to display the test SMS.",
-          "success_signal": "Virtual Phone is visible and the sender number is selected.",
-          "failure_or_wait": "Without a selected SMS-capable number, the documented send configuration is incomplete.",
-          "required": true,
-          "source_ids": ["S6"]
-        },
-        {
-          "step_number": 10,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "ide",
-          "action": "Create send_sms.py with the documented Twilio Client and messages.create call.",
-          "details": [
-            "Read the SID and token from the environment, set the message body, use the Twilio number as from_, and use +18777804236 as to."
-          ],
-          "input": "The official Python sample, sender number, and Virtual Phone destination.",
-          "output": "A runnable SMS script.",
-          "success_signal": "The sample contains the authenticated client and complete message parameters.",
-          "failure_or_wait": "A wrong sender, destination, or credential reference prevents delivery.",
-          "required": true,
-          "source_ids": ["S6"]
-        },
-        {
-          "step_number": 11,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run python send_sms.py.",
-          "details": [
-            "The script asks Twilio Messaging to create and send the SMS."
-          ],
-          "input": "The configured script, credentials, and network access.",
-          "output": "A created message request or a Twilio error.",
-          "success_signal": "The command completes without an authentication or request error.",
-          "failure_or_wait": "Trial restrictions, invalid credentials, an incapable sender, or malformed message parameters can reject the request.",
-          "required": true,
-          "source_ids": ["S4", "S6"]
-        },
-        {
-          "step_number": 12,
-          "phase": "execute",
-          "actor": "platform",
-          "interface": "device",
-          "action": "Process and deliver the SMS to Virtual Phone.",
-          "details": [
-            "The quickstart says delivery may take a few moments."
-          ],
-          "input": "The accepted Messaging request.",
-          "output": "A message delivered to the Virtual Phone interface.",
-          "success_signal": "The new SMS appears in Virtual Phone.",
-          "failure_or_wait": "Delivery is an explicit wait; absence of the message means the terminal success is not yet established.",
-          "required": true,
-          "source_ids": ["S6"]
-        },
-        {
-          "step_number": 13,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "device",
-          "action": "Verify that Virtual Phone displays the SMS body sent by the Python script.",
-          "details": [
-            "Receiving the expected content is the observable end-to-end result."
-          ],
-          "input": "The Virtual Phone message list.",
-          "output": "A confirmed first Twilio SMS delivery.",
-          "success_signal": "The expected SMS text is visible as a received message.",
-          "failure_or_wait": "A missing or different message does not satisfy first success.",
-          "required": true,
-          "source_ids": ["S6"]
-        }
-      ],
-      "source_ids": ["S3", "S4", "S6"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

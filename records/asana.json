@@ -3,14 +3,14 @@
   "category": "B2B SaaS and enterprise ecosystems",
   "surface": {
     "name": "Asana REST API Quick start guide with a personal access token",
-    "selection_basis": "Asana's developer home directs new API users to its step-by-step Quick start. The platform overview calls the REST API its primary platform feature and says most developers use a personal access token for first API calls. The Quick start then performs create, read, update, and delete operations on one task.",
+    "selection_basis": "Under the workshop policy, Asana's Quick start is the fastest commonly used documented route: it calls a personal access token the quickest authentication method and walks through task CRUD.",
     "alternatives_considered": [
       {"name": "Asana API explorer", "url": "https://developers.asana.com/docs/api-explorer", "reason_not_primary": "The platform overview lists the explorer as an alternative request interface, while the developer home explicitly promotes the Quick start for a first app and token."},
       {"name": "OAuth application", "url": "https://developers.asana.com/docs/oauth", "reason_not_primary": "Asana recommends OAuth for applications acting for users, but the platform overview says most developers test their first calls with a personal access token."},
       {"name": "Developer sandbox", "url": "https://developers.asana.com/docs/developer-sandbox", "reason_not_primary": "A sandbox is an optional test workspace for premium features; the Quick start can use any accessible workspace."}
     ]
   },
-  "research_status": "blocked",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -26,8 +26,8 @@
     "official_milestone": "Complete the Quick start task CRUD operations and become ready to begin development against the Asana API.",
     "normalized_outcome": "The intended terminal is an authenticated sequence that creates `Sample task`, retrieves it, renames it to `Modified task`, deletes it, and reaches the guide's readiness statement.",
     "observable_completion_signal": "The guide's final delete returns `200 OK` with an empty data object, after earlier `201 Created` and `200 OK` responses, then states that the developer is ready to begin API development.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The API terminal is demonstrated, but the no-account transition through current authentication, workspace creation or membership, and developer-console access is not fully public.", "source_ids": ["S1", "S2", "S3", "S4", "S5"]},
-    "why_this_is_the_boundary": "The Quick start places Next steps only after task CRUD. It requires an Asana account and accessible workspace, but the current developer-console link redirects to login and the account guide does not resolve every identity and workspace branch to the console.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "The final DELETE returns `200 OK` with an empty data object and the guide says the developer is ready to begin development.", "source_ids": ["S3"]},
+    "why_this_is_the_boundary": "The Quick start places Next steps after the completed create, read, update, and delete sequence.",
     "source_ids": ["S2", "S3", "S4", "S5"]
   },
   "prerequisites": [
@@ -38,16 +38,17 @@
     {"order": 5, "type": "software", "requirement": "Have cURL and basic REST knowledge for the selected command-line examples.", "required": true, "source_ids": ["S3"]}
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Asana developer documentation and select the promoted step-by-step Quick start.", "details": [], "input": "https://developers.asana.com/", "output": "The developer home identifies the Quick start as the first-app guide for token creation and API task creation.", "success_signal": "The Quick start link is available.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 2, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Quick start and follow its first setup action to the developer console.", "details": [], "input": "https://developers.asana.com/jd/docs/quick-start", "output": "The guide requires a personal access token and workspace GID before its task requests.", "success_signal": "The developer-console link and token instructions are visible.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S3"]},
-    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open the developer console from a no-account state.", "details": [], "input": "https://app.asana.com/0/my-apps", "output": "Asana redirects to a login page offering Google, Microsoft, or email continuation.", "success_signal": "The initial identity choices are visible.", "failure_or_wait": "Research stops because the selected identity flow, verification, password or magic-link state, corporate-domain organization branch, workspace or team creation or join, and return to the developer console are not fully enumerated by one current public path.", "required": true, "source_ids": ["S4", "S5"]}
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Asana's Quick start guide.", "details": [], "input": "https://developers.asana.com/jd/docs/quick-start", "output": "PAT, workspace GID, and task CRUD instructions are visible.", "success_signal": "The setup section is available.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1", "S2", "S3"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create an Asana account using the official login or account route and enter an accessible workspace.", "details": ["Treat signup as one opaque prerequisite under the workshop policy."], "input": "https://app.asana.com/-/login", "output": "An authenticated account with a workspace is available.", "success_signal": "Asana and the developer console can be opened.", "failure_or_wait": "Identity and organization branches vary and are not fully enumerated.", "required": true, "source_ids": ["S2", "S4", "S5"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Open the developer console, select Create new token, name it, create it, and securely copy the one-time PAT.", "details": [], "input": "Authenticated Asana account", "output": "A personal access token is available.", "success_signal": "The token is displayed.", "failure_or_wait": "The full token is shown once.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 4, "phase": "prepare", "actor": "developer", "interface": "browser", "action": "Open `https://app.asana.com/api/1.0/workspaces` while logged in and copy the target workspace GID.", "details": [], "input": "Authenticated browser session", "output": "The workspace GID is known.", "success_signal": "The endpoint returns `200` with visible workspaces.", "failure_or_wait": "Choose a workspace visible to the user.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST `/tasks` with the PAT, workspace GID, name `Sample task`, and assignee `me`.", "details": [], "input": "PAT and workspace GID", "output": "A task and task GID are returned.", "success_signal": "The API returns `201 Created`.", "failure_or_wait": "Replace all placeholders with actual values.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "api", "action": "GET `/tasks/{task_gid}` with the PAT.", "details": [], "input": "Created task GID", "output": "The task is returned.", "success_signal": "The API returns `200 OK` and `Sample task`.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "api", "action": "PUT `/tasks/{task_gid}` to rename the task `Modified task`.", "details": [], "input": "Created task GID and update body", "output": "The updated task is returned.", "success_signal": "The API returns `200 OK` with `Modified task`.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 8, "phase": "execute", "actor": "developer", "interface": "api", "action": "DELETE `/tasks/{task_gid}`.", "details": [], "input": "Created task GID", "output": "The sample task is removed.", "success_signal": "The API returns `200 OK` with an empty data object.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S3"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The current login page shows Google, Microsoft, and email, while the account guide describes email and password, Google, SAML, invitation, and corporate-domain outcomes without giving one complete no-account route through verification and workspace convergence to the developer console.",
-    "impact": "A personal access token and workspace GID cannot be reached reproducibly from no account, so the documented CRUD route has no complete public candidate.",
-    "source_ids": ["S3", "S4", "S5"]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {"at_step": 3, "condition": "Use Google or Microsoft", "path": "Select the provider on the current Asana login page and complete its external authorization.", "effect_on_first_success": "Replaces email authentication, but the provider grant and return-to-Asana sequence are not publicly enumerated.", "source_ids": ["S5"]},
     {"at_step": 3, "condition": "Use email or an organization authentication policy", "path": "Continue with email and follow the applicable Asana password, organization SAML, or other domain-controlled route.", "effect_on_first_success": "Can add verification, organization membership, team join, or administrator policy before console access.", "source_ids": ["S4", "S5"]},

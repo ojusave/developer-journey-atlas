@@ -1,55 +1,317 @@
 {
-  "platform": {"name": "Teleport", "slug": "teleport", "organization": "Gravitational, Inc."},
+  "platform": {
+    "name": "Teleport",
+    "slug": "teleport",
+    "organization": "Gravitational, Inc."
+  },
   "category": "Identity, security, and networking",
   "surface": {
-    "name": "Get Started, Enterprise Cloud route",
-    "selection_basis": "The Get Started guide selects Enterprise Cloud for quick evaluation without provisioning infrastructure, and the Step 1 guide calls it the fastest and easiest way to get started.",
+    "name": "Teleport Community Edition local Docker welcome screen",
+    "selection_basis": "Under the workshop policy, the official Community Edition local Docker route is primary because it is public, open source, no-account, and avoids the gated Enterprise Cloud signup. The guide provides exact Docker, TLS, install, configure, start, and welcome-screen checkpoint steps.",
     "alternatives_considered": [
-      {"name": "Community Edition Linux demo", "url": "https://goteleport.com/docs/get-started/deploy-community/", "reason_not_primary": "The overview recommends this for self-hosting locally or free use, while Enterprise Cloud is selected for quick evaluation."},
-      {"name": "Enterprise Self-Hosted", "url": "https://goteleport.com/docs/get-started/", "reason_not_primary": "The overview says this paid compliance-focused route requires a valid license and contact with Teleport."}
+      {
+        "name": "Community Edition Linux demo",
+        "url": "https://goteleport.com/docs/get-started/deploy-community/",
+        "reason_not_primary": "The overview recommends this for self-hosting locally or free use, while Enterprise Cloud is selected for quick evaluation."
+      },
+      {
+        "name": "Enterprise Self-Hosted",
+        "url": "https://goteleport.com/docs/get-started/",
+        "reason_not_primary": "The overview says this paid compliance-focused route requires a valid license and contact with Teleport."
+      }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
-  "entry_point": {"developer_intent": "Launch a Teleport cluster for a quick evaluation.", "starting_url": "https://goteleport.com/docs/get-started/", "assumed_prior_state": ["No Teleport account, tenant, cluster, local user, or recovery codes exist."]},
+  "entry_point": {
+    "developer_intent": "Launch a Teleport cluster for a quick evaluation.",
+    "starting_url": "https://goteleport.com/docs/get-started/",
+    "assumed_prior_state": [
+      "No Teleport account, tenant, cluster, local user, or recovery codes exist."
+    ]
+  },
   "documented_first_success": {
-    "official_milestone": "Launch your own Teleport Enterprise Cloud cluster and create a local admin user",
-    "normalized_outcome": "The intended Step 1 terminal is a provisioned dedicated Teleport Cloud cluster with a local administrator and saved recovery codes, but the complete signup flow is not documented publicly.",
-    "observable_completion_signal": "Not observable from a complete public route because the guide says only to follow the signup steps, while the public trial page does not expose the required form, activation, MFA, recovery-code, or tenant-provisioning transitions.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "At this point, you've launched your own Teleport Enterprise Cloud cluster and created a local admin user.", "source_ids": ["S2", "S3"]},
-    "why_this_is_the_boundary": "The Enterprise Cloud Step 1 guide explicitly identifies a launched cluster and local admin user before Step 2 resource enrollment, but its required signup transition is hidden.",
-    "source_ids": ["S2", "S3"]
+    "official_milestone": "Checkpoint: Verify Teleport is running",
+    "normalized_outcome": "A local Docker container runs Teleport Community Edition and serves the Teleport Web UI over HTTPS.",
+    "observable_completion_signal": "Opening `https://localhost:3080` displays the Teleport welcome screen.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "Confirm that you can access the Teleport Web UI and see the welcome screen.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    "why_this_is_the_boundary": "The welcome screen is the guide's first explicit checkpoint and proves the Auth, Proxy, and SSH services started and the HTTPS endpoint is reachable.",
+    "source_ids": [
+      "S4"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "account", "requirement": "A new Enterprise Cloud trial signup is required for the selected route.", "required": true, "source_ids": ["S2", "S3"]},
-    {"order": 2, "type": "legal", "requirement": "Requesting an activation link on the public trial page constitutes agreement to Teleport's Privacy Policy.", "required": true, "source_ids": ["S3"]}
+    {
+      "order": 1,
+      "type": "software",
+      "requirement": "Docker is installed and can run containers.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "mkcert is installed so a local certificate authority and localhost certificate can be created.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "network",
+      "requirement": "Local port 3080 is available to map to the container HTTPS listener.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Get Started and choose Enterprise Cloud for a quick evaluation without provisioning control-plane infrastructure.", "details": [], "input": "Teleport Get Started URL and evaluation intent", "output": "The Enterprise Cloud Step 1 guide opens.", "success_signal": "The guide identifies Enterprise Cloud as the fastest and easiest route.", "failure_or_wait": "Use Community Edition for a local self-hosted test or contact Teleport for Enterprise Self-Hosted.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 2, "phase": "access", "actor": "developer", "interface": "browser", "action": "Follow the Step 1 link to `goteleport.com/signup`.", "details": [], "input": "Enterprise Cloud trial link", "output": "The public Teleport Enterprise 14-Day Trial page opens.", "success_signal": "The page states that an activation link must be requested and that the Privacy Policy is accepted by requesting it.", "failure_or_wait": "The current public page does not expose the required form or post-request transition to the research client.", "required": true, "source_ids": ["S2", "S3"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Community Edition deployment guide and select Local Docker container.",
+      "details": [],
+      "input": "https://goteleport.com/docs/get-started/deploy-community/",
+      "output": "The local route and checkpoint are visible.",
+      "success_signal": "The Docker prerequisites load.",
+      "failure_or_wait": "",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install mkcert, create `teleport-tls`, install the local CA, generate a localhost certificate, and copy `rootCA.pem` into the directory.",
+      "details": [],
+      "input": "Docker and mkcert",
+      "output": "Local TLS files exist.",
+      "success_signal": "`localhost.pem`, `localhost-key.pem`, and `rootCA.pem` are present.",
+      "failure_or_wait": "Correct mkcert installation or certificate paths.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Start the documented Ubuntu container with the TLS directory mounted and port 3080 mapped to 443.",
+      "details": [],
+      "input": "TLS directory and Docker",
+      "output": "An interactive Ubuntu container runs.",
+      "success_signal": "The container shell opens.",
+      "failure_or_wait": "Resolve Docker mount or port conflicts.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install curl, trust the copied mkcert CA, and run the official Teleport install script inside the container.",
+      "details": [],
+      "input": "Running container",
+      "output": "Teleport binaries are installed.",
+      "success_signal": "The `teleport` command is available.",
+      "failure_or_wait": "Check network access and CA file paths.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `teleport configure` with cluster name localhost, public address localhost:443, and the mounted certificate and key.",
+      "details": [],
+      "input": "Mounted TLS files",
+      "output": "`/etc/teleport.yaml` is generated.",
+      "success_signal": "Configuration completes without error.",
+      "failure_or_wait": "Correct certificate filenames and mount location.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `teleport start --config=\"/etc/teleport.yaml\"`.",
+      "details": [],
+      "input": "Generated configuration",
+      "output": "Teleport Auth, Proxy, and SSH services start.",
+      "success_signal": "The process remains running and listens through mapped port 3080.",
+      "failure_or_wait": "Review terminal logs for certificate or port errors.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open `https://localhost:3080`, accept the Community Edition terms, and verify the welcome screen.",
+      "details": [],
+      "input": "Running Teleport container",
+      "output": "The Teleport Web UI welcome screen is visible.",
+      "success_signal": "The guide's Verify Teleport is running checkpoint passes.",
+      "failure_or_wait": "Check container status, port 3080, and Teleport logs.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {"reason": "The Enterprise Cloud guide says to follow the sign-up steps, but the public trial page does not enumerate its form fields, activation-link request, email action, local-user setup, MFA and recovery-code steps, tenant naming, or provisioning result.", "impact": "No complete atomic candidate can connect documentation arrival to the explicitly stated launched-cluster and local-admin terminal without inventing required account and security transitions.", "source_ids": ["S2", "S3"]},
+  "candidate_path_gap": null,
   "branches": [
-    {"at_step": 1, "condition": "The developer prefers a free local self-hosted test.", "path": "Use the Community Edition Linux demo route.", "effect_on_first_success": "Replaces the trial and managed provisioning with Linux or Docker installation and a local welcome-screen checkpoint.", "source_ids": ["S1", "S4"]},
-    {"at_step": 1, "condition": "The organization requires self-hosting for compliance.", "path": "Contact Teleport for Enterprise Self-Hosted and obtain a valid license.", "effect_on_first_success": "Adds a sales and licensing path before deployment.", "source_ids": ["S1"]}
+    {
+      "at_step": 1,
+      "condition": "The developer prefers a free local self-hosted test.",
+      "path": "Use the Community Edition Linux demo route.",
+      "effect_on_first_success": "Replaces the trial and managed provisioning with Linux or Docker installation and a local welcome-screen checkpoint.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The organization requires self-hosting for compliance.",
+      "path": "Contact Teleport for Enterprise Self-Hosted and obtain a valid license.",
+      "effect_on_first_success": "Adds a sales and licensing path before deployment.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 1, "type": "choice", "description": "Cloud, Enterprise Self-Hosted, and Community Edition differ in hosting, licensing, and prerequisites.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "account", "description": "The selected route requires the Enterprise Cloud signup and activation flow.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
-    {"at_step": 2, "type": "terms", "description": "Requesting activation agrees to the Privacy Policy.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 2, "type": "verification", "description": "The guide states that signup generates recovery codes that must be saved and creates a local user, but the current interactive sequence is not publicly enumerated.", "documented_requirement": true, "source_ids": ["S2"]}
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "Community Edition local Docker is selected over Enterprise Cloud and Enterprise Self-Hosted under workshop fastest/most-used local-first policy.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Get Started with Teleport | Teleport", "url": "https://goteleport.com/docs/get-started/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Choose your Teleport edition"], "evidence_supported": ["edition selection", "Enterprise Cloud evaluation basis", "alternative routes"]},
-    {"id": "S2", "title": "Step 1 - Sign up for Teleport Enterprise Cloud | Teleport", "url": "https://goteleport.com/docs/get-started/deploy-cloud/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Deploy your cluster", "Initial setup", "Save your recovery codes", "Next step: Enroll resources"], "evidence_supported": ["managed provisioning", "signup documentation gap", "local user and roles", "recovery codes", "intended Step 1 terminal"]},
-    {"id": "S3", "title": "Signup for Teleport Enterprise: Unify Access to All Your Environments | Teleport", "url": "https://goteleport.com/signup/", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Teleport Enterprise 14-Day Trial"], "evidence_supported": ["14-day trial", "activation-link language", "Privacy Policy agreement", "public form gap"]},
-    {"id": "S4", "title": "Step 1 - Deploy Teleport Community Edition | Teleport", "url": "https://goteleport.com/docs/get-started/deploy-community/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Prerequisites", "Checkpoint: Verify Teleport is running"], "evidence_supported": ["Community Edition alternative", "self-hosted welcome-screen checkpoint"]}
+    {
+      "id": "S1",
+      "title": "Get Started with Teleport | Teleport",
+      "url": "https://goteleport.com/docs/get-started/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Choose your Teleport edition"
+      ],
+      "evidence_supported": [
+        "edition selection",
+        "Enterprise Cloud evaluation basis",
+        "alternative routes"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Step 1 - Sign up for Teleport Enterprise Cloud | Teleport",
+      "url": "https://goteleport.com/docs/get-started/deploy-cloud/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Deploy your cluster",
+        "Initial setup",
+        "Save your recovery codes",
+        "Next step: Enroll resources"
+      ],
+      "evidence_supported": [
+        "managed provisioning",
+        "signup documentation gap",
+        "local user and roles",
+        "recovery codes",
+        "intended Step 1 terminal"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Signup for Teleport Enterprise: Unify Access to All Your Environments | Teleport",
+      "url": "https://goteleport.com/signup/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Teleport Enterprise 14-Day Trial"
+      ],
+      "evidence_supported": [
+        "14-day trial",
+        "activation-link language",
+        "Privacy Policy agreement",
+        "public form gap"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Step 1 - Deploy Teleport Community Edition | Teleport",
+      "url": "https://goteleport.com/docs/get-started/deploy-community/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Checkpoint: Verify Teleport is running"
+      ],
+      "evidence_supported": [
+        "Community Edition alternative",
+        "self-hosted welcome-screen checkpoint"
+      ]
+    }
   ],
-  "uncertainties": [
-    {"question": "What is the current complete Enterprise Cloud signup, activation, local-user, MFA, recovery-code, tenant, and provisioning sequence?", "impact": "The required action count, wait states, security gates, and transition to the launched cluster cannot be recorded.", "reason_unresolved": "The Step 1 guide delegates to `Follow the sign-up steps`, and the public trial page does not expose those interactive steps.", "checked_source_ids": ["S2", "S3"]}
-  ],
-  "excluded_after_success": ["Backup local user creation", "resource enrollment", "access-control configuration", "audit-log monitoring", "production hardening"]
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Backup local user creation",
+    "resource enrollment",
+    "access-control configuration",
+    "audit-log monitoring",
+    "production hardening"
+  ]
 }

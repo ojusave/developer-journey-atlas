@@ -1,16 +1,32 @@
 {
-  "platform": {"name": "Harness", "slug": "harness", "organization": "Harness Inc."},
+  "platform": {
+    "name": "Harness",
+    "slug": "harness",
+    "organization": "Harness Inc."
+  },
   "category": "API infrastructure and developer tooling",
   "surface": {
     "name": "Harness CI first Cloud build pipeline",
-    "selection_basis": "Harness offers multiple software-delivery modules. The current Harness CI onboarding guide explicitly takes a new user from setup to a first build and ends with running a first CI pipeline. Its minimal Run step executes a documented echo command on Cloud infrastructure, avoiding deployment targets, artifact registries, or application-specific build logic.",
+    "selection_basis": "Under the workshop policy, the primary route is Harness’s official CI onboarding quickstart: it is the recommended first build path, uses Harness-managed Cloud infrastructure, and reaches a smaller executable outcome than CD. Account creation is treated as one opaque step at the official signup URL; the public guide fully documents the post-login pipeline sequence.",
     "alternatives_considered": [
-      {"name": "Harness CD first deployment", "url": "https://developer.harness.io/docs/continuous-delivery/get-started/onboarding-guide", "reason_not_primary": "A deployment adds service, environment, infrastructure, manifest, and target credentials beyond the CI guide's earlier executable outcome."},
-      {"name": "Remote pipeline storage", "url": "https://developer.harness.io/docs/continuous-integration/use-ci/prep-ci-pipeline-components/", "reason_not_primary": "A Remote pipeline adds Git connector and repository-location setup. Inline is offered during creation and requires fewer dependencies."},
-      {"name": "Self-managed build infrastructure", "url": "https://developer.harness.io/docs/continuous-integration/get-started/overview/", "reason_not_primary": "The onboarding guide uses Cloud build infrastructure with default operating-system and architecture choices, while self-managed infrastructure adds installation and operation."}
+      {
+        "name": "Harness CD first deployment",
+        "url": "https://developer.harness.io/docs/continuous-delivery/get-started/onboarding-guide",
+        "reason_not_primary": "A deployment adds service, environment, infrastructure, manifest, and target credentials beyond the CI guide's earlier executable outcome."
+      },
+      {
+        "name": "Remote pipeline storage",
+        "url": "https://developer.harness.io/docs/continuous-integration/use-ci/prep-ci-pipeline-components/",
+        "reason_not_primary": "A Remote pipeline adds Git connector and repository-location setup. Inline is offered during creation and requires fewer dependencies."
+      },
+      {
+        "name": "Self-managed build infrastructure",
+        "url": "https://developer.harness.io/docs/continuous-integration/get-started/overview/",
+        "reason_not_primary": "The onboarding guide uses Cloud build infrastructure with default operating-system and architecture choices, while self-managed infrastructure adds installation and operation."
+      }
     ]
   },
-  "research_status": "blocked",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -26,54 +42,437 @@
     "official_milestone": "Run your first Harness CI pipeline.",
     "normalized_outcome": "A Cloud CI build for a selected Git branch executes the configured Run step containing `echo \"Harness CI is fast\"`.",
     "observable_completion_signal": "The pipeline execution reaches a successful terminal state and its build logs contain the Run step output `Harness CI is fast`.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The onboarding guide ends with 'Congratulations on running your first CI pipeline,' and the CI overview says Harness records build logs and output, but the public guide does not display or define the exact successful execution status and log screen, and the client-rendered signup continuation is not publicly enumerated.", "source_ids": ["S1", "S2", "S4"]},
-    "why_this_is_the_boundary": "A completed command step is the earliest executable CI outcome in the official onboarding guide. Adding tests, caches, artifacts, pull-request triggers, quality checks, deployments, or governance would extend beyond the first documented build.",
-    "source_ids": ["S1", "S2", "S3", "S4"]
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "A Harness CI execution completes after the documented Run step executes `echo \"Harness CI is fast\"`.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "account", "requirement": "Create a Harness account or sign in to an existing account before accessing the Continuous Integration module.", "required": true, "source_ids": ["S1", "S3"]},
-    {"order": 2, "type": "access", "requirement": "Have access to a Harness organization and project in which a CI pipeline can be created.", "required": true, "source_ids": ["S1", "S3"]},
-    {"order": 3, "type": "configuration", "requirement": "Have a source-code repository and branch available through Harness Code Repository or a supported third-party Git provider.", "required": true, "source_ids": ["S1"]},
-    {"order": 4, "type": "credential", "requirement": "Create or select a Harness connector when the source repository is hosted by a third-party Git provider.", "required": true, "source_ids": ["S1"]},
-    {"order": 5, "type": "permission", "requirement": "Use an identity with permission to create and execute pipelines, select the repository, and use Cloud build infrastructure in the target project.", "required": true, "source_ids": ["S1", "S3"]}
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "Create a Harness account or sign in to an existing account before accessing the Continuous Integration module.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "access",
+      "requirement": "Have access to a Harness organization and project in which a CI pipeline can be created.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "configuration",
+      "requirement": "Have a source-code repository and branch available through Harness Code Repository or a supported third-party Git provider.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "Create or select a Harness connector when the source repository is hosted by a third-party Git provider.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "permission",
+      "requirement": "Use an identity with permission to create and execute pipelines, select the repository, and use Cloud build infrastructure in the target project.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the current Get Started with Harness CI onboarding guide and select its first Cloud build workflow.", "details": ["The guide states that it covers initial setup through running the first build.", "Its prerequisites require a Harness account and access to a source-code repository."], "input": "https://developer.harness.io/3k-docs/continuous-integration/get-started/onboarding-guide/", "output": "The required account and repository dependencies plus the intended pipeline sequence are identified.", "success_signal": "The guide exposes Create your first CI pipeline as the next section.", "failure_or_wait": "A developer without a Harness account or source repository cannot enter the documented console workflow.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "web-ui", "action": "Open Harness's official signup application to create the required account.", "details": ["The onboarding guide requires a Harness account before the CI console steps.", "The official signup URL resolves to the client-rendered Harness authentication application rather than a publicly readable, server-rendered signup sequence."], "input": "https://app.harness.io/auth/#/signup/", "output": "The live Harness authentication application is reached.", "success_signal": "A user would need to complete signup or sign-in before selecting an organization and project.", "failure_or_wait": "The official public sources do not enumerate the full signup, verification, terms, organization, project, entitlement, and first-login transitions, so research stops before submitting identity data.", "required": true, "source_ids": ["S1", "S3", "S4"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the official Harness CI onboarding guide.",
+      "details": [],
+      "input": "https://developer.harness.io/docs/continuous-integration/get-started/onboarding-guide/",
+      "output": "The first-build sequence and prerequisites are visible.",
+      "success_signal": "The guide exposes Create your first CI pipeline.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Sign up for Harness as one opaque account step.",
+      "details": [],
+      "input": "https://app.harness.io/auth/#/signup/",
+      "output": "An authenticated Harness account is available.",
+      "success_signal": "The Harness console opens for the new account.",
+      "failure_or_wait": "Complete any signup or verification requested by Harness; individual form fields are outside this record.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the Continuous Integration module, select Pipelines, and choose Create a Pipeline.",
+      "details": [],
+      "input": "Authenticated Harness console",
+      "output": "The pipeline creation form opens.",
+      "success_signal": "Name and storage controls are visible.",
+      "failure_or_wait": "The account must have organization and project access.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Name the pipeline, choose Inline storage, and select Start.",
+      "details": [],
+      "input": "Pipeline name",
+      "output": "An inline pipeline opens in Pipeline Studio.",
+      "success_signal": "Add Stage is available.",
+      "failure_or_wait": "Remote storage would add a Git configuration dependency.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Add a Build stage, select the source provider and repository, and create or select a connector if required.",
+      "details": [],
+      "input": "Accessible repository and branch",
+      "output": "The Build stage codebase is configured.",
+      "success_signal": "Infrastructure configuration becomes available.",
+      "failure_or_wait": "Third-party repositories require a valid connector.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose Harness Cloud build infrastructure and continue with the documented operating-system and architecture defaults.",
+      "details": [],
+      "input": "Configured Build stage",
+      "output": "The stage has managed Cloud infrastructure.",
+      "success_signal": "The Execution section opens.",
+      "failure_or_wait": "Cloud entitlement and project permission are required.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "In Execution, add a Run step and enter `echo \"Harness CI is fast\"`, then apply and save.",
+      "details": [],
+      "input": "Run step name and command",
+      "output": "The pipeline contains the minimal executable step.",
+      "success_signal": "The Run step is visible in the saved stage.",
+      "failure_or_wait": "Invalid shell configuration prevents execution.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select Run, choose Git Branch, enter the branch, and select Run Pipeline.",
+      "details": [],
+      "input": "Repository branch",
+      "output": "A CI execution starts.",
+      "success_signal": "The execution view and build logs appear.",
+      "failure_or_wait": "An unavailable branch or connector causes the run to fail.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Inspect the completed execution and Run-step logs.",
+      "details": [],
+      "input": "Pipeline execution",
+      "output": "The first CI build is complete.",
+      "success_signal": "The execution succeeds and the logs contain `Harness CI is fast`.",
+      "failure_or_wait": "Use the failed step and build logs if the execution does not succeed.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The required no-account transition is hidden inside Harness's client-rendered authentication application, and the official CI guide assumes that a source repository already exists. After completing signup or sign-in, verification, legal acceptance, tenant initialization, and organization or project selection, the documented continuation is to open Continuous Integration > Pipelines, click Create a Pipeline, enter a name, keep the simpler Inline storage option, click Start, select Add Stage > Build, name the stage, choose the Git provider, create or select a connector for a third-party provider, select the repository, click Set up Stage, select Infrastructure > Cloud, accept or choose its operating-system and architecture settings, click Continue, open Execution, click the plus icon, choose Run, name the step, enter `echo \"Harness CI is fast\"`, click Apply Changes and Save, click Run, select Git Branch as the build type, enter the branch name, click Run Pipeline, then inspect the execution status and logs for a successful Run step and its echo output.",
-    "impact": "The intended console sequence is detailed, but the account boundary, tenant defaults, source-repository acquisition, connector authorization, and exact success screen prevent a fully verified chronological path from no prior state.",
-    "source_ids": ["S1", "S2", "S3", "S4"]
-  },
+  "candidate_path_gap": null,
   "branches": [
-    {"at_step": 2, "condition": "Use Harness Code Repository", "path": "Select an existing repository hosted by Harness when configuring the Build stage.", "effect_on_first_success": "Avoids a third-party Git connector, but repository creation remains a prerequisite outside the CI onboarding guide.", "source_ids": ["S1"]},
-    {"at_step": 2, "condition": "Use a third-party Git provider", "path": "Create or select the required provider connector, authorize its repository access, and select the repository.", "effect_on_first_success": "Adds an external authentication and repository-permission boundary before build infrastructure setup.", "source_ids": ["S1"]},
-    {"at_step": 2, "condition": "Store the pipeline remotely", "path": "Choose Remote instead of Inline and configure the repository location that will store the pipeline YAML.", "effect_on_first_success": "Adds Git connector and remote-file configuration to pipeline creation.", "source_ids": ["S3"]},
-    {"at_step": 2, "condition": "Use non-Cloud build infrastructure", "path": "Select and configure an alternate infrastructure type supported by Harness CI.", "effect_on_first_success": "Adds infrastructure provisioning and configuration rather than using the onboarding guide's Cloud defaults.", "source_ids": ["S1", "S2"]}
+    {
+      "at_step": 2,
+      "condition": "Use Harness Code Repository",
+      "path": "Select an existing repository hosted by Harness when configuring the Build stage.",
+      "effect_on_first_success": "Avoids a third-party Git connector, but repository creation remains a prerequisite outside the CI onboarding guide.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Use a third-party Git provider",
+      "path": "Create or select the required provider connector, authorize its repository access, and select the repository.",
+      "effect_on_first_success": "Adds an external authentication and repository-permission boundary before build infrastructure setup.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Store the pipeline remotely",
+      "path": "Choose Remote instead of Inline and configure the repository location that will store the pipeline YAML.",
+      "effect_on_first_success": "Adds Git connector and remote-file configuration to pipeline creation.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Use non-Cloud build infrastructure",
+      "path": "Select and configure an alternate infrastructure type supported by Harness CI.",
+      "effect_on_first_success": "Adds infrastructure provisioning and configuration rather than using the onboarding guide's Cloud defaults.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "account", "description": "The CI module requires a Harness account and authenticated console session.", "documented_requirement": true, "source_ids": ["S1", "S3"]},
-    {"at_step": 2, "type": "verification", "description": "The public official sources do not expose the complete no-account signup and verification sequence.", "documented_requirement": false, "source_ids": ["S1", "S4"]},
-    {"at_step": 2, "type": "configuration", "description": "The developer must have or create the correct organization and project context before pipeline creation.", "documented_requirement": true, "source_ids": ["S1", "S3"]},
-    {"at_step": 2, "type": "access", "description": "A source-code repository and branch must already be accessible to the developer.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "credential", "description": "A third-party Git repository requires a Harness connector and external provider authorization.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "choice", "description": "The developer must choose Git provider, repository, pipeline storage, build infrastructure, operating system, architecture, build type, and branch.", "documented_requirement": true, "source_ids": ["S1", "S3"]},
-    {"at_step": 2, "type": "permission", "description": "Pipeline creation, connector use, repository selection, Cloud infrastructure, and execution depend on project permissions and available entitlements.", "documented_requirement": true, "source_ids": ["S1", "S3"]}
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The CI module requires a Harness account and authenticated console session.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "verification",
+      "description": "The public official sources do not expose the complete no-account signup and verification sequence.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "The developer must have or create the correct organization and project context before pipeline creation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "access",
+      "description": "A source-code repository and branch must already be accessible to the developer.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "credential",
+      "description": "A third-party Git repository requires a Harness connector and external provider authorization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The developer must choose Git provider, repository, pipeline storage, build infrastructure, operating system, architecture, build type, and branch.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "permission",
+      "description": "Pipeline creation, connector use, repository selection, Cloud infrastructure, and execution depend on project permissions and available entitlements.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Get Started with Harness CI", "url": "https://developer.harness.io/3k-docs/continuous-integration/get-started/onboarding-guide/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": "Jul 2, 2026", "sections_used": ["Prerequisites", "Create your first CI pipeline", "Add a Build stage", "Configure the infrastructure", "Add a Run step", "Run the pipeline"], "evidence_supported": ["Harness account prerequisite", "Source-repository prerequisite", "CI module and Pipelines navigation", "Pipeline name and Start action", "Build stage", "Provider and repository selection", "Third-party connector requirement", "Cloud infrastructure", "Default operating system and architecture", "Run step and echo command", "Git Branch build type", "Branch input", "Run Pipeline action", "First-pipeline congratulation terminal"]},
-    {"id": "S2", "title": "Harness Continuous Integration overview", "url": "https://developer.harness.io/docs/continuous-integration/get-started/overview/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": "Sep 11, 2025", "sections_used": ["How Harness CI works", "Build infrastructure", "Build execution and logs"], "evidence_supported": ["CI stage purpose", "Ephemeral VM for Cloud builds", "Build-log and output recording", "Alternate infrastructure models"]},
-    {"id": "S3", "title": "CI pipeline creation overview", "url": "https://developer.harness.io/docs/continuous-integration/use-ci/prep-ci-pipeline-components/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": "May 12, 2026", "sections_used": ["Create a CI pipeline", "Pipeline settings", "Inline and Remote storage"], "evidence_supported": ["Account or Try Harness CI entry", "Organization and project context", "Pipelines navigation", "Create a Pipeline action", "Name, description, and tags", "Inline or Remote storage", "Optional template", "Start action", "Minimal pipeline purpose"]},
-    {"id": "S4", "title": "Harness", "url": "https://app.harness.io/auth/#/signup/", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Client-rendered authentication application"], "evidence_supported": ["Official signup endpoint", "Public client-rendering gate", "Absence of a server-rendered account-completion sequence"]}
+    {
+      "id": "S1",
+      "title": "Get Started with Harness CI",
+      "url": "https://developer.harness.io/3k-docs/continuous-integration/get-started/onboarding-guide/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Jul 2, 2026",
+      "sections_used": [
+        "Prerequisites",
+        "Create your first CI pipeline",
+        "Add a Build stage",
+        "Configure the infrastructure",
+        "Add a Run step",
+        "Run the pipeline"
+      ],
+      "evidence_supported": [
+        "Harness account prerequisite",
+        "Source-repository prerequisite",
+        "CI module and Pipelines navigation",
+        "Pipeline name and Start action",
+        "Build stage",
+        "Provider and repository selection",
+        "Third-party connector requirement",
+        "Cloud infrastructure",
+        "Default operating system and architecture",
+        "Run step and echo command",
+        "Git Branch build type",
+        "Branch input",
+        "Run Pipeline action",
+        "First-pipeline congratulation terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Harness Continuous Integration overview",
+      "url": "https://developer.harness.io/docs/continuous-integration/get-started/overview/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Sep 11, 2025",
+      "sections_used": [
+        "How Harness CI works",
+        "Build infrastructure",
+        "Build execution and logs"
+      ],
+      "evidence_supported": [
+        "CI stage purpose",
+        "Ephemeral VM for Cloud builds",
+        "Build-log and output recording",
+        "Alternate infrastructure models"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "CI pipeline creation overview",
+      "url": "https://developer.harness.io/docs/continuous-integration/use-ci/prep-ci-pipeline-components/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "May 12, 2026",
+      "sections_used": [
+        "Create a CI pipeline",
+        "Pipeline settings",
+        "Inline and Remote storage"
+      ],
+      "evidence_supported": [
+        "Account or Try Harness CI entry",
+        "Organization and project context",
+        "Pipelines navigation",
+        "Create a Pipeline action",
+        "Name, description, and tags",
+        "Inline or Remote storage",
+        "Optional template",
+        "Start action",
+        "Minimal pipeline purpose"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Harness",
+      "url": "https://app.harness.io/auth/#/signup/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Client-rendered authentication application"
+      ],
+      "evidence_supported": [
+        "Official signup endpoint",
+        "Public client-rendering gate",
+        "Absence of a server-rendered account-completion sequence"
+      ]
+    }
   ],
-  "uncertainties": [
-    {"question": "What exact signup, verification, legal, tenant, and first-project screens does a new Harness user encounter?", "impact": "The full pre-console step count and required inputs cannot be established from the server-rendered official documentation.", "reason_unresolved": "The official signup endpoint is a client-rendered authentication application and the CI guide begins with an existing account.", "checked_source_ids": ["S1", "S3", "S4"]},
-    {"question": "What repository and connector path is simplest for a true no-prior-state user?", "impact": "Harness Code Repository requires a repository to be created, while an external Git provider requires its own account, repository, connector, and authorization.", "reason_unresolved": "The CI onboarding guide assumes repository access and does not document repository creation as part of this first build.", "checked_source_ids": ["S1"]},
-    {"question": "What exact successful terminal status and log presentation follows Run Pipeline?", "impact": "The guide names the first-pipeline achievement but does not show a screen-complete success-state sequence for the Run step.", "reason_unresolved": "The official overview confirms that build logs and output are recorded, while the onboarding guide stops with the congratulatory first-run statement.", "checked_source_ids": ["S1", "S2"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "Repository creation and application code, compilation and test steps, cache and service dependencies, secrets, artifact publication, pull-request and webhook triggers, failure handling, quality gates, security scans, templates, notifications, deployments, governance, production build infrastructure, and cost optimization occur after the first minimal build."
   ]

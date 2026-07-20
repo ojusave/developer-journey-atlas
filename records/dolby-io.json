@@ -3,15 +3,15 @@
   "category": "Communications, media, and social",
   "surface": {
     "name": "OptiView Real-time Streaming Part 1 dashboard broadcast and hosted playback",
-    "selection_basis": "The current official docs explicitly state that Dolby OptiView Real-time Streaming is the new name for Dolby.io (Millicast). Its Getting started tutorial labels Part 1 as the starting point and promises a private stream using only the dashboard, ending with playback in the hosted Viewer App.",
+    "selection_basis": "Under the workshop policy, Part 1 is the fastest documented route because the official tutorial labels it as the starting point and uses only the dashboard, with no code. Signup is one opaque step at the official dashboard URL; the documented token, broadcast, and hosted-viewer steps follow.",
     "alternatives_considered": [
       {"name": "Create a Streaming Web Application", "url": "https://optiview.dolby.com/docs/millicast/getting-started/streaming-web-app/", "reason_not_primary": "The tutorial labels it Part 2 and says to complete Part 1 first."},
       {"name": "Automate using REST APIs", "url": "https://optiview.dolby.com/docs/millicast/getting-started/rest-api/", "reason_not_primary": "The tutorial labels it Part 3 after learning to stream through the dashboard or a web app."},
       {"name": "OptiView Player Web SDK", "url": "https://optiview.dolby.com/docs/theoplayer/getting-started/sdks/web/getting-started/", "reason_not_primary": "Player is a separate OptiView product. The Real-time docs explicitly preserve Dolby.io as the former name of the selected streaming product."}
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create a first OptiView Real-time account, then use the official dashboard-only tutorial to create a publish token, broadcast a webcam stream, and view the server round-trip in the hosted Viewer App.",
@@ -22,11 +22,11 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established end to end by public official documentation",
-    "normalized_outcome": "The dashboard-only first stream cannot be reconstructed from a no-account state because the public tutorial assumes an OptiView Real-time account and the official dashboard response does not expose a registration sequence.",
-    "observable_completion_signal": "The getting-started page directs the user to sign in at `streaming.dolby.io`, but the public dashboard response contains no signup, login, verification, plan, or account-completion states that can be recorded.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The required OptiView Real-time account-creation transition is not established by public official documentation.", "source_ids": ["S1", "S2", "S3"]},
-    "why_this_is_the_boundary": "Part 1 later documents token creation, camera and microphone permission, broadcast state, share action, Viewer launch, and full server round-trip playback, but those steps require an authenticated account that cannot be reached from public official instructions without invention.",
+    "official_milestone": "Start and view a real-time stream",
+    "normalized_outcome": "The developer broadcasts webcam audio and video from the OptiView dashboard and views the stream after its server round trip in the hosted Viewer.",
+    "observable_completion_signal": "The broadcaster shows the LIVE box and timecode, and the launched hosted Viewer plays the stream.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "In this tutorial, we were able to start and view a real-time stream.", "source_ids": ["S2"]},
+    "why_this_is_the_boundary": "The tutorial ends Part 1 at hosted playback and then directs the developer to later custom web-app work.",
     "source_ids": ["S1", "S2", "S3"]
   },
   "prerequisites": [
@@ -39,14 +39,13 @@
   ],
   "primary_path": [
     {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Getting started with OptiView Real-time Streaming and select Part 1, Use the Streaming Dashboard.", "details": [], "input": "https://optiview.dolby.com/docs/millicast/getting-started/", "output": "The no-code sequence of publish token, dashboard broadcast, and hosted Viewer playback is visible.", "success_signal": "Part 1 is labeled as the starting point for broadcasting and playback without code.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Follow the tutorial's OptiView Real-time account link to the Streaming Dashboard.", "details": [], "input": "https://streaming.dolby.io", "output": "An authenticated dashboard session or an account-access continuation is required.", "success_signal": "The official dashboard destination is reached.", "failure_or_wait": "The public dashboard response and official getting-started pages do not expose signup fields, identity choices, verification, plan selection, payment requirements, or an account-completion state. The separate official terms page confirms that account creation includes a required acceptance checkbox but does not expose the rest of the form.", "required": true, "source_ids": ["S1", "S2", "S3", "S5"]}
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to an OptiView Real-time account.", "details": ["Treat signup as one opaque workshop-policy step at the official dashboard URL."], "input": "https://streaming.dolby.io", "output": "Authenticated Streaming Dashboard access.", "success_signal": "The Streaming tab is available.", "failure_or_wait": "Follow the account recovery shown by the dashboard.", "required": true, "source_ids": ["S1", "S2", "S3", "S5"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Create a publish token.", "details": ["Select Streaming, click `+ CREATE`, enter a meaningful label such as `gettingStarted`, and click `CONFIRM`."], "input": "Authenticated account", "output": "A publish token for the stream.", "success_signal": "The token appears in the Streaming dashboard.", "failure_or_wait": "Correct token configuration and retry.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 4, "phase": "run", "actor": "developer", "interface": "browser", "action": "Start a dashboard broadcast.", "details": ["Return to Live broadcast, click `BROADCAST`, then click the green `Start` button.", "Grant microphone and camera access."], "input": "Publish token and webcam", "output": "A live broadcast.", "success_signal": "The LIVE box and running timecode appear.", "failure_or_wait": "Grant browser media permission or correct device access.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "browser", "action": "Launch and view the hosted stream.", "details": ["Click the sharing icon, then click `LAUNCH`."], "input": "Active dashboard broadcast", "output": "Hosted Viewer playback.", "success_signal": "The hosted Viewer plays the full server round-trip stream.", "failure_or_wait": "Confirm the broadcast remains LIVE and relaunch the Viewer.", "required": true, "source_ids": ["S2", "S4"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "After the undocumented account, entitlement, and sign-in transitions, Part 1 says to select Streaming, click `+ CREATE`, enter a meaningful token label such as `gettingStarted`, click `CONFIRM`, return to Live broadcast, click `BROADCAST`, click the green `Start`, grant microphone and camera access, verify the LIVE box and timecode, click the sharing icon, click `LAUNCH`, and observe the stream's full round trip in the hosted viewer.",
-    "impact": "The precise dashboard sequence and playback terminal cannot form an end-to-end first-user candidate while mandatory account and entitlement states, plus the possible billing branch, remain unestablished.",
-    "source_ids": ["S1", "S2", "S3", "S4"]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {"at_step": 2, "condition": "Account access originates in a restricted territory", "path": "Check the current Platform Requirements territory table before attempting registration. Cuba, Iran, and North Korea are documented as unavailable for account creation, portal access, Streaming APIs, and payment; China permits account creation, portal access, and Streaming APIs but payment requires consultation.", "effect_on_first_success": "Can block the journey before registration or add payment consultation, depending on territory.", "source_ids": ["S6"]},
     {"at_step": 2, "condition": "Build a custom web application", "path": "Continue to Part 2 after completing the dashboard exercise, then replace broadcast or playback with the Streaming Web SDK.", "effect_on_first_success": "Adds code after the dashboard-first milestone.", "source_ids": ["S1"]},
@@ -71,9 +70,7 @@
     {"id": "S5", "title": "Millicast Terms of Service | Dolby OptiView", "url": "https://optiview.dolby.com/policies/millicast-terms-of-service/", "official_domain": true, "source_type": "policy", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Terms of Service"], "evidence_supported": ["Required account-creation acceptance checkbox", "Existence of free accounts", "Paid-plan payment policy"]},
     {"id": "S6", "title": "Platform Requirements | Dolby OptiView Documentation", "url": "https://optiview.dolby.com/docs/millicast/network-requirements/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Restricted Territories"], "evidence_supported": ["Account-creation territory restrictions", "Portal and API access restrictions", "China payment consultation condition"]}
   ],
-  "uncertainties": [
-    {"question": "What current signup fields, identity, verification, plan, payment, and first-login states lead to the OptiView Real-time Streaming Dashboard?", "impact": "The mandatory account and entitlement segment cannot be reconstructed or counted, and a payment gate cannot be ruled in or out.", "reason_unresolved": "The getting-started tutorial assumes an account and the official dashboard response exposes no public registration content; the terms establish only the required acceptance checkbox.", "checked_source_ids": ["S1", "S2", "S3", "S5", "S6"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "No complete first-success boundary is claimed while account and entitlement transitions remain undocumented.",
     "Custom Web SDK applications, REST automation, mobile apps, secure-viewer token workflows, long broadcasts, and production distribution occur after the first hosted playback."
