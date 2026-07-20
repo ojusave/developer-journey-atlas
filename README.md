@@ -1,161 +1,131 @@
-# Platform first-mile knowledge base
+# First-Mile Atlas
 
-This is the standalone source-grounded platform dataset for the DevRelCon
-first-mile workshop research. It contains data and validation artifacts only;
-the workshop application, session contract, stage outline, and broader blocker
-research live elsewhere.
+Source-grounded onboarding research for people studying how developer platforms document the path to first success.
 
-## Research question
+[Live Atlas](https://devrelcon-research.onrender.com/) · [LLM guide](https://devrelcon-research.onrender.com/llms.txt) · [Data manifest](https://devrelcon-research.onrender.com/data/index.json) · [Source snapshot](https://devrelcon-research.onrender.com/source/index.md)
 
-For each named platform, what is the complete path documented by the platform
-from a developer arriving with intent to the first-success boundary that the
-official documentation itself explicitly names or demonstrates?
+## Highlights
 
-"Complete" applies only inside that bounded first path. It does not mean
-researching the full product, advanced configuration, production hardening,
-scaling, or later tutorials.
-
-## Evidence rules
-
-1. Inspect current official documentation directly. Search and memory may locate
-   a page but cannot support a recorded fact.
-2. Follow every official link needed to reconstruct the path. Do not summarize
-   only the landing page or quickstart index.
-3. Record every required prerequisite, account or access gate, atomic action,
-   system response, wait, branch, and verification step on the primary path.
-   When the docs present peer starting routes, preserve the shared spine in
-   `primary_path` and record at least one complete, ordered, atomic official
-   route in `candidate_paths`. A branch summary does not count as the journey.
-   If public official docs genuinely cannot expose an executable candidate,
-   record the exact source-backed reason in `candidate_path_gap` instead.
-4. Cite source IDs on every prerequisite, path step, gate, time claim, and
-   completion claim.
-5. Record the vendor's explicit time claim when one exists. Otherwise write
-   `not documented`; never estimate.
-6. Do not choose the success boundary. A complete record requires an official
-   milestone that is either explicitly named or demonstrated as the terminal
-   success state of the official getting-started path. `normalized_outcome` is
-   only a faithful paraphrase of that documented result.
-7. When official documentation is missing, contradictory, login-gated, or does
-   not select one canonical surface, record the uncertainty or return
-   `blocked`/`needs-human-judgment`. Do not fill the gap from memory.
-8. Paraphrase. Preserve exact commands, UI labels, field names, response values,
-   and very short excerpts only when necessary to make the path reproducible.
-9. Stop at the documented first-success boundary and list excluded next steps.
-10. Do not create accounts, accept terms, enter payment details, deploy, send
-    messages, or otherwise exercise a production system.
-
-## Selection rule for broad platforms
-
-Start at the vendor's official developer or product documentation home. Choose
-the path the vendor itself presents as the general or recommended getting-started
-route. Record why it is primary and list plausible alternatives. If the vendor
-offers several equally primary surfaces or terminal success states and the
-documentation does not select a default, return `needs-human-judgment` rather
-than choosing silently.
+- **205 canonical records:** each JSON file reconstructs one selected route to a documented first-success boundary.
+- **Step-level evidence:** prerequisites, actions, gates, waits, outcomes, and vendor time claims cite inspected official documentation.
+- **Honest measurement:** normalized counts separate developer actions from platform events. The effort score is unitless and is not a ranking.
+- **Multiple access paths:** use the interactive Atlas, individual JSON records, the complete manifest, or the LLM-oriented text interfaces.
 
 ## Contents
 
-- `roster.json`: the complete 205-platform research roster, including all 100 independently audited records from the scale run.
-- `record.schema.json`: machine-checkable record contract.
-- `record.template.json`: copyable starting shape for each independent agent.
-- `candidate-path-audit.json`: records flagged because their shared spine stops before an executable candidate route.
-- `cold-audit-open.json`: unresolved independent source-to-step findings that keep a record invalid until correction and recheck.
-- `cold-audit-summary.md`: resolved cross-batch source-to-step audit receipt for the high-risk and reworked records.
-- `records/`: one canonical JSON record per platform. This is the only source of truth.
-- `catalog.md`: generated human-readable index after integration.
-- `coverage.json`: generated validation and completion report.
-- `MEASUREMENT-CONTRACT.md`: definitions of every measurement unit (raw transition, developer action, platform event, wait, decision, documentation navigation, terminal). Read this before analyzing.
-- `ds-quality.json`: generated analytical-quality and comparability metadata per record. Not a ranking. Use it to filter records before analysis.
-- `selected-path-heuristic.json`: generated per-platform selected route with normalized counts and a unitless `heuristic_effort_score`. Not a ranking, not minutes, not observed time. Replaces the former `easiest-path.json`.
-- `ds-audit.md`: pre-repair baseline audit of `main` (defect counts, slug lists, reproducibility findings).
-- `lib/measure.mjs`: shared measurement library that both generators import, so counts never diverge.
-- `build-all.mjs`, `build-ds-quality.mjs`, `build-selected-path.mjs`, `build-catalog.mjs`, `build-ds-audit.mjs`: generators.
-- `tests/regression.mjs`: fixtures for the measurement layer (Render counts, Chronosphere assumptions, re-researched granularity, classifier false positives).
+- [Overview](#overview)
+- [Use the dataset](#use-the-dataset)
+- [Research contract](#research-contract)
+- [Data products](#data-products)
+- [Analyze safely](#analyze-safely)
+- [Develop and validate](#develop-and-validate)
+- [Deploy and operate](#deploy-and-operate)
+- [Contributing and license](#contributing-and-license)
 
-## Published machine-readable interfaces
+## Overview
 
-The deployed Atlas exposes a concise LLM index at `/llms.txt`, consolidated
-context and deployed source code at `/llms-full.txt`, a complete JSON manifest
-at `/data/index.json`, and individual source files under `/source/`. The source
-snapshot is available for inspection and reproducibility; no public reuse
-license is granted.
+The Atlas asks one bounded question: for each named platform, what complete path does the platform's official documentation provide from developer intent to an explicitly named or demonstrated first success?
 
-## Route selection policy
+"Complete" applies only to the selected first route. It does not cover advanced configuration, production hardening, scaling, or later tutorials. The dataset reconstructs documentation. It does not contain telemetry, observed completion times, conversion rates, or activation rates.
 
-When official docs present peer routes, or a cloud signup gate previously left a
-record unresolved, this dataset applies `SELECTION-POLICY.md`: commit to the
-fastest and most commonly used documented route (prefer local/no-account when
-offered; otherwise the vendor's first-listed or recommended quickstart).
+## Use the dataset
 
-## Completion standard
+Open the [interactive Atlas](https://devrelcon-research.onrender.com/) to search by platform, outcome, or category.
 
-A platform record is complete only when its full bounded path is reconstructed
-from inspected official sources and every evidence-bearing field is attributable.
-Passing the schema is necessary but not sufficient; the parent also reviews
-source coverage and representative paths cold.
+Fetch the machine-readable index and a canonical record:
 
-## What `complete` means (and what it does not)
+```sh
+curl -sS https://devrelcon-research.onrender.com/data/index.json \
+  | jq '.records[] | select(.slug == "render")'
 
-A `complete` record describes one committed route to an observable terminal. It is
-research-complete. It is **not** automatically globally canonical or directly
-comparable to every other record. A record can be complete while its platform still
-has no single platform-wide first success. That platform-wide ambiguity lives in
-`surface.selection_basis`, `surface.alternatives_considered`, and `uncertainties`.
-The selected-route success fields (`surface.name` and the four
-`documented_first_success` narrative fields) must describe the committed route's
-terminal affirmatively. The validator fails a `complete` record that uses blocked or
-needs-human-judgment phrasing in those fields, and reports the exact field and rule.
+curl -sS https://devrelcon-research.onrender.com/data/records/render.json \
+  | jq '{platform, surface, documented_first_success, sources}'
+```
 
-## Analysis honesty: what is safe to analyze
+For model-assisted analysis, begin with [`/llms.txt`](https://devrelcon-research.onrender.com/llms.txt). The consolidated [`/llms-full.txt`](https://devrelcon-research.onrender.com/llms-full.txt) includes the methodology, catalog, record contract, and deployed source code.
 
-This dataset is reconstructed documentation, not telemetry. There are no measured
-conversion rates, activation rates, or observed times here.
+## Research contract
 
-- **Safe:** per-record structure from `ds-quality.json` (developer actions, platform
-  events, gates, waits, starting-state assumptions, execution environment), and
-  filtering or grouping records by those fields.
-- **Conditionally safe:** cross-platform comparisons, but only after filtering on
-  `comparability_status` and the confound dimensions. Every record is currently
-  `conditional`, never unconditionally `comparable`, because documentation navigation,
-  platform events, starting-state assumptions, or granularity differences apply.
-- **Unsafe:** treating `raw_transition_count` as developer effort, treating
-  `heuristic_effort_score` as minutes, or reading `selected-path-heuristic.json` as a
-  ranking or a "best developer experience" claim.
+Each record follows these rules:
 
-### Raw transitions are not developer actions
+1. Inspect current official documentation directly. Search results and memory can locate a page but cannot support a recorded fact.
+2. Preserve every required prerequisite, account gate, developer action, platform event, wait, branch, and verification step on the selected route.
+3. Cite source IDs on every evidence-bearing field, including time and completion claims.
+4. Record a vendor time claim only when the inspected source makes one. Otherwise use `not documented`.
+5. Stop at the official first-success boundary and list excluded next steps.
+6. Record missing, contradictory, login-gated, or ambiguous documentation instead of filling gaps from memory.
 
-Render's record has 25 raw transitions but only 21 developer actions (20 required,
-1 optional). Four transitions are platform events: Render creates the service, runs
-the build, marks the deploy Live, and serves the response. Do not report 25 as "25
-steps the developer must do." See `MEASUREMENT-CONTRACT.md`.
+Broad platforms use the decision order in [`SELECTION-POLICY.md`](SELECTION-POLICY.md). Measurement units, comparability constraints, and non-claims are defined in [`MEASUREMENT-CONTRACT.md`](MEASUREMENT-CONTRACT.md).
 
-### Filter before you compare
+A record marked `complete` is research-complete for its selected route. It is not necessarily a globally canonical platform journey or directly comparable with every other record.
+
+## Data products
+
+| Path | Purpose |
+| --- | --- |
+| `records/*.json` | Canonical source of truth, one record per platform |
+| `record.schema.json` | Machine-checkable record contract |
+| `roster.json` | Complete 205-platform research roster |
+| `coverage.json` | Validation and completion report |
+| `ds-quality.json` | Analytical quality, assumptions, and comparability metadata |
+| `selected-path-heuristic.json` | Normalized counts and unitless effort scores for selected routes |
+| `catalog.md` | Generated human-readable index |
+| `ds-audit.md` | Pre-repair baseline audit and reproducibility findings |
+
+Generated files come from the canonical records and shared measurement code in `lib/measure.mjs`. Run the generators instead of editing derived artifacts by hand.
+
+## Analyze safely
+
+Safe analysis starts with `ds-quality.json`. Filter on `comparability_status` and relevant confounds before comparing records.
 
 ```js
 import fs from "node:fs";
-const dq = JSON.parse(fs.readFileSync("ds-quality.json", "utf8"));
 
-// A cohort with no assumed existing assets, no opaque signup, hosted execution,
-// and an explicitly named terminal. Compare within this cohort, not across all 205.
-const cohort = dq.records.filter((r) =>
-  r.existing_asset_requirements.length === 0 &&
-  !r.opaque_signup &&
-  r.execution_environment === "hosted" &&
-  r.boundary_evidence_type === "explicitly-named"
+const quality = JSON.parse(fs.readFileSync("ds-quality.json", "utf8"));
+const cohort = quality.records.filter((record) =>
+  record.existing_asset_requirements.length === 0 &&
+  !record.opaque_signup &&
+  record.execution_environment === "hosted" &&
+  record.boundary_evidence_type === "explicitly-named"
 );
 ```
 
-## Regenerate and validate
+Do not report `raw_transition_count` as developer effort. Do not interpret `heuristic_effort_score` as minutes, observed time, or a best-developer-experience ranking. For example, Render's record contains platform events that are not actions the developer performs.
 
-Everything is deterministic (no wall-clock timestamps; artifacts pin an
-`input_hash` derived from the records). One command regenerates and re-validates:
+## Develop and validate
 
-```bash
-node build-all.mjs          # validate, regenerate coverage/catalog/ds-quality/selected-path, re-validate
-node build-all.mjs --check  # same, then fail if regeneration left a dirty git diff (CI)
-node tests/regression.mjs   # measurement-layer fixtures
+Prerequisites: Node.js, npm, and a clean Git working tree for the reproducibility check.
+
+```sh
+npm test          # run measurement regression fixtures
+npm run validate  # validate all canonical records
+npm run build     # regenerate derived artifacts and validate again
+npm run check     # regenerate, then fail if tracked output changed
+npm run site      # build the static site into public/
 ```
 
-`ds-audit.md` is a one-time pre-repair baseline and is not regenerated by
-`build-all.mjs`.
+Key contributor paths:
+
+- `records/`: canonical research records
+- `lib/measure.mjs`: normalized measurement and classification logic
+- `build-*.mjs`: deterministic generators
+- `tests/regression.mjs`: measurement-layer fixtures
+- `site/` and `scripts/build-site.mjs`: published Atlas
+
+## Deploy and operate
+
+The production Atlas is a Render Static Site at [devrelcon-research.onrender.com](https://devrelcon-research.onrender.com/).
+
+| Setting | Value |
+| --- | --- |
+| Build Command | `node scripts/build-site.mjs` |
+| Publish Directory | `public` |
+| Required environment variables | None |
+
+After a deploy, verify that `/`, `/llms.txt`, and `/data/index.json` return `200`. Build and request logs are available from the service in the Render Dashboard.
+
+## Contributing and license
+
+Open a focused pull request against `main`. Include the validation commands you ran and regenerate any derived artifacts affected by record or measurement changes.
+
+This workshop repository has no public license. The live source snapshot is available for inspection and reproducibility, but no reuse rights are granted.
