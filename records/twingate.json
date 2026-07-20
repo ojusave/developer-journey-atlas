@@ -3,22 +3,22 @@
   "category": "Identity, security, and networking",
   "surface": {
     "name": "Private Access Quick Start",
-    "selection_basis": "The official Quick Start is the general guide for configuring a Twingate network to protect and access a private Resource, and it explicitly summarizes Remote Network, Connector, and Client stages.",
+    "selection_basis": "The official Quick Start is the first general route for configuring private access. Under the workshop policy, free signup is represented as one opaque step using the official signup URL, followed by the fully documented Remote Network, Resource, Connector, and Client sequence.",
     "alternatives_considered": [
       {"name": "Automated Deployment", "url": "https://www.twingate.com/docs/automated-deployment", "reason_not_primary": "The Quick Start presents this as an alternative to the manual general route."},
       {"name": "Getting Started with the API", "url": "https://www.twingate.com/docs/getting-started-with-the-api", "reason_not_primary": "This assumes an existing tenant and API key and targets automation rather than initial private Resource access."}
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {"developer_intent": "Protect and access a private network Resource with Twingate.", "starting_url": "https://www.twingate.com/docs/quick-start", "assumed_prior_state": ["No Twingate account, Remote Network, Resource, Connector, Group authorization, or Client configuration exists.", "The developer controls a host that can reach the intended private Resource and can deploy Docker or a native Linux service there."]},
   "documented_first_success": {
     "official_milestone": "Access your protected Resources with the Twingate Client",
-    "normalized_outcome": "The intended terminal is an authenticated Twingate Client directly reaching the configured private Resource from the developer's device, but the required free-account signup path is not publicly documented.",
-    "observable_completion_signal": "Not observable from a complete public route because the public signup URL returns no documented form or post-signup transition before the Quick Start's account-dependent network configuration.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "Once connected and authenticated, you should be able to access the Resource you configured directly from your device.", "source_ids": ["S1", "S2"]},
-    "why_this_is_the_boundary": "The Quick Start places direct Resource access immediately before its Congratulations and Next Steps section, but the prerequisite account transition cannot be reconstructed from public official pages.",
+    "normalized_outcome": "An authenticated Twingate Client directly reaches the configured private Resource from the developer's device.",
+    "observable_completion_signal": "The Resource address opens directly from the Client device after authentication.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Once connected and authenticated, you should be able to access the Resource you configured directly from your device.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The Quick Start places direct Resource access immediately before Congratulations and Next Steps. The workshop policy permits treating signup as one opaque official-URL step.",
     "source_ids": ["S1", "S2"]
   },
   "prerequisites": [
@@ -27,11 +27,16 @@
     {"order": 3, "type": "network", "requirement": "The Connector host can reach and resolve the private Resource address.", "required": true, "source_ids": ["S1", "S3"]}
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Private Access Quick Start and follow its free-account link.", "details": [], "input": "Twingate Quick Start URL", "output": "The browser redirects to `https://auth.twingate.com/signup`.", "success_signal": "The signup endpoint is reached.", "failure_or_wait": "No navigation recovery is documented.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 2, "phase": "access", "actor": "developer", "interface": "browser", "action": "Observe the public signup boundary before creating the required Twingate account.", "details": [], "input": "Twingate signup endpoint", "output": "The public endpoint exposes no reproducible signup form or completion result to the research client.", "success_signal": "The last public state is the signup endpoint itself.", "failure_or_wait": "The complete account transition is not established by current public official documentation.", "required": true, "source_ids": ["S2"]}
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Private Access Quick Start.", "details": [], "input": "https://www.twingate.com/docs/quick-start", "output": "The general private-access sequence is visible.", "success_signal": "Summary of Steps is reached.", "failure_or_wait": "", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for a free Twingate account using the official signup URL.", "details": ["Signup is intentionally treated as one opaque step under the workshop policy; no form fields are asserted."], "input": "https://auth.twingate.com/signup", "output": "An authenticated Twingate admin console is available.", "success_signal": "The Network page can be opened.", "failure_or_wait": "Use account recovery or support presented by the live service if signup does not complete.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Create a Remote Network if signup did not already create one.", "details": ["Open Network, click Add by Remote Networks, select a location, enter a name, and click Add Remote Network."], "input": "A location and Remote Network name", "output": "A Remote Network exists.", "success_signal": "The Remote Network is shown in Network.", "failure_or_wait": "Skip this step when signup already created a Remote Network.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Add the private Resource and authorize the Everyone group.", "details": ["Click Add Resource, enter its address and details, click Add Resource, select Everyone, and click Add 1 Group."], "input": "A Resource address reachable from the Connector host", "output": "The Resource exists and is authorized.", "success_signal": "The Resource is assigned to a Group.", "failure_or_wait": "A Resource is inaccessible until assigned to at least one Group.", "required": true, "source_ids": ["S1", "S3"]},
+    {"step_number": 5, "phase": "install", "actor": "developer", "interface": "web-console", "action": "Select Deploy Connector and follow the displayed method for the target host.", "details": ["Provision the Connector on a host that can reach the Resource."], "input": "A supported Docker or native Linux Connector host", "output": "The Connector reaches Twingate Controller and Relay.", "success_signal": "Connection Status shows successful connections to both Controller and Relay.", "failure_or_wait": "Check host reachability, DNS, and the selected deployment instructions.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "install", "actor": "developer", "interface": "desktop-app", "action": "Install the Twingate Client from the official client site and authenticate.", "details": [], "input": "https://get.twingate.com", "output": "The Client is connected to the Twingate network.", "success_signal": "The Client reports connected and authenticated.", "failure_or_wait": "Retry authentication or use the Client's documented recovery.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "desktop-app", "action": "Access the configured Resource directly from the Client device.", "details": [], "input": "The configured Resource address", "output": "Traffic reaches the private Resource through Twingate.", "success_signal": "The Resource responds directly from the device regardless of its current network.", "failure_or_wait": "Verify Group authorization, Connector readiness, and Resource reachability.", "required": true, "source_ids": ["S1", "S3"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {"reason": "The Quick Start requires a free account and says choices during signup may define Remote Networks, but the current official signup endpoint exposes no reproducible registration or completed-account transition.", "impact": "No atomic end-to-end candidate can connect documentation arrival to Remote Network creation, Resource authorization, Connector deployment, Client authentication, and direct Resource access without inventing the account path.", "source_ids": ["S1", "S2"]},
+  "candidate_path_gap": null,
   "branches": [
     {"at_step": 2, "condition": "One or more Remote Networks are already defined from choices made during signup.", "path": "Skip manual Remote Network creation and proceed to defining a Resource.", "effect_on_first_success": "Removes the documented Network, Add, location, name, and Add Remote Network actions.", "source_ids": ["S1"]},
     {"at_step": 2, "condition": "No Remote Network exists after signup.", "path": "Open Network, click Add by Remote Networks, choose a location, enter a name, and click Add Remote Network.", "effect_on_first_success": "Adds the full Remote Network creation sequence before Resource creation.", "source_ids": ["S1"]},

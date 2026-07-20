@@ -3,14 +3,14 @@
   "category": "Identity, security, and networking",
   "surface": {
     "name": "ggshield local repository secret scan",
-    "selection_basis": "GitGuardian's ggshield Getting started page presents its install script as the recommended quickest setup, starts browser authentication automatically, and names scanning a repository as the first content scan. This selects the local CLI route rather than the separate platform repository audit route.",
+    "selection_basis": "Under the workshop policy, the local ggshield install-script route is primary because the official guide calls it the recommended quickest setup, combines installation and browser authentication, and immediately scans a repository. Account creation is one opaque step at the official signup URL.",
     "alternatives_considered": [
       {"name": "GitGuardian platform repository audit", "url": "https://docs.gitguardian.com/platform/getting-started/first-audit", "reason_not_primary": "This path requires connecting repositories and measures historical repository health, while the selected ggshield guide explicitly presents a local first scan."},
       {"name": "Manual ggshield installation and token authentication", "url": "https://docs.gitguardian.com/ggshield-docs/getting-started", "reason_not_primary": "The same official guide labels the install script and browser login as the recommended route."}
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Install ggshield, obtain GitGuardian access, and scan a local Git repository for hardcoded secrets until the CLI reports a completed scan.",
@@ -25,8 +25,8 @@
     "official_milestone": "Scan your first content with ggshield.",
     "normalized_outcome": "ggshield has authenticated to a GitGuardian workspace and completed a secret scan of the selected local repository.",
     "observable_completion_signal": "The repository scan command exits with code 0 when it completes without detected issues, or code 1 when it completes and detects issues.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The CLI scan terminal is documented, but the required browser signup and workspace-to-token convergence are not reproducible from the public documentation.", "source_ids": ["S1", "S2", "S3", "S4", "S5"]},
-    "why_this_is_the_boundary": "The Getting started page calls the repository command a first scan, and the CLI reference defines completed-scan exit codes. Reaching it requires an account, workspace, and token, but the automatic authentication route delegates signup to a browser flow whose complete current fields and convergence are not published.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Scan your first content with ggshield.", "source_ids": ["S1", "S4", "S5"]},
+    "why_this_is_the_boundary": "The Getting started page explicitly labels this as the first content scan, and the CLI reference defines its completed-scan exit codes.",
     "source_ids": ["S1", "S2", "S3", "S4", "S5"]
   },
   "prerequisites": [
@@ -39,14 +39,12 @@
     {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the ggshield Getting started page and select the recommended Linux or macOS install-script route.", "details": [], "input": "https://docs.gitguardian.com/ggshield-docs/getting-started", "output": "Requirements, installation, authentication, and first-scan sections are visible.", "success_signal": "The page identifies the install script as the recommended quickest setup.", "failure_or_wait": "A different operating system requires another documented installation branch.", "required": true, "source_ids": ["S1"]},
     {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Run the published install script.", "details": ["Run `curl -sSfL https://raw.githubusercontent.com/GitGuardian/ggshield/main/scripts/install/install.sh | bash`."], "input": "A supported shell with network access.", "output": "ggshield is installed and the script invokes `ggshield auth login`.", "success_signal": "The CLI begins the browser authentication route.", "failure_or_wait": "Installation or network errors stop setup; the guide supplies manual alternatives.", "required": true, "source_ids": ["S1"]},
     {"step_number": 3, "phase": "authenticate", "actor": "platform", "interface": "browser", "action": "Open GitGuardian browser authentication and instruct the developer to log in or create an account.", "details": [], "input": "The login request started by ggshield.", "output": "A browser login or signup surface is opened.", "success_signal": "The browser offers an account-access route.", "failure_or_wait": "A valid GitGuardian account and workspace are required before a token can be provisioned.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 4, "phase": "account", "actor": "developer", "interface": "browser", "action": "Begin account creation using GitHub, email, or an organization SSO route.", "details": ["GitHub signup delegates GitGuardian App installation to GitHub.", "Email signup requires a form and an email continuation.", "A recognized company domain can redirect to organization SSO."], "input": "A selected identity route.", "output": "Not established by the public documentation beyond the high-level branch description.", "success_signal": "Not established by the public documentation.", "failure_or_wait": "Research stops here because the current signup fields, verification, workspace creation, repository grant choices, and token convergence are not fully documented, and the public signup page requires client-side JavaScript.", "required": true, "source_ids": ["S1", "S2", "S3"]}
+    {"step_number": 4, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to GitGuardian and select a workspace.", "details": ["Treat signup as one opaque workshop-policy step at the official signup URL."], "input": "https://dashboard.gitguardian.com/auth/signup", "output": "Authenticated GitGuardian workspace.", "success_signal": "The browser authentication flow can authorize ggshield.", "failure_or_wait": "Follow the displayed account or workspace recovery path.", "required": true, "source_ids": ["S1", "S2", "S3"]},
+    {"step_number": 5, "phase": "credential", "actor": "platform", "interface": "browser", "action": "Authorize ggshield for the workspace.", "details": ["The automatic login provisions a personal access token and stores it in ggshield's configuration."], "input": "Authenticated workspace and pending `ggshield auth login` request", "output": "Authenticated local ggshield CLI.", "success_signal": "The browser flow completes and returns control to an authenticated CLI.", "failure_or_wait": "Run `ggshield auth login` again or use the documented manual token route.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Scan the local repository.", "details": ["Run `ggshield secret scan repo /path/to/your/repo`."], "input": "Authenticated ggshield and local Git repository", "output": "Secret scan result.", "success_signal": "The command exits 0 when no issues are detected or exits 1 when issues are detected; both indicate a completed scan.", "failure_or_wait": "Authentication and usage errors use other documented exit codes.", "required": true, "source_ids": ["S1", "S4", "S5"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The official docs name three account routes but do not publish the complete current browser flow from a new user through identity verification, workspace creation or selection, optional GitHub App grants, and return to ggshield with a stored token.",
-    "impact": "The path cannot be reproduced chronologically from no account to authenticated CLI, so the documented repository scan command cannot be claimed as a complete first mile.",
-    "source_ids": ["S1", "S2", "S3"]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {"at_step": 2, "condition": "Do not use the install script", "path": "Use a documented standalone binary, package manager, pip, pipx, or Docker installation, then run `ggshield auth login` manually.", "effect_on_first_success": "Changes installation mechanics but still converges on required GitGuardian authentication.", "source_ids": ["S1"]},
     {"at_step": 4, "condition": "Use GitHub signup", "path": "Click Sign up with GitHub and follow GitHub instructions to install the GitGuardian GitHub App for all or selected repositories.", "effect_on_first_success": "Introduces external GitHub authorization and repository-scope choices before account convergence.", "source_ids": ["S2"]},
@@ -68,9 +66,7 @@
     {"id": "S4", "title": "ggshield secret scan repo | GitGuardian documentation", "url": "https://docs.gitguardian.com/ggshield-docs/reference/secret/scan/repo", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-18", "last_updated_if_shown": "Last updated on Jun 29, 2026", "sections_used": ["Description", "Usage", "Examples"], "evidence_supported": ["Repository scan syntax and scope"]},
     {"id": "S5", "title": "Overview | GitGuardian documentation", "url": "https://docs.gitguardian.com/ggshield-docs/reference/overview", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-18", "last_updated_if_shown": "Last updated on Jun 29, 2026", "sections_used": ["Exit codes"], "evidence_supported": ["Completed scan exit codes", "Authentication and usage error codes"]}
   ],
-  "uncertainties": [
-    {"question": "What exact sequence does a new user currently complete between browser signup and ggshield receiving and storing its API token?", "impact": "This is the required bridge from installation to the first repository scan.", "reason_unresolved": "The docs summarize account methods but do not enumerate the live signup, verification, workspace, grant, and CLI-return sequence; the public signup response requires client-side JavaScript.", "checked_source_ids": ["S1", "S2", "S3"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "Pre-commit hooks, CI integration, incident remediation, repository monitoring, policy tuning, and historical platform audits occur after the first local repository scan."
   ]

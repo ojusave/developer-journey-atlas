@@ -6,8 +6,8 @@
   },
   "category": "API infrastructure and developer tooling",
   "surface": {
-    "name": "SUSE Documentation, with the Rancher Prime Helm CLI proof of concept as a blocked candidate",
-    "selection_basis": "SUSE's documentation home presents many peer product families without naming a company-wide developer starting point. The Rancher Prime Helm CLI Quick Start is retained as a bounded candidate surface because it explicitly promises a proof-of-concept installation, but its required chart repository URL is hidden behind SUSE Customer Center authentication.",
+    "name": "K3s OSS Quick Start through a functional single-node cluster",
+    "selection_basis": "Under the workshop policy, the official K3s OSS Quick Start is primary because it is a public, no-account, one-command local Linux route. It is faster and less gated than Rancher Prime or SLES and explicitly states that the result is a fully functional single-node Kubernetes cluster.",
     "alternatives_considered": [
       {
         "name": "SUSE Linux Enterprise Server",
@@ -26,7 +26,7 @@
       }
     ]
   },
-  "research_status": "blocked",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -37,19 +37,19 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established from a no-account state by public official documentation.",
-    "normalized_outcome": "The intended candidate terminal is a browser displaying the Rancher user interface, but the public path cannot obtain the required Rancher Prime Helm chart repository URL.",
-    "observable_completion_signal": "The downstream quick start says the Rancher UI should appear at the configured hostname; the public no-account path cannot reach that signal reproducibly.",
+    "official_milestone": "Launch a fully functional single-node K3s cluster",
+    "normalized_outcome": "The K3s install script starts a single-node Kubernetes cluster and installs a configured `kubectl`.",
+    "observable_completion_signal": "`sudo k3s kubectl get nodes` shows the local node in Ready state.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "Navigate to the configured sslip.io hostname and see the Rancher UI",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "A single-node server installation is a fully-functional Kubernetes cluster.",
       "source_ids": [
-        "S4"
+        "S5"
       ]
     },
-    "why_this_is_the_boundary": "The quick start names the browser-visible Rancher UI as its proof-of-concept terminal, but it requires a Prime-only chart repository URL whose linked documentation redirects to SUSE identity authentication and does not expose account creation, entitlement, authorization, or the URL publicly.",
+    "why_this_is_the_boundary": "A Ready node is the first observable proof that the K3s service, control plane, datastore, kubelet, and container runtime are running.",
     "source_ids": [
-      "S4"
+      "S5"
     ]
   },
   "prerequisites": [
@@ -114,65 +114,56 @@
       "phase": "arrive",
       "actor": "developer",
       "interface": "documentation",
-      "action": "Open SUSE Documentation and choose the product family whose first mile is being measured.",
+      "action": "Open the official K3s Quick Start.",
       "details": [
-        "The home lists peer operating-system, cloud-native, edge, storage, virtualization, security, and AI products."
+        "The route requires no account or Prime entitlement."
       ],
-      "input": "https://documentation.suse.com/",
-      "output": "The product-specific documentation entry points are visible.",
-      "success_signal": "A product family can be selected.",
-      "failure_or_wait": "SUSE does not name one company-wide developer first mile on this page.",
+      "input": "https://docs.k3s.io/quick-start",
+      "output": "The one-command install route is visible.",
+      "success_signal": "The Install Script section loads.",
+      "failure_or_wait": "",
       "required": true,
       "source_ids": [
-        "S1"
+        "S5"
       ]
     },
     {
       "step_number": 2,
-      "phase": "prepare",
+      "phase": "install",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "For the retained candidate, choose SUSE Rancher Prime and open its deployment quick starts.",
+      "interface": "cli",
+      "action": "On a requirements-compatible Linux host, run `curl -sfL https://get.k3s.io | sh -`.",
       "details": [
-        "The deployment index offers Amazon EKS, Equinix Metal, manual installation, and Rancher for AWS SaaS."
+        "The script installs K3s as a service, adds kubectl and related utilities, and writes `/etc/rancher/k3s/k3s.yaml`."
       ],
-      "input": "A product and deployment-route choice",
-      "output": "A provider-specific or manual deployment guide is selected.",
-      "success_signal": "The Helm CLI Quick Start is open for the manual proof-of-concept candidate.",
-      "failure_or_wait": "The product and deployment route change the prerequisites, commands, account gates, and terminal state.",
+      "input": "Linux host with root privileges and network access",
+      "output": "The K3s service and single-node cluster start.",
+      "success_signal": "The install command exits successfully.",
+      "failure_or_wait": "Check system requirements, privileges, service status, and installer output.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3"
+        "S5"
       ]
     },
     {
       "step_number": 3,
-      "phase": "authenticate",
+      "phase": "verify",
       "actor": "developer",
-      "interface": "browser",
-      "action": "Follow the Prime-only documentation link to obtain the required Rancher Prime Helm chart repository URL.",
-      "details": [
-        "The official public quick start states that authentication is required and directs the developer to use SUSE Customer Center credentials."
-      ],
-      "input": "SUSE Customer Center credentials and access to the Prime-only documentation",
-      "output": "A redirect to SUSE identity authentication is publicly observable.",
-      "success_signal": "No completed login, entitlement, chart URL, or return state is documented on the public official surface.",
-      "failure_or_wait": "The required chart URL and every authenticated intermediate state remain hidden from public documentation.",
+      "interface": "cli",
+      "action": "Run `sudo k3s kubectl get nodes` and verify the local node is Ready.",
+      "details": [],
+      "input": "The running K3s service",
+      "output": "The cluster node table is displayed.",
+      "success_signal": "The single node reports Ready.",
+      "failure_or_wait": "Inspect the K3s service and logs if the node is not Ready.",
       "required": true,
       "source_ids": [
-        "S4"
+        "S5"
       ]
     }
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The public Helm CLI Quick Start requires `<helm-chart-repo-url>` from Prime-only documentation, but that link redirects to SUSE identity authentication and does not document account creation, entitlement, authorization, the returned URL, or convergence back to the quick start.",
-    "impact": "The Rancher chart repository cannot be added and the documented cert-manager, Rancher install, hostname, and browser-verification sequence cannot be connected chronologically to a no-account starting state without inference.",
-    "source_ids": [
-      "S4"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 1,
@@ -310,28 +301,27 @@
         "Rancher Helm command",
         "Browser-visible terminal"
       ]
-    }
-  ],
-  "uncertainties": [
-    {
-      "question": "Which SUSE product and deployment mode should define a company-wide first mile?",
-      "impact": "The answer changes the entire chronology, prerequisites, access gates, and success boundary.",
-      "reason_unresolved": "The official documentation home exposes many peer products, and even the selected Rancher family exposes multiple peer deployment routes.",
-      "checked_source_ids": [
-        "S1",
-        "S2",
-        "S3"
-      ]
     },
     {
-      "question": "What exact public sequence creates or authorizes an SCC account, exposes the Rancher Prime Helm chart repository URL, and returns the developer to the installation?",
-      "impact": "Without that bridge, the Helm repository command and every later proof-of-concept action are not reproducible from the declared no-account state.",
-      "reason_unresolved": "The public quick start shows a placeholder and an authenticated link; the linked Prime-only documentation redirects to SUSE identity authentication.",
-      "checked_source_ids": [
-        "S4"
+      "id": "S5",
+      "title": "Quick-Start Guide | K3s",
+      "url": "https://docs.k3s.io/quick-start",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install Script"
+      ],
+      "evidence_supported": [
+        "no-account OSS route",
+        "one-command installation",
+        "installed utilities and kubeconfig",
+        "fully functional single-node cluster terminal"
       ]
     }
   ],
+  "uncertainties": [],
   "excluded_after_success": [
     "Logging in, changing the bootstrap password, importing downstream clusters, deploying workloads, production certificates, backups, high availability, monitoring, and production hardening occur after the Rancher UI first appears."
   ]

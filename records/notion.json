@@ -1,16 +1,32 @@
 {
-  "platform": {"name": "Notion", "slug": "notion", "organization": "Notion Labs, Inc."},
+  "platform": {
+    "name": "Notion",
+    "slug": "notion",
+    "organization": "Notion Labs, Inc."
+  },
   "category": "B2B SaaS and enterprise ecosystems",
   "surface": {
     "name": "Notion API quickstart with a personal access token",
-    "selection_basis": "Notion's current Get started overview points to the API quickstart, which explicitly creates a private workspace page with a personal access token and one request. It recommends this personal-token route for the fastest user-owned script or CLI start and avoids the internal-connection sharing and public OAuth paths.",
+    "selection_basis": "Under the workshop policy, Notion’s API quickstart with a personal access token is primary because the official guide calls it the fastest user-owned script or CLI route and claims under two minutes after account access. Notion has no equivalent local or OSS service. Signup is one opaque official step; token creation and the one-request page terminal are fully public.",
     "alternatives_considered": [
-      {"name": "Internal connection developer quickstart", "url": "https://developers.notion.com/guides/get-started/quick-start", "reason_not_primary": "The current API quickstart says a personal access token is faster for a user-owned script or CLI, while internal connections demonstrate team-owned automation and explicit page sharing."},
-      {"name": "Notion CLI and Workers quickstart", "url": "https://developers.notion.com/workers/get-started/quickstart", "reason_not_primary": "This is a separate Workers product route that installs the CLI, deploys a worker, and runs a tool rather than making the API quickstart's one page-creation request."},
-      {"name": "Public connection with OAuth", "url": "https://developers.notion.com/guides/get-started/authorization", "reason_not_primary": "OAuth is the multi-workspace route, while the selected API quickstart uses a personal token for the developer's own workspace."}
+      {
+        "name": "Internal connection developer quickstart",
+        "url": "https://developers.notion.com/guides/get-started/quick-start",
+        "reason_not_primary": "The current API quickstart says a personal access token is faster for a user-owned script or CLI, while internal connections demonstrate team-owned automation and explicit page sharing."
+      },
+      {
+        "name": "Notion CLI and Workers quickstart",
+        "url": "https://developers.notion.com/workers/get-started/quickstart",
+        "reason_not_primary": "This is a separate Workers product route that installs the CLI, deploys a worker, and runs a tool rather than making the API quickstart's one page-creation request."
+      },
+      {
+        "name": "Public connection with OAuth",
+        "url": "https://developers.notion.com/guides/get-started/authorization",
+        "reason_not_primary": "OAuth is the multi-workspace route, while the selected API quickstart uses a personal token for the developer's own workspace."
+      }
     ]
   },
-  "research_status": "blocked",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -26,50 +42,334 @@
     "official_milestone": "Create a page in the developer's Notion workspace with a personal access token and a single API request.",
     "normalized_outcome": "The intended terminal is a private page named `Hello from the API`, created from the published Markdown request and visible through the returned URL or the Private section of the Notion sidebar.",
     "observable_completion_signal": "The API returns a page object with an ID and `url`; opening it shows the heading, paragraph, and bullet list, and the guide states that the first request has been made.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The one-request page terminal is explicit, but the required signup, workspace, role, and developer-portal transition is hidden behind the current client-rendered Notion application.", "source_ids": ["S1", "S2", "S3", "S4"]},
-    "why_this_is_the_boundary": "The API quickstart stops after checking the created private page and then labels later APIs as next steps. A new developer cannot reproduce its personal-token prerequisite because the public signup shows only initial identity choices and the developer portal requires client-side JavaScript.",
-    "source_ids": ["S1", "S2", "S3", "S4"]
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Create page API returns a page object and opening its URL shows the private `Hello from the API` page.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "account", "requirement": "Have a Notion account and workspace.", "required": true, "source_ids": ["S2", "S3"]},
-    {"order": 2, "type": "permission", "requirement": "Have permission to create a personal access token; Business and Enterprise workspaces restrict PAT creation by default and require a workspace owner to enable it.", "required": true, "source_ids": ["S2"]},
-    {"order": 3, "type": "credential", "requirement": "Create, copy, and securely store a personal access token because it cannot be viewed again.", "required": true, "source_ids": ["S2"]},
-    {"order": 4, "type": "software", "requirement": "Have a terminal and cURL for the selected one-request route.", "required": true, "source_ids": ["S2"]}
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "Have a Notion account and workspace.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "Have permission to create a personal access token; Business and Enterprise workspaces restrict PAT creation by default and require a workspace owner to enable it.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "credential",
+      "requirement": "Create, copy, and securely store a personal access token because it cannot be viewed again.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "Have a terminal and cURL for the selected one-request route.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Notion developer Get started overview and select the API quickstart.", "details": [], "input": "https://developers.notion.com/guides/get-started/overview", "output": "The personal-token API quickstart is presented alongside internal and public connection routes.", "success_signal": "The API quickstart link is visible as the hands-on first-request route.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the API quickstart and review its Notion account prerequisite, personal-token step, page request, and check-result terminal.", "details": [], "input": "https://developers.notion.com/guides/get-started/quick-start", "output": "The guide requires a Notion account before opening Personal access tokens in the Developer portal.", "success_signal": "The account prerequisite and one-request terminal are explicit.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S2"]},
-    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open Notion signup from a no-account state.", "details": ["The public signup exposes work email, Google, and Microsoft choices.", "Continuing acknowledges the Terms & Conditions and Privacy Policy."], "input": "https://app.notion.com/signup", "output": "Only the initial identity choices are publicly visible; the application requires JavaScript for continuation.", "success_signal": "The developer can identify the initial signup methods.", "failure_or_wait": "Research stops because provider authorization or email verification, account completion, workspace creation or join, role assignment, and return to the Developer portal are not publicly enumerable.", "required": true, "source_ids": ["S3", "S4"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the official Notion API quickstart.",
+      "details": [],
+      "input": "https://developers.notion.com/guides/get-started/quick-start",
+      "output": "The personal-token one-request route is visible.",
+      "success_signal": "Step 1 and Step 2 are shown.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create a Notion account and workspace as one opaque signup step.",
+      "details": [],
+      "input": "https://app.notion.com/signup",
+      "output": "An authenticated Notion workspace is available.",
+      "success_signal": "Notion opens the workspace.",
+      "failure_or_wait": "Complete any identity, verification, legal, and workspace onboarding requested by Notion; individual form fields are outside this record.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Personal access tokens, choose New token, name it, select a workspace if prompted, and create it.",
+      "details": [],
+      "input": "Notion account and workspace permission",
+      "output": "A personal access token is created.",
+      "success_signal": "The token is displayed once.",
+      "failure_or_wait": "Business and Enterprise workspaces may require an owner to enable PAT creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy the token and export it as `NOTION_API_KEY`.",
+      "details": [],
+      "input": "Personal access token",
+      "output": "The terminal session can authenticate Notion API requests.",
+      "success_signal": "The environment variable is set.",
+      "failure_or_wait": "The token cannot be viewed again after leaving its creation screen.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Send the published `POST https://api.notion.com/v1/pages` request with API version `2026-03-11` and Markdown content.",
+      "details": [],
+      "input": "NOTION_API_KEY and published request body",
+      "output": "Notion creates a private workspace page.",
+      "success_signal": "The API returns a page object with an ID and URL.",
+      "failure_or_wait": "Use the documented error code and message for recovery.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open the returned URL or locate the page under Private in the sidebar.",
+      "details": [],
+      "input": "Created page URL",
+      "output": "The first Notion API request is complete.",
+      "success_signal": "The `Hello from the API` page shows its heading, paragraph, and bullet list.",
+      "failure_or_wait": "An unauthorized or validation error is not success.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The public signup exposes email, Google, Microsoft, and legal acknowledgement, but not the selected method's verification, account completion, workspace onboarding, role outcome, or Developer portal convergence.",
-    "impact": "The personal access token cannot be reached reproducibly from no account, so the otherwise complete one-request API quickstart cannot form an end-to-end public candidate.",
-    "source_ids": ["S2", "S3", "S4"]
-  },
+  "candidate_path_gap": null,
   "branches": [
-    {"at_step": 3, "condition": "Use work email", "path": "Enter the email and continue into Notion's client-rendered verification and workspace onboarding.", "effect_on_first_success": "Can lead to workspace creation or an organization-controlled workspace outcome, but the intermediate sequence is not public.", "source_ids": ["S3"]},
-    {"at_step": 3, "condition": "Use Google or Microsoft", "path": "Choose the provider and complete its external authorization before returning to Notion onboarding.", "effect_on_first_success": "Replaces email verification but leaves provider grants and workspace convergence undocumented.", "source_ids": ["S3"]},
-    {"at_step": 3, "condition": "The account and permitted workspace already exist", "path": "Open Personal access tokens, click New token, name and create it, select a workspace if prompted, copy it, export `NOTION_API_KEY`, send the published `POST /v1/pages` request with API version `2026-03-11`, and open the returned page URL.", "effect_on_first_success": "Reaches the documented private-page terminal after the blocked account transition.", "source_ids": ["S2"]},
-    {"at_step": 3, "condition": "PAT creation is disabled on a Business or Enterprise workspace", "path": "Ask a workspace owner to enable personal access tokens under Settings & members > Connections, then return to token creation.", "effect_on_first_success": "Adds an administrator permission and wait before the API credential exists.", "source_ids": ["S2"]}
+    {
+      "at_step": 3,
+      "condition": "Use work email",
+      "path": "Enter the email and continue into Notion's client-rendered verification and workspace onboarding.",
+      "effect_on_first_success": "Can lead to workspace creation or an organization-controlled workspace outcome, but the intermediate sequence is not public.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Use Google or Microsoft",
+      "path": "Choose the provider and complete its external authorization before returning to Notion onboarding.",
+      "effect_on_first_success": "Replaces email verification but leaves provider grants and workspace convergence undocumented.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The account and permitted workspace already exist",
+      "path": "Open Personal access tokens, click New token, name and create it, select a workspace if prompted, copy it, export `NOTION_API_KEY`, send the published `POST /v1/pages` request with API version `2026-03-11`, and open the returned page URL.",
+      "effect_on_first_success": "Reaches the documented private-page terminal after the blocked account transition.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "PAT creation is disabled on a Business or Enterprise workspace",
+      "path": "Ask a workspace owner to enable personal access tokens under Settings & members > Connections, then return to token creation.",
+      "effect_on_first_success": "Adds an administrator permission and wait before the API credential exists.",
+      "source_ids": [
+        "S2"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 3, "type": "account", "description": "The API quickstart requires an existing Notion account and workspace.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 3, "type": "choice", "description": "The current signup offers work email, Google, or Microsoft.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 3, "type": "legal", "description": "Continuing signup acknowledges Notion's Terms & Conditions and Privacy Policy.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 3, "type": "permission", "description": "Business and Enterprise workspaces restrict personal access token creation by default and may require owner action.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 3, "type": "credential", "description": "The personal access token is shown once and must be stored securely for the request.", "documented_requirement": true, "source_ids": ["S2"]}
+    {
+      "at_step": 3,
+      "type": "account",
+      "description": "The API quickstart requires an existing Notion account and workspace.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "The current signup offers work email, Google, or Microsoft.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "legal",
+      "description": "Continuing signup acknowledges Notion's Terms & Conditions and Privacy Policy.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "permission",
+      "description": "Business and Enterprise workspaces restrict personal access token creation by default and may require owner action.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "The personal access token is shown once and must be stored securely for the request.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": true, "value": "Under two minutes for the API quickstart when the developer already has a Notion account and terminal.", "source_ids": ["S2"]},
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "Under two minutes for the API quickstart when the developer already has a Notion account and terminal.",
+    "source_ids": [
+      "S2"
+    ]
+  },
   "sources": [
-    {"id": "S1", "title": "Overview - Notion Docs", "url": "https://developers.notion.com/guides/get-started/overview", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Using the Notion API", "What is a Notion connection?", "Quickstart"], "evidence_supported": ["API and connection surface", "Quickstart selection", "Internal and public connection alternatives"]},
-    {"id": "S2", "title": "API quickstart - Notion Docs", "url": "https://developers.notion.com/guides/get-started/quick-start", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Step 1: Get a personal access token", "Step 2: Create a page", "Check the result", "Getting an error?", "Next steps"], "evidence_supported": ["Account and terminal requirements", "Vendor time claim", "PAT creation and restriction", "Environment variable", "Exact API version and page request", "Response URL", "Visible private-page terminal", "Documented error recovery"]},
-    {"id": "S3", "title": "Notion - Sign up", "url": "https://app.notion.com/signup", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Create your Notion account"], "evidence_supported": ["Work-email input", "Google and Microsoft choices", "Legal acknowledgement", "Existing-user login link"]},
-    {"id": "S4", "title": "Notion", "url": "https://www.notion.so/developers", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Public response"], "evidence_supported": ["Developer portal requires client-side JavaScript and exposes no reproducible account or token-creation state publicly"]}
+    {
+      "id": "S1",
+      "title": "Overview - Notion Docs",
+      "url": "https://developers.notion.com/guides/get-started/overview",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Using the Notion API",
+        "What is a Notion connection?",
+        "Quickstart"
+      ],
+      "evidence_supported": [
+        "API and connection surface",
+        "Quickstart selection",
+        "Internal and public connection alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API quickstart - Notion Docs",
+      "url": "https://developers.notion.com/guides/get-started/quick-start",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Step 1: Get a personal access token",
+        "Step 2: Create a page",
+        "Check the result",
+        "Getting an error?",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Account and terminal requirements",
+        "Vendor time claim",
+        "PAT creation and restriction",
+        "Environment variable",
+        "Exact API version and page request",
+        "Response URL",
+        "Visible private-page terminal",
+        "Documented error recovery"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Notion - Sign up",
+      "url": "https://app.notion.com/signup",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create your Notion account"
+      ],
+      "evidence_supported": [
+        "Work-email input",
+        "Google and Microsoft choices",
+        "Legal acknowledgement",
+        "Existing-user login link"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Notion",
+      "url": "https://www.notion.so/developers",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public response"
+      ],
+      "evidence_supported": [
+        "Developer portal requires client-side JavaScript and exposes no reproducible account or token-creation state publicly"
+      ]
+    }
   ],
-  "uncertainties": [
-    {"question": "What exact current signup and workspace sequence reaches a role that can create a personal access token in the Notion Developer portal?", "impact": "Without that convergence, the API credential and page-creation request cannot be reached from no account.", "reason_unresolved": "The signup page exposes only initial identity choices and legal acknowledgement, while the Developer portal itself is client-rendered and the quickstart assumes the account already exists.", "checked_source_ids": ["S1", "S2", "S3", "S4"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "Creating databases, querying content, page sharing, internal connections, OAuth, public distribution, comments, files, Workers, webhooks, rate-limit handling, and production token management occur after the first private page is verified."
   ]

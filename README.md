@@ -66,6 +66,13 @@ than choosing silently.
 - `catalog.md`: generated human-readable index after integration.
 - `coverage.json`: generated validation and completion report.
 
+## Route selection policy
+
+When official docs present peer routes, or a cloud signup gate previously left a
+record unresolved, this dataset applies `SELECTION-POLICY.md`: commit to the
+fastest and most commonly used documented route (prefer local/no-account when
+offered; otherwise the vendor's first-listed or recommended quickstart).
+
 ## Completion standard
 
 A platform record is complete only when its full bounded path is reconstructed

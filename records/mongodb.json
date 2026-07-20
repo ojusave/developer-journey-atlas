@@ -6,8 +6,8 @@
   },
   "category": "Data, databases, and search",
   "surface": {
-    "name": "MongoDB product and interface not selected",
-    "selection_basis": "MongoDB's official documentation exposes Atlas cloud, Atlas CLI, local or community deployments, drivers, and other products. The inspected Atlas material supplies a clear candidate path, but the platform-level documentation does not establish Atlas CLI as MongoDB's universal first-success route.",
+    "name": "Create and configure an Atlas cluster with Atlas CLI",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create and configure an Atlas cluster with Atlas CLI. The MongoDB product and interface router has no default, but the official Atlas CLI quickstart supplies an ordered cluster path and explicitly congratulates the developer when the cluster can host data. Prior surface before policy commit: MongoDB product and interface not selected.",
     "alternatives_considered": [
       {
         "name": "Atlas CLI create and configure cluster",
@@ -21,8 +21,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach a first MongoDB data-platform result without a preselected deployment product or interface.",
@@ -34,18 +34,18 @@
   },
   "documented_first_success": {
     "official_milestone": "No single MongoDB platform-wide first-success milestone is documented.",
-    "normalized_outcome": "Unresolved until a human chooses the deployment product and interface; the Atlas CLI candidate ends with a created cluster and connection command.",
-    "observable_completion_signal": "For the Atlas CLI candidate, output says `Cluster created`, emits a connection string, loads sample data, and prints a `mongosh` command; the page then congratulates the developer for creating a cluster to host data.",
+    "normalized_outcome": "The CLI prints the connection command and the documented cluster-created terminal signal.",
+    "observable_completion_signal": "The CLI prints the connection command and the documented cluster-created terminal signal.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The Atlas CLI page explicitly congratulates cluster creation, while the Atlas UI and non-Atlas routes establish different paths; no platform-wide documentation selects one.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The CLI prints the connection command and the documented cluster-created terminal signal.",
       "source_ids": [
         "S1",
         "S2",
         "S3"
       ]
     },
-    "why_this_is_the_boundary": "The Atlas candidate has an official terminal signal, but treating it as MongoDB's universal first success would require choosing a product and interface not selected by the cross-product docs entry point.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -88,24 +88,6 @@
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open the MongoDB documentation entry point and choose a product and deployment mode.",
-      "details": [
-        "Candidate routes include Atlas cloud and product or tool-specific documentation."
-      ],
-      "input": "Intent to start using MongoDB.",
-      "output": "A product and tool choice.",
-      "success_signal": "No shared platform success signal exists at this choice point.",
-      "failure_or_wait": "The journey branches before an atomic implementation path begins.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 2,
       "phase": "access",
       "actor": "developer",
       "interface": "console",
@@ -125,23 +107,131 @@
       ]
     },
     {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Register an Atlas account with email, GitHub, or Google and complete the selected identity flow.",
+      "details": [
+        "The email route collects email, first and last name, an Atlas-compliant password, optional company, terms acceptance, and robot check.",
+        "GitHub requires a public email; Google and company federation delegate password and 2FA to the identity provider."
+      ],
+      "input": "Supported identity and required registration details.",
+      "output": "Authenticated Atlas user.",
+      "success_signal": "The Atlas console opens for the new user.",
+      "failure_or_wait": "A GitHub account without a public email must expose or select one and retry; federated users must complete their company identity-provider flow.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
       "step_number": 3,
       "phase": "configure",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose Atlas CLI, Atlas UI, or another MongoDB deployment path.",
+      "interface": "console",
+      "action": "Use the automatically created Atlas organization and project, or create the organization and project manually.",
       "details": [
-        "The CLI quickstart requires an Atlas organization, CLI installation, and CLI connection.",
-        "The UI free-cluster procedure applies to a first Atlas cluster and introduces provider and region choices."
+        "The candidate cluster is created inside this project context."
       ],
-      "input": "A human-selected product and interface.",
-      "output": "A bounded official tutorial.",
-      "success_signal": "No platform-wide terminal state is documented.",
-      "failure_or_wait": "Without this choice, steps and completion signals cannot be normalized.",
+      "input": "Authenticated Atlas account.",
+      "output": "Atlas organization and project.",
+      "success_signal": "The project opens and can contain a cluster.",
+      "failure_or_wait": "Missing organization or project permission prevents cluster setup.",
       "required": true,
       "source_ids": [
         "S2",
-        "S3"
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install Atlas CLI and MongoDB Shell (`mongosh`), then connect Atlas CLI to the account and project.",
+      "details": [
+        "The quickstart requires an Atlas organization, installed CLI, and connected CLI before `atlas setup`."
+      ],
+      "input": "Supported local machine, Atlas account, and project.",
+      "output": "Connected Atlas CLI and local shell tools.",
+      "success_signal": "Atlas CLI can address the selected organization and project.",
+      "failure_or_wait": "Installation, authentication, organization, or project-selection errors block setup.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `atlas setup --force` to accept the quickstart defaults, or run `atlas setup` and answer the interactive prompts.",
+      "details": [
+        "The quickstart's forced route creates the documented default free cluster path."
+      ],
+      "input": "Connected Atlas CLI and target project.",
+      "output": "Atlas cluster setup operation.",
+      "success_signal": "Atlas accepts the setup request and begins cluster creation.",
+      "failure_or_wait": "Invalid project context, quota, permissions, or interactive input stops creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Capture and store the generated database user credentials and emitted connection string.",
+      "details": [
+        "The credentials are needed for the printed connection command and later database access."
+      ],
+      "input": "Running Atlas setup command.",
+      "output": "Database credentials and cluster connection string.",
+      "success_signal": "The credential values and connection string are available to the developer.",
+      "failure_or_wait": "Losing generated credentials requires credential recovery or replacement before connection.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Wait for Atlas to create the cluster, configure access, and load the quickstart sample data.",
+      "details": [
+        "Provisioning and sample-data loading are platform waits in the official CLI output."
+      ],
+      "input": "Accepted Atlas setup operation.",
+      "output": "Created Atlas cluster with access configuration and sample data.",
+      "success_signal": "Output reports `Cluster created` and finishes loading sample data.",
+      "failure_or_wait": "Provisioning or sample-data failure requires inspecting the CLI error and retrying the setup or load operation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Inspect the printed `mongosh` connection command and the quickstart completion message.",
+      "details": [
+        "The page congratulates the developer for creating a cluster that can host data."
+      ],
+      "input": "Completed cluster setup and connection string.",
+      "output": "Runnable `mongosh` command for the created cluster.",
+      "success_signal": "The CLI prints the connection command and the documented cluster-created terminal signal.",
+      "failure_or_wait": "A missing connection command or incomplete cluster state means the setup has not reached the documented boundary.",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
@@ -343,23 +433,6 @@
     "No common after-success scope is selected while product and surface remain unresolved.",
     "Atlas production sizing, paid tiers, backups, scaling, monitoring, security hardening, and application-driver integration are excluded."
   ],
-  "candidate_paths": [
-    {
-      "id": "atlas-cli-m0-cluster",
-      "name": "Create and configure an Atlas cluster with Atlas CLI",
-      "selection_basis": "The MongoDB product and interface router has no default, but the official Atlas CLI quickstart supplies an ordered cluster path and explicitly congratulates the developer when the cluster can host data.",
-      "relationship_to_primary_path": "This selects Atlas and Atlas CLI at primary step 3, while repeating the required account, organization, and project setup so the candidate is end to end.",
-      "steps": [
-        {"step_number": 1, "phase": "access", "actor": "developer", "interface": "console", "action": "Register an Atlas account with email, GitHub, or Google and complete the selected identity flow.", "details": ["The email route collects email, first and last name, an Atlas-compliant password, optional company, terms acceptance, and robot check.", "GitHub requires a public email; Google and company federation delegate password and 2FA to the identity provider."], "input": "Supported identity and required registration details.", "output": "Authenticated Atlas user.", "success_signal": "The Atlas console opens for the new user.", "failure_or_wait": "A GitHub account without a public email must expose or select one and retry; federated users must complete their company identity-provider flow.", "required": true, "source_ids": ["S4"]},
-        {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "console", "action": "Use the automatically created Atlas organization and project, or create the organization and project manually.", "details": ["The candidate cluster is created inside this project context."], "input": "Authenticated Atlas account.", "output": "Atlas organization and project.", "success_signal": "The project opens and can contain a cluster.", "failure_or_wait": "Missing organization or project permission prevents cluster setup.", "required": true, "source_ids": ["S2", "S4"]},
-        {"step_number": 3, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install Atlas CLI and MongoDB Shell (`mongosh`), then connect Atlas CLI to the account and project.", "details": ["The quickstart requires an Atlas organization, installed CLI, and connected CLI before `atlas setup`."], "input": "Supported local machine, Atlas account, and project.", "output": "Connected Atlas CLI and local shell tools.", "success_signal": "Atlas CLI can address the selected organization and project.", "failure_or_wait": "Installation, authentication, organization, or project-selection errors block setup.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `atlas setup --force` to accept the quickstart defaults, or run `atlas setup` and answer the interactive prompts.", "details": ["The quickstart's forced route creates the documented default free cluster path."], "input": "Connected Atlas CLI and target project.", "output": "Atlas cluster setup operation.", "success_signal": "Atlas accepts the setup request and begins cluster creation.", "failure_or_wait": "Invalid project context, quota, permissions, or interactive input stops creation.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 5, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Capture and store the generated database user credentials and emitted connection string.", "details": ["The credentials are needed for the printed connection command and later database access."], "input": "Running Atlas setup command.", "output": "Database credentials and cluster connection string.", "success_signal": "The credential values and connection string are available to the developer.", "failure_or_wait": "Losing generated credentials requires credential recovery or replacement before connection.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 6, "phase": "verify", "actor": "platform", "interface": "cli", "action": "Wait for Atlas to create the cluster, configure access, and load the quickstart sample data.", "details": ["Provisioning and sample-data loading are platform waits in the official CLI output."], "input": "Accepted Atlas setup operation.", "output": "Created Atlas cluster with access configuration and sample data.", "success_signal": "Output reports `Cluster created` and finishes loading sample data.", "failure_or_wait": "Provisioning or sample-data failure requires inspecting the CLI error and retrying the setup or load operation.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Inspect the printed `mongosh` connection command and the quickstart completion message.", "details": ["The page congratulates the developer for creating a cluster that can host data."], "input": "Completed cluster setup and connection string.", "output": "Runnable `mongosh` command for the created cluster.", "success_signal": "The CLI prints the connection command and the documented cluster-created terminal signal.", "failure_or_wait": "A missing connection command or incomplete cluster state means the setup has not reached the documented boundary.", "required": true, "source_ids": ["S2"]}
-      ],
-      "source_ids": ["S2", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

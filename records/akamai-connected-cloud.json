@@ -6,8 +6,8 @@
   },
   "category": "Cloud and application runtimes",
   "surface": {
-    "name": "Get started with Akamai Cloud, create and connect to a first Linode",
-    "selection_basis": "The current Akamai Cloud Get started guide explicitly says it covers account signup, Cloud Manager, first services, and billing. Its first-service section directs users to Create a Linode. The current Get started with Linodes page then orders Create a Linode, Connect to the Linode, and only afterward says the Linode can now be used for applications.",
+    "name": "Create a Distribution-based Linode in Cloud Manager and connect over SSH",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create a Distribution-based Linode in Cloud Manager and connect over SSH. The platform-wide Get started guide chooses a first Linode, the current creation guide explicitly assumes Distribution, and both the Linodes overview and secure-setup guide make SSH the normal connection path after provisioning. Prior surface before policy commit: Get started with Akamai Cloud, create and connect to a first Linode.",
     "alternatives_considered": [
       {
         "name": "Quick Deploy App",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create an Akamai Cloud account, provision a first Linux virtual machine, and establish an interactive remote shell on it.",
@@ -277,55 +277,6 @@
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
-      "action": "Select a core compute region.",
-      "details": [],
-      "input": "A region near the developer or intended users, with the desired service and plan availability.",
-      "output": "The data-center location and its available plans are fixed for this Linode.",
-      "success_signal": "Plan options become selectable for the region.",
-      "failure_or_wait": "Pricing and product availability can vary by region. Distributed compute regions use a separate guide.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 12,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Choose a supported Linux Distribution image.",
-      "details": [],
-      "input": "A distribution such as a current Ubuntu LTS, Debian, or another supported image.",
-      "output": "The Linode will be provisioned as a bare Linux system from the selected distribution.",
-      "success_signal": "The image appears in the creation summary.",
-      "failure_or_wait": "Quick Deploy Apps, StackScripts, custom images, backups, and clones are separate branches. The current general guide explicitly assumes Distribution.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 13,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Choose a Linode type and plan.",
-      "details": [],
-      "input": "A plan sized for the intended evaluation and selected region; Shared CPU is the cost-efficient family and starts at $5 per month on the current product page.",
-      "output": "vCPU, memory, storage, transfer, hourly rate, and monthly cap are assigned.",
-      "success_signal": "The selected plan and price appear in the summary.",
-      "failure_or_wait": "Plan availability and price can vary by region. The docs recommend starting with a smaller plan when uncertain because the VM can be resized later.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 14,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "web-console",
       "action": "Set the Linode label and optionally add tags; leave placement-group assignment for later if none exists.",
       "details": [],
       "input": "A valid label using letters, numbers, underscores, dashes, and periods; optional tags.",
@@ -338,7 +289,7 @@
       ]
     },
     {
-      "step_number": 15,
+      "step_number": 12,
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
@@ -356,7 +307,7 @@
       ]
     },
     {
-      "step_number": 16,
+      "step_number": 13,
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
@@ -372,7 +323,7 @@
       ]
     },
     {
-      "step_number": 17,
+      "step_number": 14,
       "phase": "configure",
       "actor": "developer",
       "interface": "web-console",
@@ -389,7 +340,7 @@
       ]
     },
     {
-      "step_number": 18,
+      "step_number": 15,
       "phase": "execute",
       "actor": "developer",
       "interface": "web-console",
@@ -407,7 +358,7 @@
       ]
     },
     {
-      "step_number": 19,
+      "step_number": 16,
       "phase": "wait",
       "actor": "platform",
       "interface": "web-console",
@@ -425,7 +376,337 @@
       ]
     },
     {
+      "step_number": 17,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy the SSH Access command from the Linode detail page and run it locally.",
+      "details": [],
+      "input": "A command like `ssh root@192.0.2.1`, the selected private key, and the key passphrase if configured.",
+      "output": "An encrypted SSH session to the first Linode.",
+      "success_signal": "The remote Linux root shell prompt appears, establishing the current docs' Now you can start using your Linode boundary.",
+      "failure_or_wait": "If SSH times out, is rejected, or rejects login, use Weblish or Lish to inspect power, boot, networking, sshd, firewall, root-login, password, and authorized-key state, then retry.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Get started with Akamai Cloud and follow Sign up for an account.",
+      "details": [],
+      "input": "https://techdocs.akamai.com/cloud-computing/docs/getting-started",
+      "output": "The official ordered account and first-service path is visible.",
+      "success_signal": "The guide shows Sign Up for an Account, Navigate Cloud Manager, Create your first Linode, and Understand billing.",
+      "failure_or_wait": "Existing account holders can skip directly to Cloud Manager.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open the signup form and create credentials, or choose Google or GitHub signup.",
+      "details": [],
+      "input": "Email, unique username, and strong password; alternatively a Google or GitHub identity followed by the separate username prompt.",
+      "output": "A pending Akamai Cloud account registration exists.",
+      "success_signal": "The flow sends a confirmation email to the supplied address.",
+      "failure_or_wait": "Username uniqueness, password requirements, provider authorization, or provider-account state can block progression.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
       "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the confirmation email and click its verification link.",
+      "details": [],
+      "input": "The confirmation message sent shortly after registration.",
+      "output": "The email address is confirmed.",
+      "success_signal": "The signup flow advances to identity verification.",
+      "failure_or_wait": "Email delivery delay or an inaccessible mailbox pauses the path.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Enter a phone number, receive the SMS code, and enter that code in the signup form.",
+      "details": [],
+      "input": "SMS-capable phone number and one-time verification code.",
+      "output": "The phone-based identity check completes.",
+      "success_signal": "The signup form accepts the verification code and proceeds.",
+      "failure_or_wait": "Unsupported phone numbers, SMS delivery delay, or an incorrect or expired code can block activation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Choose Business or Personal account type and provide its required identity fields.",
+      "details": [],
+      "input": "Business requires company name and optionally Tax ID; Personal omits Tax ID.",
+      "output": "The account is classified for billing and administration.",
+      "success_signal": "The Billing section becomes available.",
+      "failure_or_wait": "Choosing Business adds the company-name field, but the guide says platform features are the same for both account types.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Select the payment method, enter billing-address details, and accept the Master Services Agreement.",
+      "details": [],
+      "input": "Accepted credit or debit card or PayPal details, billing address, and agreement acceptance.",
+      "output": "A payment method is recorded for identity verification and future usage charges.",
+      "success_signal": "The registration can be submitted for activation.",
+      "failure_or_wait": "An invalid payment method, address mismatch, or failure to accept the agreement prevents activation. No service charge occurs until a paid service is deployed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "other",
+      "action": "Activate the account or route it to manual review.",
+      "details": [],
+      "input": "The completed identity, phone, account-type, billing, and agreement information.",
+      "output": "An active account with access to Cloud Manager, or a pending manual review.",
+      "success_signal": "The developer can sign in to Cloud Manager and add services.",
+      "failure_or_wait": "Most accounts activate instantly, while a small number require manual review before any service can be created. The guide does not publish review duration or additional evidence requests.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "For the recommended passwordless route, generate an Ed25519 SSH key pair if one does not already exist.",
+      "details": [],
+      "input": "`ssh-keygen -t ed25519 -C \"user@domain.tld\"`, default or custom file path, and a secure passphrase.",
+      "output": "A local private key and matching `.pub` public key exist.",
+      "success_signal": "The public key file can be displayed and the private key remains on the local machine.",
+      "failure_or_wait": "A developer may instead use an existing supported key or choose the root-password branch, but the official secure-setup guide recommends Ed25519 with a passphrase.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Add the public SSH key to the Akamai Cloud user profile if it is not already stored.",
+      "details": [],
+      "input": "Profile, SSH Keys, Add an SSH Key, a descriptive label, and the public-key text, then Add Key.",
+      "output": "The public key is stored in Cloud Manager and is available for new Linodes.",
+      "success_signal": "The key appears on the SSH Keys page.",
+      "failure_or_wait": "Only the public key should be pasted. An unsupported format or malformed value is rejected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the Create Linode form.",
+      "details": [],
+      "input": "Cloud Manager, Create dropdown, Linode.",
+      "output": "The Create form is visible.",
+      "success_signal": "Region, image, plan, security, networking, and summary controls are available.",
+      "failure_or_wait": "The account must be active and permitted to create compute resources.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select a core compute region.",
+      "details": [],
+      "input": "A region near the developer or intended users, with the desired service and plan availability.",
+      "output": "The data-center location and its available plans are fixed for this Linode.",
+      "success_signal": "Plan options become selectable for the region.",
+      "failure_or_wait": "Pricing and product availability can vary by region. Distributed compute regions use a separate guide.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose a supported Linux Distribution image.",
+      "details": [],
+      "input": "A distribution such as a current Ubuntu LTS, Debian, or another supported image.",
+      "output": "The Linode will be provisioned as a bare Linux system from the selected distribution.",
+      "success_signal": "The image appears in the creation summary.",
+      "failure_or_wait": "Quick Deploy Apps, StackScripts, custom images, backups, and clones are separate branches. The current general guide explicitly assumes Distribution.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose a Linode type and plan.",
+      "details": [],
+      "input": "A plan sized for the intended evaluation and selected region; Shared CPU is the cost-efficient family and starts at $5 per month on the current product page.",
+      "output": "vCPU, memory, storage, transfer, hourly rate, and monthly cap are assigned.",
+      "success_signal": "The selected plan and price appear in the summary.",
+      "failure_or_wait": "Plan availability and price can vary by region. The docs recommend starting with a smaller plan when uncertain because the VM can be resized later.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 31,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Set the Linode label and optionally add tags; leave placement-group assignment for later if none exists.",
+      "details": [],
+      "input": "A valid label using letters, numbers, underscores, dashes, and periods; optional tags.",
+      "output": "The Linode has an account-visible identity.",
+      "success_signal": "The label passes validation and is shown in the summary.",
+      "failure_or_wait": "Creating a placement group diverts to a separate interface, so the official guide recommends creating the Linode first for ease of use.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 32,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select the stored SSH public key for passwordless root access.",
+      "details": [],
+      "input": "One or more account SSH keys; omit Root Password on the recommended passwordless branch.",
+      "output": "The public key will be installed for the root user during provisioning.",
+      "success_signal": "At least one authentication method is present in the creation summary.",
+      "failure_or_wait": "The documented alternative is a strong Root Password. Weblish requires a root password even if the Linode was provisioned with keys only.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 33,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose the required networking options for direct SSH access.",
+      "details": [],
+      "input": "Public Internet as the default interface, an auto-assigned public IPv4 address, and Linode Interfaces or Configuration Profile Interfaces as the required interface type.",
+      "output": "The Linode will have reachable public networking and an IPv4 address.",
+      "success_signal": "The public interface and interface type appear in the summary.",
+      "failure_or_wait": "Selecting only VPC or VLAN without public access prevents direct internet SSH. A VPC can add public IPv4 through 1:1 NAT.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 34,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select `No firewall - traffic is unprotected (not recommended)` for the minimal first-connection route.",
+      "details": [],
+      "input": "`No firewall - traffic is unprotected (not recommended)`.",
+      "output": "The Linode creation summary records that the public interface has no Cloud Firewall.",
+      "success_signal": "The no-firewall selection is recorded and creation can continue without a separate firewall-creation flow.",
+      "failure_or_wait": "This official option leaves public traffic unprotected and is explicitly not recommended. The recommended alternative is to create or select a Cloud Firewall before deployment; a firewall that drops SSH blocks the primary terminal.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 35,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the Linode Summary and click Create Linode.",
+      "details": [],
+      "input": "Region, Distribution, plan, label, authentication, networking, firewall, and any optional settings.",
+      "output": "A paid compute service is created and the detail page opens automatically.",
+      "success_signal": "The detail page begins showing deployment status and assigned IP addresses.",
+      "failure_or_wait": "An account still awaiting activation cannot create the service; the selected creation guide does not enumerate other create-time errors. Charges begin when the paid service is deployed. A promotional credit applies only when the account is eligible under the separate offer and promotion rules.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 36,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Provision the selected Distribution image and fully boot the Linode.",
+      "details": [],
+      "input": "The accepted creation configuration.",
+      "output": "A running Linux VM with its assigned public IP and SSH key installed.",
+      "success_signal": "The creation and initialization finish and the Linode is ready for connection.",
+      "failure_or_wait": "The creation guide says Distribution images can take about 3 minutes. If the Linode is not running or lacks a login prompt, use Cloud Manager, Lish, and the basic-connection troubleshooting guide.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 37,
       "phase": "verify",
       "actor": "developer",
       "interface": "cli",
@@ -443,357 +724,7 @@
       ]
     }
   ],
-  "candidate_paths": [
-    {
-      "id": "cloud-manager-distribution-ssh",
-      "name": "Create a Distribution-based Linode in Cloud Manager and connect over SSH",
-      "selection_basis": "The platform-wide Get started guide chooses a first Linode, the current creation guide explicitly assumes Distribution, and both the Linodes overview and secure-setup guide make SSH the normal connection path after provisioning.",
-      "relationship_to_primary_path": "This is the general current browser path and follows Akamai's recommended SSH-key authentication. It reaches a usable remote shell without installing an application, which the Linodes guide places after the boundary.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "arrive",
-          "actor": "developer",
-          "interface": "documentation",
-          "action": "Open Get started with Akamai Cloud and follow Sign up for an account.",
-          "details": [],
-          "input": "https://techdocs.akamai.com/cloud-computing/docs/getting-started",
-          "output": "The official ordered account and first-service path is visible.",
-          "success_signal": "The guide shows Sign Up for an Account, Navigate Cloud Manager, Create your first Linode, and Understand billing.",
-          "failure_or_wait": "Existing account holders can skip directly to Cloud Manager.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 2,
-          "phase": "account",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Open the signup form and create credentials, or choose Google or GitHub signup.",
-          "details": [],
-          "input": "Email, unique username, and strong password; alternatively a Google or GitHub identity followed by the separate username prompt.",
-          "output": "A pending Akamai Cloud account registration exists.",
-          "success_signal": "The flow sends a confirmation email to the supplied address.",
-          "failure_or_wait": "Username uniqueness, password requirements, provider authorization, or provider-account state can block progression.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 3,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "email",
-          "action": "Open the confirmation email and click its verification link.",
-          "details": [],
-          "input": "The confirmation message sent shortly after registration.",
-          "output": "The email address is confirmed.",
-          "success_signal": "The signup flow advances to identity verification.",
-          "failure_or_wait": "Email delivery delay or an inaccessible mailbox pauses the path.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 4,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Enter a phone number, receive the SMS code, and enter that code in the signup form.",
-          "details": [],
-          "input": "SMS-capable phone number and one-time verification code.",
-          "output": "The phone-based identity check completes.",
-          "success_signal": "The signup form accepts the verification code and proceeds.",
-          "failure_or_wait": "Unsupported phone numbers, SMS delivery delay, or an incorrect or expired code can block activation.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 5,
-          "phase": "account",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Choose Business or Personal account type and provide its required identity fields.",
-          "details": [],
-          "input": "Business requires company name and optionally Tax ID; Personal omits Tax ID.",
-          "output": "The account is classified for billing and administration.",
-          "success_signal": "The Billing section becomes available.",
-          "failure_or_wait": "Choosing Business adds the company-name field, but the guide says platform features are the same for both account types.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 6,
-          "phase": "billing",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Select the payment method, enter billing-address details, and accept the Master Services Agreement.",
-          "details": [],
-          "input": "Accepted credit or debit card or PayPal details, billing address, and agreement acceptance.",
-          "output": "A payment method is recorded for identity verification and future usage charges.",
-          "success_signal": "The registration can be submitted for activation.",
-          "failure_or_wait": "An invalid payment method, address mismatch, or failure to accept the agreement prevents activation. No service charge occurs until a paid service is deployed.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 7,
-          "phase": "wait",
-          "actor": "platform",
-          "interface": "other",
-          "action": "Activate the account or route it to manual review.",
-          "details": [],
-          "input": "The completed identity, phone, account-type, billing, and agreement information.",
-          "output": "An active account with access to Cloud Manager, or a pending manual review.",
-          "success_signal": "The developer can sign in to Cloud Manager and add services.",
-          "failure_or_wait": "Most accounts activate instantly, while a small number require manual review before any service can be created. The guide does not publish review duration or additional evidence requests.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 8,
-          "phase": "prepare",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "For the recommended passwordless route, generate an Ed25519 SSH key pair if one does not already exist.",
-          "details": [],
-          "input": "`ssh-keygen -t ed25519 -C \"user@domain.tld\"`, default or custom file path, and a secure passphrase.",
-          "output": "A local private key and matching `.pub` public key exist.",
-          "success_signal": "The public key file can be displayed and the private key remains on the local machine.",
-          "failure_or_wait": "A developer may instead use an existing supported key or choose the root-password branch, but the official secure-setup guide recommends Ed25519 with a passphrase.",
-          "required": true,
-          "source_ids": [
-            "S5"
-          ]
-        },
-        {
-          "step_number": 9,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Add the public SSH key to the Akamai Cloud user profile if it is not already stored.",
-          "details": [],
-          "input": "Profile, SSH Keys, Add an SSH Key, a descriptive label, and the public-key text, then Add Key.",
-          "output": "The public key is stored in Cloud Manager and is available for new Linodes.",
-          "success_signal": "The key appears on the SSH Keys page.",
-          "failure_or_wait": "Only the public key should be pasted. An unsupported format or malformed value is rejected.",
-          "required": true,
-          "source_ids": [
-            "S4"
-          ]
-        },
-        {
-          "step_number": 10,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Open the Create Linode form.",
-          "details": [],
-          "input": "Cloud Manager, Create dropdown, Linode.",
-          "output": "The Create form is visible.",
-          "success_signal": "Region, image, plan, security, networking, and summary controls are available.",
-          "failure_or_wait": "The account must be active and permitted to create compute resources.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 11,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Select a core compute region.",
-          "details": [],
-          "input": "A region near the developer or intended users, with the desired service and plan availability.",
-          "output": "The data-center location and its available plans are fixed for this Linode.",
-          "success_signal": "Plan options become selectable for the region.",
-          "failure_or_wait": "Pricing and product availability can vary by region. Distributed compute regions use a separate guide.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 12,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Choose a supported Linux Distribution image.",
-          "details": [],
-          "input": "A distribution such as a current Ubuntu LTS, Debian, or another supported image.",
-          "output": "The Linode will be provisioned as a bare Linux system from the selected distribution.",
-          "success_signal": "The image appears in the creation summary.",
-          "failure_or_wait": "Quick Deploy Apps, StackScripts, custom images, backups, and clones are separate branches. The current general guide explicitly assumes Distribution.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 13,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Choose a Linode type and plan.",
-          "details": [],
-          "input": "A plan sized for the intended evaluation and selected region; Shared CPU is the cost-efficient family and starts at $5 per month on the current product page.",
-          "output": "vCPU, memory, storage, transfer, hourly rate, and monthly cap are assigned.",
-          "success_signal": "The selected plan and price appear in the summary.",
-          "failure_or_wait": "Plan availability and price can vary by region. The docs recommend starting with a smaller plan when uncertain because the VM can be resized later.",
-          "required": true,
-          "source_ids": [
-            "S2",
-            "S7"
-          ]
-        },
-        {
-          "step_number": 14,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Set the Linode label and optionally add tags; leave placement-group assignment for later if none exists.",
-          "details": [],
-          "input": "A valid label using letters, numbers, underscores, dashes, and periods; optional tags.",
-          "output": "The Linode has an account-visible identity.",
-          "success_signal": "The label passes validation and is shown in the summary.",
-          "failure_or_wait": "Creating a placement group diverts to a separate interface, so the official guide recommends creating the Linode first for ease of use.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 15,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Select the stored SSH public key for passwordless root access.",
-          "details": [],
-          "input": "One or more account SSH keys; omit Root Password on the recommended passwordless branch.",
-          "output": "The public key will be installed for the root user during provisioning.",
-          "success_signal": "At least one authentication method is present in the creation summary.",
-          "failure_or_wait": "The documented alternative is a strong Root Password. Weblish requires a root password even if the Linode was provisioned with keys only.",
-          "required": true,
-          "source_ids": [
-            "S2",
-            "S4",
-            "S5"
-          ]
-        },
-        {
-          "step_number": 16,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Choose the required networking options for direct SSH access.",
-          "details": [],
-          "input": "Public Internet as the default interface, an auto-assigned public IPv4 address, and Linode Interfaces or Configuration Profile Interfaces as the required interface type.",
-          "output": "The Linode will have reachable public networking and an IPv4 address.",
-          "success_signal": "The public interface and interface type appear in the summary.",
-          "failure_or_wait": "Selecting only VPC or VLAN without public access prevents direct internet SSH. A VPC can add public IPv4 through 1:1 NAT.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 17,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Select `No firewall - traffic is unprotected (not recommended)` for the minimal first-connection route.",
-          "details": [],
-          "input": "`No firewall - traffic is unprotected (not recommended)`.",
-          "output": "The Linode creation summary records that the public interface has no Cloud Firewall.",
-          "success_signal": "The no-firewall selection is recorded and creation can continue without a separate firewall-creation flow.",
-          "failure_or_wait": "This official option leaves public traffic unprotected and is explicitly not recommended. The recommended alternative is to create or select a Cloud Firewall before deployment; a firewall that drops SSH blocks the primary terminal.",
-          "required": true,
-          "source_ids": [
-            "S2",
-            "S6"
-          ]
-        },
-        {
-          "step_number": 18,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "Review the Linode Summary and click Create Linode.",
-          "details": [],
-          "input": "Region, Distribution, plan, label, authentication, networking, firewall, and any optional settings.",
-          "output": "A paid compute service is created and the detail page opens automatically.",
-          "success_signal": "The detail page begins showing deployment status and assigned IP addresses.",
-          "failure_or_wait": "An account still awaiting activation cannot create the service; the selected creation guide does not enumerate other create-time errors. Charges begin when the paid service is deployed. A promotional credit applies only when the account is eligible under the separate offer and promotion rules.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S2",
-            "S9"
-          ]
-        },
-        {
-          "step_number": 19,
-          "phase": "wait",
-          "actor": "platform",
-          "interface": "web-console",
-          "action": "Provision the selected Distribution image and fully boot the Linode.",
-          "details": [],
-          "input": "The accepted creation configuration.",
-          "output": "A running Linux VM with its assigned public IP and SSH key installed.",
-          "success_signal": "The creation and initialization finish and the Linode is ready for connection.",
-          "failure_or_wait": "The creation guide says Distribution images can take about 3 minutes. If the Linode is not running or lacks a login prompt, use Cloud Manager, Lish, and the basic-connection troubleshooting guide.",
-          "required": true,
-          "source_ids": [
-            "S2",
-            "S3",
-            "S6"
-          ]
-        },
-        {
-          "step_number": 20,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Copy the SSH Access command from the Linode detail page and run it locally.",
-          "details": [],
-          "input": "A command like `ssh root@192.0.2.1`, the selected private key, and the key passphrase if configured.",
-          "output": "An encrypted SSH session to the first Linode.",
-          "success_signal": "The remote Linux root shell prompt appears, establishing the current docs' Now you can start using your Linode boundary.",
-          "failure_or_wait": "If SSH times out, is rejected, or rejects login, use Weblish or Lish to inspect power, boot, networking, sshd, firewall, root-login, password, and authorized-key state, then retry.",
-          "required": true,
-          "source_ids": [
-            "S3",
-            "S5",
-            "S6"
-          ]
-        }
-      ],
-      "source_ids": [
-        "S1",
-        "S2",
-        "S3",
-        "S4",
-        "S5",
-        "S6",
-        "S7",
-        "S8",
-        "S9"
-      ]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
     {

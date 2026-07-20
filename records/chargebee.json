@@ -1,16 +1,32 @@
 {
-  "platform": {"name": "Chargebee", "slug": "chargebee", "organization": "Chargebee Inc."},
+  "platform": {
+    "name": "Chargebee",
+    "slug": "chargebee",
+    "organization": "Chargebee Inc."
+  },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Chargebee Billing API Quickstart",
-    "selection_basis": "Chargebee's API Quickstart is the official developer route that installs one server-side SDK, creates a test customer and catalog, and ends with a subscription plus invoice. The page requires a peer language choice, so the common account spine is preserved and Node is reconstructed as one complete candidate.",
+    "name": "Skip optional AI population and use the Node SDK",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Skip optional AI population and use the Node SDK. This candidate resolves the optional pricing-page onboarding branch by choosing Skip and resolves the peer SDK choice by following the first displayed Node implementation. Prior surface before policy commit: Chargebee Billing API Quickstart.",
     "alternatives_considered": [
-      {"name": "Python API Quickstart", "url": "https://www.chargebee.com/tutorials/quickstart/", "reason_not_primary": "Python is a peer SDK tab and the guide does not rank it over Node or the other languages."},
-      {"name": "PHP, Go, Java, Ruby, and .NET API Quickstarts", "url": "https://www.chargebee.com/tutorials/quickstart/", "reason_not_primary": "These are peer language implementations of the same customer, catalog, and subscription path."},
-      {"name": "AI-populated test-site onboarding", "url": "https://www.chargebee.com/docs/billing/2.0/getting-started/sites-intro", "reason_not_primary": "This optional path derives demo catalog data from a public pricing page rather than following the API Quickstart's fixed sample resources."}
+      {
+        "name": "Python API Quickstart",
+        "url": "https://www.chargebee.com/tutorials/quickstart/",
+        "reason_not_primary": "Python is a peer SDK tab and the guide does not rank it over Node or the other languages."
+      },
+      {
+        "name": "PHP, Go, Java, Ruby, and .NET API Quickstarts",
+        "url": "https://www.chargebee.com/tutorials/quickstart/",
+        "reason_not_primary": "These are peer language implementations of the same customer, catalog, and subscription path."
+      },
+      {
+        "name": "AI-populated test-site onboarding",
+        "url": "https://www.chargebee.com/docs/billing/2.0/getting-started/sites-intro",
+        "reason_not_primary": "This optional path derives demo catalog data from a public pricing page rather than following the API Quickstart's fixed sample resources."
+      }
     ]
   },
-  "research_status": "needs-human-judgment",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -26,79 +42,684 @@
     "official_milestone": "Successfully create a subscription through the API Quickstart.",
     "normalized_outcome": "The test-site API response contains the created active subscription, its customer, the charged test card, and the generated paid invoice.",
     "observable_completion_signal": "The final create-with-items response contains the sample subscription with `status` `active` and an associated invoice with `status` `paid`, after which the guide states that the subscription was successfully created.",
-    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Step 7: Create a subscription, followed by the created subscription, customer, charged card, and generated invoice response.", "source_ids": ["S1"]},
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "Step 7: Create a subscription, followed by the created subscription, customer, charged card, and generated invoice response.",
+      "source_ids": [
+        "S1"
+      ]
+    },
     "why_this_is_the_boundary": "The Quickstart explicitly ends after creating the sample subscription and returning its customer, card, and paid invoice. Later billing features and production setup are outside this first API route.",
-    "source_ids": ["S1"]
+    "source_ids": [
+      "S1"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "identity", "requirement": "Provide name, valid business email, phone, monetization category, employee count, and a US, EU, or AU data-center selection on the free-trial form.", "required": true, "source_ids": ["S3"]},
-    {"order": 2, "type": "configuration", "requirement": "Claim the account from the Complete Account Setup email and set the password, unique site domain, and company name so the test site can be opened.", "required": true, "source_ids": ["S2"]},
-    {"order": 3, "type": "permission", "requirement": "Use the Owner role automatically assigned to the site creator, or another owner or administrator role, to view and create API keys.", "required": true, "source_ids": ["S1", "S6"]},
-    {"order": 4, "type": "software", "requirement": "Choose and provide a supported Node, Python, PHP, Go, Java, Ruby, or .NET environment for the SDK-specific route.", "required": true, "source_ids": ["S1"]},
-    {"order": 5, "type": "credential", "requirement": "Create a full-access API key in the Chargebee test site and keep it secret.", "required": true, "source_ids": ["S1", "S4", "S5"]}
-  ],
-  "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Chargebee API Quickstart and review its required account, test-site API key, SDK choice, and subscription terminal.", "details": [], "input": "https://www.chargebee.com/tutorials/quickstart/", "output": "The seven-step API route and peer SDK tabs are visible.", "success_signal": "The guide identifies a test site as the source of its first credential.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open the Chargebee trial signup page and enter the required business values and data-center choice.", "details": ["The public form requests name, business email and phone, monetization category, employee count, and AU, US, or EU data center.", "Marketing email selection is optional."], "input": "Required business and data-location values", "output": "A completed free-trial form", "success_signal": "All required business, monetization, employee-count, and data-center inputs are populated.", "failure_or_wait": "The public form does not enumerate field-level validation failures.", "required": true, "source_ids": ["S3"]},
-    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Acknowledge the Terms of Service and Privacy Notice and select Complete Signup.", "details": [], "input": "Completed trial form and optional marketing choice", "output": "Submitted Chargebee trial registration", "success_signal": "Chargebee begins the documented Complete Account Setup email flow.", "failure_or_wait": "No submission failure or retry behavior is documented for this form.", "required": true, "source_ids": ["S2", "S3"]},
-    {"step_number": 4, "phase": "wait", "actor": "platform", "interface": "email", "action": "Send the Complete Account Setup email to the registered business email address.", "details": [], "input": "Submitted free-trial form", "output": "Account-claim link", "success_signal": "The Complete Account Setup message arrives at the registered address.", "failure_or_wait": "No delivery time or recovery instruction is documented on the selected sources.", "required": true, "source_ids": ["S2"]},
-    {"step_number": 5, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open the email link, claim the account, and set the password, unique site domain, and company name.", "details": ["The creator is automatically assigned the Owner role.", "Completing the domain setup enables login to the test site."], "input": "Complete Account Setup link and site configuration values", "output": "Claimed Chargebee account and configured test site", "success_signal": "The developer can log in to the Chargebee test site as its owner.", "failure_or_wait": "The site domain must be unique; the official sources do not enumerate a domain-collision recovery flow.", "required": true, "source_ids": ["S2", "S6"]}
-  ],
-  "candidate_paths": [
     {
-      "id": "skip-ai-setup-node",
-      "name": "Skip optional AI population and use the Node SDK",
-      "selection_basis": "This candidate resolves the optional pricing-page onboarding branch by choosing Skip and resolves the peer SDK choice by following the first displayed Node implementation.",
-      "relationship_to_primary_path": "Repeats the common trial, email-claim, and site-configuration spine, then continues through the documented Skip branch, full-access key creation, and Node Quickstart.",
-      "steps": [
-        {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the API Quickstart and its Chargebee free-trial link.", "details": [], "input": "No Chargebee account", "output": "Current free-trial form", "success_signal": "The form is visible.", "failure_or_wait": "No navigation failure is documented.", "required": true, "source_ids": ["S1", "S3"]},
-        {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Enter name, valid business email, phone, applicable monetization category, employee count, and one of the US, EU, or AU data centers.", "details": [], "input": "Required business and data-location values", "output": "Completed required form inputs", "success_signal": "All required inputs have values.", "failure_or_wait": "The public form does not enumerate field-level validation failures.", "required": true, "source_ids": ["S3"]},
-        {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Choose the optional marketing setting, acknowledge the Terms of Service and Privacy Notice, and select Complete Signup.", "details": [], "input": "Completed trial form", "output": "Submitted trial registration", "success_signal": "The Complete Account Setup email flow begins.", "failure_or_wait": "No submission failure or retry behavior is documented.", "required": true, "source_ids": ["S2", "S3"]},
-        {"step_number": 4, "phase": "wait", "actor": "platform", "interface": "email", "action": "Send the Complete Account Setup email.", "details": [], "input": "Submitted registration", "output": "Account-claim link", "success_signal": "The email arrives at the registered business address.", "failure_or_wait": "No delivery time is documented.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 5, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open the email link, claim the account, and set the password, unique site domain, and company name.", "details": ["The site creator receives the Owner role automatically."], "input": "Account-claim link and site values", "output": "Configured account and test site", "success_signal": "The owner can log in to the test site.", "failure_or_wait": "The domain must be unique; no collision recovery is documented.", "required": true, "source_ids": ["S2", "S6"]},
-        {"step_number": 6, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Select Skip the setup when Chargebee offers pricing-page auto-population.", "details": [], "input": "Claimed account and optional onboarding decision", "output": "Test-site dashboard without AI-generated catalog configuration", "success_signal": "Chargebee takes the developer to the test-site dashboard.", "failure_or_wait": "If no public pricing page is detected, Chargebee may prompt for a URL; the selected route uses the documented Skip action.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 7, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Go to Settings, Configure Chargebee, API Keys and Events, API keys; select Add API Key, choose Full-Access Key, name it, and select Create Key.", "details": ["Test and live API keys are distinct.", "Keep full-access keys secret."], "input": "Owner access to the test site", "output": "Test-site full-access API key", "success_signal": "The new full-access key is listed for the test site.", "failure_or_wait": "The key guide does not enumerate creation failures.", "required": true, "source_ids": ["S1", "S5", "S6"]},
-        {"step_number": 8, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Node Chargebee SDK with the published npm, yarn, or pnpm command.", "details": [], "input": "Supported Node environment", "output": "Installed `chargebee` package", "success_signal": "The package is available to the application.", "failure_or_wait": "No installation recovery is documented in the Quickstart.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 9, "phase": "configure", "actor": "developer", "interface": "code", "action": "Initialize the Chargebee client with the test-site name and full-access API key.", "details": [], "input": "Test-site domain and API key", "output": "Authenticated Chargebee SDK client", "success_signal": "The client is configured for the test site.", "failure_or_wait": "The guide's sample catches and prints request errors but does not add a separate configuration check.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 10, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published customer-create call for `acme-east` and `Acme Eastern`, enable auto-collection, and attach the published test card.", "details": [], "input": "Configured client and test card values", "output": "Customer and valid test card", "success_signal": "The response returns `customer` and `card` objects.", "failure_or_wait": "The Node sample catches and prints customer-creation errors.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 11, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published item-family call to create `cloud-storage` named Cloud Storage.", "details": [], "input": "Configured client", "output": "Cloud Storage item family", "success_signal": "The response returns the `item_family` object.", "failure_or_wait": "The sample catches the request error without a separate recovery flow.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 12, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published item call to create the `silver-plan` plan item inside the Cloud Storage family.", "details": [], "input": "Cloud Storage item-family ID", "output": "Silver Plan item", "success_signal": "The response returns the `item` object.", "failure_or_wait": "The sample catches the request error without a separate recovery flow.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 13, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published item-price call to create `silver-plan-USD-monthly` at 50000 minor units every month.", "details": [], "input": "Silver Plan item ID", "output": "Silver USD monthly item price", "success_signal": "The response returns the `item_price` object.", "failure_or_wait": "The sample catches the request error without a separate recovery flow.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 14, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published create-with-items call to subscribe `acme-east` to five units of `silver-plan-USD-monthly`.", "details": [], "input": "Customer ID and item-price ID", "output": "Subscription creation response", "success_signal": "The API returns subscription, customer, card, and invoice objects.", "failure_or_wait": "The sample catches and prints subscription-creation errors.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 15, "phase": "verify", "actor": "developer", "interface": "code", "action": "Verify that the returned subscription is `active`, the card was charged, and the generated invoice is `paid`.", "details": [], "input": "Create-with-items response", "output": "Confirmed sample subscription and paid invoice", "success_signal": "The response matches the Quickstart's subscription, customer, card, and paid-invoice terminal.", "failure_or_wait": "If the response is an error, use the JSON error details returned by Chargebee before retrying.", "required": true, "source_ids": ["S1", "S4"]}
-      ],
-      "source_ids": ["S1", "S2", "S3", "S4", "S5", "S6"]
+      "order": 1,
+      "type": "identity",
+      "requirement": "Provide name, valid business email, phone, monetization category, employee count, and a US, EU, or AU data-center selection on the free-trial form.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "configuration",
+      "requirement": "Claim the account from the Complete Account Setup email and set the password, unique site domain, and company name so the test site can be opened.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "Use the Owner role automatically assigned to the site creator, or another owner or administrator role, to view and create API keys.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "Choose and provide a supported Node, Python, PHP, Go, Java, Ruby, or .NET environment for the SDK-specific route.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "credential",
+      "requirement": "Create a full-access API key in the Chargebee test site and keep it secret.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
     }
   ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Chargebee API Quickstart and review its required account, test-site API key, SDK choice, and subscription terminal.",
+      "details": [],
+      "input": "https://www.chargebee.com/tutorials/quickstart/",
+      "output": "The seven-step API route and peer SDK tabs are visible.",
+      "success_signal": "The guide identifies a test site as the source of its first credential.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open the Chargebee trial signup page and enter the required business values and data-center choice.",
+      "details": [
+        "The public form requests name, business email and phone, monetization category, employee count, and AU, US, or EU data center.",
+        "Marketing email selection is optional."
+      ],
+      "input": "Required business and data-location values",
+      "output": "A completed free-trial form",
+      "success_signal": "All required business, monetization, employee-count, and data-center inputs are populated.",
+      "failure_or_wait": "The public form does not enumerate field-level validation failures.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Acknowledge the Terms of Service and Privacy Notice and select Complete Signup.",
+      "details": [],
+      "input": "Completed trial form and optional marketing choice",
+      "output": "Submitted Chargebee trial registration",
+      "success_signal": "Chargebee begins the documented Complete Account Setup email flow.",
+      "failure_or_wait": "No submission failure or retry behavior is documented for this form.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "email",
+      "action": "Send the Complete Account Setup email to the registered business email address.",
+      "details": [],
+      "input": "Submitted free-trial form",
+      "output": "Account-claim link",
+      "success_signal": "The Complete Account Setup message arrives at the registered address.",
+      "failure_or_wait": "No delivery time or recovery instruction is documented on the selected sources.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open the email link, claim the account, and set the password, unique site domain, and company name.",
+      "details": [
+        "The creator is automatically assigned the Owner role.",
+        "Completing the domain setup enables login to the test site."
+      ],
+      "input": "Complete Account Setup link and site configuration values",
+      "output": "Claimed Chargebee account and configured test site",
+      "success_signal": "The developer can log in to the Chargebee test site as its owner.",
+      "failure_or_wait": "The site domain must be unique; the official sources do not enumerate a domain-collision recovery flow.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the API Quickstart and its Chargebee free-trial link.",
+      "details": [],
+      "input": "No Chargebee account",
+      "output": "Current free-trial form",
+      "success_signal": "The form is visible.",
+      "failure_or_wait": "No navigation failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter name, valid business email, phone, applicable monetization category, employee count, and one of the US, EU, or AU data centers.",
+      "details": [],
+      "input": "Required business and data-location values",
+      "output": "Completed required form inputs",
+      "success_signal": "All required inputs have values.",
+      "failure_or_wait": "The public form does not enumerate field-level validation failures.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Choose the optional marketing setting, acknowledge the Terms of Service and Privacy Notice, and select Complete Signup.",
+      "details": [],
+      "input": "Completed trial form",
+      "output": "Submitted trial registration",
+      "success_signal": "The Complete Account Setup email flow begins.",
+      "failure_or_wait": "No submission failure or retry behavior is documented.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "email",
+      "action": "Send the Complete Account Setup email.",
+      "details": [],
+      "input": "Submitted registration",
+      "output": "Account-claim link",
+      "success_signal": "The email arrives at the registered business address.",
+      "failure_or_wait": "No delivery time is documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open the email link, claim the account, and set the password, unique site domain, and company name.",
+      "details": [
+        "The site creator receives the Owner role automatically."
+      ],
+      "input": "Account-claim link and site values",
+      "output": "Configured account and test site",
+      "success_signal": "The owner can log in to the test site.",
+      "failure_or_wait": "The domain must be unique; no collision recovery is documented.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select Skip the setup when Chargebee offers pricing-page auto-population.",
+      "details": [],
+      "input": "Claimed account and optional onboarding decision",
+      "output": "Test-site dashboard without AI-generated catalog configuration",
+      "success_signal": "Chargebee takes the developer to the test-site dashboard.",
+      "failure_or_wait": "If no public pricing page is detected, Chargebee may prompt for a URL; the selected route uses the documented Skip action.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Go to Settings, Configure Chargebee, API Keys and Events, API keys; select Add API Key, choose Full-Access Key, name it, and select Create Key.",
+      "details": [
+        "Test and live API keys are distinct.",
+        "Keep full-access keys secret."
+      ],
+      "input": "Owner access to the test site",
+      "output": "Test-site full-access API key",
+      "success_signal": "The new full-access key is listed for the test site.",
+      "failure_or_wait": "The key guide does not enumerate creation failures.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Node Chargebee SDK with the published npm, yarn, or pnpm command.",
+      "details": [],
+      "input": "Supported Node environment",
+      "output": "Installed `chargebee` package",
+      "success_signal": "The package is available to the application.",
+      "failure_or_wait": "No installation recovery is documented in the Quickstart.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Initialize the Chargebee client with the test-site name and full-access API key.",
+      "details": [],
+      "input": "Test-site domain and API key",
+      "output": "Authenticated Chargebee SDK client",
+      "success_signal": "The client is configured for the test site.",
+      "failure_or_wait": "The guide's sample catches and prints request errors but does not add a separate configuration check.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Run the published customer-create call for `acme-east` and `Acme Eastern`, enable auto-collection, and attach the published test card.",
+      "details": [],
+      "input": "Configured client and test card values",
+      "output": "Customer and valid test card",
+      "success_signal": "The response returns `customer` and `card` objects.",
+      "failure_or_wait": "The Node sample catches and prints customer-creation errors.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Run the published item-family call to create `cloud-storage` named Cloud Storage.",
+      "details": [],
+      "input": "Configured client",
+      "output": "Cloud Storage item family",
+      "success_signal": "The response returns the `item_family` object.",
+      "failure_or_wait": "The sample catches the request error without a separate recovery flow.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Run the published item call to create the `silver-plan` plan item inside the Cloud Storage family.",
+      "details": [],
+      "input": "Cloud Storage item-family ID",
+      "output": "Silver Plan item",
+      "success_signal": "The response returns the `item` object.",
+      "failure_or_wait": "The sample catches the request error without a separate recovery flow.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Run the published item-price call to create `silver-plan-USD-monthly` at 50000 minor units every month.",
+      "details": [],
+      "input": "Silver Plan item ID",
+      "output": "Silver USD monthly item price",
+      "success_signal": "The response returns the `item_price` object.",
+      "failure_or_wait": "The sample catches the request error without a separate recovery flow.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Run the published create-with-items call to subscribe `acme-east` to five units of `silver-plan-USD-monthly`.",
+      "details": [],
+      "input": "Customer ID and item-price ID",
+      "output": "Subscription creation response",
+      "success_signal": "The API returns subscription, customer, card, and invoice objects.",
+      "failure_or_wait": "The sample catches and prints subscription-creation errors.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Verify that the returned subscription is `active`, the card was charged, and the generated invoice is `paid`.",
+      "details": [],
+      "input": "Create-with-items response",
+      "output": "Confirmed sample subscription and paid invoice",
+      "success_signal": "The response matches the Quickstart's subscription, customer, card, and paid-invoice terminal.",
+      "failure_or_wait": "If the response is an error, use the JSON error details returned by Chargebee before retrying.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    }
+  ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 2, "condition": "Choose a data center", "path": "Select AU, US, or EU on the signup form.", "effect_on_first_success": "Determines the Chargebee account's data location before site creation.", "source_ids": ["S3"]},
-    {"at_step": 5, "condition": "Proceed with AI-populated test-site onboarding", "path": "Review detected products, continue to pricing, continue to brand, proceed to sandbox, wait for sync, and review the generated catalog and brand.", "effect_on_first_success": "Adds generated catalog data before the API Quickstart; the fixed sample resources still need distinct IDs.", "source_ids": ["S2"]},
-    {"at_step": 5, "condition": "Skip AI-populated setup", "path": "Select Skip the setup to go directly to the test-site dashboard without auto-configuration.", "effect_on_first_success": "This is the shorter onboarding route reconstructed in the Node candidate.", "source_ids": ["S2"]},
-    {"at_step": 5, "condition": "Choose another SDK", "path": "Follow the Python, PHP, Go, Java, Ruby, or .NET tab for the same customer, catalog, and subscription sequence.", "effect_on_first_success": "Changes installation and code while preserving the API resources and terminal.", "source_ids": ["S1"]}
+    {
+      "at_step": 2,
+      "condition": "Choose a data center",
+      "path": "Select AU, US, or EU on the signup form.",
+      "effect_on_first_success": "Determines the Chargebee account's data location before site creation.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "Proceed with AI-populated test-site onboarding",
+      "path": "Review detected products, continue to pricing, continue to brand, proceed to sandbox, wait for sync, and review the generated catalog and brand.",
+      "effect_on_first_success": "Adds generated catalog data before the API Quickstart; the fixed sample resources still need distinct IDs.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "Skip AI-populated setup",
+      "path": "Select Skip the setup to go directly to the test-site dashboard without auto-configuration.",
+      "effect_on_first_success": "This is the shorter onboarding route reconstructed in the Node candidate.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "Choose another SDK",
+      "path": "Follow the Python, PHP, Go, Java, Ruby, or .NET tab for the same customer, catalog, and subscription sequence.",
+      "effect_on_first_success": "Changes installation and code while preserving the API resources and terminal.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "form", "description": "Trial signup requires business identity, monetization category, employee count, and data-center fields.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 2, "type": "legal", "description": "Submitting the trial acknowledges the Chargebee Terms of Service and Privacy Notice.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 2, "type": "choice", "description": "The signup form requires an AU, US, or EU data-center choice.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 4, "type": "verification", "description": "The site documentation requires claiming the account from the Complete Account Setup email.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 5, "type": "configuration", "description": "A password and unique site domain must be set before test-site login.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 5, "type": "choice", "description": "Chargebee can offer Proceed or Skip for AI-populated pricing-page setup before the test-site dashboard.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 5, "type": "permission", "description": "Only a site administrator or owner can see the API keys needed by the Quickstart; the site creator is automatically the owner.", "documented_requirement": true, "source_ids": ["S1", "S6"]},
-    {"at_step": 5, "type": "credential", "description": "The Node route requires a test-site full-access key, which can create, retrieve, update, and delete API resources and must be kept secret.", "documented_requirement": true, "source_ids": ["S1", "S5"]},
-    {"at_step": 5, "type": "choice", "description": "The API Quickstart requires a Node, Python, PHP, Go, Java, Ruby, or .NET implementation choice.", "documented_requirement": true, "source_ids": ["S1"]}
+    {
+      "at_step": 2,
+      "type": "form",
+      "description": "Trial signup requires business identity, monetization category, employee count, and data-center fields.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "legal",
+      "description": "Submitting the trial acknowledges the Chargebee Terms of Service and Privacy Notice.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The signup form requires an AU, US, or EU data-center choice.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "verification",
+      "description": "The site documentation requires claiming the account from the Complete Account Setup email.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "configuration",
+      "description": "A password and unique site domain must be set before test-site login.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "choice",
+      "description": "Chargebee can offer Proceed or Skip for AI-populated pricing-page setup before the test-site dashboard.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "permission",
+      "description": "Only a site administrator or owner can see the API keys needed by the Quickstart; the site creator is automatically the owner.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "credential",
+      "description": "The Node route requires a test-site full-access key, which can create, retrieve, update, and delete API resources and must be kept secret.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "choice",
+      "description": "The API Quickstart requires a Node, Python, PHP, Go, Java, Ruby, or .NET implementation choice.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "API Quickstart Guide", "url": "https://www.chargebee.com/tutorials/quickstart/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Quickstart overview", "Step 1: Get your API key", "Step 2: Download and set up the SDK", "Step 3: Create a customer with a payment method", "Step 4: Create an item family", "Step 5: Create an item", "Step 6: Create an item price", "Step 7: Create a subscription", "What to do next?"], "evidence_supported": ["Peer SDK choices", "Test-site and role assumptions", "Full-access API key", "Fixed sample resources", "Subscription and invoice response", "Explicit successful-subscription terminal"]},
-    {"id": "S2", "title": "Understanding Sites - Chargebee Docs", "url": "https://www.chargebee.com/docs/billing/2.0/getting-started/sites-intro", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Configuring Domain Name", "Test Site", "Auto-Populate Test Site from your Pricing Page during Sign Up", "Chargebee Test Payment Gateway"], "evidence_supported": ["Test and live sites", "Complete Account Setup email", "Password and domain", "Business-email account claim", "Proceed or Skip branch", "Default test gateway"]},
-    {"id": "S3", "title": "Sign Up - Get Your Free Sandbox - Chargebee", "url": "https://www.chargebee.com/trial-signup/", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Start your free trial"], "evidence_supported": ["Required signup fields", "Monetization choices", "Employee choices", "Data-center choices", "Optional marketing selection", "Legal acknowledgement", "Complete Signup submission"]},
-    {"id": "S4", "title": "Chargebee API documentation", "url": "https://www.chargebee.com/docs/billing/2.0/kb/getting-started/chargebee-apis-documentation", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Solution", "Authentication"], "evidence_supported": ["REST and client-library options", "HTTP Basic authentication", "Test and live API-key separation", "Dashboard key location", "JSON response and error behavior"]},
-    {"id": "S5", "title": "API Keys - Chargebee Docs", "url": "https://www.chargebee.com/docs/billing/2.0/site-configuration/api_keys", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Types of API keys", "Full-access key", "Creating an API key", "Using an API key"], "evidence_supported": ["Exact API-key navigation", "Full-access key capabilities", "Add API Key", "Name and Create Key actions", "Test and live separation", "Secret-handling warning"]},
-    {"id": "S6", "title": "Users & Roles - Chargebee Docs", "url": "https://www.chargebee.com/docs/billing/2.0/site-configuration/account_settings", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Users and Roles", "Creating a New User"], "evidence_supported": ["Owner role is automatically assigned to the site creator", "Administrators have full site access"]}
+    {
+      "id": "S1",
+      "title": "API Quickstart Guide",
+      "url": "https://www.chargebee.com/tutorials/quickstart/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Quickstart overview",
+        "Step 1: Get your API key",
+        "Step 2: Download and set up the SDK",
+        "Step 3: Create a customer with a payment method",
+        "Step 4: Create an item family",
+        "Step 5: Create an item",
+        "Step 6: Create an item price",
+        "Step 7: Create a subscription",
+        "What to do next?"
+      ],
+      "evidence_supported": [
+        "Peer SDK choices",
+        "Test-site and role assumptions",
+        "Full-access API key",
+        "Fixed sample resources",
+        "Subscription and invoice response",
+        "Explicit successful-subscription terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Understanding Sites - Chargebee Docs",
+      "url": "https://www.chargebee.com/docs/billing/2.0/getting-started/sites-intro",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Configuring Domain Name",
+        "Test Site",
+        "Auto-Populate Test Site from your Pricing Page during Sign Up",
+        "Chargebee Test Payment Gateway"
+      ],
+      "evidence_supported": [
+        "Test and live sites",
+        "Complete Account Setup email",
+        "Password and domain",
+        "Business-email account claim",
+        "Proceed or Skip branch",
+        "Default test gateway"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign Up - Get Your Free Sandbox - Chargebee",
+      "url": "https://www.chargebee.com/trial-signup/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start your free trial"
+      ],
+      "evidence_supported": [
+        "Required signup fields",
+        "Monetization choices",
+        "Employee choices",
+        "Data-center choices",
+        "Optional marketing selection",
+        "Legal acknowledgement",
+        "Complete Signup submission"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Chargebee API documentation",
+      "url": "https://www.chargebee.com/docs/billing/2.0/kb/getting-started/chargebee-apis-documentation",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Solution",
+        "Authentication"
+      ],
+      "evidence_supported": [
+        "REST and client-library options",
+        "HTTP Basic authentication",
+        "Test and live API-key separation",
+        "Dashboard key location",
+        "JSON response and error behavior"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "API Keys - Chargebee Docs",
+      "url": "https://www.chargebee.com/docs/billing/2.0/site-configuration/api_keys",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Types of API keys",
+        "Full-access key",
+        "Creating an API key",
+        "Using an API key"
+      ],
+      "evidence_supported": [
+        "Exact API-key navigation",
+        "Full-access key capabilities",
+        "Add API Key",
+        "Name and Create Key actions",
+        "Test and live separation",
+        "Secret-handling warning"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Users & Roles - Chargebee Docs",
+      "url": "https://www.chargebee.com/docs/billing/2.0/site-configuration/account_settings",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Users and Roles",
+        "Creating a New User"
+      ],
+      "evidence_supported": [
+        "Owner role is automatically assigned to the site creator",
+        "Administrators have full site access"
+      ]
+    }
   ],
   "uncertainties": [
-    {"question": "Which data center, optional pricing-page onboarding branch, and SDK should the developer choose?", "impact": "The data center changes data location, the Proceed branch adds generated catalog and branding actions, and the SDK changes installation and code.", "reason_unresolved": "Chargebee presents US, EU, and AU data centers, Proceed or Skip onboarding, and seven peer SDK tabs without selecting one universal combination; the record reconstructs Skip plus Node as one complete candidate.", "checked_source_ids": ["S1", "S2", "S3"]}
+    {
+      "question": "Which data center, optional pricing-page onboarding branch, and SDK should the developer choose?",
+      "impact": "The data center changes data location, the Proceed branch adds generated catalog and branding actions, and the SDK changes installation and code.",
+      "reason_unresolved": "Chargebee presents US, EU, and AU data centers, Proceed or Skip onboarding, and seven peer SDK tabs without selecting one universal combination; the record reconstructs Skip plus Node as one complete candidate.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
   ],
   "excluded_after_success": [
     "Real gateway configuration, live-site enablement, production payment methods, taxes, hosted checkout, entitlements, dunning, webhooks, go-live review, and later subscription operations occur after the sample subscription and invoice."

@@ -6,8 +6,8 @@
   },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Plaid main web Quickstart in Sandbox",
-    "selection_basis": "Plaid labels this repository the main Quickstart, links it from the docs homepage, and explicitly marks completion after Link creates an Item, the public token is exchanged, and /accounts/get returns account data. The backend is implemented in five officially supported languages with no one labeled canonical, so language selection still needs human judgment.",
+    "name": "Node backend and React frontend Sandbox Quickstart",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Node backend and React frontend Sandbox Quickstart. Node is one of five co-equal first-party Quickstart backends. Its official repository and Quickstart document every action through Link, public-token exchange, /accounts/get, and displayed account data, so it is retained as a complete representative candidate. Prior surface before policy commit: Plaid main web Quickstart in Sandbox.",
     "alternatives_considered": [
       {
         "name": "Identity Verification Quickstart",
@@ -46,8 +46,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Run Plaid locally in Sandbox, create the first Item through Link, exchange its token, and retrieve its accounts.",
@@ -278,6 +278,253 @@
       "source_ids": [
         "S1",
         "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Enter quickstart/node and run npm install.",
+      "details": [],
+      "input": "Cloned Quickstart with Sandbox .env values",
+      "output": "Installed Node backend dependencies",
+      "success_signal": "npm completes and the backend dependencies are present.",
+      "failure_or_wait": "npm, network, lockfile, version, or permission errors must be corrected before startup.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run ./start.sh for the Node backend.",
+      "details": [],
+      "input": "Installed backend and populated root .env",
+      "output": "Quickstart backend process",
+      "success_signal": "The backend reports that it is listening on localhost:8000.",
+      "failure_or_wait": "If startup or API initialization fails, inspect backend logs, correct credentials, environment, dependency, or port errors, and restart.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "In a second shell enter quickstart/frontend and run npm install.",
+      "details": [],
+      "input": "Cloned Quickstart frontend",
+      "output": "Installed React frontend dependencies",
+      "success_signal": "The frontend packages are present.",
+      "failure_or_wait": "npm, network, lockfile, version, or permission errors must be corrected while leaving the backend running.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm start in quickstart/frontend.",
+      "details": [],
+      "input": "Installed frontend",
+      "output": "React Quickstart development server",
+      "success_signal": "The frontend serves http://localhost:3000.",
+      "failure_or_wait": "Build, dependency, port, or proxy errors must be corrected and the frontend restarted.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open http://localhost:3000 and select Launch Link.",
+      "details": [],
+      "input": "Running backend and frontend",
+      "output": "Link-token request and Plaid Link launch",
+      "success_signal": "The Plaid Link institution-selection UI opens.",
+      "failure_or_wait": "If Link does not open, inspect frontend and backend logs and verify the link-token request reaches localhost:8000.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "authenticate",
+      "actor": "external-system",
+      "interface": "api",
+      "action": "Let the backend call /link/token/create for the Quickstart user and return the one-time link_token.",
+      "details": [
+        "The request includes a unique client_user_id, Plaid Test App client name, configured products, language, optional webhook and redirect URI, and country codes."
+      ],
+      "input": "Sandbox Client ID, secret, environment, and PLAID_PRODUCTS",
+      "output": "One-time Link token",
+      "success_signal": "The React client initializes Link with the returned link_token.",
+      "failure_or_wait": "A 400 or other API error requires inspecting backend or Dashboard activity logs and correcting credentials, environment, products, country codes, redirect URI, or request fields before relaunching Link.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select a supported Sandbox institution in Link.",
+      "details": [],
+      "input": "Open Plaid Link and configured products",
+      "output": "Institution-specific Sandbox login form",
+      "success_signal": "Link displays the institution's test credential fields.",
+      "failure_or_wait": "If Link reports Connectivity not supported, choose an institution supporting PLAID_PRODUCTS or remove unsupported products from .env, restart the backend, recreate the link token, and retry.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter user_good and pass_good, and enter 1234 if Link prompts for two-factor authentication.",
+      "details": [],
+      "input": "Plaid Sandbox test credentials",
+      "output": "Authenticated Sandbox institution flow",
+      "success_signal": "Link advances through account connection and reaches success.",
+      "failure_or_wait": "Different Sandbox test credentials intentionally trigger other states; use the documented good credentials for this success candidate.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "execute",
+      "actor": "external-system",
+      "interface": "console",
+      "action": "Complete Link so it creates the first Item and invokes onSuccess with public_token.",
+      "details": [],
+      "input": "Successful Sandbox institution authentication",
+      "output": "Plaid Item and short-lived public token",
+      "success_signal": "The Quickstart frontend receives public_token through Link onSuccess.",
+      "failure_or_wait": "Institution, product, OAuth redirect, or Link-flow errors must be corrected before onSuccess fires.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Allow the frontend to send public_token to the Quickstart backend.",
+      "details": [],
+      "input": "Link public token",
+      "output": "Server-side exchange request",
+      "success_signal": "The Node backend receives the public token.",
+      "failure_or_wait": "Frontend-to-backend connectivity, route, or payload errors must be corrected before exchange.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "authenticate",
+      "actor": "external-system",
+      "interface": "api",
+      "action": "Let the backend call /item/public_token/exchange and capture access_token and item_id.",
+      "details": [
+        "The Quickstart returns public_token_exchange complete after the exchange."
+      ],
+      "input": "Sandbox Client ID, secret, and public token",
+      "output": "Item access token and Item ID",
+      "success_signal": "The backend logs or returns public_token_exchange complete with no Plaid error.",
+      "failure_or_wait": "Expired, already-used, malformed, or wrong-environment public tokens and invalid credentials must be corrected by relaunching Link or fixing .env and retrying.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Keep the access token on the server for the Quickstart session.",
+      "details": [
+        "Access tokens are long-lived Item credentials and must not be exposed to the frontend in a production design."
+      ],
+      "input": "Exchanged access token",
+      "output": "Server-side Item authentication state",
+      "success_signal": "The backend can use the token for the session's Plaid API calls.",
+      "failure_or_wait": "Losing or exposing the token prevents or compromises later requests; recreate the Item for the Quickstart if necessary.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the Quickstart Accounts button.",
+      "details": [
+        "This invokes the Quickstart /api/accounts route."
+      ],
+      "input": "Frontend with connected Item",
+      "output": "Backend accounts request",
+      "success_signal": "The Node backend calls Plaid /accounts/get with the stored access token.",
+      "failure_or_wait": "If the button or request fails, verify Item state, backend session, frontend proxy, and both running processes.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify the /accounts/get result is rendered in the Quickstart.",
+      "details": [],
+      "input": "Successful Accounts API response",
+      "output": "Completed Plaid Quickstart first result",
+      "success_signal": "The page displays account names, balances, Item metadata, and request_id.",
+      "failure_or_wait": "A Plaid error requires inspecting backend and Dashboard activity logs, correcting the reported credential, product, Item, or request problem, and retrying the Accounts action.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
       ]
     }
   ],
@@ -706,30 +953,6 @@
     "Webhooks, update mode, institution-specific recovery, transaction sync, consent renewal, and Item lifecycle after the first accounts response",
     "Production redirect HTTPS, self-signed localhost certificates, and production deployment hardening"
   ],
-  "candidate_paths": [
-    {
-      "id": "node-react-sandbox-accounts",
-      "name": "Node backend and React frontend Sandbox Quickstart",
-      "selection_basis": "Node is one of five co-equal first-party Quickstart backends. Its official repository and Quickstart document every action through Link, public-token exchange, /accounts/get, and displayed account data, so it is retained as a complete representative candidate.",
-      "relationship_to_primary_path": "Continues after primary_path step 7 by selecting Node. The shared path already completes Plaid account and email setup, Sandbox credential retrieval, prerequisite checks, repository clone, and .env configuration.",
-      "steps": [
-        {"step_number":1,"phase":"install","actor":"developer","interface":"cli","action":"Enter quickstart/node and run npm install.","details":[],"input":"Cloned Quickstart with Sandbox .env values","output":"Installed Node backend dependencies","success_signal":"npm completes and the backend dependencies are present.","failure_or_wait":"npm, network, lockfile, version, or permission errors must be corrected before startup.","required":true,"source_ids":["S1","S2"]},
-        {"step_number":2,"phase":"execute","actor":"developer","interface":"cli","action":"Run ./start.sh for the Node backend.","details":[],"input":"Installed backend and populated root .env","output":"Quickstart backend process","success_signal":"The backend reports that it is listening on localhost:8000.","failure_or_wait":"If startup or API initialization fails, inspect backend logs, correct credentials, environment, dependency, or port errors, and restart.","required":true,"source_ids":["S1","S2"]},
-        {"step_number":3,"phase":"install","actor":"developer","interface":"cli","action":"In a second shell enter quickstart/frontend and run npm install.","details":[],"input":"Cloned Quickstart frontend","output":"Installed React frontend dependencies","success_signal":"The frontend packages are present.","failure_or_wait":"npm, network, lockfile, version, or permission errors must be corrected while leaving the backend running.","required":true,"source_ids":["S1"]},
-        {"step_number":4,"phase":"execute","actor":"developer","interface":"cli","action":"Run npm start in quickstart/frontend.","details":[],"input":"Installed frontend","output":"React Quickstart development server","success_signal":"The frontend serves http://localhost:3000.","failure_or_wait":"Build, dependency, port, or proxy errors must be corrected and the frontend restarted.","required":true,"source_ids":["S1","S2"]},
-        {"step_number":5,"phase":"arrive","actor":"developer","interface":"console","action":"Open http://localhost:3000 and select Launch Link.","details":[],"input":"Running backend and frontend","output":"Link-token request and Plaid Link launch","success_signal":"The Plaid Link institution-selection UI opens.","failure_or_wait":"If Link does not open, inspect frontend and backend logs and verify the link-token request reaches localhost:8000.","required":true,"source_ids":["S1","S2"]},
-        {"step_number":6,"phase":"authenticate","actor":"external-system","interface":"api","action":"Let the backend call /link/token/create for the Quickstart user and return the one-time link_token.","details":["The request includes a unique client_user_id, Plaid Test App client name, configured products, language, optional webhook and redirect URI, and country codes."],"input":"Sandbox Client ID, secret, environment, and PLAID_PRODUCTS","output":"One-time Link token","success_signal":"The React client initializes Link with the returned link_token.","failure_or_wait":"A 400 or other API error requires inspecting backend or Dashboard activity logs and correcting credentials, environment, products, country codes, redirect URI, or request fields before relaunching Link.","required":true,"source_ids":["S1","S4"]},
-        {"step_number":7,"phase":"configure","actor":"developer","interface":"console","action":"Select a supported Sandbox institution in Link.","details":[],"input":"Open Plaid Link and configured products","output":"Institution-specific Sandbox login form","success_signal":"Link displays the institution's test credential fields.","failure_or_wait":"If Link reports Connectivity not supported, choose an institution supporting PLAID_PRODUCTS or remove unsupported products from .env, restart the backend, recreate the link token, and retry.","required":true,"source_ids":["S1","S3"]},
-        {"step_number":8,"phase":"authenticate","actor":"developer","interface":"console","action":"Enter user_good and pass_good, and enter 1234 if Link prompts for two-factor authentication.","details":[],"input":"Plaid Sandbox test credentials","output":"Authenticated Sandbox institution flow","success_signal":"Link advances through account connection and reaches success.","failure_or_wait":"Different Sandbox test credentials intentionally trigger other states; use the documented good credentials for this success candidate.","required":true,"source_ids":["S1","S3"]},
-        {"step_number":9,"phase":"execute","actor":"external-system","interface":"console","action":"Complete Link so it creates the first Item and invokes onSuccess with public_token.","details":[],"input":"Successful Sandbox institution authentication","output":"Plaid Item and short-lived public token","success_signal":"The Quickstart frontend receives public_token through Link onSuccess.","failure_or_wait":"Institution, product, OAuth redirect, or Link-flow errors must be corrected before onSuccess fires.","required":true,"source_ids":["S1","S5"]},
-        {"step_number":10,"phase":"execute","actor":"developer","interface":"api","action":"Allow the frontend to send public_token to the Quickstart backend.","details":[],"input":"Link public token","output":"Server-side exchange request","success_signal":"The Node backend receives the public token.","failure_or_wait":"Frontend-to-backend connectivity, route, or payload errors must be corrected before exchange.","required":true,"source_ids":["S1","S2"]},
-        {"step_number":11,"phase":"authenticate","actor":"external-system","interface":"api","action":"Let the backend call /item/public_token/exchange and capture access_token and item_id.","details":["The Quickstart returns public_token_exchange complete after the exchange."],"input":"Sandbox Client ID, secret, and public token","output":"Item access token and Item ID","success_signal":"The backend logs or returns public_token_exchange complete with no Plaid error.","failure_or_wait":"Expired, already-used, malformed, or wrong-environment public tokens and invalid credentials must be corrected by relaunching Link or fixing .env and retrying.","required":true,"source_ids":["S1","S4","S5"]},
-        {"step_number":12,"phase":"authenticate","actor":"developer","interface":"other","action":"Keep the access token on the server for the Quickstart session.","details":["Access tokens are long-lived Item credentials and must not be exposed to the frontend in a production design."],"input":"Exchanged access token","output":"Server-side Item authentication state","success_signal":"The backend can use the token for the session's Plaid API calls.","failure_or_wait":"Losing or exposing the token prevents or compromises later requests; recreate the Item for the Quickstart if necessary.","required":true,"source_ids":["S1","S5"]},
-        {"step_number":13,"phase":"execute","actor":"developer","interface":"console","action":"Select the Quickstart Accounts button.","details":["This invokes the Quickstart /api/accounts route."],"input":"Frontend with connected Item","output":"Backend accounts request","success_signal":"The Node backend calls Plaid /accounts/get with the stored access token.","failure_or_wait":"If the button or request fails, verify Item state, backend session, frontend proxy, and both running processes.","required":true,"source_ids":["S1","S2"]},
-        {"step_number":14,"phase":"verify","actor":"developer","interface":"console","action":"Verify the /accounts/get result is rendered in the Quickstart.","details":[],"input":"Successful Accounts API response","output":"Completed Plaid Quickstart first result","success_signal":"The page displays account names, balances, Item metadata, and request_id.","failure_or_wait":"A Plaid error requires inspecting backend and Dashboard activity logs, correcting the reported credential, product, Item, or request problem, and retrying the Accounts action.","required":true,"source_ids":["S1","S2","S4"]}
-      ],
-      "source_ids": ["S1", "S2", "S3", "S4", "S5"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

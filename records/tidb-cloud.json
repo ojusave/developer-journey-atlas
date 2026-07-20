@@ -6,8 +6,8 @@
   },
   "category": "Data, databases, and search",
   "surface": {
-    "name": "TiDB Cloud Starter automatic Instance0 through AI-assisted SQL Editor",
-    "selection_basis": "PingCAP calls Starter the best way to get started, automatically creates Instance0 for new signups, and directs the user to the built-in SQL Editor. However, the required public signup application is JavaScript-only, while official docs say to fill in registration information without enumerating every requested field or submission state.",
+    "name": "TiDB Self-Managed local test cluster with TiUP Playground",
+    "selection_basis": "Under the workshop policy, the official no-account local route takes priority over TiDB Cloud signup. PingCAP labels this the quickest way to get started with TiDB Self-Managed and provides a complete macOS/Linux sequence from TiUP installation through a running cluster and `tiup client` SQL prompt.",
     "alternatives_considered": [
       {
         "name": "Create another Starter instance manually",
@@ -41,12 +41,12 @@
       }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a TiDB Cloud account, use the automatically created free Starter instance, and run the quickstart's SQL sequence until query logs and results appear.",
-    "starting_url": "https://docs.pingcap.com/tidbcloud/tidb-cloud-quickstart/",
+    "developer_intent": "Install TiUP, start a local TiDB test cluster, and connect with the bundled TiUP client.",
+    "starting_url": "https://docs.pingcap.com/tidb/stable/quick-start-with-tidb/",
     "assumed_prior_state": [
       "No TiDB Cloud account, organization, instance, project, database credential, billing instrument, local client, table, or data is assumed.",
       "The developer is in North or South America for the documented PingCAP (US), Inc. contracting entity.",
@@ -56,133 +56,37 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established by public official documentation",
-    "normalized_outcome": "No complete TiDB Cloud Starter first-success outcome can be established because current signup fields and submission states remain incompletely documented.",
-    "observable_completion_signal": "The publicly inspectable signup response exposes only a JavaScript-required application shell, so no registration form fields or post-submit states are publicly observable without exercising the application.",
+    "official_milestone": "Deploy a local test cluster and connect to TiDB.",
+    "normalized_outcome": "TiUP Playground starts a local TiDB cluster and `tiup client` opens a SQL session against it.",
+    "observable_completion_signal": "The terminal prints `TiDB Playground Cluster is started, enjoy!` with endpoints, then `tiup client` connects to TiDB.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The required signup transition is not established by public official documentation.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "TiDB Playground Cluster is started, enjoy!",
       "source_ids": [
         "S1",
         "S2",
-        "S8"
+        "S9"
       ]
     },
-    "why_this_is_the_boundary": "The post-signup quickstart explicitly names Try AI-assisted SQL Editor and says query logs and results appear immediately. The complete first-user path cannot be established because the public signup response exposes no form and official prose does not enumerate every required registration field or current submission state.",
+    "why_this_is_the_boundary": "This is the first demonstrated working database state in the official local quickstart. Loading data, TiFlash analysis, dashboards, and cleanup follow after connectivity is established.",
     "source_ids": [
       "S1",
       "S2",
-      "S8"
+      "S9"
     ]
   },
   "prerequisites": [
-    {
-      "order": 1,
-      "type": "account",
-      "requirement": "An email address and a password with at least eight characters, one uppercase letter, one lowercase letter, and one number; it cannot equal any of the previous four passwords.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "order": 2,
-      "type": "identity",
-      "requirement": "Complete and accurate information requested by the current signup form. The docs do not enumerate all requested fields.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S6",
-        "S8"
-      ]
-    },
-    {
-      "order": 3,
-      "type": "legal",
-      "requirement": "Read and accept the Privacy Policy and Services Agreement.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S6"
-      ]
-    },
-    {
-      "order": 4,
-      "type": "verification",
-      "requirement": "Access the registration inbox and confirm the verification email.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "order": 5,
-      "type": "configuration",
-      "requirement": "Use the default Starter instance named Instance0 that TiDB Cloud creates automatically for a new signup.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "order": 6,
-      "type": "permission",
-      "requirement": "Allow PingCAP and AWS Bedrock to use code snippets for research and service improvement to follow the Chat2Query route.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S6"
-      ]
-    }
+    {"order": 1, "type": "software", "requirement": "Use a supported macOS or Linux system with curl and a shell profile that can be sourced.", "required": true, "source_ids": ["S9"]},
+    {"order": 2, "type": "hardware", "requirement": "For the default local playground, use a machine with sufficient resources; PingCAP recommends at least 10 GiB memory and 4 CPU cores for larger explicit topologies.", "required": true, "source_ids": ["S9"]}
   ],
   "primary_path": [
-    {
-      "step_number": 1,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open TiDB Cloud Quick Start and follow its account signup link.",
-      "details": [],
-      "input": "https://docs.pingcap.com/tidbcloud/tidb-cloud-quickstart/",
-      "output": "The TiDB Cloud signup application opens.",
-      "success_signal": "The tidbcloud.com free-trial application is reached.",
-      "failure_or_wait": "No navigation failure or recovery behavior is documented.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S8"
-      ]
-    },
-    {
-      "step_number": 2,
-      "phase": "access",
-      "actor": "platform",
-      "interface": "browser",
-      "action": "Render the TiDB Cloud signup application client-side.",
-      "details": [],
-      "input": "https://tidbcloud.com/free-trial",
-      "output": "The publicly inspectable response exposes only a JavaScript-required application shell.",
-      "success_signal": "No registration form fields or post-submit states are publicly observable without exercising the application.",
-      "failure_or_wait": "Official docs identify email and password, password rules, account agreements, Sign up, and email verification, but call the remaining inputs only registration information.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S6",
-        "S8"
-      ]
-    }
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Quick Start with TiDB Self-Managed and select the local test cluster route.", "details": ["The guide calls this the quickest self-managed route and limits it to testing and learning."], "input": "https://docs.pingcap.com/tidb/stable/quick-start-with-tidb/", "output": "The TiUP Playground sequence is visible.", "success_signal": "Deploy a local test cluster is selected.", "failure_or_wait": "", "required": true, "source_ids": ["S9"]},
+    {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install TiUP with the published curl command, then source the shell profile path printed by the installer.", "details": [], "input": "curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh; source ${your_shell_profile}", "output": "TiUP is installed and available on PATH.", "success_signal": "The installer prints `Have a try: tiup playground`.", "failure_or_wait": "Use the exact shell profile path printed by the installer.", "required": true, "source_ids": ["S9"]},
+    {"step_number": 3, "phase": "run", "actor": "developer", "interface": "cli", "action": "Start the default local cluster.", "details": ["On first run, TiUP downloads the latest TiDB components."], "input": "tiup playground", "output": "TiDB, TiKV, PD, TiFlash, Dashboard, and Grafana endpoints start locally.", "success_signal": "The terminal prints `TiDB Playground Cluster is started, enjoy!` and a TiDB connection endpoint.", "failure_or_wait": "Wait for component downloads and startup; insufficient local resources can cause failure.", "required": true, "source_ids": ["S9"]},
+    {"step_number": 4, "phase": "connect", "actor": "developer", "interface": "cli", "action": "Open a new terminal session and connect with the TiUP client.", "details": [], "input": "tiup client", "output": "An interactive TiDB SQL session opens.", "success_signal": "The client connects to the local TiDB endpoint.", "failure_or_wait": "Keep the playground process running in its original terminal.", "required": true, "source_ids": ["S9"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete public-doc candidate can be reconstructed from the initial signup through SQL Editor results. The public application is JavaScript-only, and the official signup documentation names email, password, agreements, and verification but does not enumerate all registration information requested by the current form or its submission states. Official sources do document the post-gate sequence: submit registration and verify email, sign in, use automatic Instance0, open SQL Editor, accept the AI data-use permission, invoke Chat2Query, review the generated SQL, construct and run the sample queries, and observe logs and results.",
-    "impact": "The detailed automatic Instance0 and SQL Editor continuation cannot form an end-to-end first-user candidate without inventing hidden signup fields and transitions.",
-    "source_ids": [
-      "S1",
-      "S2",
-      "S6",
-      "S8"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
@@ -465,6 +369,17 @@
       "evidence_supported": [
         "JavaScript-only public signup shell with no inspectable form"
       ]
+    },
+    {
+      "id": "S9",
+      "title": "Quick Start with TiDB Self-Managed",
+      "url": "https://docs.pingcap.com/tidb/stable/quick-start-with-tidb/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Deploy a local test cluster", "Download and install TiUP", "Start the cluster", "Access the TiDB cluster endpoints"],
+      "evidence_supported": ["Workshop-policy local route selection", "TiUP installation", "Playground startup", "Cluster-started terminal", "TiUP client connection"]
     }
   ],
   "uncertainties": [

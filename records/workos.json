@@ -6,8 +6,8 @@
   },
   "category": "Identity, security, and networking",
   "surface": {
-    "name": "WorkOS product documentation and AuthKit route selector",
-    "selection_basis": "WorkOS foregrounds AuthKit but also documents eleven additional developer products with different outcomes: SSO, Directory Sync, Admin Portal, Audit Logs, RBAC, FGA, Vault, Pipes, Feature Flags, Widgets, and Domain Verification. AuthKit itself offers an AI Installer and multiple manual framework guides, so no platform-wide first-success path is established.",
+    "name": "AuthKit AI Installer on a supported existing project",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: AuthKit AI Installer on a supported existing project. The AuthKit AI Installer is prominently offered on the WorkOS docs home and documents a complete automated path from framework detection through build validation and the AuthKit is ready terminal. It avoids the manual Node.js guide's unresolved CSRF_SECRET generation gap, but remains a representative AuthKit route rather than a platform-wide default over eleven peer products. Prior surface before policy commit: WorkOS product documentation and AuthKit route selector.",
     "alternatives_considered": [
       {
         "name": "AuthKit AI Installer",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach the first documented WorkOS success after selecting WorkOS as the platform.",
@@ -49,12 +49,12 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established platform-wide; AuthKit manual Node.js ends with a signed-up and signed-in user visible in the WorkOS Dashboard.",
+    "official_milestone": "The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.",
     "normalized_outcome": "The developer chooses a WorkOS product and route, configures the staging environment and credentials required by that route, executes its first workflow, and verifies the product-specific result.",
     "observable_completion_signal": "For the fully inspected AuthKit Node.js route, the local app redirects through hosted AuthKit, creates and authenticates a user, returns to the app with a sealed session and welcome email, and lists that user in the Dashboard Users section.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The WorkOS docs landing page lists AuthKit plus eleven additional products. Their outcomes range from login to directory provisioning, audit ingestion, authorization, secret storage, connections, feature rollout, widgets, and domain claims.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.",
       "source_ids": [
         "S1"
       ]
@@ -173,6 +173,158 @@
         "S1",
         "S4",
         "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open an existing project supported by the AuthKit installer and verify Node.js 20 or later.",
+      "details": [
+        "Supported integrations include Next.js, React, React Router, TanStack Start, SvelteKit, Node.js/Express, Vanilla JS, Python/Django, Ruby/Rails, Go, PHP, Laravel, .NET/ASP.NET Core, Kotlin, and Elixir/Phoenix."
+      ],
+      "input": "Existing supported application project",
+      "output": "Eligible installer target",
+      "success_signal": "The shell is in the project and Node.js 20+ is available.",
+      "failure_or_wait": "If framework detection is unsupported or ambiguous, use a manual guide or rerun the installer with --integration and an explicit supported integration.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npx workos@latest install from the project root.",
+      "details": [],
+      "input": "Eligible project",
+      "output": "AuthKit installer session",
+      "success_signal": "The CLI begins framework detection and opens or requests WorkOS authentication.",
+      "failure_or_wait": "Package download, Node version, network, or filesystem errors must be corrected and the command rerun; use --debug for more detail.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Complete the browser handoff to create or sign in to the WorkOS account and authorize the CLI for the intended staging project.",
+      "details": [
+        "Staging is free and supports localhost HTTP; production billing is outside this candidate."
+      ],
+      "input": "WorkOS identity and team access",
+      "output": "Authenticated installer linked to staging",
+      "success_signal": "The browser returns control to the CLI and it can read the WorkOS project configuration.",
+      "failure_or_wait": "Account, team-role, browser callback, or connectivity problems must be resolved before installation can continue; workos doctor is the documented diagnostic route.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Allow the installer to detect the project's framework and integration shape.",
+      "details": [],
+      "input": "Supported project files",
+      "output": "Detected AuthKit integration",
+      "success_signal": "The CLI identifies a supported framework and presents the planned setup.",
+      "failure_or_wait": "If detection fails or chooses incorrectly, stop and rerun with --integration to select the correct route explicitly.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Review and confirm the installer prompts for redirect URI, CORS, and homepage URL for the local application.",
+      "details": [],
+      "input": "Actual local application origin and callback path",
+      "output": "WorkOS application URL configuration",
+      "success_signal": "The chosen URLs match the application's local runtime.",
+      "failure_or_wait": "Incorrect callback, CORS, or homepage values cause login return, browser-origin, or post-login navigation failure and must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Allow the installer to install the matching WorkOS SDK.",
+      "details": [],
+      "input": "Detected framework and package manager",
+      "output": "Framework-appropriate WorkOS dependency",
+      "success_signal": "The dependency is added to the project's package or dependency manifest.",
+      "failure_or_wait": "Package-manager, lockfile, network, or compatibility errors stop installation and must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Allow the installer to analyze the project and create or update the callback routes, authentication middleware or provider wrappers, and environment configuration appropriate to the framework.",
+      "details": [],
+      "input": "Project structure and WorkOS staging application",
+      "output": "Generated AuthKit integration code and secrets configuration",
+      "success_signal": "The CLI reports the expected files and configuration changes.",
+      "failure_or_wait": "Unsupported project patterns, conflicting existing auth code, or unwritable files require manual review, correction, or a framework-specific guide.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Let the installer run its build validation.",
+      "details": [],
+      "input": "Modified project",
+      "output": "Build validation result",
+      "success_signal": "The project passes the installer's build validation.",
+      "failure_or_wait": "Fix pre-existing or integration-related build errors, rerun with --debug if needed, and repeat until validation passes.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Confirm the CLI displays AuthKit is ready and Run npm run dev to get started, then inspect git diff before accepting the generated integration.",
+      "details": [
+        "The documented terminal establishes installer completion, not successful signup or sign-in."
+      ],
+      "input": "Build-valid generated changes",
+      "output": "Reviewed AuthKit integration at the documented installer terminal",
+      "success_signal": "The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.",
+      "failure_or_wait": "Unexpected or unsafe changes must be corrected or reverted before running the app; the installer result alone does not prove user authentication.",
+      "required": true,
+      "source_ids": [
+        "S4"
       ]
     }
   ],
@@ -595,25 +747,6 @@
     "Advanced authorization modeling, secret rotation, audit exports, connection refresh, rollout analytics, and widget customization",
     "Additional projects, environments, workspace security, team invitations, and enterprise contracting"
   ],
-  "candidate_paths": [
-    {
-      "id": "authkit-ai-installer-existing-project",
-      "name": "AuthKit AI Installer on a supported existing project",
-      "selection_basis": "The AuthKit AI Installer is prominently offered on the WorkOS docs home and documents a complete automated path from framework detection through build validation and the AuthKit is ready terminal. It avoids the manual Node.js guide's unresolved CSRF_SECRET generation gap, but remains a representative AuthKit route rather than a platform-wide default over eleven peer products.",
-      "relationship_to_primary_path": "Continues after primary_path step 2 by selecting AuthKit and the AI Installer. The candidate assumes an existing supported project, then covers installer execution, browser authentication, generated changes, build validation, and the documented installer-ready terminal.",
-      "steps": [
-        {"step_number":1,"phase":"verify","actor":"developer","interface":"cli","action":"Open an existing project supported by the AuthKit installer and verify Node.js 20 or later.","details":["Supported integrations include Next.js, React, React Router, TanStack Start, SvelteKit, Node.js/Express, Vanilla JS, Python/Django, Ruby/Rails, Go, PHP, Laravel, .NET/ASP.NET Core, Kotlin, and Elixir/Phoenix."],"input":"Existing supported application project","output":"Eligible installer target","success_signal":"The shell is in the project and Node.js 20+ is available.","failure_or_wait":"If framework detection is unsupported or ambiguous, use a manual guide or rerun the installer with --integration and an explicit supported integration.","required":true,"source_ids":["S4"]},
-        {"step_number":2,"phase":"execute","actor":"developer","interface":"cli","action":"Run npx workos@latest install from the project root.","details":[],"input":"Eligible project","output":"AuthKit installer session","success_signal":"The CLI begins framework detection and opens or requests WorkOS authentication.","failure_or_wait":"Package download, Node version, network, or filesystem errors must be corrected and the command rerun; use --debug for more detail.","required":true,"source_ids":["S4"]},
-        {"step_number":3,"phase":"authenticate","actor":"developer","interface":"console","action":"Complete the browser handoff to create or sign in to the WorkOS account and authorize the CLI for the intended staging project.","details":["Staging is free and supports localhost HTTP; production billing is outside this candidate."],"input":"WorkOS identity and team access","output":"Authenticated installer linked to staging","success_signal":"The browser returns control to the CLI and it can read the WorkOS project configuration.","failure_or_wait":"Account, team-role, browser callback, or connectivity problems must be resolved before installation can continue; workos doctor is the documented diagnostic route.","required":true,"source_ids":["S2","S3","S4"]},
-        {"step_number":4,"phase":"configure","actor":"platform","interface":"cli","action":"Allow the installer to detect the project's framework and integration shape.","details":[],"input":"Supported project files","output":"Detected AuthKit integration","success_signal":"The CLI identifies a supported framework and presents the planned setup.","failure_or_wait":"If detection fails or chooses incorrectly, stop and rerun with --integration to select the correct route explicitly.","required":true,"source_ids":["S4"]},
-        {"step_number":5,"phase":"configure","actor":"developer","interface":"cli","action":"Review and confirm the installer prompts for redirect URI, CORS, and homepage URL for the local application.","details":[],"input":"Actual local application origin and callback path","output":"WorkOS application URL configuration","success_signal":"The chosen URLs match the application's local runtime.","failure_or_wait":"Incorrect callback, CORS, or homepage values cause login return, browser-origin, or post-login navigation failure and must be corrected.","required":true,"source_ids":["S4"]},
-        {"step_number":6,"phase":"install","actor":"platform","interface":"cli","action":"Allow the installer to install the matching WorkOS SDK.","details":[],"input":"Detected framework and package manager","output":"Framework-appropriate WorkOS dependency","success_signal":"The dependency is added to the project's package or dependency manifest.","failure_or_wait":"Package-manager, lockfile, network, or compatibility errors stop installation and must be corrected.","required":true,"source_ids":["S4"]},
-        {"step_number":7,"phase":"configure","actor":"platform","interface":"cli","action":"Allow the installer to analyze the project and create or update the callback routes, authentication middleware or provider wrappers, and environment configuration appropriate to the framework.","details":[],"input":"Project structure and WorkOS staging application","output":"Generated AuthKit integration code and secrets configuration","success_signal":"The CLI reports the expected files and configuration changes.","failure_or_wait":"Unsupported project patterns, conflicting existing auth code, or unwritable files require manual review, correction, or a framework-specific guide.","required":true,"source_ids":["S4"]},
-        {"step_number":8,"phase":"verify","actor":"platform","interface":"cli","action":"Let the installer run its build validation.","details":[],"input":"Modified project","output":"Build validation result","success_signal":"The project passes the installer's build validation.","failure_or_wait":"Fix pre-existing or integration-related build errors, rerun with --debug if needed, and repeat until validation passes.","required":true,"source_ids":["S4"]},
-        {"step_number":9,"phase":"verify","actor":"developer","interface":"cli","action":"Confirm the CLI displays AuthKit is ready and Run npm run dev to get started, then inspect git diff before accepting the generated integration.","details":["The documented terminal establishes installer completion, not successful signup or sign-in."],"input":"Build-valid generated changes","output":"Reviewed AuthKit integration at the documented installer terminal","success_signal":"The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.","failure_or_wait":"Unexpected or unsafe changes must be corrected or reverted before running the app; the installer result alone does not prove user authentication.","required":true,"source_ids":["S4"]}
-      ],
-      "source_ids": ["S2", "S3", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

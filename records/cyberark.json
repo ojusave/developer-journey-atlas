@@ -1,16 +1,28 @@
 {
-  "platform": {"name": "CyberArk", "slug": "cyberark", "organization": "CyberArk Software Ltd."},
+  "platform": {
+    "name": "CyberArk",
+    "slug": "cyberark",
+    "organization": "CyberArk Software Ltd."
+  },
   "category": "Identity, security, and networking",
   "surface": {
-    "name": "CyberArk Conjur Open Source Docker Compose quickstart",
-    "selection_basis": "A CyberArk-owned repository supplies a complete Conjur OSS demo from installation through storing and retrieving a secret. It is a reconstructable candidate, not a universal CyberArk first mile: the repository itself labels the integration Community level, community contributed, not reviewed, and unsupported by CyberArk, while CyberArk spans multiple security products.",
+    "name": "Conjur OSS Docker Compose store-and-retrieve demo",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Conjur OSS Docker Compose store-and-retrieve demo. The CyberArk-owned repository publishes every required command, generated credential, expected intermediate signal, stored variable, retrieval program, and final congratulations terminal. Prior surface before policy commit: CyberArk Conjur Open Source Docker Compose quickstart.",
     "alternatives_considered": [
-      {"name": "CyberArk commercial developer portal", "url": "https://developer.cyberark.com/", "reason_not_primary": "The current URL redirects away from a CyberArk developer start and does not establish a reproducible current product-neutral onboarding path."},
-      {"name": "Production Conjur deployment", "url": "https://github.com/cyberark/conjur-quickstart", "reason_not_primary": "The official repository explicitly says the quickstart is for learning and demonstration only and must not be used in production."}
+      {
+        "name": "CyberArk commercial developer portal",
+        "url": "https://developer.cyberark.com/",
+        "reason_not_primary": "The current URL redirects away from a CyberArk developer start and does not establish a reproducible current product-neutral onboarding path."
+      },
+      {
+        "name": "Production Conjur deployment",
+        "url": "https://github.com/cyberark/conjur-quickstart",
+        "reason_not_primary": "The official repository explicitly says the quickstart is for learning and demonstration only and must not be used in production."
+      }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Run the CyberArk Conjur OSS Docker Compose demo, create its account and policy identities, store a generated secret, and retrieve it from the demo application.",
@@ -26,69 +38,526 @@
     "official_milestone": "Run the demo application and retrieve the secret from Conjur.",
     "normalized_outcome": "The local BotApp authenticates to Conjur OSS, fetches the generated value stored in `BotApp/secretVar`, displays it, and reaches the quickstart congratulations message.",
     "observable_completion_signal": "`/tmp/program.sh` displays the stored secret and the repository says, `Congratulations! You are ready to secure your own apps with Conjur.`",
-    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The demo application displays the secret followed by the published congratulations message.", "source_ids": ["S1"]},
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The demo application displays the secret followed by the published congratulations message.",
+      "source_ids": [
+        "S1"
+      ]
+    },
     "why_this_is_the_boundary": "The repository's ordered walkthrough installs Conjur, defines policy, stores a secret, and runs an application that retrieves it. That retrieval completes the candidate before cleanup and production guidance.",
-    "source_ids": ["S1"]
+    "source_ids": [
+      "S1"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "software", "requirement": "Install Docker Desktop with Docker Compose, Git, and OpenSSL.", "required": true, "source_ids": ["S1"]},
-    {"order": 2, "type": "environment", "requirement": "Have a shell that supports the published environment-variable and command-substitution syntax.", "required": true, "source_ids": ["S1"]},
-    {"order": 3, "type": "network", "requirement": "Allow cloning from GitHub and pulling the published container images.", "required": true, "source_ids": ["S1"]},
-    {"order": 4, "type": "knowledge", "requirement": "Treat the quickstart as a local learning demo only; it is not supported or production-ready.", "required": true, "source_ids": ["S1"]}
-  ],
-  "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the CyberArk Conjur quickstart repository and accept its demo-only scope and support caveat.", "details": [], "input": "https://github.com/cyberark/conjur-quickstart", "output": "Requirements and the complete Docker Compose walkthrough are visible.", "success_signal": "The repository identifies a sample Conjur OSS install and warns against production use.", "failure_or_wait": "Human judgment is required to accept Conjur OSS as the CyberArk surface because it is not designated as CyberArk's universal first product.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Clone the quickstart, select a project version compatible with the current Conjur OSS suite release when possible, and enter its directory.", "details": ["Run `git clone https://github.com/cyberark/conjur-quickstart.git`.", "The repository strongly recommends choosing the project version from the latest Conjur OSS suite release because those versions receive additional compatibility testing.", "Run `cd conjur-quickstart`."], "input": "Git and network access.", "output": "The local working tree contains the selected quickstart Compose and policy files.", "success_signal": "The shell is in the cloned repository at the selected compatible version.", "failure_or_wait": "Clone, version-selection, or network errors stop the route.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 3, "phase": "install", "actor": "developer", "interface": "cli", "action": "Pull the quickstart container images.", "details": ["Run `docker compose pull`."], "input": "Docker Desktop and registry access.", "output": "The required images are downloaded.", "success_signal": "Compose reports the images as Pulled.", "failure_or_wait": "Registry, network, disk, or Docker errors must be resolved.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 4, "phase": "credential", "actor": "developer", "interface": "cli", "action": "Generate the Conjur data key and save it to `data_key`.", "details": ["Run `docker compose run --no-deps --rm conjur data-key generate > data_key`."], "input": "The pulled Conjur image.", "output": "A Compose network is created and `data_key` contains the generated key.", "success_signal": "The data-key command completes and the file exists.", "failure_or_wait": "Container or filesystem errors stop initialization.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 5, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Export the generated key and start the quickstart services.", "details": ["Run `export CONJUR_DATA_KEY=\"$(< data_key)\"`.", "Run `docker compose up -d`."], "input": "The generated data key.", "output": "The quickstart containers start in the background.", "success_signal": "Compose reports containers Started.", "failure_or_wait": "Missing key, port, health, or Docker errors prevent startup.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run `docker ps` and verify the expected services are running.", "details": [], "input": "Started Compose project.", "output": "Docker lists the active quickstart containers.", "success_signal": "The expected Conjur, proxy, client, database, and demo services are running.", "failure_or_wait": "Stopped or unhealthy services must be diagnosed before account creation.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 7, "phase": "account", "actor": "developer", "interface": "cli", "action": "Create the Conjur account and save its administrator data.", "details": ["Run `docker compose exec conjur conjurctl account create myConjurAccount > admin_data`."], "input": "The running Conjur service.", "output": "Account output, including administrator credentials, is written to `admin_data`.", "success_signal": "The terminal reports `Created new account 'myConjurAccount'`.", "failure_or_wait": "Service or account-creation errors stop initialization.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 8, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Initialize the client for the local self-signed Conjur OSS service.", "details": ["Run `docker compose exec client conjur init oss -u https://proxy -a myConjurAccount --self-signed`.", "At the trust prompt, enter `y`.", "Select Conjur Open Source when prompted."], "input": "Proxy URL, account name, and acceptance of the local self-signed certificate.", "output": "The client writes its certificate and configuration.", "success_signal": "Initialization completes and the Conjur configuration is written.", "failure_or_wait": "Rejecting certificate trust or choosing the wrong product prevents this demo configuration.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 9, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Log in as the Conjur administrator using the API key stored in `admin_data`.", "details": ["Run `docker compose exec client conjur login -i admin`.", "Supply the administrator API key when prompted."], "input": "The administrator API key from `admin_data`.", "output": "The client establishes an administrator session.", "success_signal": "The CLI prints `Logged in`.", "failure_or_wait": "An incorrect API key prevents policy loading.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 10, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Load the BotApp policy and save its generated identity keys.", "details": ["Run `docker compose exec client conjur policy load -b root -f policy/BotApp.yml > my_app_data`."], "input": "Administrator session and published policy file.", "output": "The policy is loaded and generated keys for Dave and BotApp are written to `my_app_data`.", "success_signal": "The CLI reports `Loaded policy 'root'`.", "failure_or_wait": "Authentication, policy, or file errors stop identity creation.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 11, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Log out the administrator, log in as `Dave@BotApp` with the saved API key, and verify the identity.", "details": ["Run the published logout command.", "Run `docker compose exec client conjur login -i Dave@BotApp` and supply Dave's API key from `my_app_data`.", "Run `docker compose exec client conjur whoami`."], "input": "Dave's generated API key.", "output": "The CLI returns the authenticated identity as JSON.", "success_signal": "Login succeeds and `whoami` identifies Dave in BotApp.", "failure_or_wait": "A wrong saved key prevents the secret write.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 12, "phase": "credential", "actor": "developer", "interface": "cli", "action": "Generate a random secret and store it in the policy variable.", "details": ["Run `secretVal=$(openssl rand -hex 12 | tr -d '\\r\\n')`.", "Run `docker compose exec client conjur variable set -i BotApp/secretVar -v ${secretVal}`."], "input": "The authenticated Dave identity and OpenSSL.", "output": "The generated value is stored in `BotApp/secretVar`.", "success_signal": "The CLI reports `Value added`.", "failure_or_wait": "Identity, authorization, variable-path, or shell errors prevent storage.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 13, "phase": "run", "actor": "developer", "interface": "cli", "action": "Enter the BotApp container and request a short-lived Conjur authentication token with the BotApp API key.", "details": ["Run `docker exec -it bot_app bash`.", "Run the published `curl` authentication command against `https://proxy/authn/myConjurAccount/host%2FBotApp%2FmyDemoApp/authenticate`, writing the response to `/tmp/conjur_token`."], "input": "The BotApp API key from `my_app_data`.", "output": "A Conjur authentication token is saved inside the demo container.", "success_signal": "The token file is created without an authentication error.", "failure_or_wait": "The token expires after eight minutes, so delay requires regeneration before secret retrieval.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 14, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run the demo program and verify that it retrieves and displays the stored secret.", "details": ["Run `/tmp/program.sh` inside `bot_app`."], "input": "A valid short-lived token and the stored `BotApp/secretVar` value.", "output": "The demo fetches and displays the secret.", "success_signal": "The stored value is displayed and the quickstart reaches `Congratulations! You are ready to secure your own apps with Conjur.`", "failure_or_wait": "If no secret appears, regenerate the authentication token and retry within its eight-minute window.", "required": true, "source_ids": ["S1"]}
-  ],
-  "candidate_paths": [
     {
-      "id": "conjur-oss-docker-compose-demo",
-      "name": "Conjur OSS Docker Compose store-and-retrieve demo",
-      "selection_basis": "The CyberArk-owned repository publishes every required command, generated credential, expected intermediate signal, stored variable, retrieval program, and final congratulations terminal.",
-      "relationship_to_primary_path": "It is the complete candidate recorded in the primary path. Human judgment remains necessary because the source is explicitly Community level and unsupported, and CyberArk does not establish this product as its platform-wide default.",
-      "steps": [
-        {"step_number": 1, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Clone the repository, select a project version compatible with the current Conjur OSS suite release when possible, enter it, and run `docker compose pull`.", "details": ["The repository strongly recommends a version from the latest Conjur OSS suite release because suite-release versions receive additional compatibility testing."], "input": "Git, Docker, and network access.", "output": "Quickstart files and images are local.", "success_signal": "Images report Pulled.", "failure_or_wait": "Clone, version-selection, or pull failures stop setup.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "cli", "action": "Generate the Conjur data key into `data_key`, export `CONJUR_DATA_KEY`, and run `docker compose up -d`.", "details": [], "input": "Pulled quickstart.", "output": "Services start with the generated key.", "success_signal": "Containers report Started.", "failure_or_wait": "Key or Docker errors prevent startup.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 3, "phase": "account", "actor": "developer", "interface": "cli", "action": "Create `myConjurAccount` into `admin_data` and initialize the client for `https://proxy` with the self-signed OSS option.", "details": [], "input": "Running services.", "output": "Account credentials and client configuration exist.", "success_signal": "The account is created and client config is written.", "failure_or_wait": "Account, trust, or product-selection errors stop setup.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 4, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Log in as admin and load `policy/BotApp.yml` into root, saving generated keys to `my_app_data`.", "details": [], "input": "Administrator API key.", "output": "BotApp policy and identities exist.", "success_signal": "The CLI reports `Loaded policy 'root'`.", "failure_or_wait": "Authentication or policy errors stop setup.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 5, "phase": "credential", "actor": "developer", "interface": "cli", "action": "Log in as `Dave@BotApp`, verify with `whoami`, generate a random value, and set `BotApp/secretVar`.", "details": [], "input": "Dave's saved API key.", "output": "A secret value is stored.", "success_signal": "The CLI reports `Value added`.", "failure_or_wait": "Identity or authorization errors block the write.", "required": true, "source_ids": ["S1"]},
-        {"step_number": 6, "phase": "run", "actor": "developer", "interface": "cli", "action": "Enter `bot_app`, authenticate the application into `/tmp/conjur_token`, and run `/tmp/program.sh`.", "details": [], "input": "BotApp API key and stored secret.", "output": "The demo retrieves and displays the secret.", "success_signal": "The value and congratulations message appear.", "failure_or_wait": "Regenerate the token if more than eight minutes elapsed.", "required": true, "source_ids": ["S1"]}
-      ],
-      "source_ids": ["S1"]
+      "order": 1,
+      "type": "software",
+      "requirement": "Install Docker Desktop with Docker Compose, Git, and OpenSSL.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "environment",
+      "requirement": "Have a shell that supports the published environment-variable and command-substitution syntax.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "network",
+      "requirement": "Allow cloning from GitHub and pulling the published container images.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "knowledge",
+      "requirement": "Treat the quickstart as a local learning demo only; it is not supported or production-ready.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the CyberArk Conjur quickstart repository and accept its demo-only scope and support caveat.",
+      "details": [],
+      "input": "https://github.com/cyberark/conjur-quickstart",
+      "output": "Requirements and the complete Docker Compose walkthrough are visible.",
+      "success_signal": "The repository identifies a sample Conjur OSS install and warns against production use.",
+      "failure_or_wait": "Human judgment is required to accept Conjur OSS as the CyberArk surface because it is not designated as CyberArk's universal first product.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Pull the quickstart container images.",
+      "details": [
+        "Run `docker compose pull`."
+      ],
+      "input": "Docker Desktop and registry access.",
+      "output": "The required images are downloaded.",
+      "success_signal": "Compose reports the images as Pulled.",
+      "failure_or_wait": "Registry, network, disk, or Docker errors must be resolved.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Generate the Conjur data key and save it to `data_key`.",
+      "details": [
+        "Run `docker compose run --no-deps --rm conjur data-key generate > data_key`."
+      ],
+      "input": "The pulled Conjur image.",
+      "output": "A Compose network is created and `data_key` contains the generated key.",
+      "success_signal": "The data-key command completes and the file exists.",
+      "failure_or_wait": "Container or filesystem errors stop initialization.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export the generated key and start the quickstart services.",
+      "details": [
+        "Run `export CONJUR_DATA_KEY=\"$(< data_key)\"`.",
+        "Run `docker compose up -d`."
+      ],
+      "input": "The generated data key.",
+      "output": "The quickstart containers start in the background.",
+      "success_signal": "Compose reports containers Started.",
+      "failure_or_wait": "Missing key, port, health, or Docker errors prevent startup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `docker ps` and verify the expected services are running.",
+      "details": [],
+      "input": "Started Compose project.",
+      "output": "Docker lists the active quickstart containers.",
+      "success_signal": "The expected Conjur, proxy, client, database, and demo services are running.",
+      "failure_or_wait": "Stopped or unhealthy services must be diagnosed before account creation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create the Conjur account and save its administrator data.",
+      "details": [
+        "Run `docker compose exec conjur conjurctl account create myConjurAccount > admin_data`."
+      ],
+      "input": "The running Conjur service.",
+      "output": "Account output, including administrator credentials, is written to `admin_data`.",
+      "success_signal": "The terminal reports `Created new account 'myConjurAccount'`.",
+      "failure_or_wait": "Service or account-creation errors stop initialization.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Initialize the client for the local self-signed Conjur OSS service.",
+      "details": [
+        "Run `docker compose exec client conjur init oss -u https://proxy -a myConjurAccount --self-signed`.",
+        "At the trust prompt, enter `y`.",
+        "Select Conjur Open Source when prompted."
+      ],
+      "input": "Proxy URL, account name, and acceptance of the local self-signed certificate.",
+      "output": "The client writes its certificate and configuration.",
+      "success_signal": "Initialization completes and the Conjur configuration is written.",
+      "failure_or_wait": "Rejecting certificate trust or choosing the wrong product prevents this demo configuration.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Log in as the Conjur administrator using the API key stored in `admin_data`.",
+      "details": [
+        "Run `docker compose exec client conjur login -i admin`.",
+        "Supply the administrator API key when prompted."
+      ],
+      "input": "The administrator API key from `admin_data`.",
+      "output": "The client establishes an administrator session.",
+      "success_signal": "The CLI prints `Logged in`.",
+      "failure_or_wait": "An incorrect API key prevents policy loading.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Load the BotApp policy and save its generated identity keys.",
+      "details": [
+        "Run `docker compose exec client conjur policy load -b root -f policy/BotApp.yml > my_app_data`."
+      ],
+      "input": "Administrator session and published policy file.",
+      "output": "The policy is loaded and generated keys for Dave and BotApp are written to `my_app_data`.",
+      "success_signal": "The CLI reports `Loaded policy 'root'`.",
+      "failure_or_wait": "Authentication, policy, or file errors stop identity creation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Log out the administrator, log in as `Dave@BotApp` with the saved API key, and verify the identity.",
+      "details": [
+        "Run the published logout command.",
+        "Run `docker compose exec client conjur login -i Dave@BotApp` and supply Dave's API key from `my_app_data`.",
+        "Run `docker compose exec client conjur whoami`."
+      ],
+      "input": "Dave's generated API key.",
+      "output": "The CLI returns the authenticated identity as JSON.",
+      "success_signal": "Login succeeds and `whoami` identifies Dave in BotApp.",
+      "failure_or_wait": "A wrong saved key prevents the secret write.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Generate a random secret and store it in the policy variable.",
+      "details": [
+        "Run `secretVal=$(openssl rand -hex 12 | tr -d '\\r\\n')`.",
+        "Run `docker compose exec client conjur variable set -i BotApp/secretVar -v ${secretVal}`."
+      ],
+      "input": "The authenticated Dave identity and OpenSSL.",
+      "output": "The generated value is stored in `BotApp/secretVar`.",
+      "success_signal": "The CLI reports `Value added`.",
+      "failure_or_wait": "Identity, authorization, variable-path, or shell errors prevent storage.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Enter the BotApp container and request a short-lived Conjur authentication token with the BotApp API key.",
+      "details": [
+        "Run `docker exec -it bot_app bash`.",
+        "Run the published `curl` authentication command against `https://proxy/authn/myConjurAccount/host%2FBotApp%2FmyDemoApp/authenticate`, writing the response to `/tmp/conjur_token`."
+      ],
+      "input": "The BotApp API key from `my_app_data`.",
+      "output": "A Conjur authentication token is saved inside the demo container.",
+      "success_signal": "The token file is created without an authentication error.",
+      "failure_or_wait": "The token expires after eight minutes, so delay requires regeneration before secret retrieval.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the demo program and verify that it retrieves and displays the stored secret.",
+      "details": [
+        "Run `/tmp/program.sh` inside `bot_app`."
+      ],
+      "input": "A valid short-lived token and the stored `BotApp/secretVar` value.",
+      "output": "The demo fetches and displays the secret.",
+      "success_signal": "The stored value is displayed and the quickstart reaches `Congratulations! You are ready to secure your own apps with Conjur.`",
+      "failure_or_wait": "If no secret appears, regenerate the authentication token and retry within its eight-minute window.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone the repository, select a project version compatible with the current Conjur OSS suite release when possible, enter it, and run `docker compose pull`.",
+      "details": [
+        "The repository strongly recommends a version from the latest Conjur OSS suite release because suite-release versions receive additional compatibility testing."
+      ],
+      "input": "Git, Docker, and network access.",
+      "output": "Quickstart files and images are local.",
+      "success_signal": "Images report Pulled.",
+      "failure_or_wait": "Clone, version-selection, or pull failures stop setup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Generate the Conjur data key into `data_key`, export `CONJUR_DATA_KEY`, and run `docker compose up -d`.",
+      "details": [],
+      "input": "Pulled quickstart.",
+      "output": "Services start with the generated key.",
+      "success_signal": "Containers report Started.",
+      "failure_or_wait": "Key or Docker errors prevent startup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create `myConjurAccount` into `admin_data` and initialize the client for `https://proxy` with the self-signed OSS option.",
+      "details": [],
+      "input": "Running services.",
+      "output": "Account credentials and client configuration exist.",
+      "success_signal": "The account is created and client config is written.",
+      "failure_or_wait": "Account, trust, or product-selection errors stop setup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Log in as admin and load `policy/BotApp.yml` into root, saving generated keys to `my_app_data`.",
+      "details": [],
+      "input": "Administrator API key.",
+      "output": "BotApp policy and identities exist.",
+      "success_signal": "The CLI reports `Loaded policy 'root'`.",
+      "failure_or_wait": "Authentication or policy errors stop setup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Log in as `Dave@BotApp`, verify with `whoami`, generate a random value, and set `BotApp/secretVar`.",
+      "details": [],
+      "input": "Dave's saved API key.",
+      "output": "A secret value is stored.",
+      "success_signal": "The CLI reports `Value added`.",
+      "failure_or_wait": "Identity or authorization errors block the write.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Enter `bot_app`, authenticate the application into `/tmp/conjur_token`, and run `/tmp/program.sh`.",
+      "details": [],
+      "input": "BotApp API key and stored secret.",
+      "output": "The demo retrieves and displays the secret.",
+      "success_signal": "The value and congratulations message appear.",
+      "failure_or_wait": "Regenerate the token if more than eight minutes elapsed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 1, "condition": "The goal is a commercial CyberArk product or production deployment", "path": "Stop and select that product's current supported documentation and entitlement path instead of using this demo.", "effect_on_first_success": "Changes the product, access model, prerequisites, and terminal; the Conjur OSS candidate cannot be generalized.", "source_ids": ["S1"]},
-    {"at_step": 14, "condition": "The application token is older than eight minutes or no secret is returned", "path": "Repeat the published authentication request to regenerate `/tmp/conjur_token`, then run the program again.", "effect_on_first_success": "Adds a documented recovery cycle before retrieval.", "source_ids": ["S1"]}
+    {
+      "at_step": 1,
+      "condition": "The goal is a commercial CyberArk product or production deployment",
+      "path": "Stop and select that product's current supported documentation and entitlement path instead of using this demo.",
+      "effect_on_first_success": "Changes the product, access model, prerequisites, and terminal; the Conjur OSS candidate cannot be generalized.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The application token is older than eight minutes or no secret is returned",
+      "path": "Repeat the published authentication request to regenerate `/tmp/conjur_token`, then run the program again.",
+      "effect_on_first_success": "Adds a documented recovery cycle before retrieval.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 1, "type": "choice", "description": "Conjur OSS is one CyberArk product candidate and is not established as the product-neutral CyberArk first mile.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 1, "type": "policy", "description": "The repository labels the route Community level, community contributed, not reviewed or supported by CyberArk, and unsuitable for production.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 3, "type": "download", "description": "The route pulls multiple Docker images before initialization.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 5, "type": "environment", "description": "The demo runs several local containers and depends on Docker resources, ports, and health.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 8, "type": "terms", "description": "The local client requires explicit trust of the demo's self-signed certificate.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 9, "type": "credential", "description": "Administrator, Dave, and BotApp API keys are generated into local files and must be selected at the correct steps.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 13, "type": "limit", "description": "The application authentication token is usable for only eight minutes before retrieval must reauthenticate.", "documented_requirement": true, "source_ids": ["S1"]}
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "Conjur OSS is one CyberArk product candidate and is not established as the product-neutral CyberArk first mile.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 1,
+      "type": "policy",
+      "description": "The repository labels the route Community level, community contributed, not reviewed or supported by CyberArk, and unsuitable for production.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "download",
+      "description": "The route pulls multiple Docker images before initialization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "environment",
+      "description": "The demo runs several local containers and depends on Docker resources, ports, and health.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "terms",
+      "description": "The local client requires explicit trust of the demo's self-signed certificate.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "credential",
+      "description": "Administrator, Dave, and BotApp API keys are generated into local files and must be selected at the correct steps.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "limit",
+      "description": "The application authentication token is usable for only eight minutes before retrieval must reauthenticate.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "GitHub - cyberark/conjur-quickstart: Start securing your secrets and infrastructure by installing Conjur OSS, using Docker and the official Conjur OSS containers on DockerHub.", "url": "https://github.com/cyberark/conjur-quickstart", "official_domain": true, "source_type": "official-example-repository", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["About", "Certification level", "Requirements", "Installation", "Define Policy", "Store Secret", "Run Demo"], "evidence_supported": ["Community and support caveat", "Docker prerequisites", "Exact install and initialization commands", "Account and generated credentials", "Policy load", "Secret write", "Application authentication", "Eight-minute token recovery", "Secret display and congratulations terminal"]}
+    {
+      "id": "S1",
+      "title": "GitHub - cyberark/conjur-quickstart: Start securing your secrets and infrastructure by installing Conjur OSS, using Docker and the official Conjur OSS containers on DockerHub.",
+      "url": "https://github.com/cyberark/conjur-quickstart",
+      "official_domain": true,
+      "source_type": "official-example-repository",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "About",
+        "Certification level",
+        "Requirements",
+        "Installation",
+        "Define Policy",
+        "Store Secret",
+        "Run Demo"
+      ],
+      "evidence_supported": [
+        "Community and support caveat",
+        "Docker prerequisites",
+        "Exact install and initialization commands",
+        "Account and generated credentials",
+        "Policy load",
+        "Secret write",
+        "Application authentication",
+        "Eight-minute token recovery",
+        "Secret display and congratulations terminal"
+      ]
+    }
   ],
   "uncertainties": [
-    {"question": "Should a CyberArk-wide first mile use this Conjur OSS demo or a different current commercial product surface?", "impact": "The selected product changes entitlements, account access, credentials, setup, implementation, and the meaning of first success.", "reason_unresolved": "The fully documented candidate is product-specific and its own CyberArk-owned source labels it community contributed, not reviewed, and unsupported rather than a universal supported onboarding path.", "checked_source_ids": ["S1"]}
+    {
+      "question": "Should a CyberArk-wide first mile use this Conjur OSS demo or a different current commercial product surface?",
+      "impact": "The selected product changes entitlements, account access, credentials, setup, implementation, and the meaning of first success.",
+      "reason_unresolved": "The fully documented candidate is product-specific and its own CyberArk-owned source labels it community contributed, not reviewed, and unsupported rather than a universal supported onboarding path.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
   ],
   "excluded_after_success": [
     "Container cleanup, production deployment, supported enterprise architecture, high availability, policy design beyond the sample, secret rotation, application integration beyond BotApp, and operational hardening occur after this demo retrieval."

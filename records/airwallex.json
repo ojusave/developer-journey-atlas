@@ -1,81 +1,484 @@
 {
-  "platform": {"name": "Airwallex", "slug": "airwallex", "organization": "Airwallex"},
+  "platform": {
+    "name": "Airwallex",
+    "slug": "airwallex",
+    "organization": "Airwallex"
+  },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Airwallex sandbox API authentication",
-    "selection_basis": "The Developer Tools API overview says that getting started with Airwallex APIs requires obtaining an access token, and the sandbox overview supplies the self-serve account, key, and authentication sequence without moving real money.",
+    "name": "Account-level admin API key with cURL",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Account-level admin API key with cURL. This candidate resolves the account-versus-organization and admin-versus-scoped key choices by using the documented account admin-key procedure and the cURL authentication example. Prior surface before policy commit: Airwallex sandbox API authentication.",
     "alternatives_considered": [
-      {"name": "Your first online payment", "url": "https://www.airwallex.com/docs/payments/get-started/quickstart", "reason_not_primary": "This is a product-specific Payments route beyond the general API authentication milestone."},
-      {"name": "Partner connections", "url": "https://www.airwallex.com/docs/developer-tools/partner-connections/get-started", "reason_not_primary": "This route requires credentials from the partner integrations team and applies to partner applications rather than the self-serve sandbox."}
+      {
+        "name": "Your first online payment",
+        "url": "https://www.airwallex.com/docs/payments/get-started/quickstart",
+        "reason_not_primary": "This is a product-specific Payments route beyond the general API authentication milestone."
+      },
+      {
+        "name": "Partner connections",
+        "url": "https://www.airwallex.com/docs/developer-tools/partner-connections/get-started",
+        "reason_not_primary": "This route requires credentials from the partner integrations team and applies to partner applications rather than the self-serve sandbox."
+      }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Authenticate to the Airwallex sandbox API for the first time.",
     "starting_url": "https://www.airwallex.com/docs/developer-tools/api",
-    "assumed_prior_state": ["No Airwallex account", "No Airwallex credentials"]
+    "assumed_prior_state": [
+      "No Airwallex account",
+      "No Airwallex credentials"
+    ]
   },
   "documented_first_success": {
     "official_milestone": "Obtain an access token",
     "normalized_outcome": "The developer receives a sandbox bearer access token from the Authentication API.",
     "observable_completion_signal": "The successful authentication response contains `token` and `expires_at` fields.",
-    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "A successful request returns an access token", "source_ids": ["S1", "S4"]},
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "A successful request returns an access token",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
     "why_this_is_the_boundary": "The general API overview explicitly defines obtaining an access token as what is needed to get started; product transactions and other endpoint calls follow this credential milestone.",
-    "source_ids": ["S1", "S4"]
+    "source_ids": [
+      "S1",
+      "S4"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "identity", "requirement": "Provide a business email, name, business country, and password for the self-serve sandbox account.", "required": true, "source_ids": ["S2"]},
-    {"order": 2, "type": "permission", "requirement": "Use an Owner, Admin, or Developer role to access the Developer app and API keys.", "required": true, "source_ids": ["S3"]},
-    {"order": 3, "type": "software", "requirement": "Use a tool capable of making the documented HTTPS POST request, such as cURL.", "required": true, "source_ids": ["S2", "S4"]}
-  ],
-  "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Airwallex Developer Tools API overview and follow the sandbox environment route.", "details": [], "input": "Intent to authenticate to Airwallex APIs", "output": "The official self-serve sandbox sequence", "success_signal": "The sandbox overview is open.", "failure_or_wait": "No failure behavior is documented for this navigation.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open Get started in sandbox, enter business email, name, business country, and password, then select Create sandbox account.", "details": [], "input": "Business identity and password", "output": "A newly provisioned sandbox account", "success_signal": "The documentation says the sandbox account is ready to use instantly.", "failure_or_wait": "The self-serve page is a JavaScript application; no official source used here documents field-level failure behavior.", "required": true, "source_ids": ["S2", "S6"]},
-    {"step_number": 3, "phase": "wait", "actor": "platform", "interface": "web-console", "action": "Provision and activate the sandbox account automatically.", "details": ["Onboarding verification is submitted and approved.", "Account status becomes ACTIVE.", "Default API access is applied."], "input": "Submitted self-serve sandbox registration", "output": "An active sandbox account with default test configuration", "success_signal": "Onboarding verification is SUCCESS and account status is ACTIVE.", "failure_or_wait": "For additional accounts, an entity name other than New Business Sandbox or Sandbox Business remains In review; this does not apply to the initial self-serve account.", "required": true, "source_ids": ["S2", "S5"]},
-    {"step_number": 4, "phase": "access", "actor": "developer", "interface": "web-console", "action": "Log in to the sandbox web app with the sandbox credentials.", "details": [], "input": "Sandbox credentials", "output": "Authenticated access to the sandbox web app", "success_signal": "The sandbox web app is available with test balances and product capabilities.", "failure_or_wait": "No login recovery behavior is documented on the selected path.", "required": true, "source_ids": ["S2"]}
-  ],
-  "candidate_paths": [
     {
-      "id": "account-admin-key-curl",
-      "name": "Account-level admin API key with cURL",
-      "selection_basis": "This candidate resolves the account-versus-organization and admin-versus-scoped key choices by using the documented account admin-key procedure and the cURL authentication example.",
-      "relationship_to_primary_path": "Repeats the shared account spine, then selects one fully documented credential route through the access-token terminal.",
-      "steps": [
-        {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the API overview and sandbox overview.", "details": [], "input": "Intent to authenticate", "output": "Sandbox setup instructions", "success_signal": "The official sandbox path is visible.", "failure_or_wait": "No failure behavior is documented.", "required": true, "source_ids": ["S1", "S2"]},
-        {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Enter business email, name, business country, and password, then select Create sandbox account.", "details": [], "input": "Required signup values", "output": "Sandbox account provisioning", "success_signal": "The account is ready instantly.", "failure_or_wait": "The public JavaScript app does not expose documented validation behavior in the inspected response.", "required": true, "source_ids": ["S2", "S6"]},
-        {"step_number": 3, "phase": "wait", "actor": "platform", "interface": "web-console", "action": "Apply automatic sandbox verification, activation, and API settings.", "details": [], "input": "Created sandbox account", "output": "ACTIVE sandbox account", "success_signal": "Verification is SUCCESS and account status is ACTIVE.", "failure_or_wait": "No initial-account provisioning failure is documented.", "required": true, "source_ids": ["S5"]},
-        {"step_number": 4, "phase": "access", "actor": "developer", "interface": "web-console", "action": "Log in to the sandbox web app.", "details": [], "input": "Sandbox credentials", "output": "Authenticated sandbox session", "success_signal": "The sandbox web app opens.", "failure_or_wait": "No login recovery is documented on this route.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 5, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Open Settings > Developer > API keys and select Generate next to the account.", "details": [], "input": "Account-level admin-key choice", "output": "A password prompt", "success_signal": "The web app asks for the login password.", "failure_or_wait": "Developer app access requires Owner, Admin, or Developer role.", "required": true, "source_ids": ["S3"]},
-        {"step_number": 6, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Enter the login password, generate the admin API key, and copy the API key and Client ID.", "details": ["Store the API key in a password manager or secret store."], "input": "Login password", "output": "Account Client ID and admin API key", "success_signal": "The generated API key is displayed for copying.", "failure_or_wait": "The API key cannot be viewed again after leaving the display.", "required": true, "source_ids": ["S3"]},
-        {"step_number": 7, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "POST to `https://api-demo.airwallex.com/api/v1/authentication/login` with Content-Type, `x-client-id`, and `x-api-key` headers.", "details": [], "input": "Sandbox Client ID and admin API key", "output": "Authentication API response", "success_signal": "The request succeeds and returns JSON.", "failure_or_wait": "Airwallex uses HTTP status codes for API success and failure; the selected pages do not enumerate an error for this exact request.", "required": true, "source_ids": ["S1", "S2", "S4"]},
-        {"step_number": 8, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Read the `token` and `expires_at` values from the successful response.", "details": ["The access token is used as a Bearer token for later API requests."], "input": "Authentication response", "output": "Sandbox bearer access token", "success_signal": "Both `token` and `expires_at` are present.", "failure_or_wait": "No additional wait is documented after a successful response.", "required": true, "source_ids": ["S4"]}
-      ],
-      "source_ids": ["S1", "S2", "S3", "S4", "S5", "S6"]
+      "order": 1,
+      "type": "identity",
+      "requirement": "Provide a business email, name, business country, and password for the self-serve sandbox account.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "Use an Owner, Admin, or Developer role to access the Developer app and API keys.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "Use a tool capable of making the documented HTTPS POST request, such as cURL.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
     }
   ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Airwallex Developer Tools API overview and follow the sandbox environment route.",
+      "details": [],
+      "input": "Intent to authenticate to Airwallex APIs",
+      "output": "The official self-serve sandbox sequence",
+      "success_signal": "The sandbox overview is open.",
+      "failure_or_wait": "No failure behavior is documented for this navigation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open Get started in sandbox, enter business email, name, business country, and password, then select Create sandbox account.",
+      "details": [],
+      "input": "Business identity and password",
+      "output": "A newly provisioned sandbox account",
+      "success_signal": "The documentation says the sandbox account is ready to use instantly.",
+      "failure_or_wait": "The self-serve page is a JavaScript application; no official source used here documents field-level failure behavior.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Provision and activate the sandbox account automatically.",
+      "details": [
+        "Onboarding verification is submitted and approved.",
+        "Account status becomes ACTIVE.",
+        "Default API access is applied."
+      ],
+      "input": "Submitted self-serve sandbox registration",
+      "output": "An active sandbox account with default test configuration",
+      "success_signal": "Onboarding verification is SUCCESS and account status is ACTIVE.",
+      "failure_or_wait": "For additional accounts, an entity name other than New Business Sandbox or Sandbox Business remains In review; this does not apply to the initial self-serve account.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Log in to the sandbox web app with the sandbox credentials.",
+      "details": [],
+      "input": "Sandbox credentials",
+      "output": "Authenticated access to the sandbox web app",
+      "success_signal": "The sandbox web app is available with test balances and product capabilities.",
+      "failure_or_wait": "No login recovery behavior is documented on the selected path.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the API overview and sandbox overview.",
+      "details": [],
+      "input": "Intent to authenticate",
+      "output": "Sandbox setup instructions",
+      "success_signal": "The official sandbox path is visible.",
+      "failure_or_wait": "No failure behavior is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter business email, name, business country, and password, then select Create sandbox account.",
+      "details": [],
+      "input": "Required signup values",
+      "output": "Sandbox account provisioning",
+      "success_signal": "The account is ready instantly.",
+      "failure_or_wait": "The public JavaScript app does not expose documented validation behavior in the inspected response.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Apply automatic sandbox verification, activation, and API settings.",
+      "details": [],
+      "input": "Created sandbox account",
+      "output": "ACTIVE sandbox account",
+      "success_signal": "Verification is SUCCESS and account status is ACTIVE.",
+      "failure_or_wait": "No initial-account provisioning failure is documented.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Log in to the sandbox web app.",
+      "details": [],
+      "input": "Sandbox credentials",
+      "output": "Authenticated sandbox session",
+      "success_signal": "The sandbox web app opens.",
+      "failure_or_wait": "No login recovery is documented on this route.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Settings > Developer > API keys and select Generate next to the account.",
+      "details": [],
+      "input": "Account-level admin-key choice",
+      "output": "A password prompt",
+      "success_signal": "The web app asks for the login password.",
+      "failure_or_wait": "Developer app access requires Owner, Admin, or Developer role.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Enter the login password, generate the admin API key, and copy the API key and Client ID.",
+      "details": [
+        "Store the API key in a password manager or secret store."
+      ],
+      "input": "Login password",
+      "output": "Account Client ID and admin API key",
+      "success_signal": "The generated API key is displayed for copying.",
+      "failure_or_wait": "The API key cannot be viewed again after leaving the display.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "POST to `https://api-demo.airwallex.com/api/v1/authentication/login` with Content-Type, `x-client-id`, and `x-api-key` headers.",
+      "details": [],
+      "input": "Sandbox Client ID and admin API key",
+      "output": "Authentication API response",
+      "success_signal": "The request succeeds and returns JSON.",
+      "failure_or_wait": "Airwallex uses HTTP status codes for API success and failure; the selected pages do not enumerate an error for this exact request.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Read the `token` and `expires_at` values from the successful response.",
+      "details": [
+        "The access token is used as a Bearer token for later API requests."
+      ],
+      "input": "Authentication response",
+      "output": "Sandbox bearer access token",
+      "success_signal": "Both `token` and `expires_at` are present.",
+      "failure_or_wait": "No additional wait is documented after a successful response.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 4, "condition": "Choose a scoped key rather than an admin key", "path": "Select New scoped API key, name it, choose organization and/or account resources with Read or Write permissions, create it, and copy it once; `x-login-as` requirements then depend on the selected account scope.", "effect_on_first_success": "Changes security posture, required configuration, and possibly the authentication headers before the same access-token terminal.", "source_ids": ["S3"]},
-    {"at_step": 4, "condition": "Generate an organization-level admin key", "path": "Select Generate next to the organization rather than the account.", "effect_on_first_success": "The resulting key cannot access account-level resources, although it can still obtain an access token for organization APIs.", "source_ids": ["S3"]}
+    {
+      "at_step": 4,
+      "condition": "Choose a scoped key rather than an admin key",
+      "path": "Select New scoped API key, name it, choose organization and/or account resources with Read or Write permissions, create it, and copy it once; `x-login-as` requirements then depend on the selected account scope.",
+      "effect_on_first_success": "Changes security posture, required configuration, and possibly the authentication headers before the same access-token terminal.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "Generate an organization-level admin key",
+      "path": "Select Generate next to the organization rather than the account.",
+      "effect_on_first_success": "The resulting key cannot access account-level resources, although it can still obtain an access token for organization APIs.",
+      "source_ids": [
+        "S3"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "form", "description": "Sandbox signup requires four documented identity and password values.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 4, "type": "choice", "description": "The developer must choose admin or scoped credentials and organization or account scope; the general getting-started path does not select one.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 4, "type": "credential", "description": "The generated API key is shown once and must be stored securely.", "documented_requirement": true, "source_ids": ["S3"]}
+    {
+      "at_step": 2,
+      "type": "form",
+      "description": "Sandbox signup requires four documented identity and password values.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "choice",
+      "description": "The developer must choose admin or scoped credentials and organization or account scope; the general getting-started path does not select one.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "credential",
+      "description": "The generated API key is shown once and must be stored securely.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "API", "url": "https://www.airwallex.com/docs/developer-tools/api", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Authentication", "Testing", "Error handling"], "evidence_supported": ["General API starting milestone", "Sandbox recommendation", "HTTP status behavior"]},
-    {"id": "S2", "title": "Sandbox environment overview", "url": "https://www.airwallex.com/docs/developer-tools/sandbox-environment", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Get started in sandbox", "Testing in the web app", "API Keys and webhooks", "Testing APIs"], "evidence_supported": ["Signup fields and action", "Instant readiness", "Sandbox login", "Key and authentication sequence"]},
-    {"id": "S3", "title": "Manage API keys", "url": "https://www.airwallex.com/docs/developer-tools/api/manage-api-keys", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Admin API keys", "Generate admin API key for the first time", "Scoped API keys", "Create a scoped API key", "Create an access token using a scoped API key"], "evidence_supported": ["Role requirement", "Admin and scoped choices", "Key-generation actions", "One-time display", "Scope-dependent x-login-as behavior"]},
-    {"id": "S4", "title": "Get started", "url": "https://www.airwallex.com/docs/api/2022-09-09/getting_started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Authentication"], "evidence_supported": ["Authentication request", "Successful token response", "Bearer-token continuation"]},
-    {"id": "S5", "title": "Sandbox settings", "url": "https://www.airwallex.com/docs/developer-tools/sandbox-environment/sandbox-settings", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Provisioning flow", "Account and onboarding settings", "API and developer settings"], "evidence_supported": ["Automatic verification", "ACTIVE status", "Default API setup", "Auto-accepted terms"]},
-    {"id": "S6", "title": "Airwallex sandbox signup", "url": "https://demo.airwallex.com/signup/us/sandbox", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public response"], "evidence_supported": ["Current JavaScript-rendered signup destination"]}
+    {
+      "id": "S1",
+      "title": "API",
+      "url": "https://www.airwallex.com/docs/developer-tools/api",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Authentication",
+        "Testing",
+        "Error handling"
+      ],
+      "evidence_supported": [
+        "General API starting milestone",
+        "Sandbox recommendation",
+        "HTTP status behavior"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sandbox environment overview",
+      "url": "https://www.airwallex.com/docs/developer-tools/sandbox-environment",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get started in sandbox",
+        "Testing in the web app",
+        "API Keys and webhooks",
+        "Testing APIs"
+      ],
+      "evidence_supported": [
+        "Signup fields and action",
+        "Instant readiness",
+        "Sandbox login",
+        "Key and authentication sequence"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Manage API keys",
+      "url": "https://www.airwallex.com/docs/developer-tools/api/manage-api-keys",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Admin API keys",
+        "Generate admin API key for the first time",
+        "Scoped API keys",
+        "Create a scoped API key",
+        "Create an access token using a scoped API key"
+      ],
+      "evidence_supported": [
+        "Role requirement",
+        "Admin and scoped choices",
+        "Key-generation actions",
+        "One-time display",
+        "Scope-dependent x-login-as behavior"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Get started",
+      "url": "https://www.airwallex.com/docs/api/2022-09-09/getting_started",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Authentication"
+      ],
+      "evidence_supported": [
+        "Authentication request",
+        "Successful token response",
+        "Bearer-token continuation"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Sandbox settings",
+      "url": "https://www.airwallex.com/docs/developer-tools/sandbox-environment/sandbox-settings",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Provisioning flow",
+        "Account and onboarding settings",
+        "API and developer settings"
+      ],
+      "evidence_supported": [
+        "Automatic verification",
+        "ACTIVE status",
+        "Default API setup",
+        "Auto-accepted terms"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Airwallex sandbox signup",
+      "url": "https://demo.airwallex.com/signup/us/sandbox",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public response"
+      ],
+      "evidence_supported": [
+        "Current JavaScript-rendered signup destination"
+      ]
+    }
   ],
   "uncertainties": [
-    {"question": "Which API-key type and resource scope should define the canonical first authentication route?", "impact": "The choice changes credential permissions, configuration steps, and sometimes required headers.", "reason_unresolved": "The general API and sandbox guides require API keys but do not select admin versus scoped or organization versus account scope.", "checked_source_ids": ["S1", "S2", "S3", "S4"]}
+    {
+      "question": "Which API-key type and resource scope should define the canonical first authentication route?",
+      "impact": "The choice changes credential permissions, configuration steps, and sometimes required headers.",
+      "reason_unresolved": "The general API and sandbox guides require API keys but do not select admin versus scoped or organization versus account scope.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    }
   ],
-  "excluded_after_success": ["Calling product APIs with the access token", "Making a payment, payout, conversion, or other simulated transaction", "Production onboarding and credentials", "Webhooks and IP allowlisting"]
+  "excluded_after_success": [
+    "Calling product APIs with the access token",
+    "Making a payment, payout, conversion, or other simulated transaction",
+    "Production onboarding and credentials",
+    "Webhooks and IP allowlisting"
+  ]
 }

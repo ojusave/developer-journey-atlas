@@ -6,8 +6,8 @@
   },
   "category": "Maps and location APIs",
   "surface": {
-    "name": "Mapbox product and application platform not selected",
-    "selection_basis": "Mapbox's official Getting Started page presents Maps, Search, Location AI, Navigation, and data products. It calls rendering an interactive map the most common developer workflow and provides a Map Developer Journey, but the `Add a map` stage explicitly requires choosing web, iOS, or Android. The web guide then requires another choice among CDN, npm, and a scaffold utility. The docs establish a common milestone, an interactive map, but not one atomic implementation path without a platform choice.",
+    "name": "Render and interact with a Mapbox GL JS map using the CDN route",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Render and interact with a Mapbox GL JS map using the CDN route. Mapbox offers several products and platform routes, but its official GL JS CDN quickstart documents a self-contained web candidate from account token access through an interactive Mapbox Standard map. Prior surface before policy commit: Mapbox product and application platform not selected.",
     "alternatives_considered": [
       {
         "name": "Mapbox GL JS using CDN",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach a first Mapbox result without a selected product family or web, iOS, or Android application platform.",
@@ -44,11 +44,11 @@
   },
   "documented_first_success": {
     "official_milestone": "Get up and running with your first map in a few minutes",
-    "normalized_outcome": "The docs establish an interactive map using Mapbox Standard style as the common Maps milestone, but an atomic journey remains unresolved until a human chooses web, iOS, or Android and, where required, an installation variant and framework.",
-    "observable_completion_signal": "The chosen application displays an interactive Mapbox map that can be dragged and zoomed: in a browser for GL JS, an iOS simulator for the iOS SDK, or an Android emulator or device for the Android SDK.",
+    "normalized_outcome": "The map visibly responds to drag and zoom input.",
+    "observable_completion_signal": "The map visibly responds to drag and zoom input.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The official Add a map page names the first-map result but provides three separate Get Started links for web, iOS, and Android rather than selecting one.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The map visibly responds to drag and zoom input.",
       "source_ids": [
         "S1",
         "S2",
@@ -57,7 +57,7 @@
         "S5"
       ]
     },
-    "why_this_is_the_boundary": "The terminal result is shared, but platform choice changes account placement, local toolchain, package installation, credential file, code, build, runtime, waits, and failures. Selecting GL JS or a mobile SDK without user direction would be an analyst decision.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -192,6 +192,149 @@
         "S4",
         "S5",
         "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create or sign into a Mapbox account.",
+      "details": [
+        "The Map Developer Journey states that account signup automatically creates an access token."
+      ],
+      "input": "Mapbox account identity and signup or sign-in details.",
+      "output": "Authenticated Mapbox account.",
+      "success_signal": "The developer can access the Mapbox account and Developer Console.",
+      "failure_or_wait": "Signup, email verification, sign-in, or account-status failure prevents token access.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Locate and copy the automatically created default public access token.",
+      "details": [
+        "The web quickstart requires a public token with a `pk.` prefix."
+      ],
+      "input": "Authenticated Mapbox account.",
+      "output": "Mapbox public access token.",
+      "success_signal": "A valid public token is available for the page.",
+      "failure_or_wait": "A missing, deactivated, invalid, or improperly restricted token prevents map resources from loading.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create or open a standalone HTML file for the map.",
+      "details": [],
+      "input": "Writable local project folder and text editor.",
+      "output": "Editable HTML document.",
+      "success_signal": "The document can be saved and opened or served in a browser.",
+      "failure_or_wait": "A missing document or unwritable location stops page construction.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Add the current Mapbox GL JS stylesheet link and JavaScript script from the documented CDN to the HTML head.",
+      "details": [
+        "This route loads GL JS directly from the CDN and does not require npm."
+      ],
+      "input": "HTML document and current CDN resource URLs from the guide.",
+      "output": "Page with Mapbox GL JS CSS and JavaScript dependencies.",
+      "success_signal": "The browser can request both documented resources.",
+      "failure_or_wait": "Incorrect versions, blocked CDN access, or missing CSS or script prevents correct rendering.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Add the map container `div` and give it nonzero width and height.",
+      "details": [
+        "The quickstart troubleshooting guidance identifies missing container dimensions as a cause of a blank map."
+      ],
+      "input": "HTML body and CSS.",
+      "output": "Dimensioned map container.",
+      "success_signal": "The container occupies visible page space.",
+      "failure_or_wait": "A zero-height or missing container leaves no visible surface for the map.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Set `mapboxgl.accessToken` to the public token and instantiate `mapboxgl.Map` with the container, starting center, and zoom from the guide.",
+      "details": [
+        "The documented working example renders the Mapbox Standard style."
+      ],
+      "input": "Public token, dimensioned container, center, and zoom values.",
+      "output": "Configured Mapbox GL JS map instance.",
+      "success_signal": "The page JavaScript runs without a syntax or token configuration error.",
+      "failure_or_wait": "Placeholder token, invalid token, wrong container ID, syntax, or configuration errors prevent initialization.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Save and open or locally serve the HTML page in a browser.",
+      "details": [],
+      "input": "Completed HTML page and browser network access.",
+      "output": "Loaded web page requesting Mapbox resources.",
+      "success_signal": "The Mapbox Standard map becomes visible in the container.",
+      "failure_or_wait": "If the map is blank, check token replacement and validity, container dimensions, network requests, and browser-console errors before retrying.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Drag and zoom the rendered map to verify that it is interactive.",
+      "details": [
+        "Adding custom data, application interactions, and deployment are later stages of the Map Developer Journey."
+      ],
+      "input": "Visible Mapbox Standard map.",
+      "output": "Rendered and interactable first web map.",
+      "success_signal": "The map visibly responds to drag and zoom input.",
+      "failure_or_wait": "A static, blank, or erroring surface means the documented first-map result has not been reached.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
       ]
     }
   ],
@@ -540,140 +683,6 @@
     "Navigation, Search, Location AI, and data products unless chosen as the primary surface",
     "Production token restriction, observability, and cost controls"
   ],
-  "candidate_paths": [
-    {
-      "id": "gl-js-cdn-first-map",
-      "name": "Render and interact with a Mapbox GL JS map using the CDN route",
-      "selection_basis": "Mapbox offers several products and platform routes, but its official GL JS CDN quickstart documents a self-contained web candidate from account token access through an interactive Mapbox Standard map.",
-      "relationship_to_primary_path": "This selects Maps, web, and the standalone CDN variant at primary step 1, then expands account access, page setup, map creation, and interactive verification.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Create or sign into a Mapbox account.",
-          "details": [
-            "The Map Developer Journey states that account signup automatically creates an access token."
-          ],
-          "input": "Mapbox account identity and signup or sign-in details.",
-          "output": "Authenticated Mapbox account.",
-          "success_signal": "The developer can access the Mapbox account and Developer Console.",
-          "failure_or_wait": "Signup, email verification, sign-in, or account-status failure prevents token access.",
-          "required": true,
-          "source_ids": ["S1", "S7"]
-        },
-        {
-          "step_number": 2,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Locate and copy the automatically created default public access token.",
-          "details": [
-            "The web quickstart requires a public token with a `pk.` prefix."
-          ],
-          "input": "Authenticated Mapbox account.",
-          "output": "Mapbox public access token.",
-          "success_signal": "A valid public token is available for the page.",
-          "failure_or_wait": "A missing, deactivated, invalid, or improperly restricted token prevents map resources from loading.",
-          "required": true,
-          "source_ids": ["S4", "S7"]
-        },
-        {
-          "step_number": 3,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Create or open a standalone HTML file for the map.",
-          "details": [],
-          "input": "Writable local project folder and text editor.",
-          "output": "Editable HTML document.",
-          "success_signal": "The document can be saved and opened or served in a browser.",
-          "failure_or_wait": "A missing document or unwritable location stops page construction.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 4,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Add the current Mapbox GL JS stylesheet link and JavaScript script from the documented CDN to the HTML head.",
-          "details": [
-            "This route loads GL JS directly from the CDN and does not require npm."
-          ],
-          "input": "HTML document and current CDN resource URLs from the guide.",
-          "output": "Page with Mapbox GL JS CSS and JavaScript dependencies.",
-          "success_signal": "The browser can request both documented resources.",
-          "failure_or_wait": "Incorrect versions, blocked CDN access, or missing CSS or script prevents correct rendering.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 5,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Add the map container `div` and give it nonzero width and height.",
-          "details": [
-            "The quickstart troubleshooting guidance identifies missing container dimensions as a cause of a blank map."
-          ],
-          "input": "HTML body and CSS.",
-          "output": "Dimensioned map container.",
-          "success_signal": "The container occupies visible page space.",
-          "failure_or_wait": "A zero-height or missing container leaves no visible surface for the map.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 6,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "other",
-          "action": "Set `mapboxgl.accessToken` to the public token and instantiate `mapboxgl.Map` with the container, starting center, and zoom from the guide.",
-          "details": [
-            "The documented working example renders the Mapbox Standard style."
-          ],
-          "input": "Public token, dimensioned container, center, and zoom values.",
-          "output": "Configured Mapbox GL JS map instance.",
-          "success_signal": "The page JavaScript runs without a syntax or token configuration error.",
-          "failure_or_wait": "Placeholder token, invalid token, wrong container ID, syntax, or configuration errors prevent initialization.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 7,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Save and open or locally serve the HTML page in a browser.",
-          "details": [],
-          "input": "Completed HTML page and browser network access.",
-          "output": "Loaded web page requesting Mapbox resources.",
-          "success_signal": "The Mapbox Standard map becomes visible in the container.",
-          "failure_or_wait": "If the map is blank, check token replacement and validity, container dimensions, network requests, and browser-console errors before retrying.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 8,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "browser",
-          "action": "Drag and zoom the rendered map to verify that it is interactive.",
-          "details": [
-            "Adding custom data, application interactions, and deployment are later stages of the Map Developer Journey."
-          ],
-          "input": "Visible Mapbox Standard map.",
-          "output": "Rendered and interactable first web map.",
-          "success_signal": "The map visibly responds to drag and zoom input.",
-          "failure_or_wait": "A static, blank, or erroring surface means the documented first-map result has not been reached.",
-          "required": true,
-          "source_ids": ["S2", "S4"]
-        }
-      ],
-      "source_ids": ["S1", "S2", "S4", "S7"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

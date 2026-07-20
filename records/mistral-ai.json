@@ -6,8 +6,8 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Unresolved among Vibe, Studio, and Developer API quickstarts",
-    "selection_basis": "The current Mistral documentation home and Platform overview explicitly present three products and tell the visitor to pick the one matching the intended work. They expose multiple first-task quickstarts across Vibe Work, Vibe Code, Studio, Developer API, and Admin without selecting one universal developer outcome.",
+    "name": "Send and verify a first Mistral API request with Python",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Send and verify a first Mistral API request with Python. The official developer quickstart defines a roughly five-minute Python route and a printed model response as its Verify state. Prior surface before policy commit: Unresolved among Vibe, Studio, and Developer API quickstarts.",
     "alternatives_considered": [
       {
         "name": "Run your first Vibe Work task",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Choose which Mistral product and first outcome the workshop means before reconstructing its complete first mile.",
@@ -49,17 +49,17 @@
   },
   "documented_first_success": {
     "official_milestone": "No single cross-product first-success milestone is established by the documentation.",
-    "normalized_outcome": "Unresolved: the terminal outcome could be a completed Vibe task, a CLI prompt, a Studio API key or Playground response, a first API response, or an initialized organization.",
-    "observable_completion_signal": "No universal completion signal exists across the product-specific quickstarts.",
+    "normalized_outcome": "The terminal contains the short description rather than an authentication, billing, or rate-limit error.",
+    "observable_completion_signal": "The terminal contains the short description rather than an authentication, billing, or rate-limit error.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The platform overview says Mistral AI has three products and instructs the reader to pick the one matching the intended work; the docs home then lists separate role/product quickstarts.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The terminal contains the short description rather than an authentication, billing, or rate-limit error.",
       "source_ids": [
         "S1",
         "S2"
       ]
     },
-    "why_this_is_the_boundary": "Choosing one path would impose a researcher-selected definition of success. The official docs provide explicit terminal signals only after a product and role are chosen.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -118,6 +118,154 @@
       "source_ids": [
         "S1",
         "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or sign in to a Mistral account and confirm that Python 3.9 or later is available.",
+      "details": [
+        "The quickstart lists a Mistral account and Python 3.9 or later as prerequisites.",
+        "Free mode is enabled by default and does not require a credit card."
+      ],
+      "input": "A usable email identity and a local Python 3.9 or later environment.",
+      "output": "An authenticated account and compatible runtime.",
+      "success_signal": "Mistral Studio is accessible and the Python version satisfies the documented prerequisite.",
+      "failure_or_wait": "Account signup UI details and timing are not decomposed in the quickstart; a 402 later means the selected usage requires a payment method.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Studio, go to API keys, and select Create new key.",
+      "details": [
+        "API keys are created from the Studio API keys page."
+      ],
+      "input": "Authenticated Mistral Studio access.",
+      "output": "The new-key configuration form.",
+      "success_signal": "The form asks for a key name.",
+      "failure_or_wait": "The page is unavailable if Studio access has not been established.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Name the key, create it, and copy the secret immediately.",
+      "details": [
+        "The secret is displayed only once."
+      ],
+      "input": "A key name.",
+      "output": "A newly generated Mistral API key secret.",
+      "success_signal": "The key is shown and copied to secure temporary storage.",
+      "failure_or_wait": "If the one-time secret is not copied, create another key.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set the copied secret as the MISTRAL_API_KEY environment variable.",
+      "details": [
+        "The sample reads the secret from the environment instead of embedding it in source code."
+      ],
+      "input": "The copied API key.",
+      "output": "MISTRAL_API_KEY in the shell environment.",
+      "success_signal": "The environment variable is present in the shell used to run the sample.",
+      "failure_or_wait": "A later 401 indicates that the key is incorrect or not set; the guide recommends checking it with echo $MISTRAL_API_KEY.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Mistral Python SDK with pip install mistralai.",
+      "details": [
+        "This installs the package imported by the documented sample."
+      ],
+      "input": "Python 3.9 or later and pip.",
+      "output": "The mistralai package in the active Python environment.",
+      "success_signal": "The package installation completes without an error.",
+      "failure_or_wait": "Package or environment errors must be resolved before the sample can import Mistral.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Create quickstart.py with the documented Mistral client and chat completion code.",
+      "details": [
+        "Read MISTRAL_API_KEY from the environment.",
+        "Create a Mistral client, call client.chat.complete with mistral-large-latest, ask What is Mistral AI?, and print the response content."
+      ],
+      "input": "The official Python sample and configured environment variable.",
+      "output": "A runnable quickstart.py file.",
+      "success_signal": "The file contains the client initialization, request, and print statement.",
+      "failure_or_wait": "Syntax, import, or environment-variable mistakes prevent execution.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run python quickstart.py.",
+      "details": [
+        "The script sends the first chat-completion request to the Mistral API."
+      ],
+      "input": "The runnable sample, SDK, API key, and network access.",
+      "output": "An API response or an HTTP error.",
+      "success_signal": "The command completes and prints response text.",
+      "failure_or_wait": "401 means the key is wrong or unset; 402 means a payment method is required for the attempted usage; 429 means the rate limit was reached and the guide says to wait and use exponential backoff.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify that the terminal prints a short description of Mistral AI.",
+      "details": [
+        "This printed model response is the quickstart's explicit Verify state."
+      ],
+      "input": "The script output.",
+      "output": "A human-readable model response describing Mistral AI.",
+      "success_signal": "The terminal contains the short description rather than an authentication, billing, or rate-limit error.",
+      "failure_or_wait": "No response or an error means first success has not been reached.",
+      "required": true,
+      "source_ids": [
+        "S4"
       ]
     }
   ],
@@ -338,146 +486,6 @@
   "excluded_after_success": [
     "No downstream work is excluded until a product-specific first-success boundary is chosen."
   ],
-  "candidate_paths": [
-    {
-      "id": "python-first-api-response",
-      "name": "Send and verify a first Mistral API request with Python",
-      "selection_basis": "The official developer quickstart defines a roughly five-minute Python route and a printed model response as its Verify state.",
-      "relationship_to_primary_path": "This is one complete peer route after the shared documentation choice spine selects Studio API development and Python.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Create or sign in to a Mistral account and confirm that Python 3.9 or later is available.",
-          "details": [
-            "The quickstart lists a Mistral account and Python 3.9 or later as prerequisites.",
-            "Free mode is enabled by default and does not require a credit card."
-          ],
-          "input": "A usable email identity and a local Python 3.9 or later environment.",
-          "output": "An authenticated account and compatible runtime.",
-          "success_signal": "Mistral Studio is accessible and the Python version satisfies the documented prerequisite.",
-          "failure_or_wait": "Account signup UI details and timing are not decomposed in the quickstart; a 402 later means the selected usage requires a payment method.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 2,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open Studio, go to API keys, and select Create new key.",
-          "details": [
-            "API keys are created from the Studio API keys page."
-          ],
-          "input": "Authenticated Mistral Studio access.",
-          "output": "The new-key configuration form.",
-          "success_signal": "The form asks for a key name.",
-          "failure_or_wait": "The page is unavailable if Studio access has not been established.",
-          "required": true,
-          "source_ids": ["S3", "S4"]
-        },
-        {
-          "step_number": 3,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Name the key, create it, and copy the secret immediately.",
-          "details": [
-            "The secret is displayed only once."
-          ],
-          "input": "A key name.",
-          "output": "A newly generated Mistral API key secret.",
-          "success_signal": "The key is shown and copied to secure temporary storage.",
-          "failure_or_wait": "If the one-time secret is not copied, create another key.",
-          "required": true,
-          "source_ids": ["S3", "S4"]
-        },
-        {
-          "step_number": 4,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Set the copied secret as the MISTRAL_API_KEY environment variable.",
-          "details": [
-            "The sample reads the secret from the environment instead of embedding it in source code."
-          ],
-          "input": "The copied API key.",
-          "output": "MISTRAL_API_KEY in the shell environment.",
-          "success_signal": "The environment variable is present in the shell used to run the sample.",
-          "failure_or_wait": "A later 401 indicates that the key is incorrect or not set; the guide recommends checking it with echo $MISTRAL_API_KEY.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 5,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Install the Mistral Python SDK with pip install mistralai.",
-          "details": [
-            "This installs the package imported by the documented sample."
-          ],
-          "input": "Python 3.9 or later and pip.",
-          "output": "The mistralai package in the active Python environment.",
-          "success_signal": "The package installation completes without an error.",
-          "failure_or_wait": "Package or environment errors must be resolved before the sample can import Mistral.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 6,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "ide",
-          "action": "Create quickstart.py with the documented Mistral client and chat completion code.",
-          "details": [
-            "Read MISTRAL_API_KEY from the environment.",
-            "Create a Mistral client, call client.chat.complete with mistral-large-latest, ask What is Mistral AI?, and print the response content."
-          ],
-          "input": "The official Python sample and configured environment variable.",
-          "output": "A runnable quickstart.py file.",
-          "success_signal": "The file contains the client initialization, request, and print statement.",
-          "failure_or_wait": "Syntax, import, or environment-variable mistakes prevent execution.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 7,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run python quickstart.py.",
-          "details": [
-            "The script sends the first chat-completion request to the Mistral API."
-          ],
-          "input": "The runnable sample, SDK, API key, and network access.",
-          "output": "An API response or an HTTP error.",
-          "success_signal": "The command completes and prints response text.",
-          "failure_or_wait": "401 means the key is wrong or unset; 402 means a payment method is required for the attempted usage; 429 means the rate limit was reached and the guide says to wait and use exponential backoff.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 8,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Verify that the terminal prints a short description of Mistral AI.",
-          "details": [
-            "This printed model response is the quickstart's explicit Verify state."
-          ],
-          "input": "The script output.",
-          "output": "A human-readable model response describing Mistral AI.",
-          "success_signal": "The terminal contains the short description rather than an authentication, billing, or rate-limit error.",
-          "failure_or_wait": "No response or an error means first success has not been reached.",
-          "required": true,
-          "source_ids": ["S4"]
-        }
-      ],
-      "source_ids": ["S3", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

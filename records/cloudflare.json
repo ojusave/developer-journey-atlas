@@ -6,8 +6,8 @@
   },
   "category": "Cloud and application runtimes",
   "surface": {
-    "name": "Cloudflare Workers getting-started router",
-    "selection_basis": "Cloudflare's Developer Platform learning path says full-stack applications are built with Workers, and the Workers Getting started page says Build your first Worker. That page presents CLI, Dashboard, Prompting, and Templates as parallel routes without naming one default.",
+    "name": "Workers CLI edited Hello Worker deployment",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Workers CLI edited Hello Worker deployment. The CLI guide is the official end-to-end code-first route that creates, runs, edits, deploys, and verifies a first Worker. It is a complete candidate, not a platform-wide default over Dashboard, Prompting, Templates, or Playground. Prior surface before policy commit: Cloudflare Workers getting-started router.",
     "alternatives_considered": [
       {
         "name": "Workers CLI",
@@ -36,8 +36,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Build the first Cloudflare Developer Platform application after selecting Cloudflare but before selecting an onboarding interface.",
@@ -49,11 +49,11 @@
   },
   "documented_first_success": {
     "official_milestone": "No single first-Worker terminal path is selected by the official Workers getting-started router.",
-    "normalized_outcome": "A human must select CLI, Dashboard, Prompting, Templates, or Playground before one complete documented first-success journey can be recorded.",
-    "observable_completion_signal": "The CLI route ends with a deployed Worker preview at a workers.dev subdomain; the Dashboard route ends with a deployed preview at a provided workers.dev subdomain; Prompting produces an agent-generated application whose result depends on the chosen prompt; Templates require choosing and starting one of many projects; Playground provides an immediate browser preview without setup.",
+    "normalized_outcome": "The public workers.dev endpoint returns Hello Worker!.",
+    "observable_completion_signal": "The public workers.dev endpoint returns Hello Worker!.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The official Getting started page says Build your first Worker but exposes four parallel routes. The CLI, Dashboard, Prompting, and Templates pages define materially different choices and actions, while the Dashboard and Playground documentation separately name Playground as the quickest no-setup experiment.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The public workers.dev endpoint returns Hello Worker!.",
       "source_ids": [
         "S1",
         "S2",
@@ -64,7 +64,7 @@
         "S7"
       ]
     },
-    "why_this_is_the_boundary": "The official router does not choose one interface, and the routes differ materially in account, local software, Git-provider, code-editing, and deployment gates. Research stops at the unresolved interface choice.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -201,6 +201,303 @@
         "S5",
         "S6",
         "S7"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Cloudflare's signup page.",
+      "details": [],
+      "input": "Browser session",
+      "output": "Create Account form",
+      "success_signal": "Email and password fields are visible.",
+      "failure_or_wait": "An existing account can sign in instead and continue at Node.js setup.",
+      "required": true,
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter an email address and password, then select Create Account.",
+      "details": [
+        "Workers Free is the default; Workers Paid is a separate purchase and is not required."
+      ],
+      "input": "Email address and password",
+      "output": "New Cloudflare account",
+      "success_signal": "Cloudflare creates the account and automatically sends a verification email.",
+      "failure_or_wait": "Form or identity validation must be corrected before account creation succeeds.",
+      "required": true,
+      "source_ids": [
+        "S8",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "platform",
+      "interface": "email",
+      "action": "Wait for Cloudflare's automatic verification email.",
+      "details": [],
+      "input": "New-account email address",
+      "output": "Verification message",
+      "success_signal": "The recent Cloudflare message appears in the inbox or Spam folder.",
+      "failure_or_wait": "If missing, sign in, open My Profile, and select Send verification email.",
+      "required": true,
+      "source_ids": [
+        "S9"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the verification link and log in to Cloudflare to verify the address.",
+      "details": [],
+      "input": "Verification message and Cloudflare credentials",
+      "output": "Verified Cloudflare account",
+      "success_signal": "My Profile shows the verified label.",
+      "failure_or_wait": "If the link is expired or fails, resend it and retry in another browser or private window.",
+      "required": true,
+      "source_ids": [
+        "S9"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install Node.js 16.17.0 or later.",
+      "details": [
+        "Cloudflare recommends a version manager such as Volta or nvm to avoid permissions problems and switch versions."
+      ],
+      "input": "Supported local operating system",
+      "output": "Supported Node.js runtime",
+      "success_signal": "The installed Node.js version is 16.17.0 or later.",
+      "failure_or_wait": "An older or unavailable Node.js runtime blocks C3 and Wrangler.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npm create cloudflare@latest -- my-first-worker.",
+      "details": [
+        "The guide also displays equivalent yarn and pnpm commands; npm is selected for this candidate."
+      ],
+      "input": "Node.js and npm",
+      "output": "C3 interactive setup",
+      "success_signal": "C3 displays the project prompts.",
+      "failure_or_wait": "Package download, npm, permissions, or network errors must be corrected and the command rerun.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose Hello World example.",
+      "details": [],
+      "input": "C3 example prompt",
+      "output": "Hello World starter selection",
+      "success_signal": "C3 advances to application type.",
+      "failure_or_wait": "Selecting another example changes generated code and the verification text.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose Worker only.",
+      "details": [],
+      "input": "C3 application-type prompt",
+      "output": "Worker-only project",
+      "success_signal": "C3 advances to language selection.",
+      "failure_or_wait": "A different application type changes files and deployment behavior.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose JavaScript.",
+      "details": [],
+      "input": "C3 language prompt",
+      "output": "JavaScript Worker",
+      "success_signal": "C3 advances to Git setup.",
+      "failure_or_wait": "TypeScript changes source files and code.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose Yes for Git version control and No for immediate deployment.",
+      "details": [
+        "The guide delays deployment so the Worker can be edited first."
+      ],
+      "input": "C3 Git and deployment prompts",
+      "output": "Generated local Worker project",
+      "success_signal": "C3 finishes and reports project files including wrangler.jsonc, src/index.js, package.json, lockfile, and node_modules.",
+      "failure_or_wait": "Choosing immediate deployment changes the order and skips the documented edit-before-deploy route.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run cd my-first-worker.",
+      "details": [],
+      "input": "Generated project directory",
+      "output": "Shell in the Worker project",
+      "success_signal": "wrangler.jsonc and src/index.js are present.",
+      "failure_or_wait": "A different project name requires the matching directory.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npx wrangler dev.",
+      "details": [],
+      "input": "Generated Worker project",
+      "output": "Local Wrangler development server",
+      "success_signal": "Wrangler starts the server for http://localhost:8787.",
+      "failure_or_wait": "If this is the first Wrangler use, browser authentication must complete; dependency, port, or configuration errors must be corrected before the server stays running.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "If Wrangler opens a browser login, authenticate with the verified Cloudflare account and authorize Wrangler.",
+      "details": [],
+      "input": "Verified Cloudflare account",
+      "output": "Authenticated Wrangler session",
+      "success_signal": "wrangler dev continues and serves the local Worker.",
+      "failure_or_wait": "If browser login is unavailable or fails, follow wrangler login documentation and retry wrangler dev.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open http://localhost:8787 and verify the generated response is Hello World!.",
+      "details": [],
+      "input": "Running local Worker",
+      "output": "Initial local response",
+      "success_signal": "The browser displays Hello World!.",
+      "failure_or_wait": "A missing response requires checking Wrangler output, the local port, and generated source.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Edit src/index.js so the fetch handler returns Hello Worker!, then save the file.",
+      "details": [],
+      "input": "Generated Worker source",
+      "output": "Edited Worker source",
+      "success_signal": "src/index.js contains the new response text.",
+      "failure_or_wait": "Editing a different file or not saving leaves the preview unchanged.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Reload http://localhost:8787 and verify the response changes to Hello Worker!.",
+      "details": [],
+      "input": "Saved source and running wrangler dev",
+      "output": "Verified edited local Worker",
+      "success_signal": "The browser displays Hello Worker!.",
+      "failure_or_wait": "Confirm the file was saved, wrangler dev is running, and the page was reloaded, then retry.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npx wrangler deploy.",
+      "details": [],
+      "input": "Authenticated and locally verified Worker",
+      "output": "Cloudflare deployment",
+      "success_signal": "Wrangler reports a deployed workers.dev URL.",
+      "failure_or_wait": "If no workers.dev subdomain or custom domain is configured, answer Wrangler's publish-time prompt to create one; deployment errors must be corrected and retried.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the reported <YOUR_WORKER>.<YOUR_SUBDOMAIN>.workers.dev URL and verify Hello Worker!.",
+      "details": [],
+      "input": "Deployed Worker URL",
+      "output": "Public first Worker",
+      "success_signal": "The public workers.dev endpoint returns Hello Worker!.",
+      "failure_or_wait": "The first workers.dev push can return 523; wait about a minute and reload before diagnosing another cause.",
+      "required": true,
+      "source_ids": [
+        "S3"
       ]
     }
   ],
@@ -828,34 +1125,6 @@
     "Completing any one interface-specific Worker route until a human chooses the canonical route",
     "Bindings, examples, tutorials, testing, debugging, custom domains, and automatic builds after the first Worker preview"
   ],
-  "candidate_paths": [
-    {
-      "id": "workers-cli-hello-worker",
-      "name": "Workers CLI edited Hello Worker deployment",
-      "selection_basis": "The CLI guide is the official end-to-end code-first route that creates, runs, edits, deploys, and verifies a first Worker. It is a complete candidate, not a platform-wide default over Dashboard, Prompting, Templates, or Playground.",
-      "relationship_to_primary_path": "Continues after primary_path step 3 by selecting CLI. The candidate includes new-account creation and verification, local development, Cloudflare authentication, edit verification, deployment, and public workers.dev verification.",
-      "steps": [
-        {"step_number":1,"phase":"access","actor":"developer","interface":"console","action":"Open Cloudflare's signup page.","details":[],"input":"Browser session","output":"Create Account form","success_signal":"Email and password fields are visible.","failure_or_wait":"An existing account can sign in instead and continue at Node.js setup.","required":true,"source_ids":["S8"]},
-        {"step_number":2,"phase":"access","actor":"developer","interface":"console","action":"Enter an email address and password, then select Create Account.","details":["Workers Free is the default; Workers Paid is a separate purchase and is not required."],"input":"Email address and password","output":"New Cloudflare account","success_signal":"Cloudflare creates the account and automatically sends a verification email.","failure_or_wait":"Form or identity validation must be corrected before account creation succeeds.","required":true,"source_ids":["S8","S10"]},
-        {"step_number":3,"phase":"access","actor":"platform","interface":"email","action":"Wait for Cloudflare's automatic verification email.","details":[],"input":"New-account email address","output":"Verification message","success_signal":"The recent Cloudflare message appears in the inbox or Spam folder.","failure_or_wait":"If missing, sign in, open My Profile, and select Send verification email.","required":true,"source_ids":["S9"]},
-        {"step_number":4,"phase":"access","actor":"developer","interface":"email","action":"Open the verification link and log in to Cloudflare to verify the address.","details":[],"input":"Verification message and Cloudflare credentials","output":"Verified Cloudflare account","success_signal":"My Profile shows the verified label.","failure_or_wait":"If the link is expired or fails, resend it and retry in another browser or private window.","required":true,"source_ids":["S9"]},
-        {"step_number":5,"phase":"install","actor":"developer","interface":"cli","action":"Install Node.js 16.17.0 or later.","details":["Cloudflare recommends a version manager such as Volta or nvm to avoid permissions problems and switch versions."],"input":"Supported local operating system","output":"Supported Node.js runtime","success_signal":"The installed Node.js version is 16.17.0 or later.","failure_or_wait":"An older or unavailable Node.js runtime blocks C3 and Wrangler.","required":true,"source_ids":["S3"]},
-        {"step_number":6,"phase":"install","actor":"developer","interface":"cli","action":"Run npm create cloudflare@latest -- my-first-worker.","details":["The guide also displays equivalent yarn and pnpm commands; npm is selected for this candidate."],"input":"Node.js and npm","output":"C3 interactive setup","success_signal":"C3 displays the project prompts.","failure_or_wait":"Package download, npm, permissions, or network errors must be corrected and the command rerun.","required":true,"source_ids":["S3"]},
-        {"step_number":7,"phase":"configure","actor":"developer","interface":"cli","action":"Choose Hello World example.","details":[],"input":"C3 example prompt","output":"Hello World starter selection","success_signal":"C3 advances to application type.","failure_or_wait":"Selecting another example changes generated code and the verification text.","required":true,"source_ids":["S3"]},
-        {"step_number":8,"phase":"configure","actor":"developer","interface":"cli","action":"Choose Worker only.","details":[],"input":"C3 application-type prompt","output":"Worker-only project","success_signal":"C3 advances to language selection.","failure_or_wait":"A different application type changes files and deployment behavior.","required":true,"source_ids":["S3"]},
-        {"step_number":9,"phase":"configure","actor":"developer","interface":"cli","action":"Choose JavaScript.","details":[],"input":"C3 language prompt","output":"JavaScript Worker","success_signal":"C3 advances to Git setup.","failure_or_wait":"TypeScript changes source files and code.","required":true,"source_ids":["S3"]},
-        {"step_number":10,"phase":"configure","actor":"developer","interface":"cli","action":"Choose Yes for Git version control and No for immediate deployment.","details":["The guide delays deployment so the Worker can be edited first."],"input":"C3 Git and deployment prompts","output":"Generated local Worker project","success_signal":"C3 finishes and reports project files including wrangler.jsonc, src/index.js, package.json, lockfile, and node_modules.","failure_or_wait":"Choosing immediate deployment changes the order and skips the documented edit-before-deploy route.","required":true,"source_ids":["S3"]},
-        {"step_number":11,"phase":"configure","actor":"developer","interface":"cli","action":"Run cd my-first-worker.","details":[],"input":"Generated project directory","output":"Shell in the Worker project","success_signal":"wrangler.jsonc and src/index.js are present.","failure_or_wait":"A different project name requires the matching directory.","required":true,"source_ids":["S3"]},
-        {"step_number":12,"phase":"execute","actor":"developer","interface":"cli","action":"Run npx wrangler dev.","details":[],"input":"Generated Worker project","output":"Local Wrangler development server","success_signal":"Wrangler starts the server for http://localhost:8787.","failure_or_wait":"If this is the first Wrangler use, browser authentication must complete; dependency, port, or configuration errors must be corrected before the server stays running.","required":true,"source_ids":["S3"]},
-        {"step_number":13,"phase":"authenticate","actor":"developer","interface":"console","action":"If Wrangler opens a browser login, authenticate with the verified Cloudflare account and authorize Wrangler.","details":[],"input":"Verified Cloudflare account","output":"Authenticated Wrangler session","success_signal":"wrangler dev continues and serves the local Worker.","failure_or_wait":"If browser login is unavailable or fails, follow wrangler login documentation and retry wrangler dev.","required":true,"source_ids":["S3"]},
-        {"step_number":14,"phase":"verify","actor":"developer","interface":"console","action":"Open http://localhost:8787 and verify the generated response is Hello World!.","details":[],"input":"Running local Worker","output":"Initial local response","success_signal":"The browser displays Hello World!.","failure_or_wait":"A missing response requires checking Wrangler output, the local port, and generated source.","required":true,"source_ids":["S3"]},
-        {"step_number":15,"phase":"configure","actor":"developer","interface":"other","action":"Edit src/index.js so the fetch handler returns Hello Worker!, then save the file.","details":[],"input":"Generated Worker source","output":"Edited Worker source","success_signal":"src/index.js contains the new response text.","failure_or_wait":"Editing a different file or not saving leaves the preview unchanged.","required":true,"source_ids":["S3"]},
-        {"step_number":16,"phase":"verify","actor":"developer","interface":"console","action":"Reload http://localhost:8787 and verify the response changes to Hello Worker!.","details":[],"input":"Saved source and running wrangler dev","output":"Verified edited local Worker","success_signal":"The browser displays Hello Worker!.","failure_or_wait":"Confirm the file was saved, wrangler dev is running, and the page was reloaded, then retry.","required":true,"source_ids":["S3"]},
-        {"step_number":17,"phase":"execute","actor":"developer","interface":"cli","action":"Run npx wrangler deploy.","details":[],"input":"Authenticated and locally verified Worker","output":"Cloudflare deployment","success_signal":"Wrangler reports a deployed workers.dev URL.","failure_or_wait":"If no workers.dev subdomain or custom domain is configured, answer Wrangler's publish-time prompt to create one; deployment errors must be corrected and retried.","required":true,"source_ids":["S3"]},
-        {"step_number":18,"phase":"verify","actor":"developer","interface":"console","action":"Open the reported <YOUR_WORKER>.<YOUR_SUBDOMAIN>.workers.dev URL and verify Hello Worker!.","details":[],"input":"Deployed Worker URL","output":"Public first Worker","success_signal":"The public workers.dev endpoint returns Hello Worker!.","failure_or_wait":"The first workers.dev push can return 523; wait about a minute and reload before diagnosing another cause.","required":true,"source_ids":["S3"]}
-      ],
-      "source_ids": ["S3", "S8", "S9", "S10"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

@@ -6,8 +6,8 @@
   },
   "category": "Identity, security, and networking",
   "surface": {
-    "name": "Snyk scan product and integration route not selected",
-    "selection_basis": "Snyk's general getting-started page says the integration type depends on the systems used, what is being scanned, and integration scope. It presents guided SCM, manual SCM, and CLI routes, then separates Open Source, Code, Container, and IaC results. The docs therefore do not establish one platform-wide atomic journey.",
+    "name": "Authenticate Snyk CLI and run the Ionic quick test",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Authenticate Snyk CLI and run the Ionic quick test. The scan-product router has no default, but the official CLI getting-started guide provides a self-contained quick test whose terminal output is a vulnerability report. Prior surface before policy commit: Snyk scan product and integration route not selected.",
     "alternatives_considered": [
       {
         "name": "Snyk CLI quick test",
@@ -21,8 +21,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Reach the first documented security scan result on Snyk without a preselected product or integration.",
@@ -34,11 +34,11 @@
   },
   "documented_first_success": {
     "official_milestone": "No single Snyk platform-wide first-success milestone is documented.",
-    "normalized_outcome": "Unresolved until a human selects the scan product and integration route; documented candidates end with scan findings visible in the terminal or Snyk Web UI.",
-    "observable_completion_signal": "The CLI candidate prints a test report with found vulnerabilities, severity, description links, dependency paths, and fix guidance. The SCM candidate displays issue results after importing and scanning a Project.",
+    "normalized_outcome": "The terminal displays the issue report and its remediation guidance.",
+    "observable_completion_signal": "The terminal displays the issue report and its remediation guidance.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The general page branches by integration and Project type. The CLI guide demonstrates a terminal test report, while an imported Project produces Web UI results.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The terminal displays the issue report and its remediation guidance.",
       "source_ids": [
         "S1",
         "S2",
@@ -46,7 +46,7 @@
         "S4"
       ]
     },
-    "why_this_is_the_boundary": "The candidate terminal states are explicit, but choosing one as Snyk's universal first success would require a product, source, and interface decision that the general docs make conditional.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -126,6 +126,136 @@
         "S2",
         "S3",
         "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or sign in to the correct Snyk account and Organization, or complete the company's SSO invitation.",
+      "details": [
+        "The authenticated CLI is associated with this account and Organization context."
+      ],
+      "input": "Snyk identity or organization SSO access.",
+      "output": "Accessible Snyk account.",
+      "success_signal": "The Snyk Web UI opens in the intended account context.",
+      "failure_or_wait": "Invitation, SSO, account, or Organization access must be resolved before CLI consent.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Snyk CLI using one documented method and make the `snyk` command available.",
+      "details": [
+        "The npm route requires supported Node.js and npm; standalone, Homebrew, Yarn, Docker, and WSL have their own documented conditions."
+      ],
+      "input": "Supported local environment for the selected installer.",
+      "output": "Installed Snyk CLI.",
+      "success_signal": "The `snyk` command can be invoked from the terminal.",
+      "failure_or_wait": "Installer, runtime, path, permission, or WSL limitations require correcting the selected installation route.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "If the account is outside `SNYK-US-01`, run `snyk config environment <ENVIRONMENT>` with its documented regional value before authentication.",
+      "details": [
+        "The default-region account skips this command."
+      ],
+      "input": "Snyk account region.",
+      "output": "CLI configured for the account's Snyk environment.",
+      "success_signal": "The CLI stores the correct regional environment.",
+      "failure_or_wait": "Using the wrong environment sends authentication to the wrong regional service and must be corrected before retrying.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `snyk auth` to start the recommended OAuth authentication flow.",
+      "details": [
+        "Personal access token and Snyk API token are documented alternatives."
+      ],
+      "input": "Installed, region-configured Snyk CLI.",
+      "output": "Browser authorization request.",
+      "success_signal": "The Snyk authentication page opens or its URL is provided.",
+      "failure_or_wait": "Browser launch, network, region, or CLI errors prevent OAuth initiation.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Log in if prompted, grant the Snyk CLI application access, complete browser confirmation, and return to the terminal.",
+      "details": [
+        "The consent associates the local CLI with the signed-in Snyk identity."
+      ],
+      "input": "Snyk credentials and OAuth consent.",
+      "output": "Authorized local CLI.",
+      "success_signal": "The terminal prints `Your account has been authenticated` and regains control.",
+      "failure_or_wait": "Denied consent, wrong account, SSO, expired browser flow, or organization policy requires restarting authentication.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `snyk test ionic` to perform the documented vulnerability quick test against the public Ionic npm package.",
+      "details": [
+        "Running `snyk --help` is the guide's alternative installation-only quick test, so it is not required in this vulnerability-report candidate.",
+        "A local project route instead builds when required, enters the manifest directory, and runs `snyk test`."
+      ],
+      "input": "Authenticated Snyk CLI.",
+      "output": "CLI vulnerability test execution against the Ionic package.",
+      "success_signal": "The CLI runs the Ionic vulnerability test instead of reporting installation or authentication failure.",
+      "failure_or_wait": "Command, authentication, region, network, policy, or product-entitlement errors stop the scan.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Inspect the terminal test report.",
+      "details": [
+        "The documented report includes found vulnerabilities, severity, description links, dependency paths, and fix guidance."
+      ],
+      "input": "Completed Snyk quick test.",
+      "output": "Snyk vulnerability findings report.",
+      "success_signal": "The terminal displays the issue report and its remediation guidance.",
+      "failure_or_wait": "No report means the scan did not reach the candidate terminal and the preceding CLI error must be corrected before retrying.",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
@@ -321,23 +451,6 @@
     "No shared after-success scope is selected while scan product and integration remain unresolved.",
     "Monitoring, recurring scans, pull-request checks, remediation automation, policies, reporting, and enterprise rollout are excluded from the candidate first scan."
   ],
-  "candidate_paths": [
-    {
-      "id": "cli-ionic-quick-test",
-      "name": "Authenticate Snyk CLI and run the Ionic quick test",
-      "selection_basis": "The scan-product router has no default, but the official CLI getting-started guide provides a self-contained quick test whose terminal output is a vulnerability report.",
-      "relationship_to_primary_path": "This is the local CLI quick-test choice at primary step 2, expanded from Snyk account and CLI installation through the terminal findings report.",
-      "steps": [
-        {"step_number": 1, "phase": "access", "actor": "developer", "interface": "console", "action": "Create or sign in to the correct Snyk account and Organization, or complete the company's SSO invitation.", "details": ["The authenticated CLI is associated with this account and Organization context."], "input": "Snyk identity or organization SSO access.", "output": "Accessible Snyk account.", "success_signal": "The Snyk Web UI opens in the intended account context.", "failure_or_wait": "Invitation, SSO, account, or Organization access must be resolved before CLI consent.", "required": true, "source_ids": ["S1", "S4"]},
-        {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Snyk CLI using one documented method and make the `snyk` command available.", "details": ["The npm route requires supported Node.js and npm; standalone, Homebrew, Yarn, Docker, and WSL have their own documented conditions."], "input": "Supported local environment for the selected installer.", "output": "Installed Snyk CLI.", "success_signal": "The `snyk` command can be invoked from the terminal.", "failure_or_wait": "Installer, runtime, path, permission, or WSL limitations require correcting the selected installation route.", "required": true, "source_ids": ["S2", "S3"]},
-        {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "cli", "action": "If the account is outside `SNYK-US-01`, run `snyk config environment <ENVIRONMENT>` with its documented regional value before authentication.", "details": ["The default-region account skips this command."], "input": "Snyk account region.", "output": "CLI configured for the account's Snyk environment.", "success_signal": "The CLI stores the correct regional environment.", "failure_or_wait": "Using the wrong environment sends authentication to the wrong regional service and must be corrected before retrying.", "required": true, "source_ids": ["S4"]},
-        {"step_number": 4, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Run `snyk auth` to start the recommended OAuth authentication flow.", "details": ["Personal access token and Snyk API token are documented alternatives."], "input": "Installed, region-configured Snyk CLI.", "output": "Browser authorization request.", "success_signal": "The Snyk authentication page opens or its URL is provided.", "failure_or_wait": "Browser launch, network, region, or CLI errors prevent OAuth initiation.", "required": true, "source_ids": ["S2", "S4"]},
-        {"step_number": 5, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Log in if prompted, grant the Snyk CLI application access, complete browser confirmation, and return to the terminal.", "details": ["The consent associates the local CLI with the signed-in Snyk identity."], "input": "Snyk credentials and OAuth consent.", "output": "Authorized local CLI.", "success_signal": "The terminal prints `Your account has been authenticated` and regains control.", "failure_or_wait": "Denied consent, wrong account, SSO, expired browser flow, or organization policy requires restarting authentication.", "required": true, "source_ids": ["S4"]},
-        {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Run `snyk test ionic` to perform the documented vulnerability quick test against the public Ionic npm package.", "details": ["Running `snyk --help` is the guide's alternative installation-only quick test, so it is not required in this vulnerability-report candidate.", "A local project route instead builds when required, enters the manifest directory, and runs `snyk test`."], "input": "Authenticated Snyk CLI.", "output": "CLI vulnerability test execution against the Ionic package.", "success_signal": "The CLI runs the Ionic vulnerability test instead of reporting installation or authentication failure.", "failure_or_wait": "Command, authentication, region, network, policy, or product-entitlement errors stop the scan.", "required": true, "source_ids": ["S2"]},
-        {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Inspect the terminal test report.", "details": ["The documented report includes found vulnerabilities, severity, description links, dependency paths, and fix guidance."], "input": "Completed Snyk quick test.", "output": "Snyk vulnerability findings report.", "success_signal": "The terminal displays the issue report and its remediation guidance.", "failure_or_wait": "No report means the scan did not reach the candidate terminal and the preceding CLI error must be corrected before retrying.", "required": true, "source_ids": ["S2"]}
-      ],
-      "source_ids": ["S1", "S2", "S3", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

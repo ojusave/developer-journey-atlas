@@ -6,8 +6,8 @@
   },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Unresolved at CDP custodial model, product family, authentication model, and implementation selection",
-    "selection_basis": "Coinbase's current CDP API overview explicitly separates non-custodial APIs available after signup from custodial APIs that require a verified business, then exposes wallets, payments, trading, onchain tools, customers, webhooks, consumer, business, and institutional APIs. The docs do not choose one of these peer outcomes for a company-level Coinbase Developer Platform entry.",
+    "name": "Create and verify a first EVM API Key Wallet account with Node TypeScript",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create and verify a first EVM API Key Wallet account with Node TypeScript. The official API Key Wallet quickstart defines a non-custodial Node route with a printed EVM address as its first observable result, before funding or transactions. Prior surface before policy commit: Unresolved at CDP custodial model, product family, authentication model, and implementation selection.",
     "alternatives_considered": [
       {
         "name": "API Key Wallet quickstart",
@@ -41,8 +41,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Choose the CDP product and developer outcome whose first mile should be measured, then follow its account, credential, SDK or CLI, and first-success path.",
@@ -54,18 +54,18 @@
   },
   "documented_first_success": {
     "official_milestone": "No single platform-wide first-success milestone is established for Coinbase Developer Platform.",
-    "normalized_outcome": "Unresolved: success could be a valid authenticated API response, a created non-custodial wallet account, a funded testnet wallet, a sent transaction, a payment, a trade quote, a webhook event, market data, or an institutional API response.",
-    "observable_completion_signal": "Each selected quickstart supplies a different signal, such as JSON without an authentication error, a wallet address, a transaction explorer URL, a payment state, or an API-specific response.",
+    "normalized_outcome": "The terminal displays the Created EVM account label and a 0x-prefixed address.",
+    "observable_completion_signal": "The terminal displays the Created EVM account label and a 0x-prefixed address.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The CDP API overview divides non-custodial and custodial APIs and the documentation navigation exposes multiple peer product families. Its Get started section says to create an API key and learn authentication but does not select an API operation.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The terminal displays the Created EVM account label and a 0x-prefixed address.",
       "source_ids": [
         "S1",
         "S2",
         "S3"
       ]
     },
-    "why_this_is_the_boundary": "An API key is shared setup, not a product result. Choosing a later success changes eligibility, custody, credentials, permissions, secret types, runtime, network, financial assets, actors, cost, and verification.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -235,6 +235,171 @@
       "required": true,
       "source_ids": [
         "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or sign in to a CDP Portal account, open its project, and confirm Node.js 22 or later is available locally.",
+      "details": [
+        "The quickstart requires a CDP Portal account and Node 22 or later; CDP documentation says a project is included or auto-created on first sign-in."
+      ],
+      "input": "An eligible Coinbase identity and local Node environment.",
+      "output": "An authenticated CDP project and compatible runtime.",
+      "success_signal": "The project's API Keys area is accessible and Node satisfies the version requirement.",
+      "failure_or_wait": "The developer guides do not enumerate current account-creation, email, entity, geographic, or compliance screens.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a CDP API key and copy its API key ID and secret.",
+      "details": [
+        "The server-side SDK uses the CDP secret API-key credentials."
+      ],
+      "input": "The authenticated CDP project.",
+      "output": "A CDP API key ID and secret.",
+      "success_signal": "Both key values are available for local configuration.",
+      "failure_or_wait": "Wrong key type, permissions, or lost secret prevents SDK authentication.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Generate and copy the Wallet Secret for the project.",
+      "details": [
+        "API Key Wallet operations require this additional wallet credential."
+      ],
+      "input": "The selected CDP project.",
+      "output": "A Wallet Secret.",
+      "success_signal": "The Wallet Secret is generated and stored for local use.",
+      "failure_or_wait": "A missing or mismatched Wallet Secret prevents wallet-account creation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create the cdp-sdk-example Node project, set package type to module, and create main.ts and .env.",
+      "details": [
+        "The guide uses mkdir, npm init -y, npm pkg set type=module, and empty main.ts and .env files."
+      ],
+      "input": "Node.js 22 or later and npm.",
+      "output": "A local TypeScript example project.",
+      "success_signal": "package.json, main.ts, and .env exist in the project directory.",
+      "failure_or_wait": "Filesystem or npm initialization errors block setup.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add CDP_API_KEY_ID, CDP_API_KEY_SECRET, and CDP_WALLET_SECRET to .env.",
+      "details": [
+        "Each variable must contain the matching value created in the CDP Portal."
+      ],
+      "input": "The three copied credential values.",
+      "output": "The complete local CDP credential environment.",
+      "success_signal": "All three variables are present without placeholder values.",
+      "failure_or_wait": "Missing, swapped, or malformed credential values cause authentication or wallet errors.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install @coinbase/cdp-sdk and dotenv.",
+      "details": [
+        "These packages provide the CDP client and load .env credentials."
+      ],
+      "input": "The initialized Node project.",
+      "output": "The CDP SDK and dotenv dependencies.",
+      "success_signal": "npm completes installation without error.",
+      "failure_or_wait": "Dependency or supported-runtime errors prevent execution.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Configure main.ts to load the environment, instantiate CdpClient, create an EVM account, and print its address.",
+      "details": [
+        "Use cdp.evm.createAccount and log the resulting account address."
+      ],
+      "input": "The official Node sample and installed dependencies.",
+      "output": "A runnable EVM account-creation program.",
+      "success_signal": "main.ts contains client initialization, createAccount, and output logging.",
+      "failure_or_wait": "An omitted Wallet Secret or incorrect SDK configuration prevents wallet creation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npx tsx main.ts.",
+      "details": [
+        "The SDK authenticates to CDP and creates the EVM account."
+      ],
+      "input": "The program, dependencies, credentials, and network access.",
+      "output": "A newly created EVM account or an SDK error.",
+      "success_signal": "The command prints Created EVM account followed by a 0x address.",
+      "failure_or_wait": "Invalid API credentials, Wallet Secret, project permissions, or network access prevents account creation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify that the printed value is the newly created EVM account address.",
+      "details": [
+        "The 0x-prefixed address is the first observable wallet result; faucet funding and sending a transaction are later steps in the quickstart."
+      ],
+      "input": "The command output.",
+      "output": "A confirmed first CDP API Key Wallet account.",
+      "success_signal": "The terminal displays the Created EVM account label and a 0x-prefixed address.",
+      "failure_or_wait": "No address or only an error means the candidate terminal was not reached.",
+      "required": true,
+      "source_ids": [
         "S3"
       ]
     }
@@ -549,160 +714,6 @@
   "excluded_after_success": [
     "No product-specific downstream work can be excluded until custody model, product, authentication, runtime, network, and first-success boundary are selected."
   ],
-  "candidate_paths": [
-    {
-      "id": "node-evm-api-key-wallet",
-      "name": "Create and verify a first EVM API Key Wallet account with Node TypeScript",
-      "selection_basis": "The official API Key Wallet quickstart defines a non-custodial Node route with a printed EVM address as its first observable result, before funding or transactions.",
-      "relationship_to_primary_path": "This is one complete peer route after the shared CDP spine selects non-custodial API Key Wallets, Node TypeScript, EVM, and account creation.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Create or sign in to a CDP Portal account, open its project, and confirm Node.js 22 or later is available locally.",
-          "details": [
-            "The quickstart requires a CDP Portal account and Node 22 or later; CDP documentation says a project is included or auto-created on first sign-in."
-          ],
-          "input": "An eligible Coinbase identity and local Node environment.",
-          "output": "An authenticated CDP project and compatible runtime.",
-          "success_signal": "The project's API Keys area is accessible and Node satisfies the version requirement.",
-          "failure_or_wait": "The developer guides do not enumerate current account-creation, email, entity, geographic, or compliance screens.",
-          "required": true,
-          "source_ids": ["S2", "S3", "S4"]
-        },
-        {
-          "step_number": 2,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Create a CDP API key and copy its API key ID and secret.",
-          "details": [
-            "The server-side SDK uses the CDP secret API-key credentials."
-          ],
-          "input": "The authenticated CDP project.",
-          "output": "A CDP API key ID and secret.",
-          "success_signal": "Both key values are available for local configuration.",
-          "failure_or_wait": "Wrong key type, permissions, or lost secret prevents SDK authentication.",
-          "required": true,
-          "source_ids": ["S2", "S3"]
-        },
-        {
-          "step_number": 3,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Generate and copy the Wallet Secret for the project.",
-          "details": [
-            "API Key Wallet operations require this additional wallet credential."
-          ],
-          "input": "The selected CDP project.",
-          "output": "A Wallet Secret.",
-          "success_signal": "The Wallet Secret is generated and stored for local use.",
-          "failure_or_wait": "A missing or mismatched Wallet Secret prevents wallet-account creation.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 4,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Create the cdp-sdk-example Node project, set package type to module, and create main.ts and .env.",
-          "details": [
-            "The guide uses mkdir, npm init -y, npm pkg set type=module, and empty main.ts and .env files."
-          ],
-          "input": "Node.js 22 or later and npm.",
-          "output": "A local TypeScript example project.",
-          "success_signal": "package.json, main.ts, and .env exist in the project directory.",
-          "failure_or_wait": "Filesystem or npm initialization errors block setup.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 5,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "ide",
-          "action": "Add CDP_API_KEY_ID, CDP_API_KEY_SECRET, and CDP_WALLET_SECRET to .env.",
-          "details": [
-            "Each variable must contain the matching value created in the CDP Portal."
-          ],
-          "input": "The three copied credential values.",
-          "output": "The complete local CDP credential environment.",
-          "success_signal": "All three variables are present without placeholder values.",
-          "failure_or_wait": "Missing, swapped, or malformed credential values cause authentication or wallet errors.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 6,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Install @coinbase/cdp-sdk and dotenv.",
-          "details": [
-            "These packages provide the CDP client and load .env credentials."
-          ],
-          "input": "The initialized Node project.",
-          "output": "The CDP SDK and dotenv dependencies.",
-          "success_signal": "npm completes installation without error.",
-          "failure_or_wait": "Dependency or supported-runtime errors prevent execution.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 7,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "ide",
-          "action": "Configure main.ts to load the environment, instantiate CdpClient, create an EVM account, and print its address.",
-          "details": [
-            "Use cdp.evm.createAccount and log the resulting account address."
-          ],
-          "input": "The official Node sample and installed dependencies.",
-          "output": "A runnable EVM account-creation program.",
-          "success_signal": "main.ts contains client initialization, createAccount, and output logging.",
-          "failure_or_wait": "An omitted Wallet Secret or incorrect SDK configuration prevents wallet creation.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 8,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run npx tsx main.ts.",
-          "details": [
-            "The SDK authenticates to CDP and creates the EVM account."
-          ],
-          "input": "The program, dependencies, credentials, and network access.",
-          "output": "A newly created EVM account or an SDK error.",
-          "success_signal": "The command prints Created EVM account followed by a 0x address.",
-          "failure_or_wait": "Invalid API credentials, Wallet Secret, project permissions, or network access prevents account creation.",
-          "required": true,
-          "source_ids": ["S3"]
-        },
-        {
-          "step_number": 9,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Verify that the printed value is the newly created EVM account address.",
-          "details": [
-            "The 0x-prefixed address is the first observable wallet result; faucet funding and sending a transaction are later steps in the quickstart."
-          ],
-          "input": "The command output.",
-          "output": "A confirmed first CDP API Key Wallet account.",
-          "success_signal": "The terminal displays the Created EVM account label and a 0x-prefixed address.",
-          "failure_or_wait": "No address or only an error means the candidate terminal was not reached.",
-          "required": true,
-          "source_ids": ["S3"]
-        }
-      ],
-      "source_ids": ["S2", "S3", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

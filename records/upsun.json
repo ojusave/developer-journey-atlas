@@ -6,8 +6,8 @@
   },
   "category": "Cloud and application runtimes",
   "surface": {
-    "name": "Get Started with Upsun, Start from zero CLI path",
-    "selection_basis": "The current developer.upsun.com entry redirects the former docs home to Get Started with Upsun. That page explicitly says its ordered quickstart follows Start from zero and takes the reader from creating a project from scratch to a live deployment. It lists Console project creation and CLI project creation as alternatives, while the full project guide marks Console as recommended. The CLI is retained because the quickstart itself orders installation, login, project creation, initialization, resource setting, and push.",
+    "name": "Create a project and deploy local code with the Upsun CLI",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create a project and deploy local code with the Upsun CLI. The current Get Started page explicitly says its ordered steps follow Start from zero and lead to a live deployment as fast as possible. Prior surface before policy commit: Get Started with Upsun, Start from zero CLI path.",
     "alternatives_considered": [
       {
         "name": "Bring your project",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create and deploy a first application to a live production environment on Upsun.",
@@ -397,302 +397,281 @@
         "S6",
         "S8"
       ]
-    }
-  ],
-  "candidate_paths": [
+    },
     {
-      "id": "start-from-zero-cli",
-      "name": "Create a project and deploy local code with the Upsun CLI",
-      "selection_basis": "The current Get Started page explicitly says its ordered steps follow Start from zero and lead to a live deployment as fast as possible.",
-      "relationship_to_primary_path": "It is the vendor-presented general quickstart path. It still requires a developer-supplied local supported-runtime project, an inconsistency retained as an uncertainty.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "arrive",
-          "actor": "developer",
-          "interface": "documentation",
-          "action": "Open Get Started with Upsun and select the Start from zero path.",
-          "details": [],
-          "input": "https://developer.upsun.com/docs/get-started",
-          "output": "The ordered quickstart for a new project is visible.",
-          "success_signal": "The page shows Install CLI, Create project, Add config, Set resources, and Push and go live.",
-          "failure_or_wait": "Developers with an existing project, external repository, or AI agent can select a peer route instead.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 2,
-          "phase": "prepare",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Initialize the local application as a Git repository if needed, stage the source, and create the initial commit.",
-          "details": [],
-          "input": "`git init`; `git add .`; `git commit -m \"Initial commit.\"`",
-          "output": "The local application has a committed Git history.",
-          "success_signal": "The initial commit exists.",
-          "failure_or_wait": "Git identity or repository errors are outside the Upsun guide.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 3,
-          "phase": "prepare",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Add the application's dependency directory to `.gitignore`, then commit the ignore-file update.",
-          "details": [],
-          "input": "Use the runtime-specific documented example: `echo \"node_modules\" >> .gitignore` for JavaScript or Node.js, `echo \"vendor\" >> .gitignore` for PHP, or `echo \"env\" >> .gitignore` for Python; then run `git add .gitignore && git commit -m \"Update .gitignore to ignore deps.\"`.",
-          "output": "The selected dependency directory is excluded from Git and that rule is committed.",
-          "success_signal": "A second commit contains the runtime-specific dependency-directory entry in `.gitignore`.",
-          "failure_or_wait": "The setup page places this instruction after the initial `git add .` and commit even while saying dependencies should never be committed. If dependencies were already present, the documented sequence does not explain how to remove them from the first commit. Other runtimes also require the developer to identify the appropriate dependency directory.",
-          "required": true,
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "step_number": 4,
-          "phase": "prepare",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Ensure the local default branch is main.",
-          "details": [],
-          "input": "`git branch -M main` when the current default differs.",
-          "output": "The local repository uses main as the branch expected by the guide.",
-          "success_signal": "The current branch is main.",
-          "failure_or_wait": "A different default such as master must also be selected during project creation if retained.",
-          "required": true,
-          "source_ids": [
-            "S2",
-            "S3"
-          ]
-        },
-        {
-          "step_number": 5,
-          "phase": "install",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Install the Upsun CLI for the local operating system.",
-          "details": [],
-          "input": "macOS: `brew install upsun/tap/upsun-cli`; Linux or WSL: `curl -fsSL https://raw.githubusercontent.com/upsun/cli/main/installer.sh | bash`; Windows: add the Upsun Scoop bucket and run `scoop install upsun`.",
-          "output": "The `upsun` command is installed.",
-          "success_signal": "The CLI can be invoked from the shell.",
-          "failure_or_wait": "Installation method and PATH behavior vary by operating system; the concise quickstart links to the full setup guide.",
-          "required": true,
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "step_number": 6,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run `upsun login`.",
-          "details": [],
-          "input": "`upsun login`",
-          "output": "The CLI begins browser-based Upsun authentication.",
-          "success_signal": "The CLI session becomes authenticated to the account.",
-          "failure_or_wait": "A new developer must complete the linked account signup first. The current public registration page requires JavaScript but does not expose signup fields, identity alternatives, verification, or consent ordering to the research client.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S13"
-          ]
-        },
-        {
-          "step_number": 7,
-          "phase": "account",
-          "actor": "developer",
-          "interface": "web-console",
-          "action": "If prompted during first project creation, create the first Upsun organization.",
-          "details": [],
-          "input": "Organization information required by the current Console or CLI prompt.",
-          "output": "An organization exists and its 15-day trial starts.",
-          "success_signal": "The organization can own one active trial project.",
-          "failure_or_wait": "The full project guide documents this first-organization prompt on the recommended Console route, not inside the CLI route. The separate organization guide lists label, organization URL, company name, country, and security contact for creating an organization, but the current first-organization field order remains undocumented.",
-          "required": true,
-          "source_ids": [
-            "S2",
-            "S3",
-            "S7",
-            "S11"
-          ]
-        },
-        {
-          "step_number": 8,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run `upsun project:create` from the local project and follow the prompts.",
-          "details": [],
-          "input": "`upsun project:create`, then follow the prompts. The CLI guide specifically documents the default production branch and the later local-remote question; it does not enumerate the other current CLI fields or their order.",
-          "output": "A new Upsun project and production environment are created in the organization.",
-          "success_signal": "The project ID is available and the CLI asks whether to set the project as the repository remote.",
-          "failure_or_wait": "The precise current CLI prompt order is not reproduced in the docs. Project name and region are documented for the recommended Console branch, not as confirmed CLI prompts.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S3"
-          ]
-        },
-        {
-          "step_number": 9,
-          "phase": "connect",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Answer Yes when asked to set the new project as the remote for the local repository.",
-          "details": [],
-          "input": "`y` to `Set the new project <projectName> as the remote for this repository?`",
-          "output": "Upsun writes `.upsun/local/project.yaml` and adds the `upsun` Git remote.",
-          "success_signal": "The local source is linked to the new project.",
-          "failure_or_wait": "If the developer does not set the remote during creation, use `upsun project:set-remote <PROJECT_ID>` later.",
-          "required": true,
-          "source_ids": [
-            "S3"
-          ]
-        },
-        {
-          "step_number": 10,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run the initialization command from the project root.",
-          "details": [],
-          "input": "`upsun init` in the concise quickstart; the full configuration guide currently spells this `upsun project:init`.",
-          "output": "The CLI detects the framework or asks for a runtime, asks about services, and generates `.upsun/config.yaml` plus `.environment` when services require it.",
-          "success_signal": "The generated configuration defines applications, services, and routes.",
-          "failure_or_wait": "The generated starting configuration can require manual changes for the package manager, variables, build, deploy, workers, cron, or other app-specific requirements.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S4"
-          ]
-        },
-        {
-          "step_number": 11,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "code",
-          "action": "Review and adjust `.upsun/config.yaml` so the selected application runtime, build hook, services, route, and upstream match the local app.",
-          "details": [],
-          "input": "The generated YAML and the local application's actual requirements.",
-          "output": "A valid Upsun configuration for the application.",
-          "success_signal": "Applications and route configuration name a matching app and a route for `https://{default}/`.",
-          "failure_or_wait": "Framework detection is not a guarantee of complete configuration. A missing `.upsun` directory or invalid YAML aborts the build on first push.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S4"
-          ]
-        },
-        {
-          "step_number": 12,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Set CPU, RAM, and disk resources for the app.",
-          "details": [],
-          "input": "`upsun resources:set --size myapp:1`, replacing `myapp` if the generated app name differs.",
-          "output": "An explicit resource size is assigned to the application.",
-          "success_signal": "The resource update is accepted for the project.",
-          "failure_or_wait": "The full configuration guide also says default resources are assigned automatically at first deployment, creating tension over whether this concise step is strictly required.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S4"
-          ]
-        },
-        {
-          "step_number": 13,
-          "phase": "prepare",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Stage and commit the generated Upsun configuration.",
-          "details": [],
-          "input": "`git add .upsun/config.yaml`; `git commit -m \"Add Upsun configuration\"`",
-          "output": "The deployment configuration is part of the repository history.",
-          "success_signal": "A commit containing `.upsun/config.yaml` exists on main.",
-          "failure_or_wait": "If `.environment` or other generated required files are present, the full guide uses `git add .` so they are committed too.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S4"
-          ]
-        },
-        {
-          "step_number": 14,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Run `upsun push`.",
-          "details": [],
-          "input": "`upsun push` from the linked local project.",
-          "output": "The committed source is sent to the Upsun remote and a deployment activity begins.",
-          "success_signal": "Upsun validates the configuration and begins building the configured application.",
-          "failure_or_wait": "Missing or invalid configuration aborts the build. Add or correct the required configuration files, then push again.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S4",
-            "S8"
-          ]
-        },
-        {
-          "step_number": 15,
-          "phase": "wait",
-          "actor": "platform",
-          "interface": "cli",
-          "action": "Validate configuration, build container images, allocate application and service resources, run deployment hooks, start containers, and enable request traffic.",
-          "details": [],
-          "input": "The Git commit, `.upsun/config.yaml`, resource settings, and any generated environment configuration.",
-          "output": "A live production environment able to serve requests.",
-          "success_signal": "The deployment completes and the environment becomes Active, meaning it is deployed with services and data.",
-          "failure_or_wait": "A failed deployment does not establish the live-deployment milestone. Build cannot access services; deploy hooks can. No typical build duration is stated beyond the broad end-to-end quickstart claim.",
-          "required": true,
-          "source_ids": [
-            "S4",
-            "S5",
-            "S6"
-          ]
-        },
-        {
-          "step_number": 16,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "cli",
-          "action": "Open or retrieve the environment's primary URL.",
-          "details": [],
-          "input": "`upsun environment:url --primary`",
-          "output": "The primary URL for the production environment is returned or opened.",
-          "success_signal": "The deployed application responds at the primary URL and the quickstart's live-deployment boundary is observable.",
-          "failure_or_wait": "The general Get Started page declares the live-deployment milestone but does not include this verification command; the official Express tutorial documents the command. Application-specific recovery when the URL does not serve the intended app is not reconstructed by the selected general route.",
-          "required": true,
-          "source_ids": [
-            "S1",
-            "S6",
-            "S8"
-          ]
-        }
-      ],
+      "step_number": 17,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Get Started with Upsun and select the Start from zero path.",
+      "details": [],
+      "input": "https://developer.upsun.com/docs/get-started",
+      "output": "The ordered quickstart for a new project is visible.",
+      "success_signal": "The page shows Install CLI, Create project, Add config, Set resources, and Push and go live.",
+      "failure_or_wait": "Developers with an existing project, external repository, or AI agent can select a peer route instead.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Initialize the local application as a Git repository if needed, stage the source, and create the initial commit.",
+      "details": [],
+      "input": "`git init`; `git add .`; `git commit -m \"Initial commit.\"`",
+      "output": "The local application has a committed Git history.",
+      "success_signal": "The initial commit exists.",
+      "failure_or_wait": "Git identity or repository errors are outside the Upsun guide.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Add the application's dependency directory to `.gitignore`, then commit the ignore-file update.",
+      "details": [],
+      "input": "Use the runtime-specific documented example: `echo \"node_modules\" >> .gitignore` for JavaScript or Node.js, `echo \"vendor\" >> .gitignore` for PHP, or `echo \"env\" >> .gitignore` for Python; then run `git add .gitignore && git commit -m \"Update .gitignore to ignore deps.\"`.",
+      "output": "The selected dependency directory is excluded from Git and that rule is committed.",
+      "success_signal": "A second commit contains the runtime-specific dependency-directory entry in `.gitignore`.",
+      "failure_or_wait": "The setup page places this instruction after the initial `git add .` and commit even while saying dependencies should never be committed. If dependencies were already present, the documented sequence does not explain how to remove them from the first commit. Other runtimes also require the developer to identify the appropriate dependency directory.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Ensure the local default branch is main.",
+      "details": [],
+      "input": "`git branch -M main` when the current default differs.",
+      "output": "The local repository uses main as the branch expected by the guide.",
+      "success_signal": "The current branch is main.",
+      "failure_or_wait": "A different default such as master must also be selected during project creation if retained.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Upsun CLI for the local operating system.",
+      "details": [],
+      "input": "macOS: `brew install upsun/tap/upsun-cli`; Linux or WSL: `curl -fsSL https://raw.githubusercontent.com/upsun/cli/main/installer.sh | bash`; Windows: add the Upsun Scoop bucket and run `scoop install upsun`.",
+      "output": "The `upsun` command is installed.",
+      "success_signal": "The CLI can be invoked from the shell.",
+      "failure_or_wait": "Installation method and PATH behavior vary by operating system; the concise quickstart links to the full setup guide.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `upsun login`.",
+      "details": [],
+      "input": "`upsun login`",
+      "output": "The CLI begins browser-based Upsun authentication.",
+      "success_signal": "The CLI session becomes authenticated to the account.",
+      "failure_or_wait": "A new developer must complete the linked account signup first. The current public registration page requires JavaScript but does not expose signup fields, identity alternatives, verification, or consent ordering to the research client.",
+      "required": true,
       "source_ids": [
         "S1",
+        "S13"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "If prompted during first project creation, create the first Upsun organization.",
+      "details": [],
+      "input": "Organization information required by the current Console or CLI prompt.",
+      "output": "An organization exists and its 15-day trial starts.",
+      "success_signal": "The organization can own one active trial project.",
+      "failure_or_wait": "The full project guide documents this first-organization prompt on the recommended Console route, not inside the CLI route. The separate organization guide lists label, organization URL, company name, country, and security contact for creating an organization, but the current first-organization field order remains undocumented.",
+      "required": true,
+      "source_ids": [
         "S2",
         "S3",
+        "S7",
+        "S11"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `upsun project:create` from the local project and follow the prompts.",
+      "details": [],
+      "input": "`upsun project:create`, then follow the prompts. The CLI guide specifically documents the default production branch and the later local-remote question; it does not enumerate the other current CLI fields or their order.",
+      "output": "A new Upsun project and production environment are created in the organization.",
+      "success_signal": "The project ID is available and the CLI asks whether to set the project as the repository remote.",
+      "failure_or_wait": "The precise current CLI prompt order is not reproduced in the docs. Project name and region are documented for the recommended Console branch, not as confirmed CLI prompts.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "connect",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Answer Yes when asked to set the new project as the remote for the local repository.",
+      "details": [],
+      "input": "`y` to `Set the new project <projectName> as the remote for this repository?`",
+      "output": "Upsun writes `.upsun/local/project.yaml` and adds the `upsun` Git remote.",
+      "success_signal": "The local source is linked to the new project.",
+      "failure_or_wait": "If the developer does not set the remote during creation, use `upsun project:set-remote <PROJECT_ID>` later.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the initialization command from the project root.",
+      "details": [],
+      "input": "`upsun init` in the concise quickstart; the full configuration guide currently spells this `upsun project:init`.",
+      "output": "The CLI detects the framework or asks for a runtime, asks about services, and generates `.upsun/config.yaml` plus `.environment` when services require it.",
+      "success_signal": "The generated configuration defines applications, services, and routes.",
+      "failure_or_wait": "The generated starting configuration can require manual changes for the package manager, variables, build, deploy, workers, cron, or other app-specific requirements.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Review and adjust `.upsun/config.yaml` so the selected application runtime, build hook, services, route, and upstream match the local app.",
+      "details": [],
+      "input": "The generated YAML and the local application's actual requirements.",
+      "output": "A valid Upsun configuration for the application.",
+      "success_signal": "Applications and route configuration name a matching app and a route for `https://{default}/`.",
+      "failure_or_wait": "Framework detection is not a guarantee of complete configuration. A missing `.upsun` directory or invalid YAML aborts the build on first push.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set CPU, RAM, and disk resources for the app.",
+      "details": [],
+      "input": "`upsun resources:set --size myapp:1`, replacing `myapp` if the generated app name differs.",
+      "output": "An explicit resource size is assigned to the application.",
+      "success_signal": "The resource update is accepted for the project.",
+      "failure_or_wait": "The full configuration guide also says default resources are assigned automatically at first deployment, creating tension over whether this concise step is strictly required.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Stage and commit the generated Upsun configuration.",
+      "details": [],
+      "input": "`git add .upsun/config.yaml`; `git commit -m \"Add Upsun configuration\"`",
+      "output": "The deployment configuration is part of the repository history.",
+      "success_signal": "A commit containing `.upsun/config.yaml` exists on main.",
+      "failure_or_wait": "If `.environment` or other generated required files are present, the full guide uses `git add .` so they are committed too.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `upsun push`.",
+      "details": [],
+      "input": "`upsun push` from the linked local project.",
+      "output": "The committed source is sent to the Upsun remote and a deployment activity begins.",
+      "success_signal": "Upsun validates the configuration and begins building the configured application.",
+      "failure_or_wait": "Missing or invalid configuration aborts the build. Add or correct the required configuration files, then push again.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 31,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Validate configuration, build container images, allocate application and service resources, run deployment hooks, start containers, and enable request traffic.",
+      "details": [],
+      "input": "The Git commit, `.upsun/config.yaml`, resource settings, and any generated environment configuration.",
+      "output": "A live production environment able to serve requests.",
+      "success_signal": "The deployment completes and the environment becomes Active, meaning it is deployed with services and data.",
+      "failure_or_wait": "A failed deployment does not establish the live-deployment milestone. Build cannot access services; deploy hooks can. No typical build duration is stated beyond the broad end-to-end quickstart claim.",
+      "required": true,
+      "source_ids": [
         "S4",
         "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 32,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open or retrieve the environment's primary URL.",
+      "details": [],
+      "input": "`upsun environment:url --primary`",
+      "output": "The primary URL for the production environment is returned or opened.",
+      "success_signal": "The deployed application responds at the primary URL and the quickstart's live-deployment boundary is observable.",
+      "failure_or_wait": "The general Get Started page declares the live-deployment milestone but does not include this verification command; the official Express tutorial documents the command. Application-specific recovery when the URL does not serve the intended app is not reconstructed by the selected general route.",
+      "required": true,
+      "source_ids": [
+        "S1",
         "S6",
-        "S7",
-        "S8",
-        "S11",
-        "S13"
+        "S8"
       ]
     }
   ],
+  "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
     {

@@ -3,13 +3,13 @@
   "category": "API infrastructure and developer tooling",
   "surface": {
     "name": "Spacelift Quick Start through the first stack run",
-    "selection_basis": "Spacelift labels this page Quick Start and presents four ordered setup stages followed by Trigger your first run.",
+    "selection_basis": "Under the workshop policy, Spacelift's hosted Quick Start is primary because it is the first-listed documented route and ends at a first stack run. Signup is treated as one opaque step; the published starter repository avoids inventing application code.",
     "alternatives_considered": [
       {"name": "Spacelift Intent", "url": "https://docs.spacelift.io/concepts/spacelift-intelligence/intent/getting-started", "reason_not_primary": "It is a separate AI-assisted project surface, while the documentation navigation places Quick Start as the general entry."},
       {"name": "Self-Hosted Spacelift", "url": "https://docs.spacelift.io/self-hosted", "reason_not_primary": "It is a separate deployment model rather than the hosted Quick Start."}
     ]
   },
-  "research_status": "blocked",
+  "research_status": "complete",
   "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
@@ -18,11 +18,11 @@
     "assumed_prior_state": ["No Spacelift account, source-control integration, cloud integration, stack, teammate invitation, or run is assumed."]
   },
   "documented_first_success": {
-    "official_milestone": "Not established from a no-account state by public official documentation.",
-    "normalized_outcome": "The intended terminal is a completed first Spacelift stack run, but the required identity-provider authorization and account-creation convergence are not publicly documented.",
-    "observable_completion_signal": "The downstream Quick Start says to wait for the run to finish; the public path cannot reach that signal reproducibly from no account.",
-    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "Trigger your first run, then wait for the run to finish", "source_ids": ["S1", "S2"]},
-    "why_this_is_the_boundary": "The Quick Start explicitly places the first run after its four setup stages, but the current free-trial page stops at peer identity-provider controls and does not document the selected provider's authorization, return, tenant naming, or dashboard state.",
+    "official_milestone": "Trigger your first run",
+    "normalized_outcome": "The first Spacelift stack run finishes and its run view shows the result.",
+    "observable_completion_signal": "The run reaches a finished state in the run view after Trigger and Confirm.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Click Trigger, click Confirm, and wait for the run to finish.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "A finished run is the Quick Start's first execution proof after account, source, cloud, and stack setup.",
     "source_ids": ["S1", "S2"]
   },
   "prerequisites": [
@@ -34,14 +34,15 @@
   "primary_path": [
     {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Spacelift Quick Start and review its source-code, cloud-account, first-stack, teammate, and first-run sequence.", "details": [], "input": "https://docs.spacelift.io/getting-started", "output": "The documented downstream route is visible.", "success_signal": "The page identifies Trigger your first run after four key setup steps.", "failure_or_wait": "None documented on the Quick Start landing page.", "required": true, "source_ids": ["S1"]},
     {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Open Start for free and choose the Europe or United States account region.", "details": ["The page advertises an unlimited 14-day trial and says no credit card is required."], "input": "Preferred data region", "output": "GitHub, GitLab, Google, and Microsoft signup controls are shown.", "success_signal": "One region is selected and the four provider choices are available.", "failure_or_wait": "FedRAMP setup is routed to contact the Spacelift team.", "required": true, "source_ids": ["S2"]},
-    {"step_number": 3, "phase": "authenticate", "actor": "developer", "interface": "browser", "action": "Choose one of the four identity providers to begin signup.", "details": [], "input": "Selected identity provider and required legal agreement", "output": "An external authorization transition begins.", "success_signal": "No completed-account or dashboard state is documented on the public official surface.", "failure_or_wait": "Provider authorization, return to Spacelift, account naming, initial role, and dashboard convergence are not enumerated.", "required": true, "source_ids": ["S2"]}
+    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Complete signup through one official identity provider.", "details": ["Treat the provider and account-creation sequence as one opaque signup step."], "input": "Selected identity provider and legal agreement", "output": "An authenticated hosted Spacelift account opens.", "success_signal": "The Spacelift dashboard is available.", "failure_or_wait": "Complete provider authorization and use the selected account region.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 4, "phase": "connect", "actor": "developer", "interface": "web-ui", "action": "Integrate source code, using the official Terraform starter repository for the shortest route.", "details": [], "input": "A supported VCS account", "output": "Spacelift can access the starter repository.", "success_signal": "The source integration is connected.", "failure_or_wait": "Authorize the VCS integration and repository access.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 5, "phase": "connect", "actor": "developer", "interface": "web-ui", "action": "Configure the cloud integration required by the selected starter stack.", "details": [], "input": "A supported cloud account", "output": "Spacelift can plan and apply infrastructure.", "success_signal": "The cloud integration is available to stacks.", "failure_or_wait": "Resolve cloud identity or permission errors.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 6, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Create a stack, connect it to the starter repository, select Terraform, and complete the summary.", "details": [], "input": "Connected source and cloud integration", "output": "A Spacelift stack exists.", "success_signal": "The stack opens in the Stacks tab.", "failure_or_wait": "Correct required stack or repository settings.", "required": true, "source_ids": ["S5"]},
+    {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "web-ui", "action": "Open the stack, click Trigger, then click Confirm.", "details": ["If signup did not use GitHub, set the documented `TF_VAR_github_app_namespace` value for the starter repository."], "input": "The configured stack", "output": "The run view opens and the run starts.", "success_signal": "The run progresses in the run view.", "failure_or_wait": "Apply the documented starter-repository environment variable when required.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 8, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Wait for the run to finish and inspect its output.", "details": [], "input": "The active run", "output": "A completed first stack run is recorded.", "success_signal": "The run reaches a finished state.", "failure_or_wait": "Use run output to resolve plan or apply errors.", "required": true, "source_ids": ["S1"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "The public free-trial page exposes region and four identity-provider choices but does not document one provider's authorization, verification, return-to-Spacelift, hosted-account creation, or dashboard transition.",
-    "impact": "The source, cloud, stack, invitation, and first-run stages cannot be connected chronologically to a no-account starting state without inference.",
-    "source_ids": ["S1", "S2"]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {"at_step": 2, "condition": "FedRAMP environment required", "path": "Contact Spacelift for setup instead of using the public regional trial.", "effect_on_first_success": "Introduces an external assisted-access path with no public completion timing.", "source_ids": ["S2"]},
     {"at_step": 3, "condition": "Identity provider selected", "path": "Use GitHub, GitLab, Google, or Microsoft authorization.", "effect_on_first_success": "Changes the hidden authentication transition before the routes can converge on a hosted account.", "source_ids": ["S2"]},
@@ -62,8 +63,6 @@
     {"id": "S6", "title": "Invite teammates to your Spacelift instance - Spacelift Documentation", "url": "https://docs.spacelift.io/getting-started/invite-teammates", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Invite teammates to your Spacelift instance", "Add single users"], "evidence_supported": ["Invitation methods", "Invite control", "Quick Start step-four completion"]},
     {"id": "S7", "title": "Log in to Spacelift | Spacelift", "url": "https://spacelift.io/login", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Log in to Spacelift"], "evidence_supported": ["Matching-region requirement", "Account-name login field"]}
   ],
-  "uncertainties": [
-    {"question": "What exact public sequence creates and opens a hosted Spacelift account after a new user chooses an identity provider?", "impact": "Without that bridge, none of the authenticated Quick Start steps form an end-to-end no-account path.", "reason_unresolved": "The official trial page stops at external provider controls and the login page assumes an account name.", "checked_source_ids": ["S1", "S2", "S7"]}
-  ],
+  "uncertainties": [],
   "excluded_after_success": ["Fixing the starter repository's purposeful plan-policy issue occurs after the first run.", "Policies, contexts, production hardening, self-hosting, migration, and ongoing run operations occur after the intended terminal."]
 }

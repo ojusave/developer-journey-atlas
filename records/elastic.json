@@ -6,8 +6,8 @@
   },
   "category": "Data, databases, and search",
   "surface": {
-    "name": "Elastic platform, solution and deployment type not selected",
-    "selection_basis": "Elastic's official Solutions overview is the platform-level entry. It presents Elasticsearch, Elastic Observability, and Elastic Security as separate recommended solutions for different needs, then presents managed Serverless, Cloud Hosted, local Docker, and self-managed deployment choices. It does not select one solution and deployment pair as the general default.",
+    "name": "Elastic Cloud trial to first Elasticsearch Console search",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Elastic Cloud trial to first Elasticsearch Console search. The current Search getting-started page recommends Elastic Cloud Serverless for simplicity and speed and points to Index and search basics. This is a complete representative Search candidate, not a platform-wide choice over Observability or Security. Prior surface before policy commit: Elastic platform, solution and deployment type not selected.",
     "alternatives_considered": [
       {
         "name": "Get started with Elasticsearch",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Get started with the Elastic platform, with no solution use case or deployment model supplied.",
@@ -44,11 +44,11 @@
   },
   "documented_first_success": {
     "official_milestone": "Not established at the Elastic platform level.",
-    "normalized_outcome": "Unresolved until a human selects both an Elastic solution and a deployment or execution path.",
-    "observable_completion_signal": "No single platform-wide completion signal is documented; candidate signals include a successful search result, visible ingested telemetry, or a configured Security project with data.",
+    "normalized_outcome": "The expected book appears under hits.hits with its original _source JSON.",
+    "observable_completion_signal": "The expected book appears under hits.hits with its original _source JSON.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The platform overview routes developers to three different solution-specific getting-started guides, each with different tasks and outcomes.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The expected book appears under hits.hits with its original _source JSON.",
       "source_ids": [
         "S1",
         "S2",
@@ -56,7 +56,7 @@
         "S4"
       ]
     },
-    "why_this_is_the_boundary": "A researcher-selected Elasticsearch query, Observability view, or Security ingestion state would replace the vendor's unresolved solution choice. The official platform entry does not name one of them as Elastic's universal first success.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -105,21 +105,171 @@
     },
     {
       "step_number": 2,
-      "phase": "configure",
+      "phase": "access",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Select a solution and deployment model before a first-mile journey can be reconstructed.",
+      "interface": "console",
+      "action": "Open Elastic Cloud Sign Up and register with email and password, Google, Microsoft, or a supported marketplace.",
       "details": [
-        "Search, Observability, and Security have different ingestion, query, exploration, and terminal states; each also exposes deployment choices."
+        "First signup creates an Elastic Cloud organization and starts a free 14-day trial.",
+        "An email address can belong to only one Elastic Cloud account and a user can belong to only one organization at a time."
       ],
-      "input": "Human use-case and deployment decision.",
-      "output": "A bounded getting-started guide capable of defining later steps.",
-      "success_signal": "One solution and deployment route is selected.",
-      "failure_or_wait": "The supplied platform-level intent does not provide this decision, and Elastic does not choose it globally.",
+      "input": "Eligible email identity or supported federated or marketplace identity.",
+      "output": "Elastic Cloud account, organization, and trial.",
+      "success_signal": "The Elastic Cloud home page is available.",
+      "failure_or_wait": "A reused account email or existing organization membership can require leaving the organization or using another email.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S5"
+        "S6"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "From the Elastic Cloud home page, choose to create a serverless project and select the Elasticsearch project type.",
+      "details": [
+        "The trial currently permits one active serverless project.",
+        "Project creation requires the admin predefined role or an equivalent custom role.",
+        "Elastic says to choose Elasticsearch when unsure because it provides core search capabilities and search-building UI tools."
+      ],
+      "input": "Elastic Cloud trial organization with project-creation permission.",
+      "output": "Elasticsearch Serverless project creation flow.",
+      "success_signal": "The project settings can be reviewed and submitted.",
+      "failure_or_wait": "Missing admin-equivalent permission, the active-project trial limit, the broader organization project limit, or blocked Elastic CDN domains can prevent creation or leave the UI blank.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the serverless project settings and launch the project.",
+      "details": [
+        "The public generic project page does not enumerate every current Elasticsearch settings field."
+      ],
+      "input": "Elasticsearch project selection and accepted settings.",
+      "output": "Submitted Elasticsearch Serverless project.",
+      "success_signal": "Elastic creates the project and exposes entry to the project UI.",
+      "failure_or_wait": "Invalid project settings or provisioning failures block project access; no duration is documented for this candidate.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Elasticsearch project and navigate to Dev Tools, Console.",
+      "details": [
+        "Console can also be opened as Persistent Console from the footer on supported Search and Elasticsearch Serverless pages."
+      ],
+      "input": "Ready Elasticsearch Serverless project.",
+      "output": "Interactive Console request and response panels.",
+      "success_signal": "Console accepts Elasticsearch API syntax.",
+      "failure_or_wait": "Blocked kibana.estccdn.com or cloud.elastic.co can make the project UI blank; Console can also be disabled by configuration.",
+      "required": true,
+      "source_ids": [
+        "S7",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Run PUT /books in Console.",
+      "details": [],
+      "input": "Elasticsearch Console.",
+      "output": "Index-creation response.",
+      "success_signal": "The JSON response contains acknowledged true, shards_acknowledged true, and index books.",
+      "failure_or_wait": "A non-success HTTP status or JSON error means the index was not created.",
+      "required": true,
+      "source_ids": [
+        "S8",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Run POST books/_doc with the documented Snow Crash JSON document.",
+      "details": [
+        "The document includes name, author, release_date, and page_count."
+      ],
+      "input": "Created books index and sample JSON.",
+      "output": "Indexed book document.",
+      "success_signal": "The response result is created, failed shard count is zero, and a document ID is returned.",
+      "failure_or_wait": "Mapping, request-format, authorization, or shard failures prevent the document from becoming searchable.",
+      "required": true,
+      "source_ids": [
+        "S8",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "api",
+      "action": "Make the indexed document available for search in near real time.",
+      "details": [
+        "Elastic documents near-real-time search availability rather than immediate transactional visibility."
+      ],
+      "input": "Successfully indexed document.",
+      "output": "Searchable books document.",
+      "success_signal": "A subsequent search can return the document.",
+      "failure_or_wait": "A search issued before refresh may not immediately return the new document; no candidate-specific wait duration is given.",
+      "required": true,
+      "source_ids": [
+        "S9"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Run GET books/_search in Console.",
+      "details": [],
+      "input": "Searchable books index.",
+      "output": "Elasticsearch search response.",
+      "success_signal": "The response has timed_out false and a hits array containing the indexed book document.",
+      "failure_or_wait": "An empty result can mean refresh delay, wrong index, or a failed earlier indexing request; an error response must be corrected before retrying.",
+      "required": true,
+      "source_ids": [
+        "S8",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Inspect the response panel and verify the returned hit contains the Snow Crash source fields.",
+      "details": [
+        "Console also displays the HTTP status code and request execution time."
+      ],
+      "input": "Search response.",
+      "output": "Verified first Elasticsearch index, document, and search result.",
+      "success_signal": "The expected book appears under hits.hits with its original _source JSON.",
+      "failure_or_wait": "Missing or different source data means the documented first-search terminal has not been reached.",
+      "required": true,
+      "source_ids": [
+        "S8",
+        "S9"
       ]
     }
   ],
@@ -281,8 +431,19 @@
       "source_type": "account-setup",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Sign up", "Trial information", "Trial limitations", "Maintain access to your trial projects and data"],
-      "evidence_supported": ["Signup methods", "Organization creation", "14-day trial", "One active Serverless project trial limit", "Trial expiry and deletion behavior"]
+      "sections_used": [
+        "Sign up",
+        "Trial information",
+        "Trial limitations",
+        "Maintain access to your trial projects and data"
+      ],
+      "evidence_supported": [
+        "Signup methods",
+        "Organization creation",
+        "14-day trial",
+        "One active Serverless project trial limit",
+        "Trial expiry and deletion behavior"
+      ]
     },
     {
       "id": "S7",
@@ -292,8 +453,17 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Create a serverless project", "Project types", "Browser access requirements"],
-      "evidence_supported": ["Account and admin-role gates", "Elasticsearch project selection", "Project limits", "Blank-UI network failure"]
+      "sections_used": [
+        "Create a serverless project",
+        "Project types",
+        "Browser access requirements"
+      ],
+      "evidence_supported": [
+        "Account and admin-role gates",
+        "Elasticsearch project selection",
+        "Project limits",
+        "Blank-UI network failure"
+      ]
     },
     {
       "id": "S8",
@@ -303,8 +473,16 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Open Console", "Write requests", "Run requests"],
-      "evidence_supported": ["Console navigation", "Request execution", "JSON, HTTP status, and timing response signals"]
+      "sections_used": [
+        "Open Console",
+        "Write requests",
+        "Run requests"
+      ],
+      "evidence_supported": [
+        "Console navigation",
+        "Request execution",
+        "JSON, HTTP status, and timing response signals"
+      ]
     },
     {
       "id": "S9",
@@ -314,8 +492,18 @@
       "source_type": "documentation",
       "accessed_at": "2026-07-18",
       "last_updated_if_shown": null,
-      "sections_used": ["Requirements", "Create an index", "Add a single document", "Search all documents"],
-      "evidence_supported": ["Index request and acknowledgement", "Document request and created result", "Near-real-time wait", "Search response and hit terminal"]
+      "sections_used": [
+        "Requirements",
+        "Create an index",
+        "Add a single document",
+        "Search all documents"
+      ],
+      "evidence_supported": [
+        "Index request and acknowledgement",
+        "Document request and created result",
+        "Near-real-time wait",
+        "Search response and hit terminal"
+      ]
     }
   ],
   "uncertainties": [
@@ -346,25 +534,6 @@
     "Production deployment design",
     "Scaling, retention, alerting, dashboards, and advanced analysis"
   ],
-  "candidate_paths": [
-    {
-      "id": "elasticsearch-serverless-first-search",
-      "name": "Elastic Cloud trial to first Elasticsearch Console search",
-      "selection_basis": "The current Search getting-started page recommends Elastic Cloud Serverless for simplicity and speed and points to Index and search basics. This is a complete representative Search candidate, not a platform-wide choice over Observability or Security.",
-      "relationship_to_primary_path": "This candidate resolves the primary path to Search, Elastic Cloud Serverless, an Elasticsearch project, and Console. It includes account and organization creation, project access, indexing, the near-real-time availability condition, and a visible search response.",
-      "steps": [
-        {"step_number": 1, "phase": "access", "actor": "developer", "interface": "console", "action": "Open Elastic Cloud Sign Up and register with email and password, Google, Microsoft, or a supported marketplace.", "details": ["First signup creates an Elastic Cloud organization and starts a free 14-day trial.", "An email address can belong to only one Elastic Cloud account and a user can belong to only one organization at a time."], "input": "Eligible email identity or supported federated or marketplace identity.", "output": "Elastic Cloud account, organization, and trial.", "success_signal": "The Elastic Cloud home page is available.", "failure_or_wait": "A reused account email or existing organization membership can require leaving the organization or using another email.", "required": true, "source_ids": ["S6"]},
-        {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "console", "action": "From the Elastic Cloud home page, choose to create a serverless project and select the Elasticsearch project type.", "details": ["The trial currently permits one active serverless project.", "Project creation requires the admin predefined role or an equivalent custom role.", "Elastic says to choose Elasticsearch when unsure because it provides core search capabilities and search-building UI tools."], "input": "Elastic Cloud trial organization with project-creation permission.", "output": "Elasticsearch Serverless project creation flow.", "success_signal": "The project settings can be reviewed and submitted.", "failure_or_wait": "Missing admin-equivalent permission, the active-project trial limit, the broader organization project limit, or blocked Elastic CDN domains can prevent creation or leave the UI blank.", "required": true, "source_ids": ["S2", "S6", "S7"]},
-        {"step_number": 3, "phase": "execute", "actor": "developer", "interface": "console", "action": "Review the serverless project settings and launch the project.", "details": ["The public generic project page does not enumerate every current Elasticsearch settings field."], "input": "Elasticsearch project selection and accepted settings.", "output": "Submitted Elasticsearch Serverless project.", "success_signal": "Elastic creates the project and exposes entry to the project UI.", "failure_or_wait": "Invalid project settings or provisioning failures block project access; no duration is documented for this candidate.", "required": true, "source_ids": ["S2", "S7"]},
-        {"step_number": 4, "phase": "arrive", "actor": "developer", "interface": "console", "action": "Open the Elasticsearch project and navigate to Dev Tools, Console.", "details": ["Console can also be opened as Persistent Console from the footer on supported Search and Elasticsearch Serverless pages."], "input": "Ready Elasticsearch Serverless project.", "output": "Interactive Console request and response panels.", "success_signal": "Console accepts Elasticsearch API syntax.", "failure_or_wait": "Blocked kibana.estccdn.com or cloud.elastic.co can make the project UI blank; Console can also be disabled by configuration.", "required": true, "source_ids": ["S7", "S8"]},
-        {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "console", "action": "Run PUT /books in Console.", "details": [], "input": "Elasticsearch Console.", "output": "Index-creation response.", "success_signal": "The JSON response contains acknowledged true, shards_acknowledged true, and index books.", "failure_or_wait": "A non-success HTTP status or JSON error means the index was not created.", "required": true, "source_ids": ["S8", "S9"]},
-        {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "console", "action": "Run POST books/_doc with the documented Snow Crash JSON document.", "details": ["The document includes name, author, release_date, and page_count."], "input": "Created books index and sample JSON.", "output": "Indexed book document.", "success_signal": "The response result is created, failed shard count is zero, and a document ID is returned.", "failure_or_wait": "Mapping, request-format, authorization, or shard failures prevent the document from becoming searchable.", "required": true, "source_ids": ["S8", "S9"]},
-        {"step_number": 7, "phase": "verify", "actor": "platform", "interface": "api", "action": "Make the indexed document available for search in near real time.", "details": ["Elastic documents near-real-time search availability rather than immediate transactional visibility."], "input": "Successfully indexed document.", "output": "Searchable books document.", "success_signal": "A subsequent search can return the document.", "failure_or_wait": "A search issued before refresh may not immediately return the new document; no candidate-specific wait duration is given.", "required": true, "source_ids": ["S9"]},
-        {"step_number": 8, "phase": "execute", "actor": "developer", "interface": "console", "action": "Run GET books/_search in Console.", "details": [], "input": "Searchable books index.", "output": "Elasticsearch search response.", "success_signal": "The response has timed_out false and a hits array containing the indexed book document.", "failure_or_wait": "An empty result can mean refresh delay, wrong index, or a failed earlier indexing request; an error response must be corrected before retrying.", "required": true, "source_ids": ["S8", "S9"]},
-        {"step_number": 9, "phase": "verify", "actor": "developer", "interface": "console", "action": "Inspect the response panel and verify the returned hit contains the Snow Crash source fields.", "details": ["Console also displays the HTTP status code and request execution time."], "input": "Search response.", "output": "Verified first Elasticsearch index, document, and search result.", "success_signal": "The expected book appears under hits.hits with its original _source JSON.", "failure_or_wait": "Missing or different source data means the documented first-search terminal has not been reached.", "required": true, "source_ids": ["S8", "S9"]}
-      ],
-      "source_ids": ["S2", "S6", "S7", "S8", "S9"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }

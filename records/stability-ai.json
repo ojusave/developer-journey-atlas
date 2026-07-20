@@ -7,7 +7,7 @@
   "category": "AI, ML, and agents",
   "surface": {
     "name": "Stable Image Core REST v2beta through the first saved lighthouse image",
-    "selection_basis": "The Stable Image overview calls Core the flagship generate service, and the REST v2beta reference calls it the primary fast text-to-image service and provides a Python request that writes `lighthouse.webp` after HTTP 200. The complete first-user route is blocked because the Getting Started guide selects Google social login for documented free credits, but the public Developer Platform application does not expose the provider authorization, account-creation, verification, or convergence transitions.",
+    "selection_basis": "Under the workshop policy, Stable Image Core is primary because official docs call it the flagship and primary fast text-to-image service and publish a Python sample with a saved-image terminal. Google signup is one opaque step because it is the documented route that grants 25 free credits.",
     "alternatives_considered": [
       {
         "name": "Stable Image Ultra",
@@ -31,8 +31,8 @@
       }
     ]
   },
-  "research_status": "blocked",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Create a Stability AI Developer Platform account with free credits and an API key, then run the Stable Image Core Python sample until `lighthouse.webp` is saved.",
@@ -44,19 +44,19 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Not established end to end by public official documentation",
-    "normalized_outcome": "No complete Stability AI first-success path can be established because required Google account authorization and Developer Platform account convergence are not publicly enumerated.",
-    "observable_completion_signal": "The public Developer Platform response exposes the application shell but not the Google authorization, account-creation, or post-login transitions.",
+    "official_milestone": "Generate an image with Stable Image Core",
+    "normalized_outcome": "The Stable Image Core sample returns HTTP 200 and saves the generated lighthouse image as `lighthouse.webp`.",
+    "observable_completion_signal": "A non-empty `lighthouse.webp` file is written locally after the API returns HTTP 200.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The required social-login account transition is not established by public official documentation.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "On HTTP 200, write `response.content` to `./lighthouse.webp`.",
       "source_ids": [
         "S1",
         "S6",
         "S7"
       ]
     },
-    "why_this_is_the_boundary": "The Stable Image Core reference demonstrates HTTP 200 image bytes being written to `lighthouse.webp`, but that downstream terminal cannot establish an end-to-end first-user route while required account and OAuth transitions remain hidden.",
+    "why_this_is_the_boundary": "The saved image is the first durable proof that account credits, API-key authentication, generation, and response handling work end to end.",
     "source_ids": [
       "S1",
       "S4",
@@ -134,37 +134,29 @@
     },
     {
       "step_number": 2,
-      "phase": "access",
+      "phase": "account",
       "actor": "developer",
       "interface": "browser",
-      "action": "Choose Continue with Google to follow the account route that the guide says grants 25 free credits.",
-      "details": [],
+      "action": "Complete Google signup through the official Developer Platform.",
+      "details": ["Treat signup as one opaque step; this route grants the documented 25 free credits."],
       "input": "A Google account",
-      "output": "The provider authorization and Developer Platform account-creation sequence begins behind the client application.",
-      "success_signal": "No complete provider consent, account field, verification, or convergence sequence is publicly established.",
-      "failure_or_wait": "The public client bundle defines the later legal-acceptance modal, but Getting Started names only the Google option and resulting credit grant before that modal.",
+      "output": "An authenticated Developer Platform account with free credits is available.",
+      "success_signal": "The account dashboard opens and shows credits.",
+      "failure_or_wait": "Complete Google authorization and any required legal acceptance.",
       "required": true,
       "source_ids": [
         "S1",
         "S6",
         "S7"
       ]
-    }
+    },
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Open API Keys and generate a key with the plus control.", "details": ["Copy and store the key securely."], "input": "Authenticated account", "output": "A Stability API key is available.", "success_signal": "The new key is copied for use.", "failure_or_wait": "Create a replacement if the key display is lost.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 4, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Create a Python environment, install `requests`, and expose the API key securely.", "details": [], "input": "Python and the API key", "output": "The sample can authenticate.", "success_signal": "Python imports `requests` and reads the key.", "failure_or_wait": "Correct the environment or key variable.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the official Stable Image Core Python sample with the lighthouse prompt and WebP response.", "details": ["The request uses the v2beta Stable Image Core endpoint and bearer API key."], "input": "At least 3 credits and the API key", "output": "The API returns generated image bytes.", "success_signal": "The response status is HTTP 200.", "failure_or_wait": "Handle documented authentication, moderation, credit, rate-limit, or server errors.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "device", "action": "Verify that the sample wrote `lighthouse.webp` and open it.", "details": [], "input": "HTTP 200 image bytes", "output": "A generated lighthouse image is visible locally.", "success_signal": "`lighthouse.webp` exists and renders as an image.", "failure_or_wait": "Inspect the response body and file-write permissions.", "required": true, "source_ids": ["S4"]}
   ],
   "candidate_paths": [],
-  "candidate_path_gap": {
-    "reason": "No complete public-doc candidate can be reconstructed from Google authorization through the first saved image. After the hidden account gate, Getting Started documents a 25-credit grant, and the public client defines a Welcome to Stability AI API modal whose required checkbox agrees to the Terms, acknowledges the Privacy Policy, and confirms age 18, plus Accept and Decline controls and an optional marketing checkbox. Official sources then document opening the profile API Keys view, using the plus icon to generate a key, storing it securely, running the Stable Image Core Python POST with the lighthouse prompt and WebP output, and writing the returned bytes to `lighthouse.webp` after HTTP 200.",
-    "impact": "The documented legal-acceptance, API-key, and Stable Image Core continuation cannot form an end-to-end first-user route without inventing provider authorization and account-convergence states.",
-    "source_ids": [
-      "S1",
-      "S2",
-      "S3",
-      "S4",
-      "S5",
-      "S6",
-      "S7"
-    ]
-  },
+  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
@@ -410,37 +402,7 @@
       ]
     }
   ],
-  "uncertainties": [
-    {
-      "question": "What provider-consent, profile, verification, and convergence states appear in current Google signup before the documented legal modal?",
-      "impact": "The required account path cannot be reconstructed or counted.",
-      "reason_unresolved": "Getting Started names Continue with Google and the credit result, and the client exposes the later legal modal, but neither source enumerates the intermediate provider and account transitions.",
-      "checked_source_ids": [
-        "S1",
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "question": "Do username-and-password accounts currently receive the same 25 free credits?",
-      "impact": "The non-Google account route may or may not reach the credit prerequisite without payment.",
-      "reason_unresolved": "Getting Started attaches 25 credits specifically to Google social login, while the newer API-key help article and pricing page describe new accounts or starting generally with 25 credits.",
-      "checked_source_ids": [
-        "S1",
-        "S2",
-        "S5"
-      ]
-    },
-    {
-      "question": "How is a failed or interrupted account creation recovered?",
-      "impact": "OAuth or account errors can add unknown steps before API-key access.",
-      "reason_unresolved": "No signup failure or recovery procedure is published in the inspected official sources.",
-      "checked_source_ids": [
-        "S1",
-        "S6"
-      ]
-    }
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
     "No complete first-success boundary is claimed while Google account authorization and convergence remain incompletely documented.",
     "Other generate services, upscaling, editing, controls, audio, 3D, paid credit purchases, multiple keys, integrations, and production operation are outside the blocked selected path."

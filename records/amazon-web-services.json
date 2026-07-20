@@ -6,8 +6,8 @@
   },
   "category": "Cloud and application runtimes",
   "surface": {
-    "name": "AWS platform, service, and workload not selected",
-    "selection_basis": "AWS's Getting Started Resource Center recommends six onboarding tasks spanning several services, while the AWS documentation home and Management Console guide direct developers into a large collection of service consoles. The platform-level material does not establish one workload or resource as AWS's single first-success path.",
+    "name": "Create a standalone AWS account and complete console orientation",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create a standalone AWS account and complete console orientation. AWS does not select one first cloud resource, but its official Management Console guide defines a complete beginner route with an explicit conclusion after account access, navigation, search, CloudShell, and dashboard orientation. Prior surface before policy commit: AWS platform, service, and workload not selected.",
     "alternatives_considered": [
       {
         "name": "AWS Management Console orientation",
@@ -21,8 +21,8 @@
       }
     ]
   },
-  "research_status": "needs-human-judgment",
-  "researched_at": "2026-07-18",
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
   "official_docs_only": true,
   "entry_point": {
     "developer_intent": "Start building on AWS without a preselected AWS service, workload, or interface.",
@@ -34,17 +34,17 @@
   },
   "documented_first_success": {
     "official_milestone": "No single platform-wide first-success milestone is documented.",
-    "normalized_outcome": "Unresolved until a human selects the AWS workload or decides that completing the console orientation is itself the intended outcome.",
-    "observable_completion_signal": "The console guide displays a congratulations conclusion, but the general resource center describes six onboarding tasks across services and does not normalize one platform resource outcome.",
+    "normalized_outcome": "The developer reaches the documented Congratulations conclusion after locating the console's core controls and widgets.",
+    "observable_completion_signal": "The developer reaches the documented Congratulations conclusion after locating the console's core controls and widgets.",
     "boundary_evidence": {
-      "type": "not-established-by-docs",
-      "official_label_or_terminal_state": "The Management Console guide ends with 'You have finished' and console-navigation knowledge; the general AWS onboarding route spans six tasks and multiple services.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The developer reaches the documented Congratulations conclusion after locating the console's core controls and widgets.",
       "source_ids": [
         "S1",
         "S2"
       ]
     },
-    "why_this_is_the_boundary": "AWS explicitly presents multiple onboarding tasks and service choices. Selecting EC2, S3, Lambda, App Runner, or another product would be a researcher choice, which this dataset prohibits.",
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
     "source_ids": [
       "S1",
       "S2",
@@ -195,24 +195,6 @@
     },
     {
       "step_number": 7,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "console",
-      "action": "Choose an AWS Support plan and select Complete sign up.",
-      "details": [
-        "AWS then displays a confirmation page stating that the account is being activated."
-      ],
-      "input": "Support-plan choice.",
-      "output": "Account activation request.",
-      "success_signal": "The activation-pending confirmation page appears.",
-      "failure_or_wait": "The account is not usable until activation completes.",
-      "required": true,
-      "source_ids": [
-        "S4"
-      ]
-    },
-    {
-      "step_number": 8,
       "phase": "wait",
       "actor": "system",
       "interface": "email",
@@ -231,25 +213,237 @@
       ]
     },
     {
-      "step_number": 9,
-      "phase": "configure",
+      "step_number": 8,
+      "phase": "access",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Select an AWS service, workload, or the console-orientation outcome before continuing.",
+      "interface": "console",
+      "action": "Open Sign up for AWS, enter the root-user email address and AWS account name, and choose Verify email address.",
       "details": [
-        "The console is a unified entry point to a broad collection of individual service consoles.",
-        "The console guide's next recommendations include separate static-site and virtual-machine guides."
+        "AWS sends a verification code to the root-user email address."
       ],
-      "input": "An activated account and a human-selected intended outcome.",
-      "output": "A bounded AWS tutorial, if the missing choice is supplied.",
-      "success_signal": "No common platform-level resource signal is documented.",
-      "failure_or_wait": "Without the missing scope choice, the journey branches across services and terminal states.",
+      "input": "Reachable root-user email and account name.",
+      "output": "Email verification challenge.",
+      "success_signal": "AWS sends the email verification code.",
+      "failure_or_wait": "An unavailable email address or an organization-managed member-account requirement prevents the standalone path.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2",
-        "S3",
         "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter and verify the email code, then create and confirm a compliant root-user password.",
+      "details": [
+        "The password must be 8 to 128 characters, use at least three documented character classes, and differ from the account name and email."
+      ],
+      "input": "Email verification code and root-user password.",
+      "output": "Verified root identity.",
+      "success_signal": "AWS advances to account-plan selection.",
+      "failure_or_wait": "Invalid code or noncompliant password blocks signup.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose the AWS account plan, provide contact information, and accept the AWS Customer Agreement.",
+      "details": [
+        "AWS documents a separate account-creation route for India."
+      ],
+      "input": "Plan choice, contact details, and agreement acceptance.",
+      "output": "Account profile ready for billing verification.",
+      "success_signal": "The billing-information page opens.",
+      "failure_or_wait": "Incomplete details or failure to accept the agreement prevents continuation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a valid payment method and billing address.",
+      "details": [
+        "AWS states that signup cannot proceed without a valid payment method."
+      ],
+      "input": "Payment and billing information.",
+      "output": "Submitted payment method.",
+      "success_signal": "AWS permits signup to continue.",
+      "failure_or_wait": "Invalid payment information blocks signup; AWS India has separate CVV, bank OTP, and refundable verification behavior.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "If AWS prompts for identity confirmation, receive the SMS code at the supplied phone number and enter it.",
+      "details": [
+        "The phone must be reachable during signup."
+      ],
+      "input": "Reachable phone number and SMS code.",
+      "output": "Confirmed signup identity.",
+      "success_signal": "AWS accepts the verification code and continues.",
+      "failure_or_wait": "This step is conditional; failure to receive or enter the code prevents completion when it is requested.",
+      "required": false,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose an AWS Support plan and select Complete sign up.",
+      "details": [],
+      "input": "Support-plan choice.",
+      "output": "Account activation request.",
+      "success_signal": "The activation-pending confirmation page appears.",
+      "failure_or_wait": "The account remains unusable until activation finishes.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "wait",
+      "actor": "system",
+      "interface": "email",
+      "action": "Wait for the AWS account-activation email.",
+      "details": [
+        "AWS says activation usually takes a few minutes but can take up to 24 hours.",
+        "A newly created account might not have access to all services required by the console tutorial for up to 24 hours."
+      ],
+      "input": "Completed signup.",
+      "output": "Activated AWS account.",
+      "success_signal": "The activation email arrives.",
+      "failure_or_wait": "Check spam and allow up to the documented 24-hour window before treating activation as failed.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign in to the AWS Management Console and open Console Home.",
+      "details": [
+        "The console guide recommends the latest Chrome or Firefox."
+      ],
+      "input": "Activated AWS account and root-user credentials.",
+      "output": "Authenticated Console Home session.",
+      "success_signal": "The console dashboard appears.",
+      "failure_or_wait": "Sign-in, browser, or new-account service-access delay prevents the orientation steps.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the account-information menu and review the account ID, current user, and links for account, organization, quotas, billing, security credentials, and settings.",
+      "details": [],
+      "input": "Console Home navigation bar.",
+      "output": "Located AWS account-management surfaces.",
+      "success_signal": "The developer can identify the account and its management links.",
+      "failure_or_wait": "Missing navigation or access restrictions prevent completion of this guide section.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Region selector and switch the console to another available AWS Region.",
+      "details": [
+        "The selector displays the region group, region name, and region string; global services show Global."
+      ],
+      "input": "Console session and Region choice.",
+      "output": "Console scoped to the selected Region.",
+      "success_signal": "The navigation bar shows the newly selected Region.",
+      "failure_or_wait": "A service can be global or unavailable in the selected Region.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Use the service selector and search box to locate services, features, documentation, tutorials, and other AWS results.",
+      "details": [
+        "Services can also be marked as favorites and pinned to the navigation bar."
+      ],
+      "input": "Console navigation and a search term.",
+      "output": "Navigable service categories and search results.",
+      "success_signal": "The selector and search return the documented categories of results.",
+      "failure_or_wait": "An unmatched query omits result sections with no matches.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the AWS CloudShell icon and launch the browser-based shell in the current Region.",
+      "details": [
+        "CloudShell is pre-authenticated with the console credentials and its files are Region-specific."
+      ],
+      "input": "Authenticated console session and selected Region.",
+      "output": "Pre-authenticated CloudShell terminal.",
+      "success_signal": "The CloudShell prompt opens and shows the current Region.",
+      "failure_or_wait": "Account age, service availability, permissions, or shell launch failure can prevent CloudShell access.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Return to Console Home, review the default dashboard widgets, and reach the guide's Conclusion.",
+      "details": [
+        "The guide covers static getting-started widgets plus AWS Health, cost and usage, favorites, recently visited, and Trusted Advisor.",
+        "The conclusion explicitly congratulates the developer for finishing the Management Console guide."
+      ],
+      "input": "Completed account, Region, navigation, search, and CloudShell orientation.",
+      "output": "Completed AWS Management Console orientation.",
+      "success_signal": "The developer reaches the documented Congratulations conclusion after locating the console's core controls and widgets.",
+      "failure_or_wait": "This terminal proves console familiarity, not creation of a cloud resource; a service-specific tutorial is required for that different outcome.",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
@@ -451,222 +645,6 @@
     "No after-success scope is selected because the platform-wide terminal boundary is unresolved.",
     "Production architecture, security hardening, scaling, observability, and service-specific advanced work are excluded."
   ],
-  "candidate_paths": [
-    {
-      "id": "standalone-account-console-orientation",
-      "name": "Create a standalone AWS account and complete console orientation",
-      "selection_basis": "AWS does not select one first cloud resource, but its official Management Console guide defines a complete beginner route with an explicit conclusion after account access, navigation, search, CloudShell, and dashboard orientation.",
-      "relationship_to_primary_path": "This follows the standalone account spine in primary steps 2 through 8, then selects console orientation at step 9 and expands it through the guide's Congratulations conclusion.",
-      "steps": [
-        {
-          "step_number": 1,
-          "phase": "access",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open Sign up for AWS, enter the root-user email address and AWS account name, and choose Verify email address.",
-          "details": [
-            "AWS sends a verification code to the root-user email address."
-          ],
-          "input": "Reachable root-user email and account name.",
-          "output": "Email verification challenge.",
-          "success_signal": "AWS sends the email verification code.",
-          "failure_or_wait": "An unavailable email address or an organization-managed member-account requirement prevents the standalone path.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 2,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Enter and verify the email code, then create and confirm a compliant root-user password.",
-          "details": [
-            "The password must be 8 to 128 characters, use at least three documented character classes, and differ from the account name and email."
-          ],
-          "input": "Email verification code and root-user password.",
-          "output": "Verified root identity.",
-          "success_signal": "AWS advances to account-plan selection.",
-          "failure_or_wait": "Invalid code or noncompliant password blocks signup.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 3,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Choose the AWS account plan, provide contact information, and accept the AWS Customer Agreement.",
-          "details": [
-            "AWS documents a separate account-creation route for India."
-          ],
-          "input": "Plan choice, contact details, and agreement acceptance.",
-          "output": "Account profile ready for billing verification.",
-          "success_signal": "The billing-information page opens.",
-          "failure_or_wait": "Incomplete details or failure to accept the agreement prevents continuation.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 4,
-          "phase": "billing",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Enter a valid payment method and billing address.",
-          "details": [
-            "AWS states that signup cannot proceed without a valid payment method."
-          ],
-          "input": "Payment and billing information.",
-          "output": "Submitted payment method.",
-          "success_signal": "AWS permits signup to continue.",
-          "failure_or_wait": "Invalid payment information blocks signup; AWS India has separate CVV, bank OTP, and refundable verification behavior.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 5,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "If AWS prompts for identity confirmation, receive the SMS code at the supplied phone number and enter it.",
-          "details": [
-            "The phone must be reachable during signup."
-          ],
-          "input": "Reachable phone number and SMS code.",
-          "output": "Confirmed signup identity.",
-          "success_signal": "AWS accepts the verification code and continues.",
-          "failure_or_wait": "This step is conditional; failure to receive or enter the code prevents completion when it is requested.",
-          "required": false,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 6,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Choose an AWS Support plan and select Complete sign up.",
-          "details": [],
-          "input": "Support-plan choice.",
-          "output": "Account activation request.",
-          "success_signal": "The activation-pending confirmation page appears.",
-          "failure_or_wait": "The account remains unusable until activation finishes.",
-          "required": true,
-          "source_ids": ["S4"]
-        },
-        {
-          "step_number": 7,
-          "phase": "wait",
-          "actor": "system",
-          "interface": "email",
-          "action": "Wait for the AWS account-activation email.",
-          "details": [
-            "AWS says activation usually takes a few minutes but can take up to 24 hours.",
-            "A newly created account might not have access to all services required by the console tutorial for up to 24 hours."
-          ],
-          "input": "Completed signup.",
-          "output": "Activated AWS account.",
-          "success_signal": "The activation email arrives.",
-          "failure_or_wait": "Check spam and allow up to the documented 24-hour window before treating activation as failed.",
-          "required": true,
-          "source_ids": ["S2", "S4"]
-        },
-        {
-          "step_number": 8,
-          "phase": "authenticate",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Sign in to the AWS Management Console and open Console Home.",
-          "details": [
-            "The console guide recommends the latest Chrome or Firefox."
-          ],
-          "input": "Activated AWS account and root-user credentials.",
-          "output": "Authenticated Console Home session.",
-          "success_signal": "The console dashboard appears.",
-          "failure_or_wait": "Sign-in, browser, or new-account service-access delay prevents the orientation steps.",
-          "required": true,
-          "source_ids": ["S2", "S4"]
-        },
-        {
-          "step_number": 9,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open the account-information menu and review the account ID, current user, and links for account, organization, quotas, billing, security credentials, and settings.",
-          "details": [],
-          "input": "Console Home navigation bar.",
-          "output": "Located AWS account-management surfaces.",
-          "success_signal": "The developer can identify the account and its management links.",
-          "failure_or_wait": "Missing navigation or access restrictions prevent completion of this guide section.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 10,
-          "phase": "configure",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Open the Region selector and switch the console to another available AWS Region.",
-          "details": [
-            "The selector displays the region group, region name, and region string; global services show Global."
-          ],
-          "input": "Console session and Region choice.",
-          "output": "Console scoped to the selected Region.",
-          "success_signal": "The navigation bar shows the newly selected Region.",
-          "failure_or_wait": "A service can be global or unavailable in the selected Region.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 11,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Use the service selector and search box to locate services, features, documentation, tutorials, and other AWS results.",
-          "details": [
-            "Services can also be marked as favorites and pinned to the navigation bar."
-          ],
-          "input": "Console navigation and a search term.",
-          "output": "Navigable service categories and search results.",
-          "success_signal": "The selector and search return the documented categories of results.",
-          "failure_or_wait": "An unmatched query omits result sections with no matches.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 12,
-          "phase": "execute",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Select the AWS CloudShell icon and launch the browser-based shell in the current Region.",
-          "details": [
-            "CloudShell is pre-authenticated with the console credentials and its files are Region-specific."
-          ],
-          "input": "Authenticated console session and selected Region.",
-          "output": "Pre-authenticated CloudShell terminal.",
-          "success_signal": "The CloudShell prompt opens and shows the current Region.",
-          "failure_or_wait": "Account age, service availability, permissions, or shell launch failure can prevent CloudShell access.",
-          "required": true,
-          "source_ids": ["S2"]
-        },
-        {
-          "step_number": 13,
-          "phase": "verify",
-          "actor": "developer",
-          "interface": "console",
-          "action": "Return to Console Home, review the default dashboard widgets, and reach the guide's Conclusion.",
-          "details": [
-            "The guide covers static getting-started widgets plus AWS Health, cost and usage, favorites, recently visited, and Trusted Advisor.",
-            "The conclusion explicitly congratulates the developer for finishing the Management Console guide."
-          ],
-          "input": "Completed account, Region, navigation, search, and CloudShell orientation.",
-          "output": "Completed AWS Management Console orientation.",
-          "success_signal": "The developer reaches the documented Congratulations conclusion after locating the console's core controls and widgets.",
-          "failure_or_wait": "This terminal proves console familiarity, not creation of a cloud resource; a service-specific tutorial is required for that different outcome.",
-          "required": true,
-          "source_ids": ["S2"]
-        }
-      ],
-      "source_ids": ["S2", "S4"]
-    }
-  ],
+  "candidate_paths": [],
   "candidate_path_gap": null
 }
