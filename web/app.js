@@ -205,26 +205,97 @@ function renderUnknown(query) {
   el.result.innerHTML = `
     <div class="card unknown-panel">
       <h2>"${esc(query)}" isn't in the dataset yet</h2>
-      <p class="lede">This platform hasn't been researched into the Atlas. Live research for unknown platforms, with a source-grounded record and a draft pull request back to the dataset, is coming in Phase 2.</p>
-      <button class="btn btn-primary" id="research-btn" type="button">Request research</button>
-      <p class="dist-line" id="research-status"></p>
+      <p class="lede">Run live research: the Atlas searches official documentation, reconstructs a source-grounded first-mile record, measures it, and (when configured) opens a draft pull request back to the dataset.</p>
+      <button class="btn btn-primary" id="research-btn" type="button">Research this platform live</button>
+      <ol class="research-log" id="research-log" hidden></ol>
     </div>`;
-  document.querySelector("#research-btn").addEventListener("click", async () => {
-    const status = document.querySelector("#research-status");
-    status.textContent = "Checking…";
-    try {
-      const res = await fetch("/api/research", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ platform: query }),
-      });
-      const body = await res.json().catch(() => ({}));
-      status.textContent = body.error ? body.error.message : "Request received.";
-    } catch {
-      status.textContent = "Could not reach the research service right now.";
-    }
-  });
+  document.querySelector("#research-btn").addEventListener("click", () => researchPlatform(query));
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function logStep(text, cls) {
+  const logEl = document.querySelector("#research-log");
+  if (!logEl) return;
+  logEl.hidden = false;
+  const li = document.createElement("li");
+  if (cls) li.className = cls;
+  li.textContent = text;
+  logEl.appendChild(li);
+}
+
+function draftBanner(record) {
+  const json = JSON.stringify(record, null, 2);
+  const blob = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+  return `
+    <div class="draft-banner">
+      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com + an LLM. It passed schema
+      validation but has not been human-reviewed. Treat it as a starting point, not a source of truth.
+      <a href="${blob}" download="${esc(record.platform.slug)}.json">Download the drafted record (JSON)</a>
+    </div>`;
+}
+
+// Parse a Server-Sent Events stream from a fetch Response body.
+async function* readSse(res) {
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const chunks = buffer.split("\n\n");
+    buffer = chunks.pop() ?? "";
+    for (const chunk of chunks) {
+      const dataLine = chunk.split("\n").find((l) => l.startsWith("data:"));
+      if (dataLine) {
+        try {
+          yield JSON.parse(dataLine.slice(5).trim());
+        } catch {
+          /* ignore malformed frame */
+        }
+      }
+    }
+  }
+}
+
+async function researchPlatform(query) {
+  const btn = document.querySelector("#research-btn");
+  if (btn) btn.disabled = true;
+  logStep("Starting…");
+  try {
+    const res = await fetch("/api/research", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ platform: query }),
+    });
+    if (!res.ok || !res.body) {
+      const body = await res.json().catch(() => ({}));
+      logStep(body.error ? body.error.message : `Research unavailable (${res.status}).`, "err");
+      if (btn) btn.disabled = false;
+      return;
+    }
+
+    let resultHtml = "";
+    for await (const ev of readSse(res)) {
+      if (ev.type === "status") logStep(ev.message);
+      else if (ev.type === "known") return showPlatform(ev.slug);
+      else if (ev.type === "result") {
+        resultHtml = draftBanner(ev.record) + renderAssessment(ev.assessment) + renderComparison(ev.comparison);
+        el.result.innerHTML = resultHtml;
+      } else if (ev.type === "pr") {
+        el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line"><strong>Draft PR opened:</strong> <a href="${esc(ev.url)}" rel="noreferrer">${esc(ev.url)}</a></p></div>`;
+      } else if (ev.type === "pr_skipped") {
+        el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line">${esc(ev.reason)}</p></div>`;
+      } else if (ev.type === "error") {
+        if (resultHtml) el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line err">${esc(ev.message)}</p></div>`;
+        else logStep(ev.message, "err");
+      }
+    }
+  } catch {
+    logStep("Lost connection to the research service.", "err");
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 async function submitQuery(q) {

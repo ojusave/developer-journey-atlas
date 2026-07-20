@@ -9,11 +9,19 @@ export const config = {
     return path.join(this.dataRoot, "public");
   },
   githubRepoUrl: "https://github.com/ojusave/devrelcon-first-mile-data",
+  // owner/repo slug derived from the URL; used by the PR writer.
+  githubRepoSlug: "ojusave/devrelcon-first-mile-data",
   // Phase 2 kill switch. Off until the live-research pipeline is wired.
   researchEnabled: process.env.RESEARCH_ENABLED === "true",
   // Phase 2 search provider (You.com Web Search API). YDC_API_KEY is the
   // canonical env var name across You.com's docs and SDKs.
   youApiKey: process.env.YDC_API_KEY ?? "",
+  // Phase 2 LLM provider (OpenRouter). Model is overridable per deployment.
+  openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
+  openRouterModel: process.env.OPENROUTER_MODEL ?? "openai/gpt-4o",
+  // Phase 2 auto-PR. Optional: when absent, research still runs and displays,
+  // and the UI offers the drafted record for manual submission.
+  githubToken: process.env.GITHUB_TOKEN ?? "",
 };
 
 /** Canonical Render signup URL with fixed campaign UTMs; only utm_content varies. */

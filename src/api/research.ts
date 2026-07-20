@@ -1,23 +1,55 @@
 import type { Request, Response } from "express";
 import { config } from "../config.js";
 import { sendError } from "./http.js";
+import { runResearch, type ResearchDeps } from "../core/researchPipeline.js";
 
 /**
- * Phase 2 endpoint: research a platform that is not in the dataset, then open a
- * draft PR to add it. Gated by RESEARCH_ENABLED. Until the Render Workflow is
- * wired, this returns a clear, non-crashing status so the UI can degrade.
+ * Phase 2 endpoint: research a platform that is not in the dataset and stream
+ * progress over Server-Sent Events. Gated by RESEARCH_ENABLED and by whether the
+ * search/LLM providers are configured. Each pipeline event is one SSE message.
  */
-export function startResearch() {
-  return (_req: Request, res: Response): void => {
+export function startResearch(deps: ResearchDeps | null) {
+  return async (req: Request, res: Response): Promise<void> => {
     if (!config.researchEnabled) {
-      sendError(
-        res,
-        503,
-        "research_disabled",
-        "Live research for unknown platforms is not enabled yet. This ships in Phase 2.",
-      );
+      sendError(res, 503, "research_disabled", "Live research for unknown platforms is not enabled.");
       return;
     }
-    sendError(res, 501, "not_implemented", "Live research pipeline is under construction (Phase 2).");
+    if (!deps) {
+      sendError(res, 503, "research_unconfigured", "Research is enabled but not configured (missing search or LLM key).");
+      return;
+    }
+    const platform = typeof req.body?.platform === "string" ? req.body.platform.trim() : "";
+    if (!platform) {
+      sendError(res, 400, "bad_request", "Provide a platform name.");
+      return;
+    }
+
+    res.status(200);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+
+    // Detect a real client disconnect via the response socket closing before we
+    // finished writing. (req "close" is unreliable: it fires once the request
+    // body has been consumed, not when the client goes away.)
+    let aborted = false;
+    res.on("close", () => {
+      if (!res.writableEnded) aborted = true;
+    });
+    const send = (event: string, data: unknown): void => {
+      if (!aborted && !res.writableEnded) {
+        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+      }
+    };
+
+    try {
+      await runResearch(platform, deps, (ev) => send(ev.type, ev));
+    } catch (err) {
+      console.error("Research stream error:", err);
+      send("error", { type: "error", code: "internal", message: "Research failed unexpectedly." });
+    } finally {
+      if (!res.writableEnded) res.end();
+    }
   };
 }

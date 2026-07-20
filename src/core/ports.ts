@@ -77,9 +77,16 @@ export interface ResearchResult {
   message?: string;
 }
 
+/** One official-docs hit, optionally with crawled page content for grounding. */
+export interface DocHit {
+  title: string;
+  url: string;
+  content?: string;
+}
+
 /** Phase 2 ports. Non-critical: failures degrade, never crash the site. */
 export interface SearchProvider {
-  findOfficialDocs(platform: string): Promise<Array<{ title: string; url: string }>>;
+  findOfficialDocs(platform: string): Promise<DocHit[]>;
 }
 
 export interface LLMProvider {
