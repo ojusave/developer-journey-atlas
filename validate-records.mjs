@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { detectContradictions, inputHash, sourceSnapshotDate } from "./lib/measure.mjs";
 
 const base = path.dirname(new URL(import.meta.url).pathname);
 const roster = JSON.parse(fs.readFileSync(path.join(base, "roster.json"), "utf8"));
@@ -167,6 +168,13 @@ function validateRecord(entry, file) {
   if (!success.boundary_evidence?.official_label_or_terminal_state?.trim()) {
     errors.push("Missing documented_first_success.boundary_evidence.official_label_or_terminal_state");
   }
+  // A complete record must not describe its selected route with blocked or
+  // needs-human-judgment phrasing. This scans only surface.name and the four
+  // documented_first_success narrative fields, never selection_basis or
+  // uncertainties, so honest platform-wide ambiguity is preserved.
+  for (const m of detectContradictions(record)) {
+    errors.push(`Contradictory selected-route phrasing in ${m.field} (rule ${m.rule}): "${m.excerpt}"`);
+  }
   if (!Array.isArray(success.boundary_evidence?.source_ids) || success.boundary_evidence.source_ids.length === 0) {
     errors.push("Documented success boundary has no source IDs");
   }
@@ -259,6 +267,12 @@ function validateRecord(entry, file) {
     }
     if (!Array.isArray(gate.source_ids) || gate.source_ids.length === 0) errors.push(`friction_gates[${index}] has no source IDs`);
   });
+  asArray(record.branches).forEach((branch, index) => {
+    if (branch.at_step !== undefined && branch.at_step !== null
+      && (!Number.isInteger(branch.at_step) || branch.at_step < 1 || branch.at_step > asArray(record.primary_path).length)) {
+      errors.push(`branches[${index}].at_step is outside the primary path`);
+    }
+  });
 
   const time = record.time_to_first_success ?? {};
   if (typeof time.vendor_claim !== "boolean") errors.push("time_to_first_success.vendor_claim must be boolean");
@@ -303,12 +317,38 @@ for (const entry of selectedRoster) {
 const unexpected = requestedSlug ? [] : fs.readdirSync(recordsDir)
   .filter((name) => name.endsWith(".json"))
   .filter((name) => !roster.some((entry) => `${entry.slug}.json` === name));
+
+// Roster-level structural checks (duplicate slugs, filename/slug mismatch).
+const structuralErrors = [];
+if (!requestedSlug) {
+  const slugSeen = new Map();
+  for (const entry of roster) slugSeen.set(entry.slug, (slugSeen.get(entry.slug) ?? 0) + 1);
+  for (const [slug, n] of slugSeen) if (n > 1) structuralErrors.push(`Duplicate roster slug: ${slug} (${n} entries)`);
+  for (const entry of roster) {
+    const file = path.join(recordsDir, `${entry.slug}.json`);
+    if (!fs.existsSync(file)) continue;
+    try {
+      const record = JSON.parse(fs.readFileSync(file, "utf8"));
+      if (record.platform?.slug && record.platform.slug !== entry.slug) {
+        structuralErrors.push(`Filename/slug mismatch: ${entry.slug}.json declares platform.slug "${record.platform.slug}"`);
+      }
+    } catch { /* JSON errors reported per-record above */ }
+  }
+  for (const name of unexpected) structuralErrors.push(`Unexpected record file not in roster: ${name}`);
+}
+if (structuralErrors.length) {
+  console.error("Structural errors:\n" + structuralErrors.map((e) => `  - ${e}`).join("\n"));
+}
+
 const counts = results.reduce((acc, result) => {
   acc[result.status] = (acc[result.status] ?? 0) + 1;
   return acc;
 }, {});
 const coverage = {
-  generated_at: new Date().toISOString(),
+  // Deterministic: derived from the newest researched_at, not a wall clock, so
+  // regenerating from unchanged records produces an identical file.
+  generated_at: sourceSnapshotDate(),
+  input_hash: requestedSlug ? null : inputHash(),
   roster_count: selectedRoster.length,
   counts,
   unexpected_record_files: unexpected,
@@ -320,4 +360,4 @@ if (process.argv.includes("--write")) {
 }
 
 console.log(JSON.stringify(coverage, null, 2));
-if ((counts.invalid ?? 0) > 0 || unexpected.length > 0) process.exitCode = 1;
+if ((counts.invalid ?? 0) > 0 || unexpected.length > 0 || structuralErrors.length > 0) process.exitCode = 1;

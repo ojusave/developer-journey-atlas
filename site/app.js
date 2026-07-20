@@ -35,9 +35,9 @@ function populateCategories(rows) {
 }
 
 function compareRows(a, b, mode) {
-  if (mode === "steps") return a.steps - b.steps || a.name.localeCompare(b.name);
-  if (mode === "friction") return a.friction_score - b.friction_score || a.steps - b.steps;
-  if (mode === "minutes") return a.est_minutes - b.est_minutes || a.steps - b.steps;
+  if (mode === "steps") return a.developer_action_count - b.developer_action_count || a.name.localeCompare(b.name);
+  if (mode === "gates") return a.gate_count - b.gate_count || a.developer_action_count - b.developer_action_count;
+  if (mode === "effort") return a.heuristic_effort_score - b.heuristic_effort_score || a.developer_action_count - b.developer_action_count;
   return a.name.localeCompare(b.name);
 }
 
@@ -50,7 +50,7 @@ function render() {
     .filter((row) => !category || row.category === category)
     .filter((row) => {
       if (!query) return true;
-      const haystack = [row.name, row.category, row.outcome, row.first_success_type]
+      const haystack = [row.name, row.category, row.outcome, row.first_success_type, row.selected_surface]
         .join(" ")
         .toLocaleLowerCase();
       return haystack.includes(query);
@@ -71,9 +71,9 @@ function render() {
         <summary>
           <span class="result-title">${escapeHtml(row.name)}</span>
           <span class="result-outcome">${escapeHtml(row.outcome)}</span>
-          <span class="result-metrics" aria-label="${escapeHtml(row.steps)} steps, friction score ${escapeHtml(row.friction_score)}">
-            <span class="metric">${escapeHtml(row.steps)} steps</span>
-            <span class="metric">friction ${escapeHtml(row.friction_score)}</span>
+          <span class="result-metrics" aria-label="${escapeHtml(row.developer_action_count)} developer actions, ${escapeHtml(row.gate_count)} friction gates">
+            <span class="metric">${escapeHtml(row.developer_action_count)} dev actions</span>
+            <span class="metric">${escapeHtml(row.gate_count)} gates</span>
           </span>
         </summary>
         <div class="result-body">
@@ -83,11 +83,19 @@ function render() {
           </dl>
           <dl>
             <dt>Selected route</dt>
-            <dd>${escapeHtml(row.route)}</dd>
+            <dd>${escapeHtml(row.selected_surface)}</dd>
           </dl>
           <dl>
-            <dt>Heuristic estimate</dt>
-            <dd>${escapeHtml(row.est_minutes)} minutes, not observed time</dd>
+            <dt>Raw transitions</dt>
+            <dd>${escapeHtml(row.raw_transition_count)} total (${escapeHtml(row.platform_event_count)} platform events, not developer actions)</dd>
+          </dl>
+          <dl>
+            <dt>Heuristic effort score</dt>
+            <dd>${escapeHtml(row.heuristic_effort_score)} (unitless model output, not minutes and not observed time)</dd>
+          </dl>
+          <dl>
+            <dt>Comparability</dt>
+            <dd>${escapeHtml(row.comparability_status)}</dd>
           </dl>
           <a class="record-link" href="data/records/${encodeURIComponent(row.slug)}.json">Open the evidence record (JSON)</a>
         </div>
@@ -102,7 +110,7 @@ function render() {
 async function load() {
   try {
     const [atlasResponse, coverageResponse] = await Promise.all([
-      fetch("data/easiest-path.json"),
+      fetch("data/selected-path-heuristic.json"),
       fetch("data/coverage-summary.json"),
     ]);
 

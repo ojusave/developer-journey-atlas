@@ -8,7 +8,7 @@ const dataRoot = path.join(outputRoot, "data");
 
 await mkdir(dataRoot, { recursive: true });
 await cp(path.join(projectRoot, "site"), outputRoot, { recursive: true, force: true });
-await cp(path.join(projectRoot, "easiest-path.json"), path.join(dataRoot, "easiest-path.json"));
+await cp(path.join(projectRoot, "selected-path-heuristic.json"), path.join(dataRoot, "selected-path-heuristic.json"));
 await cp(path.join(projectRoot, "records"), path.join(dataRoot, "records"), { recursive: true, force: true });
 
 const coverage = JSON.parse(await readFile(path.join(projectRoot, "coverage.json"), "utf8"));

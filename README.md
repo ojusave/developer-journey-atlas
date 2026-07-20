@@ -62,9 +62,16 @@ than choosing silently.
 - `candidate-path-audit.json`: records flagged because their shared spine stops before an executable candidate route.
 - `cold-audit-open.json`: unresolved independent source-to-step findings that keep a record invalid until correction and recheck.
 - `cold-audit-summary.md`: resolved cross-batch source-to-step audit receipt for the high-risk and reworked records.
-- `records/`: one canonical JSON record per platform.
+- `records/`: one canonical JSON record per platform. This is the only source of truth.
 - `catalog.md`: generated human-readable index after integration.
 - `coverage.json`: generated validation and completion report.
+- `MEASUREMENT-CONTRACT.md`: definitions of every measurement unit (raw transition, developer action, platform event, wait, decision, documentation navigation, terminal). Read this before analyzing.
+- `ds-quality.json`: generated analytical-quality and comparability metadata per record. Not a ranking. Use it to filter records before analysis.
+- `selected-path-heuristic.json`: generated per-platform selected route with normalized counts and a unitless `heuristic_effort_score`. Not a ranking, not minutes, not observed time. Replaces the former `easiest-path.json`.
+- `ds-audit.md`: pre-repair baseline audit of `main` (defect counts, slug lists, reproducibility findings).
+- `lib/measure.mjs`: shared measurement library that both generators import, so counts never diverge.
+- `build-all.mjs`, `build-ds-quality.mjs`, `build-selected-path.mjs`, `build-catalog.mjs`, `build-ds-audit.mjs`: generators.
+- `tests/regression.mjs`: fixtures for the measurement layer (Render counts, Chronosphere assumptions, re-researched granularity, classifier false positives).
 
 ## Route selection policy
 
@@ -79,3 +86,68 @@ A platform record is complete only when its full bounded path is reconstructed
 from inspected official sources and every evidence-bearing field is attributable.
 Passing the schema is necessary but not sufficient; the parent also reviews
 source coverage and representative paths cold.
+
+## What `complete` means (and what it does not)
+
+A `complete` record describes one committed route to an observable terminal. It is
+research-complete. It is **not** automatically globally canonical or directly
+comparable to every other record. A record can be complete while its platform still
+has no single platform-wide first success. That platform-wide ambiguity lives in
+`surface.selection_basis`, `surface.alternatives_considered`, and `uncertainties`.
+The selected-route success fields (`surface.name` and the four
+`documented_first_success` narrative fields) must describe the committed route's
+terminal affirmatively. The validator fails a `complete` record that uses blocked or
+needs-human-judgment phrasing in those fields, and reports the exact field and rule.
+
+## Analysis honesty: what is safe to analyze
+
+This dataset is reconstructed documentation, not telemetry. There are no measured
+conversion rates, activation rates, or observed times here.
+
+- **Safe:** per-record structure from `ds-quality.json` (developer actions, platform
+  events, gates, waits, starting-state assumptions, execution environment), and
+  filtering or grouping records by those fields.
+- **Conditionally safe:** cross-platform comparisons, but only after filtering on
+  `comparability_status` and the confound dimensions. Every record is currently
+  `conditional`, never unconditionally `comparable`, because documentation navigation,
+  platform events, starting-state assumptions, or granularity differences apply.
+- **Unsafe:** treating `raw_transition_count` as developer effort, treating
+  `heuristic_effort_score` as minutes, or reading `selected-path-heuristic.json` as a
+  ranking or a "best developer experience" claim.
+
+### Raw transitions are not developer actions
+
+Render's record has 25 raw transitions but only 21 developer actions (20 required,
+1 optional). Four transitions are platform events: Render creates the service, runs
+the build, marks the deploy Live, and serves the response. Do not report 25 as "25
+steps the developer must do." See `MEASUREMENT-CONTRACT.md`.
+
+### Filter before you compare
+
+```js
+import fs from "node:fs";
+const dq = JSON.parse(fs.readFileSync("ds-quality.json", "utf8"));
+
+// A cohort with no assumed existing assets, no opaque signup, hosted execution,
+// and an explicitly named terminal. Compare within this cohort, not across all 205.
+const cohort = dq.records.filter((r) =>
+  r.existing_asset_requirements.length === 0 &&
+  !r.opaque_signup &&
+  r.execution_environment === "hosted" &&
+  r.boundary_evidence_type === "explicitly-named"
+);
+```
+
+## Regenerate and validate
+
+Everything is deterministic (no wall-clock timestamps; artifacts pin an
+`input_hash` derived from the records). One command regenerates and re-validates:
+
+```bash
+node build-all.mjs          # validate, regenerate coverage/catalog/ds-quality/selected-path, re-validate
+node build-all.mjs --check  # same, then fail if regeneration left a dirty git diff (CI)
+node tests/regression.mjs   # measurement-layer fixtures
+```
+
+`ds-audit.md` is a one-time pre-repair baseline and is not regenerated by
+`build-all.mjs`.
