@@ -2,7 +2,7 @@
 
 These are the remaining publication and product decisions. Repository creation and licensing were approved on July 21, 2026.
 
-## Required before publication
+## Remaining before deployment or public visibility
 
 1. **Choose deployment ownership.** The recommendation is one production application owned by the new repository, with research intake remaining a review-gated job in the same repository. Retarget and verify staging before changing the live Render service.
 2. **Resolve current dependency advisories.** A clean npm audit reports three moderate and two low transitive findings through optional Mastra dependencies. There are no high or critical findings. The affected Hono Windows static-file path is not used by the scanner, but the lockfile should be updated when an upstream-compatible release is available.

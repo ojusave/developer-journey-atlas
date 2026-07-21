@@ -18,6 +18,14 @@ Integration commit: `23464708b766710bf3c6334bba78e3abb2987e53`
 - The canonical counts remain 205 platform records, 790 blocker reasons, 28 universal families, and 16 platform archetypes.
 - The migration map covers all 375 source paths. Every transformation is approved under a named evidence class in the human review gate.
 
+## Canonical publication
+
+- The canonical repository is `https://github.com/ojusave/developer-journey-atlas`.
+- It was created private with `main` as its default branch.
+- The first published commit was `0bfc24faae81fd2b48c465ed3a7b1682b802087e`.
+- GitHub Actions run `29868804912` passed the Node 22 and data-integrity job and the full-history secret scan.
+- The two source repositories remain unarchived and were not modified by publication.
+
 ## Automated verification
 
 The final local verification passed on 2026-07-21:

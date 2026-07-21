@@ -144,6 +144,8 @@ Repository software is licensed under the [Apache License 2.0](LICENSE). Origina
 
 Read [LICENSE_SCOPE.md](LICENSE_SCOPE.md) for the exact path boundaries and third-party exclusions.
 
+Contributions are welcome under the evidence and licensing rules in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Current release gate
 
 The implementation and live technical path are **artifact verified**, not **outcome validated** and not yet approved for workshop traffic.

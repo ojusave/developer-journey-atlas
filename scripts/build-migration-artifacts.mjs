@@ -274,7 +274,7 @@ const inventory = `# Developer Journey Atlas migration inventory
 
 ## Decision
 
-The existing scanner repository is the local integration destination. The public product name is Developer Journey Atlas. Remote repositories and infrastructure identifiers remain unchanged until a separate approval.
+The existing scanner repository was the local integration destination. The canonical remote is the private \`ojusave/developer-journey-atlas\` repository. Both source repositories remain unchanged and unarchived. Infrastructure identifiers remain unchanged until a separate approval.
 
 ## Baselines
 
