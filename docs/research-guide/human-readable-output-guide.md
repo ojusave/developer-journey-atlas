@@ -31,3 +31,17 @@ Prohibited without appropriate evidence:
 - “This is the confirmed cause.”
 
 The generated `packages/generated-views/atlas.md` presents the full corpus. A future UI may progressively disclose sources and alternatives, but it must preserve the same evidence boundaries.
+
+## Progressive presentation
+
+The wrapper should render the assembled diagnosis in this order:
+
+1. Bottom line.
+2. What the evidence establishes.
+3. Up to three possible explanations or research areas.
+4. What remains unknown.
+5. One next check.
+
+Sources, methodology, comparison limitations, and alternative hypotheses may begin collapsed, but they must remain available without changing the wording or evidence state of the primary claims.
+
+The wrapper may simplify sentence structure. It must not merge separate evidence classes, replace an unknown with a guess, promote a candidate to a supported hypothesis, or rewrite an attributed report as direct observation.
