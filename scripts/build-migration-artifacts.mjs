@@ -334,7 +334,7 @@ The journey corpus and blocker taxonomy are independent canonical datasets. Gene
 - No repository, package, database, environment variable, Render resource, or remote URL was renamed.
 - No UI redesign was performed.
 - No live platform research was run.
-- No production change, deployment, push, archive, or publication was performed.
+- No production change, deployment, source-repository archive, or deletion was performed during migration.
 `;
 
 await mkdir(docsRoot, { recursive: true });

@@ -41,11 +41,11 @@ The final local verification passed on 2026-07-21:
 | Scanner production build | passed |
 | Workflow type check and build | passed |
 | Journey deterministic generation check | passed |
-| Atlas integrity checks | 23 passed |
+| Atlas integrity checks | 24 passed |
 | Browser end-to-end and accessibility smoke test | passed |
 | In-memory API load smoke test | 100 completed, 0 failed |
 
-The Atlas integrity checks compile all three strict JSON Schemas, verify imported Git blobs and source hashes, verify all 80 unchanged scanner blobs, verify generated-view hashes, parse all 1,040 JSONL records independently, confirm that all 790 blocker hypotheses remain `not_diagnosis_eligible`, classify all 375 original files, and prove that every mapped destination path is unique.
+The Atlas integrity checks compile all three strict JSON Schemas, verify imported Git blobs and source hashes, verify all 79 unchanged scanner blobs, review four license metadata changes, verify generated-view hashes, parse all 1,040 JSONL records independently, confirm that all 790 blocker hypotheses remain `not_diagnosis_eligible`, classify all 375 original files, and prove that every mapped destination path is unique.
 
 The browser smoke test covered the supported diagnostic flow, insufficient-evidence handling, a corrected journey, legitimate completion with no drop-off, exports, persistence, deletion, accessibility, offline behavior, and layouts from 320 px through 1280 px. The API load smoke test completed 100 concurrent in-memory sessions with no failures.
 
@@ -67,11 +67,11 @@ Gitleaks 8.30.1 scanned the entire reachable migration history. Its two initial 
 
 - The full suite and browser flow passed in a fresh checkout using the official Node 22.22.0 macOS ARM64 binary and npm 10.9.4. The downloaded archive matched Node's published SHA-256.
 - The production build emits an existing warning for a client chunk larger than 500 kB. The build still passes.
-- A clean npm audit reports three moderate and two low transitive advisories through optional Mastra dependencies. There are no high or critical findings. The optional Mastra path is disabled by default, but this remains a publication dependency gate.
+- A clean npm audit reports three moderate and two low transitive advisories through optional Mastra dependencies. There are no high or critical findings. The optional Mastra path is disabled by default. This is a tracked maintenance risk, not a high or critical release blocker.
 - No live platform research was performed during migration.
 - No causal drop-off reason, prevalence claim, or comparison conclusion was created from the taxonomy.
 - No user study or ADHD-language comprehension test was performed.
-- No remote repository, deployment, archive, or production resource was changed.
+- The canonical remote repository was created private. No deployment, archive, or production resource was changed during migration.
 
 ## Reproduce
 

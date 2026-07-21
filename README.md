@@ -120,15 +120,9 @@ The Blueprint deliberately starts with `REASONING_MODE=deterministic`, `EXECUTIO
 
 Optional provider credentials are not declared with `sync: false` in the initial Blueprint because Render would require every placeholder during creation even though those features are disabled. Add the relevant keys from `.env.example` in the Dashboard only when enabling that feature.
 
-The deployed source is the historical [GitHub repository](https://github.com/ojusave/devrelcon-first-mile-scanner). The live resources in Render's `First Mile Scanner` project are:
+Deployment is not part of the current open-source release. On July 21, 2026, the historical Scanner URL returned `404`, and the previously recorded Scanner service, database, and Workflow were no longer present in the selected Render workspace. Historical deployment checks remain evidence of past behavior only.
 
-- web service `first-mile-scanner` (`srv-d9dpkedaeets739p3m40`): <https://first-mile-scanner.onrender.com>;
-- private-only Postgres `first-mile-scanner-db` (`dpg-d9dpjpbrjlhs73b42epg-a`); and
-- Workflow `first-mile-scanner-workflows` (`wfl-d9dpkutaeets739p4m50`) with the registered `diagnosticTurn` task.
-
-These live resources were created directly through the Render CLI and API, so they are not managed by a Blueprint instance. Do not apply `render.yaml` to the same workspace without first reconciling it with these resource IDs, or Render can create a second set.
-
-The deployed web service remains in the safe `EXECUTION_MODE=direct`. The Workflow is released and its opaque callback completed successfully against the live web service. Automatic web-to-Workflow dispatch still requires a new long-lived Render API key and the deployed task slug. Do not substitute the expiring CLI login token.
+Treat `render.yaml` as a proposed deployment shape, not the source of truth for a current environment. Validate it against a staging environment before creating or changing Render resources. The separate research static site remains connected to the historical data repository and must be retargeted in a deployment-specific change.
 
 ## Rollback switches
 
@@ -146,9 +140,11 @@ Read [LICENSE_SCOPE.md](LICENSE_SCOPE.md) for the exact path boundaries and thir
 
 Contributions are welcome under the evidence and licensing rules in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+Report vulnerabilities and sensitive research-data concerns through the process in [SECURITY.md](SECURITY.md).
+
 ## Current release gate
 
-The implementation and live technical path are **artifact verified**, not **outcome validated** and not yet approved for workshop traffic.
+The implementation is **artifact verified**, not **outcome validated**. No current Scanner deployment is verified or approved for workshop traffic.
 
 The first live participant-flow review failed: the app behaved like a long diagnostic interview, required 15 transitions before synthesis, and did not make the purpose of its questions clear. The current map-first frontend is the corrective release candidate. It must be redeployed and tested by Ojus and representative practitioners before replacing that failure with a workshop-readiness claim.
 
@@ -156,14 +152,14 @@ The remaining gates are external or research-quality gates:
 
 - zero individual reason cards are currently diagnosis eligible, so the app may narrow families and prescribe evidence but must not claim an individual cause;
 - the participant-facing map currently uses deterministic research routing and does not invoke the optional OpenRouter and Mastra path;
-- the live OpenRouter and Mastra path has not been exercised with a rotated restricted key;
+- the optional OpenRouter and Mastra path has not been exercised with a rotated restricted key;
 - the Arize export has not been observed in a real project;
 - automatic web-to-Workflow dispatch remains disabled until a long-lived Render API key is added and that path passes the same live checks;
 - the actual room concurrency, shared-network behavior, provider cost cap, and abuse controls have not been verified; and
 - five representative practitioners have not yet completed a moderated pilot showing that the flow is useful, understandable, and not boring.
 
-The release candidate passed 114 application and server tests plus four Workflow tests. The local browser smoke covers the map-first mobile flow, value before diagnosis, stage-specific research routing, accessibility, correction retraction, Markdown and JSON export, resume, deletion, offline shell, and layouts from 320px through 1280px. The previous live technical checks remain valid for the unchanged backend: a 100-session concurrency smoke completed all 100 with zero failures, an opaque Workflow run completed the protected callback, and the Blueprint validates as three actions. The new frontend still needs the same checks after deployment.
+The release candidate passed 114 application and server tests plus four Workflow tests. The local browser smoke covers the map-first mobile flow, value before diagnosis, stage-specific research routing, accessibility, correction retraction, Markdown and JSON export, resume, deletion, offline shell, and layouts from 320px through 1280px. Historical checks recorded a 100-session concurrency smoke with zero failures and one successful opaque Workflow callback. Those checks do not establish the state of any current deployment. The Blueprint validates as three actions, and any future deployment must repeat the runtime checks in its target environment.
 
-The current production build is 133.12KB gzip. Vite reports the uncompressed 661.21KB client chunk as large, primarily because the complete research catalog is available offline, so test first load on the actual event network before public use. A clean npm audit currently reports three moderate and two low transitive findings through optional Mastra dependencies, with no high or critical findings. The Mastra path is disabled by default. Track or adopt an upstream-compatible fix instead of forcing an incompatible override.
+The current local production build is 133.12KB gzip. Vite reports the uncompressed 661.21KB client chunk as large, primarily because the complete research catalog is available offline, so test first load on the actual event network before public use. A clean npm audit currently reports three moderate and two low transitive findings through optional Mastra dependencies, with no high or critical findings. The Mastra path is disabled by default. Track or adopt an upstream-compatible fix instead of forcing an incompatible override.
 
 Keep the QR code and public workshop claim blocked until those gates pass.
