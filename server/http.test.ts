@@ -1,6 +1,9 @@
 // @vitest-environment node
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import { randomUUID } from "node:crypto";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createScannerServer } from "./http.js";
 import { DeterministicReasoner, type ReasoningInput, type TurnProposal, type TurnReasoner } from "./reasoner.js";
@@ -12,9 +15,13 @@ describe("scanner HTTP boundary", () => {
     await Promise.all(resources.splice(0).map((close) => close()));
   });
 
-  async function start(config = testConfig, reasoner?: TurnReasoner) {
+  async function start(
+    config = testConfig,
+    reasoner?: TurnReasoner,
+    options: { staticRoot?: string } = {},
+  ) {
     const runtime = createTestService({ config, reasoner });
-    const server = createScannerServer(runtime.service, runtime.store, runtime.config, silentLogger);
+    const server = createScannerServer(runtime.service, runtime.store, runtime.config, silentLogger, options);
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     resources.push(() => new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())));
     const port = (server.address() as AddressInfo).port;
@@ -65,7 +72,10 @@ describe("scanner HTTP boundary", () => {
   });
 
   it("serves the service worker with revalidation instead of an immutable cache", async () => {
-    const { baseUrl } = await start();
+    const staticRoot = await mkdtemp(join(tmpdir(), "scanner-static-test-"));
+    await writeFile(join(staticRoot, "sw.js"), "// test service worker\n", "utf8");
+    resources.push(() => rm(staticRoot, { recursive: true, force: true }));
+    const { baseUrl } = await start(testConfig, undefined, { staticRoot });
     const response = await fetch(`${baseUrl}/sw.js`);
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-cache");

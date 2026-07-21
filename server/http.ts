@@ -70,8 +70,7 @@ function mimeType(path: string): string {
   } as Record<string, string>)[extname(path)] ?? "application/octet-stream";
 }
 
-function serveStatic(requestPath: string, response: ServerResponse): boolean {
-  const root = resolve(process.cwd(), "dist");
+function serveStatic(requestPath: string, response: ServerResponse, root: string): boolean {
   const requested = requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
   let path = resolve(root, requested);
   if (path !== root && !path.startsWith(`${root}${sep}`)) return false;
@@ -103,7 +102,9 @@ export function createScannerServer(
   store: DiagnosticStore,
   config: RuntimeConfig,
   logger: SafeLogger,
+  options: { staticRoot?: string } = {},
 ): Server {
+  const staticRoot = options.staticRoot ?? resolve(process.cwd(), "dist");
   const windowMs = config.rateLimitWindowSeconds * 1_000;
   const sessionCreateLimiter = new FixedWindowRateLimiter(config.sessionCreateLimit, windowMs);
   const sessionTurnLimiter = new FixedWindowRateLimiter(config.sessionTurnLimit, windowMs);
@@ -189,7 +190,7 @@ export function createScannerServer(
       }
 
       if (method === "GET" && !url.pathname.startsWith("/api/") && !url.pathname.startsWith("/internal/")) {
-        if (serveStatic(url.pathname, response)) return;
+        if (serveStatic(url.pathname, response, staticRoot)) return;
       }
       throw new AppError(404, "route_not_found", "Route not found");
     } catch (error) {
