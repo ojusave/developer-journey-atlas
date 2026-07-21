@@ -84,8 +84,27 @@ const runSearch = debounce(async (q) => {
 
 /* ---------- Rendering an assessment ---------- */
 
-function metricBox(value, label) {
-  return `<div class="metric-box"><span class="m-value">${esc(value)}</span><span class="m-label">${esc(label)}</span></div>`;
+function metricBox(value, label, hint) {
+  const hintHtml = hint ? `<span class="m-hint">${esc(hint)}</span>` : "";
+  return `<div class="metric-box"><span class="m-value">${esc(value)}</span><span class="m-label">${esc(label)}</span>${hintHtml}</div>`;
+}
+
+// Plain-language translation of the comparability status, so "conditional"
+// isn't a cryptic label.
+function comparabilityText(status) {
+  if (status === "comparable") return "Comparable: this route makes few special assumptions.";
+  if (status === "not-comparable") return "Not directly comparable: the documented success here is ambiguous or unusual.";
+  return "Conditionally comparable: this route assumes things (like an existing account or a specific surface), so read side-by-side numbers loosely.";
+}
+
+// A short, scannable "how to read this" strip shown with every result.
+function readStrip() {
+  return `
+    <p class="read-strip">
+      <strong>How to read this:</strong> these numbers describe the route official docs lay out to a first success,
+      how many steps and gates it spells out. They are not a measure of how easy, fast, or good the product is,
+      and a lower number is not "better".
+    </p>`;
 }
 
 function renderAssessment(a) {
@@ -117,14 +136,16 @@ function renderAssessment(a) {
         <span class="pill pill-cat">${esc(a.category)}</span>
       </div>
       <p class="lede">${esc(a.outcome)}</p>
+      ${readStrip()}
 
       <div class="metrics-grid">
-        ${metricBox(num(a.metrics.developerActions), "Developer actions")}
-        ${metricBox(num(a.metrics.gates), "Friction gates")}
-        ${metricBox(num(a.metrics.platformEvents), "Platform events")}
-        ${metricBox(a.metrics.effortScore, "Effort score (unitless)")}
-        ${metricBox(esc(a.metrics.comparability), "Comparability")}
+        ${metricBox(num(a.metrics.developerActions), "Developer actions", "steps you take")}
+        ${metricBox(num(a.metrics.gates), "Friction gates", "sign-up, billing, approvals…")}
+        ${metricBox(num(a.metrics.platformEvents), "Automated steps", "the platform does these")}
+        ${metricBox(a.metrics.effortScore, "Route length", "weighted step count, not time")}
+        ${metricBox(esc(a.metrics.comparability), "Comparability", "how safely it compares")}
       </div>
+      <p class="lede compare-note">${esc(comparabilityText(a.metrics.comparability))}</p>
 
       <dl class="kv">
         <div><dt>Selected route</dt><dd>${esc(a.selectedSurface)}</dd></div>
@@ -156,6 +177,17 @@ function peerRow(p) {
       </tr>`;
 }
 
+// Turn the effort-score distribution into one plain sentence about where this
+// route sits among same-finish-line peers, framed as documentation length.
+function positionSentence(c) {
+  const d = c.distribution.effortScore;
+  let where;
+  if (d.higherCount > d.lowerCount) where = "on the longer, more spelled-out side";
+  else if (d.lowerCount > d.higherCount) where = "on the shorter, more condensed side";
+  else where = "about mid-pack";
+  return `Among the ${c.sameFinishLineCount} peer(s) that also reach "${c.finishLine}", this route's documented length is ${where}. That reflects how much the docs walk you through, which can mean thorough docs or more required steps, not that it is harder or worse.`;
+}
+
 function renderComparison(c) {
   if (c.peerCount === 0) {
     return `<div class="card"><h2>Category context</h2><p class="lede">No other platforms in "${esc(c.category)}" yet.</p></div>`;
@@ -165,7 +197,8 @@ function renderComparison(c) {
   const diffFinish = c.peers.filter((p) => !p.sameFinishLine);
 
   const dist = c.sameFinishLineCount > 0
-    ? `${distLine("Developer actions", c.distribution.developerActions)}
+    ? `<p class="lede compare-note">${esc(positionSentence(c))}</p>
+       ${distLine("Developer actions", c.distribution.developerActions)}
        ${distLine("Friction gates", c.distribution.gates)}
        ${distLine("Route length (effort score)", c.distribution.effortScore)}`
     : `<p class="lede">No peer in this category documents the same finish line ("${esc(c.finishLine)}"), so there is no like-for-like distribution to show.</p>`;
