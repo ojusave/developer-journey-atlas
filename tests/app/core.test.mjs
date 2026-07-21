@@ -61,10 +61,10 @@ test("buildAssessment surfaces record detail when present", () => {
 
 test("buildComparison reports distribution, not a rank, and excludes not-comparable peers", () => {
   const rows = [
-    row(),
-    row({ name: "Fly", slug: "fly", developer_action_count: 12, gate_count: 5, heuristic_effort_score: 14, comparability_status: "conditional" }),
-    row({ name: "Heroku", slug: "heroku", developer_action_count: 4, gate_count: 2, heuristic_effort_score: 6, comparability_status: "comparable" }),
-    row({ name: "Odd", slug: "odd", developer_action_count: 99, gate_count: 99, heuristic_effort_score: 99, comparability_status: "not-comparable" }),
+    row({ first_success_type: "deploy / host" }),
+    row({ name: "Fly", slug: "fly", first_success_type: "deploy / host", developer_action_count: 12, gate_count: 5, heuristic_effort_score: 14, comparability_status: "conditional" }),
+    row({ name: "Heroku", slug: "heroku", first_success_type: "deploy / host", developer_action_count: 4, gate_count: 2, heuristic_effort_score: 6, comparability_status: "comparable" }),
+    row({ name: "Odd", slug: "odd", first_success_type: "deploy / host", developer_action_count: 99, gate_count: 99, heuristic_effort_score: 99, comparability_status: "not-comparable" }),
     row({ name: "Other Cat", slug: "other", category: "Payments", comparability_status: "comparable" }),
   ];
   const c = buildComparison(rows[0], rows);
@@ -73,4 +73,25 @@ test("buildComparison reports distribution, not a rank, and excludes not-compara
   assert.equal(c.distribution.developerActions.lowerCount, 1); // heroku(4)
   assert.equal(c.distribution.developerActions.higherCount, 1); // fly(12)
   assert.ok(c.peers.some((p) => p.slug === "odd")); // still listed for transparency
+});
+
+test("buildComparison only compares peers that reach the same finish line", () => {
+  const rows = [
+    row({ name: "Render", slug: "render", first_success_type: "deploy / host", developer_action_count: 21, heuristic_effort_score: 35.8 }),
+    row({ name: "Heroku", slug: "heroku", first_success_type: "deploy / host", developer_action_count: 11, heuristic_effort_score: 31 }),
+    // AWS documents a shallower finish line (account/orientation), so it must
+    // not fold into Render's distribution even though its numbers are lower.
+    row({ name: "AWS", slug: "aws", first_success_type: "other", developer_action_count: 18, heuristic_effort_score: 29.8 }),
+  ];
+  const c = buildComparison(rows[0], rows);
+  assert.equal(c.finishLine, "deploy / host");
+  assert.equal(c.peerCount, 2); // heroku + aws listed
+  assert.equal(c.sameFinishLineCount, 1); // only heroku
+  assert.equal(c.differentFinishLineCount, 1); // aws
+  assert.equal(c.comparablePeerCount, 1); // distribution over heroku only
+  // AWS (29.8) is lower than Render (35.8) but must NOT count as "shorter".
+  assert.equal(c.distribution.effortScore.lowerCount, 1); // heroku(31) only
+  assert.equal(c.distribution.effortScore.higherCount, 0);
+  const aws = c.peers.find((p) => p.slug === "aws");
+  assert.equal(aws.sameFinishLine, false);
 });

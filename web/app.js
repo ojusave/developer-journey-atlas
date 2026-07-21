@@ -142,42 +142,67 @@ function renderAssessment(a) {
 }
 
 function distLine(label, d) {
-  return `<p class="dist-line"><strong>${esc(label)}:</strong> ${num(d.value)} vs category median ${num(d.categoryMedian)}. ${num(d.lowerCount)} peers document fewer, ${num(d.higherCount)} document more.</p>`;
+  return `<p class="dist-line"><strong>${esc(label)}:</strong> ${num(d.value)} vs same-finish-line median ${num(d.categoryMedian)}. ${num(d.lowerCount)} document a shorter route, ${num(d.higherCount)} document a longer one.</p>`;
+}
+
+function peerRow(p) {
+  return `
+      <tr class="${p.sameFinishLine ? "" : "diff-finish"}">
+        <td><a href="#" data-slug="${esc(p.slug)}" class="peer-link">${esc(p.name)}</a></td>
+        <td>${esc(p.finishLine)}</td>
+        <td>${num(p.developerActions)}</td>
+        <td>${num(p.gates)}</td>
+        <td>${p.effortScore}</td>
+      </tr>`;
 }
 
 function renderComparison(c) {
   if (c.peerCount === 0) {
     return `<div class="card"><h2>Category context</h2><p class="lede">No other platforms in "${esc(c.category)}" yet.</p></div>`;
   }
-  const rows = c.peers
-    .map(
-      (p) => `
-      <tr>
-        <td><a href="#" data-slug="${esc(p.slug)}" class="peer-link">${esc(p.name)}</a></td>
-        <td>${num(p.developerActions)}</td>
-        <td>${num(p.gates)}</td>
-        <td>${p.effortScore}</td>
-        <td><span class="tag ${p.comparability === "not-comparable" ? "not-comparable" : ""}">${esc(p.comparability)}</span></td>
-      </tr>`,
-    )
-    .join("");
+
+  const sameFinish = c.peers.filter((p) => p.sameFinishLine);
+  const diffFinish = c.peers.filter((p) => !p.sameFinishLine);
+
+  const dist = c.sameFinishLineCount > 0
+    ? `${distLine("Developer actions", c.distribution.developerActions)}
+       ${distLine("Friction gates", c.distribution.gates)}
+       ${distLine("Route length (effort score)", c.distribution.effortScore)}`
+    : `<p class="lede">No peer in this category documents the same finish line ("${esc(c.finishLine)}"), so there is no like-for-like distribution to show.</p>`;
+
+  const selfRow = `
+    <tr class="self">
+      <td>${esc(c.platform.name)} (this platform)</td>
+      <td>${esc(c.finishLine)}</td>
+      <td>${num(c.distribution.developerActions.value)}</td>
+      <td>${num(c.distribution.gates.value)}</td>
+      <td>${c.distribution.effortScore.value}</td>
+    </tr>`;
+
+  const sameSection = sameFinish.length
+    ? sameFinish.map(peerRow).join("")
+    : "";
+
+  const diffSection = diffFinish.length
+    ? `<tr class="section-label"><td colspan="5">Different finish line: measures a different milestone, not compared</td></tr>${diffFinish.map(peerRow).join("")}`
+    : "";
 
   return `
     <div class="card">
       <div class="assess-head">
         <h2>Category context: ${esc(c.category)}</h2>
-        <span class="pill">${num(c.comparablePeerCount)} comparable peers</span>
+        <span class="pill">${num(c.sameFinishLineCount)} peer(s) with the same finish line</span>
       </div>
-      ${distLine("Developer actions", c.distribution.developerActions)}
-      ${distLine("Friction gates", c.distribution.gates)}
-      ${distLine("Effort score", c.distribution.effortScore)}
+      <p class="dist-line">Documented finish line for this route: <strong>${esc(c.finishLine)}</strong>. Comparisons only make sense between routes that end at the same milestone.</p>
+      ${dist}
       <table class="compare-table">
         <thead>
-          <tr><th>Platform</th><th>Dev actions</th><th>Gates</th><th>Effort</th><th>Comparability</th></tr>
+          <tr><th>Platform</th><th>Finish line</th><th>Dev actions</th><th>Gates</th><th>Route length</th></tr>
         </thead>
         <tbody>
-          <tr class="self"><td>${esc(c.platform.name)}</td><td>${num(c.distribution.developerActions.value)}</td><td>${num(c.distribution.gates.value)}</td><td>${c.distribution.effortScore.value}</td><td>this platform</td></tr>
-          ${rows}
+          ${selfRow}
+          ${sameSection}
+          ${diffSection}
         </tbody>
       </table>
       <p class="dist-line">${esc(c.comparabilityNote)}</p>

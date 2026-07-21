@@ -8,6 +8,8 @@ export interface PeerMetric {
   gates: number;
   effortScore: number;
   comparability: string;
+  finishLine: string;
+  sameFinishLine: boolean;
 }
 
 export interface Distribution {
@@ -21,8 +23,13 @@ export interface Distribution {
 export interface Comparison {
   category: string;
   platform: { name: string; slug: string };
+  finishLine: string;
   peerCount: number;
   comparablePeerCount: number;
+  /** Peers that reach the same documented finish line and drive the distribution. */
+  sameFinishLineCount: number;
+  /** Peers whose documented route ends at a different milestone (not compared). */
+  differentFinishLineCount: number;
   peers: PeerMetric[];
   distribution: {
     developerActions: Distribution;
@@ -52,24 +59,38 @@ function distribution(value: number, peerValues: number[]): Distribution {
 }
 
 /**
- * Place a platform in the context of its category peers. Reports how the
- * documented counts sit relative to peers as a distribution, never as a rank.
- * Peers flagged not-comparable in ds-quality are excluded from the distribution
- * math but still listed for transparency.
+ * Place a platform in the context of its category peers. The distribution is
+ * computed ONLY against peers that reach the same documented finish line
+ * (first_success_type) and are not flagged not-comparable, because comparing a
+ * route that ends at "account created" with one that ends at "app deployed" is
+ * apples-to-oranges. Peers with a different finish line are still listed for
+ * transparency but never fold into the numbers, and nothing here is a rank.
  */
 export function buildComparison(row: MetricRow, allRows: MetricRow[]): Comparison {
   const peers = allRows.filter((r) => r.category === row.category && r.slug !== row.slug);
-  const comparablePeers = peers.filter((r) => r.comparability_status !== "not-comparable");
+  const sameFinish = peers.filter((r) => r.first_success_type === row.first_success_type);
+  const differentFinish = peers.filter((r) => r.first_success_type !== row.first_success_type);
 
-  const peerActions = comparablePeers.map((r) => r.developer_action_count);
-  const peerGates = comparablePeers.map((r) => r.gate_count);
-  const peerEffort = comparablePeers.map((r) => r.heuristic_effort_score);
+  // Distribution is only over same-finish-line peers that are themselves comparable.
+  const distributionPeers = sameFinish.filter((r) => r.comparability_status !== "not-comparable");
+  const peerActions = distributionPeers.map((r) => r.developer_action_count);
+  const peerGates = distributionPeers.map((r) => r.gate_count);
+  const peerEffort = distributionPeers.map((r) => r.heuristic_effort_score);
+
+  const finishLine = row.first_success_type;
+  const comparabilityNote =
+    distributionPeers.length === 0
+      ? `No other "${row.category}" platform documents the same finish line ("${finishLine}"), so there is nothing to place this route against. The peers below reach a different milestone.`
+      : `Compared only against ${distributionPeers.length} peer(s) whose documented route ends at the same milestone ("${finishLine}"). A lower count is a shorter documented route, not an easier or better product. Peers that stop at a different milestone are listed separately and not counted.`;
 
   return {
     category: row.category,
     platform: { name: row.name, slug: row.slug },
+    finishLine,
     peerCount: peers.length,
-    comparablePeerCount: comparablePeers.length,
+    comparablePeerCount: distributionPeers.length,
+    sameFinishLineCount: sameFinish.length,
+    differentFinishLineCount: differentFinish.length,
     peers: peers
       .map((r) => ({
         name: r.name,
@@ -78,17 +99,20 @@ export function buildComparison(row: MetricRow, allRows: MetricRow[]): Compariso
         gates: r.gate_count,
         effortScore: r.heuristic_effort_score,
         comparability: r.comparability_status,
+        finishLine: r.first_success_type,
+        sameFinishLine: r.first_success_type === row.first_success_type,
       }))
-      .sort((a, b) => a.name.localeCompare(b.name)),
+      .sort((a, b) => {
+        // Same-finish-line peers first, then by name.
+        if (a.sameFinishLine !== b.sameFinishLine) return a.sameFinishLine ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      }),
     distribution: {
       developerActions: distribution(row.developer_action_count, peerActions),
       gates: distribution(row.gate_count, peerGates),
       effortScore: distribution(row.heuristic_effort_score, peerEffort),
     },
-    comparabilityNote:
-      row.comparability_status === "comparable"
-        ? "This platform's route is marked comparable. Peer comparisons below still exclude routes marked not-comparable."
-        : `This platform's route is marked "${row.comparability_status}". Read peer differences as documented-route shape, not as which product is easier to use.`,
+    comparabilityNote,
     note: MEASUREMENT_NOTE,
   };
 }
