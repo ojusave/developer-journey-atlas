@@ -8,6 +8,8 @@ Evidence state: **ARTIFACT VERIFIED**
 
 This result verifies the local migration artifact on `migration/developer-journey-atlas`. It does not approve publication, prove research freshness, or validate the future UI with real users.
 
+Integration commit: `23464708b766710bf3c6334bba78e3abb2987e53`
+
 ## Source preservation
 
 - The journey corpus was imported from commit `dd23053647944efefc1bec68d1897a369b495055` using an unsquashed Git subtree.
