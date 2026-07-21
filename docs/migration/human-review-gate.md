@@ -31,7 +31,7 @@ No tracked source file was intentionally excluded. Git metadata and ignored loca
 - Seven source paths existed in both repositories with different content: `.env.example`, `.gitignore`, `README.md`, `package-lock.json`, `package.json`, `render.yaml`, and `tsconfig.json`. All seven were isolated under the package boundary. None was overwritten.
 - Twenty-one same-filename, different-content pairs were reported for review. See `repository-comparison.json` for exact paths and Git blobs.
 
-Every original path and transformation is listed in `migration-map.json`. All 375 entries are approved under one of four explicit evidence classes: 288 byte-identical imports, 80 unchanged scanner blobs, one path-only taxonomy move, and six reviewed compatibility edits.
+Every original path and transformation is listed in `migration-map.json`. All 375 entries are approved under one of five explicit evidence classes: 285 byte-identical imports, four reviewed license metadata changes, 79 unchanged scanner blobs, one path-only taxonomy move, and six reviewed compatibility edits.
 
 ## Preservation evidence
 
@@ -39,7 +39,9 @@ Every original path and transformation is listed in `migration-map.json`. All 37
 - 790 of 790 blocker reasons preserved
 - 28 of 28 universal blocker families preserved
 - 16 of 16 platform archetypes preserved
-- 288 of 288 imported Git blobs byte-identical
+- 285 research and implementation files remain byte-identical to their imported Git blobs
+- three imported license metadata files changed after approval, with their original Git blobs retained in the migration map
+- one scanner lockfile changed only to reflect the approved package license, with its original Git blob retained in the migration map
 - 0 duplicate platform slugs
 - 0 mapped destination collisions
 - 1,040 independently parseable LLM retrieval records

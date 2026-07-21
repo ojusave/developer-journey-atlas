@@ -13,10 +13,10 @@ Integration commit: `23464708b766710bf3c6334bba78e3abb2987e53`
 ## Source preservation
 
 - The journey corpus was imported from commit `dd23053647944efefc1bec68d1897a369b495055` using an unsquashed Git subtree.
-- All 288 imported files remain byte-identical to that source commit.
+- 285 imported files remain byte-identical to that source commit. The package README, package manifest, and package lock metadata changed only to implement the approved dual-license boundary, with their original blobs retained in the migration map.
 - The blocker taxonomy SHA-256 remains `54c7cc6b9512dfe59bb1468537f122357f41a5693b254a405d173e89a6a08341` after its path-only move.
 - The canonical counts remain 205 platform records, 790 blocker reasons, 28 universal families, and 16 platform archetypes.
-- The migration map covers all 375 source paths. Every transformation remains explicitly unapproved pending human review.
+- The migration map covers all 375 source paths. Every transformation is approved under a named evidence class in the human review gate.
 
 ## Automated verification
 

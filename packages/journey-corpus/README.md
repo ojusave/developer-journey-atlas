@@ -148,4 +148,4 @@ After a deploy, verify that `/`, `/llms.txt`, and `/data/index.json` return `200
 
 Open a focused pull request against `main`. Include the validation commands you ran and regenerate any derived artifacts affected by record or measurement changes.
 
-This workshop repository has no public license. The live source snapshot is available for inspection and reproducibility, but no reuse rights are granted.
+Software in this package is licensed under the Apache License 2.0. Original research records and research documentation are licensed under Creative Commons Attribution 4.0 International. The repository-level `LICENSE_SCOPE.md` defines the controlling path boundaries and exclusions.

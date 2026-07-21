@@ -138,6 +138,12 @@ The deployed web service remains in the safe `EXECUTION_MODE=direct`. The Workfl
 - Adaptive product problem: set `VITE_ADAPTIVE_ENABLED=false`, rebuild, and deploy the guided-only client.
 - Data incident: disable the service, rotate affected credentials and `SESSION_ENVELOPE_KEY`, review Postgres retention and backups, and do not claim deletion beyond what was verified.
 
+## Licensing
+
+Repository software is licensed under the [Apache License 2.0](LICENSE). Original research records, taxonomy content, documentation, and generated research views are licensed under [Creative Commons Attribution 4.0 International](DATA_LICENSE.md).
+
+Read [LICENSE_SCOPE.md](LICENSE_SCOPE.md) for the exact path boundaries and third-party exclusions.
+
 ## Current release gate
 
 The implementation and live technical path are **artifact verified**, not **outcome validated** and not yet approved for workshop traffic.

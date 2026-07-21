@@ -175,6 +175,7 @@ const approval = (basis, evidence) => ({
 
 const mappings = [];
 for (const { path, blob } of scannerEntries) {
+  const licenseMetadataChange = path === "package-lock.json";
   const newPath = path === "research/first-mile-blocker-universe.md"
     ? "packages/blocker-taxonomy/first-mile-blocker-universe.md"
     : path;
@@ -186,7 +187,9 @@ for (const { path, blob } of scannerEntries) {
     "server/http.ts",
     "src/generated/catalog.json",
   ];
-  const transformation = path === "research/first-mile-blocker-universe.md"
+  const transformation = licenseMetadataChange
+    ? "license_metadata_updated"
+    : path === "research/first-mile-blocker-universe.md"
     ? "moved"
     : compatibilityPaths.includes(path)
       ? "schema_wrapped"
@@ -200,18 +203,24 @@ for (const { path, blob } of scannerEntries) {
     classification: classifyPath("scanner", path),
     potentiallySensitive: /(^|\/)\.env(\.|$)/.test(path),
     transformation,
-    reason: transformation === "moved"
+    reason: licenseMetadataChange
+      ? "Updated only to reflect the approved Apache-2.0 package metadata."
+      : transformation === "moved"
       ? "Place the canonical blocker taxonomy behind an explicit package boundary."
       : transformation === "schema_wrapped"
         ? "Integrate the original application with the combined Atlas repository while preserving runtime compatibility."
         : "Preserved at the same path.",
     ...approval(
-      transformation === "unchanged"
+      licenseMetadataChange
+        ? "reviewed_license_metadata_change"
+        : transformation === "unchanged"
         ? "unchanged_blob_verified"
         : transformation === "moved"
           ? "path_only_hash_verified"
           : "reviewed_compatibility_change",
-      transformation === "unchanged"
+      licenseMetadataChange
+        ? "The original Git blob remains recorded and the scoped lockfile metadata diff was reviewed."
+        : transformation === "unchanged"
         ? "The current Git blob must equal the recorded scanner source blob."
         : transformation === "moved"
           ? "The taxonomy SHA-256, IDs, counts, and runtime catalog derivation are verified."
@@ -220,7 +229,10 @@ for (const { path, blob } of scannerEntries) {
   });
 }
 
+const corpusLicenseMetadataPaths = new Set(["README.md", "package-lock.json", "package.json"]);
+
 for (const { path, blob } of corpusEntries) {
+  const licenseMetadataChange = corpusLicenseMetadataPaths.has(path);
   mappings.push({
     originalRepository: manifest.sources.journeyCorpus.repository,
     originalCommit: corpusCommit,
@@ -229,11 +241,15 @@ for (const { path, blob } of corpusEntries) {
     newPath: `packages/journey-corpus/${path}`,
     classification: classifyPath("journeyCorpus", path),
     potentiallySensitive: /(^|\/)\.env(\.|$)/.test(path),
-    transformation: "moved",
-    reason: "Imported byte-identically under the canonical journey-corpus package with Git history preserved.",
+    transformation: licenseMetadataChange ? "license_metadata_updated" : "moved",
+    reason: licenseMetadataChange
+      ? "Imported with history, then updated only to resolve the approved repository license boundary."
+      : "Imported byte-identically under the canonical journey-corpus package with Git history preserved.",
     ...approval(
-      "byte_identical_history_import",
-      "The imported file's current Git blob must equal its blob at the recorded journey-corpus source commit.",
+      licenseMetadataChange ? "reviewed_license_metadata_change" : "byte_identical_history_import",
+      licenseMetadataChange
+        ? "The original Git blob remains recorded, the scoped metadata diff was reviewed, and no research record content changed."
+        : "The imported file's current Git blob must equal its blob at the recorded journey-corpus source commit.",
     ),
   });
 }
@@ -245,7 +261,7 @@ mappings.sort((a, b) =>
 const map = {
   schemaVersion: 1,
   generatedFrom: "docs/migration/migration-manifest.json",
-  approvalPolicy: "Each mapping is approved only under one of four verified evidence classes; no destructive transformation is present.",
+  approvalPolicy: "Each mapping is approved only under one of five verified evidence classes; no destructive transformation is present.",
   counts: {
     scannerEntries: scannerEntries.length,
     journeyCorpusEntries: corpusEntries.length,

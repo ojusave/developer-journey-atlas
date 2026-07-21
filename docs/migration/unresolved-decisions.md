@@ -1,22 +1,20 @@
 # Developer Journey Atlas unresolved decisions
 
-These items are intentionally unresolved. None is approved by the local migration.
+These are the remaining publication and product decisions. Repository creation and licensing were approved on July 21, 2026.
 
 ## Required before publication
 
-1. **Approve the public repository plan.** The recommendation is a new `ojusave/developer-journey-atlas` repository, initially private. Publish and verify it before archiving the two historical repositories. Do not delete them.
-2. **Resolve licensing.** Use Apache License 2.0 for software and CC BY 4.0 for original research records, taxonomy content, documentation, and generated data views, subject to ownership confirmation. The journey-corpus README currently says there is no public license while its `package.json` says MIT.
-3. **Choose deployment ownership.** The recommendation is one production application owned by the new repository, with research intake remaining a review-gated job in the same repository. Retarget and verify staging before changing the live Render service.
-4. **Resolve current dependency advisories.** A clean npm audit reports three moderate and two low transitive findings through optional Mastra dependencies. There are no high or critical findings. The affected Hono Windows static-file path is not used by the scanner, but the lockfile should be updated when an upstream-compatible release is available.
+1. **Choose deployment ownership.** The recommendation is one production application owned by the new repository, with research intake remaining a review-gated job in the same repository. Retarget and verify staging before changing the live Render service.
+2. **Resolve current dependency advisories.** A clean npm audit reports three moderate and two low transitive findings through optional Mastra dependencies. There are no high or critical findings. The affected Hono Windows static-file path is not used by the scanner, but the lockfile should be updated when an upstream-compatible release is available.
 
-## Licensing recommendation
+## Resolved licensing decision
 
 - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) is designed for software and includes an explicit patent license.
 - [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) covers copyright and applicable database rights while preserving attribution for the research work.
 - Creative Commons [recommends software-specific licenses for software](https://creativecommons.org/faq/#can-i-apply-a-creative-commons-license-to-software), which is why one CC license should not cover the whole repository.
 - Linked vendor documentation, trademarks, quotations, and other third-party material remain under their original rights. The Atlas license can cover only original expression, selection, arrangement, and database rights owned by the licensor.
 
-Before adding the license files, confirm that Ojus owns or has permission to license all original contributions. Then add explicit path scope, attribution instructions, and matching package metadata. This is a licensing recommendation, not legal advice.
+The repository uses Apache License 2.0 for software and Creative Commons Attribution 4.0 International for the original research material listed in `LICENSE_SCOPE.md`. Third-party rights are excluded. This is a recorded project decision, not legal advice or a warranty of ownership for third-party material.
 
 ## Required before product diagnosis
 
@@ -32,5 +30,5 @@ Before adding the license files, confirm that Ojus owns or has permission to lic
 - Building or redesigning the UI
 - Automatically merging research for an unknown platform
 - Renaming infrastructure or package identifiers
-- Publishing, pushing, deploying, or archiving repositories
+- Deploying or archiving repositories
 - Claiming that documented friction explains actual user abandonment
