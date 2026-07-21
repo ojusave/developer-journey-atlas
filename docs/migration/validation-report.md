@@ -33,11 +33,11 @@ The final local verification passed on 2026-07-21:
 | Scanner production build | passed |
 | Workflow type check and build | passed |
 | Journey deterministic generation check | passed |
-| Atlas integrity checks | 22 passed |
+| Atlas integrity checks | 23 passed |
 | Browser end-to-end and accessibility smoke test | passed |
 | In-memory API load smoke test | 100 completed, 0 failed |
 
-The Atlas integrity checks compile all three strict JSON Schemas, verify imported Git blobs and source hashes, verify generated-view hashes, parse all 1,040 JSONL records independently, confirm that all 790 blocker hypotheses remain `not_diagnosis_eligible`, classify all 375 original files, and prove that every mapped destination path is unique.
+The Atlas integrity checks compile all three strict JSON Schemas, verify imported Git blobs and source hashes, verify all 80 unchanged scanner blobs, verify generated-view hashes, parse all 1,040 JSONL records independently, confirm that all 790 blocker hypotheses remain `not_diagnosis_eligible`, classify all 375 original files, and prove that every mapped destination path is unique.
 
 The browser smoke test covered the supported diagnostic flow, insufficient-evidence handling, a corrected journey, legitimate completion with no drop-off, exports, persistence, deletion, accessibility, offline behavior, and layouts from 320 px through 1280 px. The API load smoke test completed 100 concurrent in-memory sessions with no failures.
 
@@ -53,12 +53,13 @@ Generated outputs are derived views. They must be regenerated from the canonical
 
 ## Security and privacy preflight
 
-A local pattern scan found no private-key, GitHub-token, AWS-key, OpenAI-key, or Render-key signatures in tracked history. Tracked environment examples contain blank or placeholder credentials. This is a preflight result, not a substitute for a dedicated secret scanner before publication.
+Gitleaks 8.30.1 scanned all 32 commits and approximately 15.89 MB of Git patches. Its two alerts were manually verified UUID fixtures, not credentials. The earlier pattern scan also found no private-key, GitHub-token, AWS-key, OpenAI-key, or Render-key signatures. Tracked environment examples contain blank or placeholder credentials.
 
 ## Environment and limitations
 
-- Verification ran on Node 24.13.0. Both source repositories declare Node 22, so a clean Node 22 run remains required before publication.
+- The full suite and browser flow passed in a fresh checkout using the official Node 22.22.0 macOS ARM64 binary and npm 10.9.4. The downloaded archive matched Node's published SHA-256.
 - The production build emits an existing warning for a client chunk larger than 500 kB. The build still passes.
+- A clean npm audit reports three moderate and two low transitive advisories through optional Mastra dependencies. There are no high or critical findings. The optional Mastra path is disabled by default, but this remains a publication dependency gate.
 - No live platform research was performed during migration.
 - No causal drop-off reason, prevalence claim, or comparison conclusion was created from the taxonomy.
 - No user study or ADHD-language comprehension test was performed.

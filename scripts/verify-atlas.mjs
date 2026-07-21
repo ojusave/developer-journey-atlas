@@ -172,10 +172,30 @@ if (
 } else {
   fail("migration-map", JSON.stringify(migrationMap.counts));
 }
-if (migrationMap.mappings.every((entry) => entry.approved === false)) {
-  pass("migration-approval", "no transformation self-approved");
+const approvalBasisCounts = Object.fromEntries(
+  Object.entries(Object.groupBy(migrationMap.mappings, (entry) => entry.approval?.basis ?? "missing"))
+    .map(([basis, entries]) => [basis, entries.length]),
+);
+if (
+  migrationMap.mappings.every((entry) => entry.approved === true && entry.approval?.status === "approved") &&
+  approvalBasisCounts.byte_identical_history_import === 288 &&
+  approvalBasisCounts.unchanged_blob_verified === 80 &&
+  approvalBasisCounts.path_only_hash_verified === 1 &&
+  approvalBasisCounts.reviewed_compatibility_change === 6
+) {
+  pass("migration-approval", "288 imported, 80 unchanged, 1 path-only, and 6 compatibility mappings approved by evidence class");
 } else {
-  fail("migration-approval", "one or more transformations were marked approved automatically");
+  fail("migration-approval", JSON.stringify(approvalBasisCounts));
+}
+let unchangedScannerMismatches = 0;
+for (const entry of migrationMap.mappings.filter(({ approval }) => approval?.basis === "unchanged_blob_verified")) {
+  const current = await readFile(resolve(root, entry.newPath));
+  if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
+}
+if (unchangedScannerMismatches === 0) {
+  pass("scanner-preservation", "80 unchanged scanner files retain their original Git blobs");
+} else {
+  fail("scanner-preservation", `${unchangedScannerMismatches} unchanged scanner files differ from their source blobs`);
 }
 const allowedClassifications = new Set([
   "canonical source data",

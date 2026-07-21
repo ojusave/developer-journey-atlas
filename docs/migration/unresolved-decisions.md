@@ -4,12 +4,19 @@ These items are intentionally unresolved. None is approved by the local migratio
 
 ## Required before publication
 
-1. **Choose the public repository plan.** Decide whether the scanner repository becomes the monorepo remote, whether a new remote is created, and what happens to each current repository. Do not archive either source until the published monorepo and rollback path are verified.
-2. **Run a dedicated secret scan.** The pattern audit passed, but a purpose-built scanner has not been run against the full combined history.
-3. **Verify Node 22.** The full suite passed on Node 24.13.0, not the repositories' declared Node 22 runtime.
-4. **Resolve licensing.** The journey-corpus README says there is no public license while its `package.json` says MIT. Human or legal review must establish the intended license before publishing the combined work.
-5. **Approve transformations.** Every entry in `migration-map.json` has `approved: false`. A human must review and approve semantic transformations before they are treated as authoritative.
-6. **Choose deployment ownership.** The current scanner and journey-corpus services have separate runtime assumptions. Updating remote URLs, Render resources, environment variables, or CI targets requires a separate deployment plan.
+1. **Approve the public repository plan.** The recommendation is a new `ojusave/developer-journey-atlas` repository, initially private. Publish and verify it before archiving the two historical repositories. Do not delete them.
+2. **Resolve licensing.** Use Apache License 2.0 for software and CC BY 4.0 for original research records, taxonomy content, documentation, and generated data views, subject to ownership confirmation. The journey-corpus README currently says there is no public license while its `package.json` says MIT.
+3. **Choose deployment ownership.** The recommendation is one production application owned by the new repository, with research intake remaining a review-gated job in the same repository. Retarget and verify staging before changing the live Render service.
+4. **Resolve current dependency advisories.** A clean npm audit reports three moderate and two low transitive findings through optional Mastra dependencies. There are no high or critical findings. The affected Hono Windows static-file path is not used by the scanner, but the lockfile should be updated when an upstream-compatible release is available.
+
+## Licensing recommendation
+
+- [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) is designed for software and includes an explicit patent license.
+- [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) covers copyright and applicable database rights while preserving attribution for the research work.
+- Creative Commons [recommends software-specific licenses for software](https://creativecommons.org/faq/#can-i-apply-a-creative-commons-license-to-software), which is why one CC license should not cover the whole repository.
+- Linked vendor documentation, trademarks, quotations, and other third-party material remain under their original rights. The Atlas license can cover only original expression, selection, arrangement, and database rights owned by the licensor.
+
+Before adding the license files, confirm that Ojus owns or has permission to license all original contributions. Then add explicit path scope, attribution instructions, and matching package metadata. This is a licensing recommendation, not legal advice.
 
 ## Required before product diagnosis
 

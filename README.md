@@ -120,7 +120,7 @@ The Blueprint deliberately starts with `REASONING_MODE=deterministic`, `EXECUTIO
 
 Optional provider credentials are not declared with `sync: false` in the initial Blueprint because Render would require every placeholder during creation even though those features are disabled. Add the relevant keys from `.env.example` in the Dashboard only when enabling that feature.
 
-The deployed source is the private [GitHub repository](https://github.com/ojusave/devrelcon-first-mile-scanner). The live resources in Render's `First Mile Scanner` project are:
+The deployed source is the historical [GitHub repository](https://github.com/ojusave/devrelcon-first-mile-scanner). The live resources in Render's `First Mile Scanner` project are:
 
 - web service `first-mile-scanner` (`srv-d9dpkedaeets739p3m40`): <https://first-mile-scanner.onrender.com>;
 - private-only Postgres `first-mile-scanner-db` (`dpg-d9dpjpbrjlhs73b42epg-a`); and
@@ -156,6 +156,6 @@ The remaining gates are external or research-quality gates:
 
 The release candidate passed 114 application and server tests plus four Workflow tests. The local browser smoke covers the map-first mobile flow, value before diagnosis, stage-specific research routing, accessibility, correction retraction, Markdown and JSON export, resume, deletion, offline shell, and layouts from 320px through 1280px. The previous live technical checks remain valid for the unchanged backend: a 100-session concurrency smoke completed all 100 with zero failures, an opaque Workflow run completed the protected callback, and the Blueprint validates as three actions. The new frontend still needs the same checks after deployment.
 
-The current production build is 133.12KB gzip. Vite reports the uncompressed 661.21KB client chunk as large, primarily because the complete research catalog is available offline, so test first load on the actual event network before public use. `npm audit` reports no critical, high, or moderate findings. Low-severity findings remain in Mastra's nested legacy AI SDK utility chain. Track the upstream fix instead of forcing an incompatible override.
+The current production build is 133.12KB gzip. Vite reports the uncompressed 661.21KB client chunk as large, primarily because the complete research catalog is available offline, so test first load on the actual event network before public use. A clean npm audit currently reports three moderate and two low transitive findings through optional Mastra dependencies, with no high or critical findings. The Mastra path is disabled by default. Track or adopt an upstream-compatible fix instead of forcing an incompatible override.
 
 Keep the QR code and public workshop claim blocked until those gates pass.

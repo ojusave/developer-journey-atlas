@@ -19,7 +19,7 @@ The existing scanner repository is the local integration destination. The public
 
 The scanner baseline passed 114 application tests, 4 Workflow tests, type checks, and builds. The journey-corpus baseline passed 6 regression tests, 15 application tests, record validation, deterministic generation checks, and the TypeScript build.
 
-The repositories declare Node 22 compatibility. Baseline checks ran on Node 24.13.0 because that is the available local runtime. Node 22 remains a required portability check before publication.
+The scanner declares Node 22.22.0. Baseline checks first ran on Node 24.13.0, then the complete suite and browser flow passed in a fresh checkout using the verified official Node 22.22.0 macOS ARM64 binary.
 
 ## File classification
 
@@ -49,7 +49,7 @@ The path-level classification for all 375 original files is in `migration-map.js
 
 - No private-key, GitHub-token, AWS-key, OpenAI-key, or Render-key signatures were found in tracked history using the local pattern audit.
 - Both tracked `.env.example` files contain placeholders or blank secret fields, not credentials.
-- No dedicated secret-scanning binary was available. A dedicated scanner remains a pre-publication check.
+- Gitleaks 8.30.1 scanned all 32 commits and approximately 15.89 MB of Git patches. Its two alerts were manually verified UUID fixtures, not credentials.
 - The data repository was imported with full history using an unsquashed Git subtree.
 - Source Git bundles and tracked-file archives are stored outside this repository under the dated migration backup directory.
 

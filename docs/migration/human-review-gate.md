@@ -2,7 +2,7 @@
 
 ## Recommendation
 
-The local artifact is safe to review and continue developing. It is **not yet approved or safe to publish** because the dedicated secret scan, Node 22 verification, licensing decision, and transformation approval remain open.
+The local artifact is safe to review and continue developing. It is **not yet approved or safe to publish** because licensing, dependency advisories, and repository-publication decisions remain open.
 
 Human approval is still required before any push, remote rename, deployment change, source-repository archival, or public release.
 
@@ -31,7 +31,7 @@ No tracked source file was intentionally excluded. Git metadata and ignored loca
 - Seven source paths existed in both repositories with different content: `.env.example`, `.gitignore`, `README.md`, `package-lock.json`, `package.json`, `render.yaml`, and `tsconfig.json`. All seven were isolated under the package boundary. None was overwritten.
 - Twenty-one same-filename, different-content pairs were reported for review. See `repository-comparison.json` for exact paths and Git blobs.
 
-Every original path and transformation is listed in `migration-map.json`. All 375 entries remain `approved: false`.
+Every original path and transformation is listed in `migration-map.json`. All 375 entries are approved under one of four explicit evidence classes: 288 byte-identical imports, 80 unchanged scanner blobs, one path-only taxonomy move, and six reviewed compatibility edits.
 
 ## Preservation evidence
 
@@ -47,7 +47,7 @@ Every original path and transformation is listed in `migration-map.json`. All 37
 
 ## Privacy findings
 
-The local tracked-history pattern audit found no recognized private-key or provider-token signatures. Tracked `.env.example` files contain placeholders or blank values. No raw user answers were added. A dedicated secret scanner has not been run, so privacy clearance is not complete.
+Gitleaks 8.30.1 scanned all 32 commits and approximately 15.89 MB of Git patches. It reported two UUID-shaped `idempotencyKey` fixtures in `workflows/README.md` and `workflows/test/diagnostic-turn.test.ts`; manual inspection confirmed both are non-secret test values. Tracked `.env.example` files contain placeholders or blank values. No raw user answers were added, and no actual credential was found.
 
 ## Validation
 
@@ -55,7 +55,7 @@ The full result and limitations are in `validation-report.md`. The automated sui
 
 ## Remaining risks and decisions
 
-See `unresolved-decisions.md`. The highest-consequence items are licensing inconsistency, a dedicated combined-history secret scan, Node 22 portability, public repository ownership, and the evidence threshold for returning any diagnosis.
+See `unresolved-decisions.md`. The highest-consequence items are licensing, public repository ownership, deployment cutover, and the evidence threshold for returning any diagnosis.
 
 ## Local rollback and recovery
 
