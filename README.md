@@ -2,7 +2,7 @@
 
 Developer Journey Atlas combines a source-grounded corpus of documented developer journeys with a separate blocker-hypothesis taxonomy and the existing map-first scanner application.
 
-The repository is being consolidated locally. The existing GitHub repository, package names, deployment resources, storage keys, and runtime identifiers retain their historical names until a separate publication and compatibility migration is approved.
+This public repository is the canonical open-source home for the combined project. Historical package, storage, and runtime identifiers remain where changing them would create unnecessary compatibility risk. The two source repositories are archived read-only for provenance.
 
 ## Research boundaries
 
@@ -16,7 +16,7 @@ Run `npm run atlas:verify` after changing either canonical dataset. See `docs/re
 
 ## Existing scanner application
 
-The scanner remains the deployable application while the combined data system is verified. The private product and architecture record remains the canonical decision log for the workshop application.
+The scanner is the application layer in this monorepo. Its implementation is verified locally and in CI, but no current production deployment is verified. Product diagnosis and workshop-readiness claims remain gated by the evidence requirements below.
 
 ## What is implemented
 
@@ -34,7 +34,7 @@ The scanner remains the deployable application while the combined data system is
 
 ## Local run
 
-Node 22.22.0 is the verified runtime used by Render and the deployment checks.
+Node 22.22.0 is the verified local and CI runtime.
 
 Install and verify:
 

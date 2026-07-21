@@ -6,7 +6,7 @@ Status: **PASS**
 
 Evidence state: **ARTIFACT VERIFIED**
 
-This result verifies the local migration artifact on `migration/developer-journey-atlas`. It does not approve publication, prove research freshness, or validate the future UI with real users.
+This result verifies the local migration artifact on `migration/developer-journey-atlas`. Migration verification alone did not approve publication. The subsequent public release is documented below. Neither step proves research freshness or validates the future UI with real users.
 
 Integration commit: `23464708b766710bf3c6334bba78e3abb2987e53`
 
@@ -24,7 +24,13 @@ Integration commit: `23464708b766710bf3c6334bba78e3abb2987e53`
 - It was created private with `main` as its default branch.
 - The first published commit was `0bfc24faae81fd2b48c465ed3a7b1682b802087e`.
 - GitHub Actions run `29868804912` passed the Node 22 and data-integrity job and the full-history secret scan.
-- The two source repositories remain unarchived and were not modified by publication.
+- A public-release audit corrected a stale claim about historical Render resources before visibility changed.
+- Public release commit `4e0854b298409caff9bbcdac7af8f009ebd5c355` passed GitHub Actions run `29869690383`.
+- Anonymous repository, contents, archive, and Git access were verified after the visibility changed to public.
+- Private vulnerability reporting and dependency alerts are enabled.
+- The scanner source repository received canonical notice commit `42129c2` and the journey-corpus source repository received canonical notice commit `b904ffb`.
+- Both source repositories are archived read-only. Neither was deleted.
+- Both active research static sites remained on source commit `dd23053647944efefc1bec68d1897a369b495055`; the pointer commit used Render's documented `[skip render]` mechanism and did not deploy.
 
 ## Automated verification
 
@@ -71,7 +77,7 @@ Gitleaks 8.30.1 scanned the entire reachable migration history. Its two initial 
 - No live platform research was performed during migration.
 - No causal drop-off reason, prevalence claim, or comparison conclusion was created from the taxonomy.
 - No user study or ADHD-language comprehension test was performed.
-- The canonical remote repository was created private. No deployment, archive, or production resource was changed during migration.
+- The canonical remote repository was created private, audited, and later made public. No production resource or deployment was changed during publication.
 
 ## Reproduce
 

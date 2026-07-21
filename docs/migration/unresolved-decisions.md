@@ -1,8 +1,8 @@
 # Developer Journey Atlas unresolved decisions
 
-These are the remaining publication and product decisions. Repository creation and licensing were approved on July 21, 2026.
+These are the remaining deployment and product decisions. Repository creation, licensing, public visibility, and legacy archival were completed on July 21, 2026.
 
-## Remaining before deployment or public visibility
+## Remaining before deployment or product claims
 
 1. **Choose deployment ownership.** The recommendation is one production application owned by the new repository, with research intake remaining a review-gated job in the same repository. Retarget and verify staging before changing the live Render service.
 2. **Resolve current dependency advisories.** A clean npm audit reports three moderate and two low transitive findings through optional Mastra dependencies. There are no high or critical findings. The affected Hono Windows static-file path is not used by the scanner, but the lockfile should be updated when an upstream-compatible release is available.
@@ -25,10 +25,12 @@ The repository uses Apache License 2.0 for software and Creative Commons Attribu
 5. **Test language with real users.** The human-readable format follows the documented plain-language rules, but ADHD readability and actionability have not been tested with users.
 6. **Retarget unknown-platform automation.** The imported draft-PR research flow still reflects the original repository and configuration. Update it only after the monorepo publication target and review ownership are approved.
 
-## Explicitly outside this migration
+## Explicitly outside the data migration
 
 - Building or redesigning the UI
 - Automatically merging research for an unknown platform
 - Renaming infrastructure or package identifiers
-- Deploying or archiving repositories
+- Deploying application infrastructure
 - Claiming that documented friction explains actual user abandonment
+
+Repository publication and legacy archival were completed as a separate, verified release operation after the data migration passed.

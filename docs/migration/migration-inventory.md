@@ -2,7 +2,7 @@
 
 ## Decision
 
-The existing scanner repository was the local integration destination. The canonical remote is the private `ojusave/developer-journey-atlas` repository. Both source repositories remain unchanged and unarchived. Infrastructure identifiers remain unchanged until a separate approval.
+The existing scanner repository was the local integration destination. The canonical remote is the public `ojusave/developer-journey-atlas` repository. Both source repositories are archived read-only with canonical migration notices. Infrastructure identifiers remain unchanged until a separate approval.
 
 ## Baselines
 
@@ -62,4 +62,4 @@ The journey corpus and blocker taxonomy are independent canonical datasets. Gene
 - No repository, package, database, environment variable, Render resource, or remote URL was renamed.
 - No UI redesign was performed.
 - No live platform research was run.
-- No production change, deployment, source-repository archive, or deletion was performed during migration.
+- No production change, deployment, or repository deletion was performed. The source repositories were archived only after public verification and canonical pointer commits.
