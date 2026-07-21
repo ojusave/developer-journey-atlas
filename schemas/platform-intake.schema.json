@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer-journey-atlas.invalid/platform-intake.schema.json",
+  "title": "Developer Journey Atlas platform research intake",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "submitted_name",
+    "normalized_name",
+    "status",
+    "requested_at",
+    "bounded_developer_goal",
+    "official_source_urls",
+    "duplicate_of",
+    "draft_record_path",
+    "validation",
+    "review"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "request_id": {"type": "string", "pattern": "^request:[a-z0-9-]+:[a-z0-9-]+$"},
+    "submitted_name": {"type": "string", "minLength": 1},
+    "normalized_name": {"type": "string", "minLength": 1},
+    "status": {
+      "enum": ["requested", "duplicate-or-alias", "researching", "partial", "blocked", "needs-review", "published", "rejected"]
+    },
+    "requested_at": {"type": "string", "format": "date-time"},
+    "bounded_developer_goal": {"type": ["string", "null"]},
+    "official_source_urls": {
+      "type": "array",
+      "items": {"type": "string", "format": "uri"},
+      "uniqueItems": true
+    },
+    "duplicate_of": {"type": ["string", "null"], "pattern": "^platform:[a-z0-9-]+$"},
+    "draft_record_path": {"type": ["string", "null"]},
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_valid", "source_references_valid", "identity_checked", "evidence_reviewed", "errors"],
+      "properties": {
+        "schema_valid": {"type": "boolean"},
+        "source_references_valid": {"type": "boolean"},
+        "identity_checked": {"type": "boolean"},
+        "evidence_reviewed": {"type": "boolean"},
+        "errors": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "reviewer", "reviewed_at", "decision"],
+      "properties": {
+        "required": {"const": true},
+        "reviewer": {"type": ["string", "null"]},
+        "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+        "decision": {"enum": ["pending", "approved", "changes-requested", "rejected"]}
+      }
+    }
+  }
+}

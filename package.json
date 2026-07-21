@@ -8,6 +8,13 @@
   },
   "scripts": {
     "catalog:build": "node scripts/build-catalog.mjs",
+    "migration:artifacts": "node scripts/build-migration-artifacts.mjs",
+    "atlas:views": "npm run catalog:build && npm run migration:artifacts && node scripts/build-atlas-views.mjs",
+    "atlas:verify": "npm run journey:validate && npm run atlas:views && node scripts/verify-atlas.mjs",
+    "journey:validate": "node scripts/run-journey-validation.mjs",
+    "journey:check": "npm --prefix packages/journey-corpus run check",
+    "journey:test": "npm --prefix packages/journey-corpus test && npm --prefix packages/journey-corpus run test:app",
+    "test:all": "npm run test:run && npm run journey:test && npm run atlas:verify",
     "prebuild": "npm run catalog:build",
     "dev": "vite --host 127.0.0.1",
     "dev:server": "ALLOW_IN_MEMORY_STORE=true REASONING_MODE=deterministic node --enable-source-maps --import tsx server/index.ts",

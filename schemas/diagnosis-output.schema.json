@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer-journey-atlas.invalid/diagnosis-output.schema.json",
+  "title": "Developer Journey Atlas analysis output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "platform_id",
+    "journey_id",
+    "analysis_mode",
+    "analysis_status",
+    "headline",
+    "what_we_know",
+    "what_may_be_happening",
+    "what_we_do_not_know",
+    "next_check",
+    "comparison",
+    "source_ids",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "platform_id": {"type": "string", "pattern": "^platform:[a-z0-9-]+$"},
+    "journey_id": {"type": ["string", "null"]},
+    "analysis_mode": {"enum": ["documented-journey", "specific-attempt"]},
+    "analysis_status": {
+      "enum": ["documented-path", "candidate-risks", "plausible-hypothesis", "supported-hypothesis", "insufficient-evidence", "research-incomplete", "platform-not-present"]
+    },
+    "headline": {"type": "string", "minLength": 1},
+    "what_we_know": {"type": "array", "items": {"$ref": "#/$defs/claim"}},
+    "what_may_be_happening": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statement", "blocker_ids", "evidence_state", "source_ids"],
+        "properties": {
+          "statement": {"type": "string", "minLength": 1},
+          "blocker_ids": {"type": "array", "items": {"type": "string", "pattern": "^blocker:[UP][0-9]{2}(?:\\.[0-9]{2,3})?$"}, "uniqueItems": true},
+          "evidence_state": {"enum": ["participant-reported", "inferred", "unresolved", "contradicted", "supported"]},
+          "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "what_we_do_not_know": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "next_check": {"type": "string", "minLength": 1},
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "comparison_record_ids", "limitations", "minimum_comparison_count_met"],
+      "properties": {
+        "summary": {"type": ["string", "null"]},
+        "comparison_record_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "limitations": {"type": "array", "items": {"type": "string"}},
+        "minimum_comparison_count_met": {"type": "boolean"}
+      }
+    },
+    "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  },
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "evidence_state", "source_ids"],
+      "properties": {
+        "statement": {"type": "string", "minLength": 1},
+        "evidence_state": {"enum": ["documented", "directly-observed", "participant-reported", "inferred", "unresolved", "contradicted"]},
+        "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    }
+  }
+}

@@ -1,6 +1,22 @@
-# First-Mile Scanner
+# Developer Journey Atlas
 
-This repository contains the map-first scanner for the DevRelCon first-mile workshop side quest. The private product and architecture record remains the canonical decision log. This repository is the canonical source for the deployable application.
+Developer Journey Atlas combines a source-grounded corpus of documented developer journeys with a separate blocker-hypothesis taxonomy and the existing map-first scanner application.
+
+The repository is being consolidated locally. The existing GitHub repository, package names, deployment resources, storage keys, and runtime identifiers retain their historical names until a separate publication and compatibility migration is approved.
+
+## Research boundaries
+
+- `packages/journey-corpus/records/*.json` is the canonical source for 205 documented platform journeys.
+- `packages/blocker-taxonomy/first-mile-blocker-universe.md` is the canonical source for 790 blocker hypotheses.
+- `packages/generated-views/atlas.md` and `atlas.jsonl` are deterministic human and LLM projections. Do not edit them directly.
+- A documented friction gate is not a confirmed drop-off point.
+- A blocker hypothesis is not a diagnosis without evidence from a specific attempt.
+
+Run `npm run atlas:verify` after changing either canonical dataset. See `docs/research-guide/` for the data model, evidence method, retrieval contract, intake workflow, and anonymized-comparison rules.
+
+## Existing scanner application
+
+The scanner remains the deployable application while the combined data system is verified. The private product and architecture record remains the canonical decision log for the workshop application.
 
 ## What is implemented
 
@@ -8,7 +24,7 @@ This repository contains the map-first scanner for the DevRelCon first-mile work
 - An editable eight-stage developer journey from encounter and access through a representative operation and independently verified success.
 - Two evidence-placement decisions, the furthest stage definitely reached and the earliest unresolved transition, followed by exactly one stage-specific discriminator.
 - Immediate map feedback before any cause question, participant-owned conclusions, explicit uncertainty, and valid non-intervention, legitimate-gate, deliberate-non-fit, and evidence-gap endings.
-- A compiled versioned research graph built from the repository's [first-mile blocker universe](research/first-mile-blocker-universe.md), containing 790 preserved blocker reasons across 28 universal families and 16 platform archetypes.
+- A compiled versioned research graph built from the repository's [blocker taxonomy](packages/blocker-taxonomy/first-mile-blocker-universe.md), containing 790 preserved blocker hypotheses across 28 universal families and 16 platform archetypes.
 - Browser resume, validated JSON import and export, Markdown journey-map export, correction retraction, clear-map deletion, and an offline application shell.
 - An anonymous Node service with Postgres persistence, revision checks, idempotency, short-lived encrypted answer envelopes, and no name or company fields.
 - An optional single-call Mastra reasoner through a pinned OpenRouter model. Deterministic reasoning is the safe default.

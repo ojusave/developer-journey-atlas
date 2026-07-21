@@ -1,0 +1,217 @@
+import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { readFile, readdir } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, "..");
+const manifest = JSON.parse(await readFile(resolve(root, "docs/migration/migration-manifest.json"), "utf8"));
+const migrationMap = JSON.parse(await readFile(resolve(root, "docs/migration/migration-map.json"), "utf8"));
+const repositoryComparison = JSON.parse(await readFile(resolve(root, "docs/migration/repository-comparison.json"), "utf8"));
+const generatedIndex = JSON.parse(await readFile(resolve(root, "packages/generated-views/index.json"), "utf8"));
+const runtimeCatalog = JSON.parse(await readFile(resolve(root, "src/generated/catalog.json"), "utf8"));
+
+const failures = [];
+const checks = [];
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+const pass = (name, detail) => checks.push({ name, status: "pass", detail });
+const fail = (name, detail) => {
+  checks.push({ name, status: "fail", detail });
+  failures.push(`${name}: ${detail}`);
+};
+const git = (...args) => execFileSync("git", args, { cwd: root });
+const gitBlobHash = (value) => createHash("sha1")
+  .update(`blob ${value.length}\0`)
+  .update(value)
+  .digest("hex");
+
+const journeyRequire = createRequire(resolve(root, "packages/journey-corpus/package.json"));
+const Ajv2020 = journeyRequire("ajv/dist/2020").default;
+const addFormats = journeyRequire("ajv-formats");
+const schemaCompiler = new Ajv2020({ allErrors: true, strict: true });
+addFormats(schemaCompiler);
+
+const schemaFiles = [
+  "schemas/platform-intake.schema.json",
+  "schemas/diagnosis-output.schema.json",
+  "schemas/comparison-record.schema.json",
+];
+for (const path of schemaFiles) {
+  try {
+    const schema = JSON.parse(await readFile(resolve(root, path), "utf8"));
+    if (schema.additionalProperties !== false || !Array.isArray(schema.required)) {
+      fail(`schema:${path}`, "schema must reject additional properties and declare required fields");
+    } else {
+      schemaCompiler.compile(schema);
+      pass(`schema:${path}`, `compiled; ${schema.required.length} required top-level fields`);
+    }
+  } catch (error) {
+    fail(`schema:${path}`, error.message);
+  }
+}
+
+const corpusCommit = manifest.sources.journeyCorpus.commit;
+const importedEntries = git("ls-tree", "-r", corpusCommit)
+  .toString("utf8").trim().split("\n").filter(Boolean).map((line) => {
+    const [metadata, path] = line.split("\t", 2);
+    const [, , blob] = metadata.split(" ");
+    return { path, blob };
+  });
+let importMismatches = 0;
+for (const { path, blob } of importedEntries) {
+  const current = await readFile(resolve(root, "packages/journey-corpus", path));
+  if (gitBlobHash(current) !== blob) importMismatches += 1;
+}
+if (importMismatches === 0) pass("journey-import", `${importedEntries.length} imported files remain byte-identical`);
+else fail("journey-import", `${importMismatches} imported files differ from ${corpusCommit}`);
+
+const blockerSource = await readFile(resolve(root, "packages/blocker-taxonomy/first-mile-blocker-universe.md"));
+const blockerHash = sha256(blockerSource);
+if (blockerHash === manifest.sources.blockerTaxonomy.sha256) pass("blocker-source", blockerHash);
+else fail("blocker-source", `expected ${manifest.sources.blockerTaxonomy.sha256}, found ${blockerHash}`);
+
+const recordFiles = (await readdir(resolve(root, "packages/journey-corpus/records")))
+  .filter((name) => name.endsWith(".json"));
+if (recordFiles.length === 205) pass("platform-count", "205 canonical records");
+else fail("platform-count", `expected 205, found ${recordFiles.length}`);
+
+if (
+  runtimeCatalog.counts.reasons === 790 &&
+  runtimeCatalog.counts.universalFamilies === 28 &&
+  runtimeCatalog.counts.platformArchetypes === 16
+) {
+  pass("blocker-counts", "790 reasons, 28 universal families, 16 platform archetypes");
+} else {
+  fail("blocker-counts", JSON.stringify(runtimeCatalog.counts));
+}
+
+if (runtimeCatalog.source === "packages/blocker-taxonomy/first-mile-blocker-universe.md") {
+  pass("runtime-catalog-source", runtimeCatalog.source);
+} else {
+  fail("runtime-catalog-source", `stale source path ${runtimeCatalog.source}`);
+}
+
+const human = await readFile(resolve(root, generatedIndex.generatedFiles.human.path));
+const llm = await readFile(resolve(root, generatedIndex.generatedFiles.llm.path));
+for (const [kind, value] of [["human", human], ["llm", llm]]) {
+  const expected = generatedIndex.generatedFiles[kind].sha256;
+  const actual = sha256(value);
+  if (actual === expected) pass(`generated-${kind}-hash`, actual);
+  else fail(`generated-${kind}-hash`, `expected ${expected}, found ${actual}`);
+}
+const blockersView = await readFile(resolve(root, generatedIndex.generatedFiles.blockers.path));
+if (sha256(blockersView) === generatedIndex.generatedFiles.blockers.sha256) {
+  pass("generated-blockers-hash", generatedIndex.generatedFiles.blockers.sha256);
+} else {
+  fail("generated-blockers-hash", "blocker view does not match its generated index");
+}
+const platformViewEntries = generatedIndex.generatedFiles.platforms.records;
+const platformViewParts = [];
+let platformViewMismatches = 0;
+for (const entry of platformViewEntries) {
+  const content = await readFile(resolve(root, entry.path));
+  const actual = sha256(content);
+  if (actual !== entry.sha256) platformViewMismatches += 1;
+  platformViewParts.push(`${entry.path}:${actual}`);
+}
+const platformManifestHash = sha256(`${platformViewParts.join("\n")}\n`);
+if (
+  platformViewEntries.length === 205 &&
+  platformViewMismatches === 0 &&
+  platformManifestHash === generatedIndex.generatedFiles.platforms.manifestSha256
+) {
+  pass("generated-platform-views", "205 human-readable platform files match the generated index");
+} else {
+  fail("generated-platform-views", `${platformViewEntries.length} files, ${platformViewMismatches} hash mismatches`);
+}
+
+const lines = llm.toString("utf8").trim().split("\n");
+const ids = new Set();
+const recordTypes = new Map();
+let invalidJsonLines = 0;
+let unsafeBlockers = 0;
+for (const [index, line] of lines.entries()) {
+  try {
+    const value = JSON.parse(line);
+    if (!value.id || ids.has(value.id)) fail("llm-id", `missing or duplicate ID on line ${index + 1}: ${value.id ?? "missing"}`);
+    ids.add(value.id);
+    recordTypes.set(value.recordType, (recordTypes.get(value.recordType) ?? 0) + 1);
+    if (value.recordType === "blocker_hypothesis" && value.diagnosisEligibility !== "not_diagnosis_eligible") {
+      unsafeBlockers += 1;
+    }
+  } catch {
+    invalidJsonLines += 1;
+  }
+}
+if (invalidJsonLines === 0) pass("llm-jsonl", `${lines.length} independently parseable records`);
+else fail("llm-jsonl", `${invalidJsonLines} invalid lines`);
+if (recordTypes.get("platform_journey") === 205) pass("llm-platform-records", "205 platform journeys");
+else fail("llm-platform-records", `found ${recordTypes.get("platform_journey") ?? 0}`);
+if (recordTypes.get("blocker_hypothesis") === 790) pass("llm-blocker-records", "790 blocker hypotheses");
+else fail("llm-blocker-records", `found ${recordTypes.get("blocker_hypothesis") ?? 0}`);
+if (unsafeBlockers === 0) pass("diagnosis-eligibility", "all individual blocker hypotheses remain not diagnosis eligible");
+else fail("diagnosis-eligibility", `${unsafeBlockers} blocker hypotheses were upgraded without evidence`);
+
+const forbiddenClaims = [
+  /this is why the developer dropped off/i,
+  /this is the most common reason/i,
+  /similar platforms usually/i,
+];
+const humanText = human.toString("utf8");
+const forbidden = forbiddenClaims.filter((pattern) => pattern.test(humanText));
+if (forbidden.length === 0) pass("unsupported-language", "no prohibited causal or prevalence phrases in generated human output");
+else fail("unsupported-language", `${forbidden.length} prohibited phrase patterns found`);
+
+if (
+  migrationMap.counts.scannerEntries === manifest.sources.scanner.trackedFiles &&
+  migrationMap.counts.journeyCorpusEntries === manifest.sources.journeyCorpus.trackedFiles
+) {
+  pass("migration-map", `${migrationMap.counts.total} source paths mapped`);
+} else {
+  fail("migration-map", JSON.stringify(migrationMap.counts));
+}
+if (migrationMap.mappings.every((entry) => entry.approved === false)) {
+  pass("migration-approval", "no transformation self-approved");
+} else {
+  fail("migration-approval", "one or more transformations were marked approved automatically");
+}
+const allowedClassifications = new Set([
+  "canonical source data",
+  "application source",
+  "generated output",
+  "test fixture",
+  "documentation",
+  "deployment configuration",
+  "local-only or disposable",
+  "sensitive or potentially sensitive",
+  "uncertain and requiring review",
+]);
+if (migrationMap.mappings.every((entry) => allowedClassifications.has(entry.classification))) {
+  pass("migration-classification", "all 375 original files have an allowed classification");
+} else {
+  fail("migration-classification", "one or more original files lack an allowed classification");
+}
+const mappedDestinations = migrationMap.mappings.map(({ newPath }) => newPath);
+if (new Set(mappedDestinations).size === mappedDestinations.length) {
+  pass("migration-destinations", "all mapped destination paths are unique");
+} else {
+  fail("migration-destinations", "two or more original files map to the same destination path");
+}
+if (
+  repositoryComparison.counts.samePathDifferentContent === 7 &&
+  repositoryComparison.counts.duplicateRecordSlugs === 0
+) {
+  pass("repository-comparison", "7 original path conflicts isolated; 0 duplicate platform slugs");
+} else {
+  fail("repository-comparison", JSON.stringify(repositoryComparison.counts));
+}
+
+const result = {
+  status: failures.length ? "FAIL" : "PASS",
+  evidenceState: failures.length ? "NO RELIABLE EVIDENCE" : "ARTIFACT VERIFIED",
+  checks,
+};
+console.log(JSON.stringify(result, null, 2));
+if (failures.length) process.exit(1);
