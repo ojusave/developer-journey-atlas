@@ -1,0 +1,602 @@
+{
+  "platform": {
+    "name": "CircleCI",
+    "slug": "circleci",
+    "organization": "Circle Internet Services, Inc."
+  },
+  "category": "API infrastructure and developer tooling",
+  "surface": {
+    "name": "CircleCI Cloud Quickstart, GitHub App Create Project route",
+    "selection_basis": "CircleCI's current Quickstart guide is the general guided tour for connecting code and obtaining a first passing pipeline. Its first VCS tab is GitHub App, and the linked Create a project guide fully enumerates that current circleci-type organization route, including authorization, config preparation, default trigger, commit, and run.",
+    "alternatives_considered": [
+      {
+        "name": "GitLab and Bitbucket Data Center Create Project routes",
+        "url": "https://circleci.com/docs/guides/getting-started/getting-started/",
+        "reason_not_primary": "These are co-located VCS variants after the first-listed GitHub App route and add provider-specific authorization and configuration behavior."
+      },
+      {
+        "name": "GitHub OAuth App and Bitbucket Cloud Set Up Project route",
+        "url": "https://circleci.com/docs/guides/getting-started/create-project/#set-up-a-project",
+        "reason_not_primary": "This legacy integration path applies when the web app shows Set up a project rather than Create Project."
+      },
+      {
+        "name": "Hello world configuration examples",
+        "url": "https://circleci.com/docs/guides/getting-started/hello-world/",
+        "reason_not_primary": "These examples require an account, connected code, and an already created CircleCI project, while the general Quickstart includes those missing first-mile gates."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Connect an existing GitHub repository to CircleCI Cloud and obtain the first passing pipeline.",
+    "starting_url": "https://circleci.com/docs/guides/getting-started/first-steps/",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected CircleCI Cloud.",
+      "The developer has a GitHub account, an existing repository containing code, and enough GitHub access to authorize or request authorization for the CircleCI GitHub App."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Congratulations, you will soon have a passing pipeline",
+    "normalized_outcome": "CircleCI has created a project linked to the selected GitHub repository, committed or accepted a CircleCI configuration, triggered the first run, and displayed it as passing.",
+    "observable_completion_signal": "The CircleCI pipelines page shows the new pipeline in a passing state; expanding its workflow and job reveals successfully completed steps and their output.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Quickstart's Connect your code section ends each VCS branch with a Congratulations panel stating that the developer will soon have a passing pipeline, before moving to Dig into your first pipeline.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "A passing first run is the quickstart's first completed CI outcome. Collaboration, config debugging, SSH reruns, and later pipeline iteration follow after this state.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A CircleCI Cloud account and organization.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "account",
+      "requirement": "A GitHub account and an existing code repository to build.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "For the first GitHub project, a GitHub organization administrator or person with repository admin access must install and authorize the CircleCI GitHub App for all or selected repositories.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "access",
+      "requirement": "CircleCI requests read and write access; a public GitHub repository can be selected if the developer is not ready to share private-repository access.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the CircleCI signup page and select Sign Up.",
+      "details": [],
+      "input": "Developer email identity",
+      "output": "Email signup form",
+      "success_signal": "Email and password fields are visible.",
+      "failure_or_wait": "The page is protected by reCAPTCHA.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter an email address, create a password, and submit the account signup.",
+      "details": [
+        "Signing up accepts CircleCI's SaaS Agreement and Privacy Policy."
+      ],
+      "input": "Email and password",
+      "output": "CircleCI user account",
+      "success_signal": "The onboarding questions appear.",
+      "failure_or_wait": "Invalid credentials or reCAPTCHA failure prevents account creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Answer the questions about how the developer plans to use CircleCI.",
+      "details": [],
+      "input": "Role and organization information",
+      "output": "CircleCI user homepage",
+      "success_signal": "The account can choose Find Your Team or create an organization.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On the user homepage, select Get Started in the Start a new organization card.",
+      "details": [],
+      "input": "CircleCI account",
+      "output": "Organization creation form",
+      "success_signal": "The organization name field appears.",
+      "failure_or_wait": "A developer joining an existing organization follows the Find Your Team or invite branch instead.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter an organization name and select Let's Go.",
+      "details": [],
+      "input": "Organization name",
+      "output": "New CircleCI organization",
+      "success_signal": "The homepage shows a Create a project card.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Get Started in the Create a project card, or Home > Create Project.",
+      "details": [
+        "The Create Project label identifies the current circleci-type organization flow."
+      ],
+      "input": "New CircleCI organization",
+      "output": "Project creation flow",
+      "success_signal": "CircleCI asks what work the project will do and for a project name.",
+      "failure_or_wait": "If the UI shows Set up a project, use the legacy OAuth or Bitbucket Cloud branch instead.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose the project option matching the work, enter a descriptive project name, and select Next: Set up a pipeline.",
+      "details": [
+        "The name must begin with a letter, contain 3 to 40 characters, and use only the documented letters, numbers, spaces, and allowed punctuation."
+      ],
+      "input": "Project purpose and valid name",
+      "output": "Pipeline setup form",
+      "success_signal": "The first-pipeline name field appears.",
+      "failure_or_wait": "An invalid name must be corrected before continuing.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Name the pipeline, for example build-and-test, and select Next: Choose a repo.",
+      "details": [],
+      "input": "Descriptive pipeline name",
+      "output": "Repository selection",
+      "success_signal": "Available GitHub repositories or an Add option are displayed.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "If GitHub repositories are not yet available, select Add, choose GitHub, and select Authorize in GitHub.",
+      "details": [
+        "This is required for the first GitHub project or when the existing authorization lacks the repository."
+      ],
+      "input": "GitHub identity",
+      "output": "GitHub App installation and authorization screen",
+      "success_signal": "GitHub offers all-repository or selected-repository access.",
+      "failure_or_wait": "Without GitHub organization or repository admin access, an administrator must complete or approve this one-time action.",
+      "required": false,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Install and authorize the CircleCI GitHub App for all repositories or a selected subset that includes the intended repository.",
+      "details": [
+        "This one-time action exposes the authorized repositories to CircleCI."
+      ],
+      "input": "GitHub administrative authorization",
+      "output": "CircleCI GitHub App repository access",
+      "success_signal": "The target repository appears in CircleCI's chooser.",
+      "failure_or_wait": "If the repository remains absent, check permissions, correct organization selection, reauthorize the VCS connection, and verify the GitHub App installation and repository access.",
+      "required": false,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the GitHub repository to connect to the CircleCI project.",
+      "details": [],
+      "input": "Authorized repository list",
+      "output": "Connected code source",
+      "success_signal": "CircleCI prepares or displays a config file for the repository.",
+      "failure_or_wait": "An unavailable repository requires the documented authorization and permission checks.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the prepared CircleCI configuration, or the existing .circleci/config.yml if detected, then select Next: set up your triggers.",
+      "details": [
+        "A repository without config receives a prepared file that will be committed on a new branch later."
+      ],
+      "input": "Connected repository",
+      "output": "Selected CircleCI configuration",
+      "success_signal": "The trigger setup appears.",
+      "failure_or_wait": "A malformed existing config can cause the subsequent pipeline to fail.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Keep the default GitHub App trigger that builds on every repository commit, or review triggers without adding more.",
+      "details": [
+        "A single commit trigger is created by default."
+      ],
+      "input": "Connected repository and config",
+      "output": "First pipeline trigger",
+      "success_signal": "The final setup review becomes available.",
+      "failure_or_wait": "Incomplete trigger setup can leave a project with no runnable pipeline.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the project, pipeline, repository, configuration, and trigger, then select Commit config and run.",
+      "details": [
+        "If the repository already contains config, the button can instead be Finish setup.",
+        "The prepared config is committed to a new branch before the first build."
+      ],
+      "input": "Complete project setup",
+      "output": "Committed CircleCI config and triggered first pipeline",
+      "success_signal": "The new project opens on its pipelines page with a run in progress.",
+      "failure_or_wait": "An incomplete setup can produce a project with no repository, config, trigger, or pipelines; complete the missing Project Setup actions and trigger again.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Wait for CircleCI to execute the first pipeline and inspect its state.",
+      "details": [
+        "The Quickstart explicitly says the developer will soon have a passing pipeline."
+      ],
+      "input": "Committed configuration and trigger",
+      "output": "Completed pipeline",
+      "success_signal": "The pipeline is marked passing.",
+      "failure_or_wait": "If it fails, expand the job and use step output or Explain This Error; fix the configuration or code and rerun beyond the selected success boundary.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Expand the passing workflow, select its job, and expand a step to inspect the successful output.",
+      "details": [
+        "The job view also exposes test results, timing, artifacts, and resource usage tabs."
+      ],
+      "input": "Passing pipeline",
+      "output": "Visible successful job-step evidence",
+      "success_signal": "The selected step shows completed output rather than an error.",
+      "failure_or_wait": "A failed step exposes Explain This Error and is not the documented passing endpoint.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 4,
+      "condition": "The developer is joining an existing CircleCI organization.",
+      "path": "Use Find Your Team or follow an email invite; for an invite, enter email and password, answer role and engineering-organization prompts, then arrive at that organization's pipelines dashboard.",
+      "effect_on_first_success": "Replaces organization creation and can inherit existing project and VCS permissions.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The organization shows Set up a project because it uses GitHub OAuth App or Bitbucket Cloud.",
+      "path": "Select Set up a project, find the repository, click Set Up Project, choose Faster to commit a starter pipeline on circleci-project-setup, and click Set Up Project.",
+      "effect_on_first_success": "Replaces the current Create Project wizard with the legacy repository-first configuration modal.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The target repository is already visible and authorized.",
+      "path": "Skip GitHub App installation and choose the repository directly.",
+      "effect_on_first_success": "Removes the one-time external authorization and potential administrator gate.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "The repository already contains .circleci/config.yml.",
+      "path": "Review the detected file, keep it rather than committing a prepared config, and use Finish setup at the final review.",
+      "effect_on_first_success": "Avoids a new configuration commit but makes first-run success depend on the repository's existing config.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 15,
+      "condition": "The pipeline fails.",
+      "path": "Expand the workflow and job, inspect the failed step output, use Explain This Error if helpful, correct code or config, commit the change, and wait for the default trigger to rerun the pipeline.",
+      "effect_on_first_success": "Adds diagnosis, a repository change, another commit, and another pipeline wait before a passing state.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "The repository is not visible.",
+      "path": "Confirm the correct CircleCI organization, repository admin permission, VCS reauthorization, and GitHub App installation with access to that repository, then reopen the chooser.",
+      "effect_on_first_success": "Adds permission or administrator remediation before code can be connected.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "CircleCI account creation requires email, password, onboarding questions, terms acceptance, privacy acceptance, and reCAPTCHA.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "configuration",
+      "description": "A new developer must create or join a CircleCI organization before project creation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "permission",
+      "description": "First-time GitHub App installation and repository authorization can require a GitHub organization administrator or repository admin.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "configuration",
+      "description": "The repository needs a valid CircleCI configuration and trigger; the current wizard prepares both but requires review and a commit or existing file.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 14,
+      "type": "permission",
+      "description": "The selected setup writes configuration to the GitHub repository on a new branch before it can run.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "wait",
+      "description": "The developer must wait for the first CI run to reach a passing or failed terminal state.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The Quickstart is labeled 8 min read; CircleCI does not state that the first passing pipeline itself completes in eight minutes.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart guide",
+      "url": "https://circleci.com/docs/guides/getting-started/getting-started/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-06",
+      "sections_used": [
+        "Prerequisites",
+        "Connect your code",
+        "GitHub App",
+        "Dig into your first pipeline",
+        "Debug and iterate"
+      ],
+      "evidence_supported": [
+        "General quickstart selection",
+        "First passing-pipeline boundary",
+        "VCS variants",
+        "Job and step verification",
+        "Failure inspection",
+        "Read-time label"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sign up and try CircleCI",
+      "url": "https://circleci.com/docs/guides/getting-started/first-steps/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-05",
+      "sections_used": [
+        "Sign up",
+        "Create an org",
+        "Sign up with an invite",
+        "Terms"
+      ],
+      "evidence_supported": [
+        "Account fields and questions",
+        "Organization creation",
+        "Existing-team path",
+        "VCS account variants",
+        "Terms, privacy, reCAPTCHA, and repository access"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create a project in CircleCI",
+      "url": "https://circleci.com/docs/guides/getting-started/create-project/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-07",
+      "sections_used": [
+        "Prerequisites",
+        "Build a new project on CircleCI",
+        "Create a project",
+        "GitHub App",
+        "Set up a project",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "Complete current GitHub App project path",
+        "Naming rules",
+        "Repository authorization and admin gate",
+        "Prepared config and default trigger",
+        "Final commit and run",
+        "Legacy Set Up Project path",
+        "Repository visibility and incomplete-setup recovery"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which exact starter configuration does the current GitHub App wizard prepare for a repository without CircleCI config?",
+      "impact": "The job name and step output shown in the first passing run vary with the wizard's repository-aware selection.",
+      "reason_unresolved": "The public current Create Project guide states that CircleCI prepares a config but does not reproduce its dynamic contents; the separate Hello World guide is an optional example, not asserted as the wizard default.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Merging the setup branch",
+    "Inviting teammates",
+    "Installing the VS Code extension",
+    "Rerunning with SSH",
+    "Editing or extending the config",
+    "Additional triggers",
+    "Deployment jobs",
+    "CircleCI Server setup"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

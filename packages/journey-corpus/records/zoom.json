@@ -1,0 +1,977 @@
+{
+  "platform": {
+    "name": "Zoom",
+    "slug": "zoom",
+    "organization": "Zoom Video Communications, Inc."
+  },
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "Zoom General App creation build flow",
+    "selection_basis": "The Zoom Developer Platform home presents Start building as its primary action and links it to the unified app creation build flow. That flow covers apps that surface third-party applications inside Zoom and apps that integrate Zoom products into third-party applications. Its official Quick start guide selects a General app and ends with a local test milestone.",
+    "alternatives_considered": [
+      {
+        "name": "Zoom REST API",
+        "url": "https://developers.zoom.us/docs/api/",
+        "reason_not_primary": "This is a capability-specific route that requires choosing OAuth or server-to-server OAuth and an API operation, while Zoom's top-level Start building action points to the unified General App flow."
+      },
+      {
+        "name": "Zoom Video SDK for web",
+        "url": "https://developers.zoom.us/docs/video-sdk/web/get-started/",
+        "reason_not_primary": "This is a product and runtime-specific route with its own credential, toolkit, and custom-integration branches rather than the vendor's general app-creation route."
+      },
+      {
+        "name": "Zoom Meeting SDK for web",
+        "url": "https://developers.zoom.us/docs/meeting-sdk/web/get-started/",
+        "reason_not_primary": "This is a product and runtime-specific installation path rather than the vendor's unified General App route."
+      },
+      {
+        "name": "Zoom Apps",
+        "url": "https://developers.zoom.us/docs/zoom-apps/",
+        "reason_not_primary": "This route is specifically for third-party apps surfaced inside the Zoom client, while the unified build flow covers both in-Zoom and external integrations."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Zoom application or integration and reach the first local test state documented by Zoom.",
+    "starting_url": "https://developers.zoom.us/",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has chosen Zoom.",
+      "The developer has not yet created the General App being researched.",
+      "No Zoom account, developer role, product feature, or management type is silently assumed; documented branches cover those conditions."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Step 5: Test and preview your app, using Add App Now and then Allow for the developer's own account.",
+    "normalized_outcome": "A development General App is authorized and added to the developer's own Zoom account for local testing.",
+    "observable_completion_signal": "For a user-managed app, Zoom states that the added app is displayed in the local Zoom client's My apps area. Admin-managed apps are instead managed through the web portal and hidden from the client.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The official Quick start guide's final numbered section is Step 5: Test and preview your app. Its own-account path ends with selecting Add App Now and then Allow. The linked Local Test page states that this authorizes and adds the app, and that a user-managed app is then displayed in My apps.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the terminal state demonstrated by Zoom's official General App Quick start guide. Making a REST API request, implementing an SDK feature, sharing a beta app, or publishing is not part of that guide's terminal local-test step.",
+    "source_ids": [
+      "S4",
+      "S9"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Zoom account.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S10"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "The account owner or an account admin role, or an assigned Zoom for developers role with View and Edit permissions.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "knowledge",
+      "requirement": "Read Zoom Developer Platform Key concepts before creating the app.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "other",
+      "requirement": "A development OAuth redirect URL or endpoint and at least one OAuth allow-list URL.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "A local Zoom client is needed to observe the documented My apps completion signal for a user-managed app.",
+      "required": false,
+      "source_ids": [
+        "S9"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "identity",
+      "requirement": "Access to the email address used for signup is required if the developer must create a Zoom account, because Zoom sends a verification code.",
+      "required": false,
+      "source_ids": [
+        "S10"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Zoom Developer Platform home and select Start building.",
+      "details": [
+        "The primary home-page action links to the Zoom App creation build flow."
+      ],
+      "input": "Intent to build on Zoom",
+      "output": "Zoom App creation build-flow documentation",
+      "success_signal": "The build-flow page opens.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Review the build-flow overview and its What, Where, and Which questions.",
+      "details": [
+        "The flow asks what kind of app is being created, where users will use it, and which Zoom products it will work with.",
+        "Use the Development view for the local-test path."
+      ],
+      "input": "Intended app and integration use case",
+      "output": "Inputs needed for the unified build flow",
+      "success_signal": "The developer can proceed to the Quick start guide.",
+      "failure_or_wait": "The documentation does not choose these use-case answers for the developer.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Read Key concepts as required by the build-flow prerequisites.",
+      "details": [
+        "Review app distribution labels, adding versus installing apps, and admin-managed versus user-managed apps."
+      ],
+      "input": "Key concepts page",
+      "output": "Required conceptual preparation",
+      "success_signal": "The stated knowledge prerequisite is completed.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Go to the Zoom App Marketplace and sign in with a Zoom account.",
+      "details": [
+        "If no account exists, follow the documented account-creation branch before returning to sign in."
+      ],
+      "input": "Zoom account credentials",
+      "output": "Authenticated Zoom App Marketplace session",
+      "success_signal": "The Marketplace loads for the signed-in account.",
+      "failure_or_wait": "Account creation requires email verification when the developer does not already have an account.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S10"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Developer in the lower-left Marketplace navigation.",
+      "details": [
+        "Zoom displays the Developer link only when the account has proper developer permissions."
+      ],
+      "input": "Signed-in account with app-development permission",
+      "output": "Created apps page",
+      "success_signal": "The Developer link is visible and opens Created apps.",
+      "failure_or_wait": "If the link is absent, an account admin must assign the required role permissions.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Created apps, select Develop and then Build an app.",
+      "details": [],
+      "input": "Created apps page",
+      "output": "App creation screen",
+      "success_signal": "The app creation screen is shown.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select General app and then Create.",
+      "details": [],
+      "input": "General app selection",
+      "output": "New General App in the build flow",
+      "success_signal": "The Basic Info page for the new app is available.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Generate a generic app name and development app credentials.",
+      "details": [
+        "The build flow automatically generates a client ID and client secret.",
+        "Development credentials differ from production credentials."
+      ],
+      "input": "New General App",
+      "output": "Generic name, development client ID, and development client secret",
+      "success_signal": "The generated values appear on Basic Info.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Optionally replace the generated app name and save by clicking outside the name field.",
+      "details": [
+        "Select the edit icon to change the name."
+      ],
+      "input": "Desired app name",
+      "output": "Updated app name",
+      "success_signal": "The new name is displayed.",
+      "failure_or_wait": "The generated name remains if the developer does not change it.",
+      "required": false,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm whether the app is admin-managed or user-managed.",
+      "details": [
+        "The management choice changes who can add the app and which products, features, scopes, and permissions are available.",
+        "Changing management type later requires reviewing and reconfirming features and scopes."
+      ],
+      "input": "Intended app manager and data-access level",
+      "output": "Selected app management type",
+      "success_signal": "Basic Info displays the chosen management type.",
+      "failure_or_wait": "The documentation provides no universal default because the choice depends on the app's intended users and access.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the required development OAuth Redirect URL or endpoint.",
+      "details": [
+        "After a user approves the app, Zoom redirects an authorization code or token to this registered URL.",
+        "Loopback and development endpoints can be used in development but should not be used for production redirects."
+      ],
+      "input": "Development redirect URL or endpoint",
+      "output": "Registered OAuth redirect URL",
+      "success_signal": "The redirect URL is present in OAuth Information.",
+      "failure_or_wait": "An unregistered or invalid redirect prevents the intended OAuth return path.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Add the required OAuth allow-list URL or URLs.",
+      "details": [
+        "Zoom accepts either a complete URL or a base URL without path or query parameters."
+      ],
+      "input": "Approved redirect domain or complete URL",
+      "output": "OAuth allow list",
+      "success_signal": "The required allow-list entry is present.",
+      "failure_or_wait": "Redirects outside the allow list are not accepted.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Optionally enable Strict Mode URL or Subdomain check.",
+      "details": [
+        "Strict mode permits only exact registered redirect matches.",
+        "Subdomain check restricts redirects to registered subdomains."
+      ],
+      "input": "Desired redirect validation policy",
+      "output": "Optional redirect restrictions",
+      "success_signal": "The selected restriction is reflected in OAuth Information.",
+      "failure_or_wait": "Exact or subdomain mismatches are rejected when the corresponding restriction is enabled.",
+      "required": false,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Features, select and configure the Zoom product and feature path required by the intended General App.",
+      "details": [
+        "Access supports tokens and event subscriptions.",
+        "Surface supports in-client Zoom products and features.",
+        "Embed provides Meeting, Contact Center, and Phone SDKs.",
+        "Connect configures third-party API connectors."
+      ],
+      "input": "The app's What, Where, and Which answers",
+      "output": "Applicable product and feature configuration",
+      "success_signal": "The intended feature configuration is represented in the app.",
+      "failure_or_wait": "Required fields vary by the feature path and are later checked by the Local Test wizard.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Scopes, select Add Scopes.",
+      "details": [],
+      "input": "Scopes page",
+      "output": "Scope-selection interface",
+      "success_signal": "Zoom product and scope choices are available.",
+      "failure_or_wait": "Available scopes depend on the app management type and selected features.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the Zoom product, check the desired scopes, and select Done.",
+      "details": [
+        "Scopes define which Zoom API methods the app is allowed to call."
+      ],
+      "input": "Required Zoom API permissions",
+      "output": "Selected scopes",
+      "success_signal": "The selected scopes appear on the app.",
+      "failure_or_wait": "Scopes unnecessary for the app may be rejected by Zoom Security Review.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Explain in Scope Description why each requested scope is necessary.",
+      "details": [
+        "Zoom states that adding a scope submits a request to its Security Review team and that unnecessary scope requests may be rejected."
+      ],
+      "input": "Justification for requested access",
+      "output": "Scope description",
+      "success_signal": "The scope justification is present.",
+      "failure_or_wait": "The documentation does not state a review duration for this first-mile path.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Local Test in the Development view.",
+      "details": [
+        "Local Test is available only in Development."
+      ],
+      "input": "Configured development app",
+      "output": "Local Test page",
+      "success_signal": "The Local Test wizard is visible.",
+      "failure_or_wait": "The page is not available in the Production view.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Verify the app against all local-test requirements and display any incomplete fields.",
+      "details": [],
+      "input": "Current app configuration",
+      "output": "Requirement checklist or list of incomplete fields",
+      "success_signal": "No required field remains incomplete.",
+      "failure_or_wait": "The developer must return to and complete any fields listed by the wizard before adding the app.",
+      "required": true,
+      "source_ids": [
+        "S9"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Optionally select Preview Your App Listing Page.",
+      "details": [
+        "The preview shows a summary of app details and the Marketplace listing page."
+      ],
+      "input": "Configured app",
+      "output": "Listing summary and preview",
+      "success_signal": "The preview is displayed.",
+      "failure_or_wait": "Preview is not required to take the documented Add App path.",
+      "required": false,
+      "source_ids": [
+        "S4",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Add App Now for the developer's own account.",
+      "details": [],
+      "input": "App that passes Local Test requirements",
+      "output": "Zoom authorization and consent screen",
+      "success_signal": "The Allow action is presented.",
+      "failure_or_wait": "Incomplete required fields block progression and are listed by the wizard.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the authorization request and select Allow.",
+      "details": [],
+      "input": "Consent to add the development app",
+      "output": "Authorization decision",
+      "success_signal": "Zoom accepts the authorization and adds the app.",
+      "failure_or_wait": "Declining authorization prevents the app from being added.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Authorize and add the app for local testing.",
+      "details": [
+        "A user-managed app is displayed in My apps in the local Zoom client.",
+        "An admin-managed app is managed through the web portal and is hidden from the client."
+      ],
+      "input": "Allowed authorization request",
+      "output": "Development app added to the developer's own Zoom account",
+      "success_signal": "The app is visible in My apps for the user-managed branch, or is available for management in the web portal for the admin-managed branch.",
+      "failure_or_wait": "No post-authorization wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S9"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 4,
+      "condition": "The developer has no Zoom account.",
+      "path": "Open Zoom's signup page, enter a birth year, enter an email address, select Continue, wait for the verification email, enter the code, select Verify, enter full name and password, and select Continue. Zoom then creates a Basic account; return to Marketplace sign-in.",
+      "effect_on_first_success": "Adds identity data entry and an email-verification wait before the Marketplace path can begin.",
+      "source_ids": [
+        "S10"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The Developer link is absent because the account lacks app-development permissions.",
+      "path": "An administrator signs into the Zoom web portal, opens User Management, Roles, All, edits the relevant role, opens Role Settings, Advanced features, and enables both View and Edit for Zoom for developers. The developer then returns to the Marketplace.",
+      "effect_on_first_success": "Introduces an administrator dependency before app creation can continue.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "The intended app is admin-managed.",
+      "path": "Select Admin-managed. Account admins add and manage the app for users on their account. At the terminal local-test state the app is managed through the web portal and is hidden from the Zoom client.",
+      "effect_on_first_success": "The final verification surface is the web portal instead of My apps in the Zoom client.",
+      "source_ids": [
+        "S4",
+        "S7",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "The intended app is user-managed.",
+      "path": "Select User-managed. Individual users add and manage the app, and each user must authenticate. At the terminal local-test state the app is displayed in My apps in the local Zoom client.",
+      "effect_on_first_success": "The final completion signal is directly visible in the Zoom client.",
+      "source_ids": [
+        "S4",
+        "S7",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "The app is an SDK app that does not need end-user authorization.",
+      "path": "Use the company's home domain in the required OAuth Redirect URL field, as directed by the OAuth Information page.",
+      "effect_on_first_success": "Replaces an authorization callback endpoint with the company home domain for this SDK-specific condition.",
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The app needs API access or event notifications.",
+      "path": "Use Access to manage the app token and, if needed, configure Event Subscription with an event endpoint. Corresponding event scopes are selected automatically.",
+      "effect_on_first_success": "Adds credential handling or event endpoint configuration before Local Test.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "Users will open the app inside Zoom products.",
+      "path": "Use Surface to select the Zoom products, enter the Home URL domain, add accepted URLs to the Domain Allow List, select applicable in-client features, and choose supported Zoom clients. The Home URL must return the required OWASP response headers.",
+      "effect_on_first_success": "Adds hosted-application, domain, security-header, product, and client-support configuration before Local Test.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The app embeds Zoom capabilities in a third-party application.",
+      "path": "Use Embed and select or download the applicable Meeting, Contact Center, or Phone SDK.",
+      "effect_on_first_success": "Adds an SDK choice and SDK-specific work beyond the generic local-add milestone.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The app connects third-party APIs into Zoom.",
+      "path": "Use Connect, upload an OpenAPI 3.0.0 through 3.1.0 JSON or YAML file or enter the base URL and authentication parameters, then configure and test GET, POST, DELETE, PATCH, or PUT endpoints.",
+      "effect_on_first_success": "Adds an API description, authentication, endpoint configuration, and endpoint test before Local Test.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 4,
+      "type": "account",
+      "description": "A Zoom account is required to sign in to the App Marketplace.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "verification",
+      "description": "New account creation requires an email verification code after age and email entry.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S10"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "permission",
+      "description": "The Developer link is exposed only to an owner, admin, or role with Zoom for developers permissions.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "choice",
+      "description": "The developer must choose admin-managed or user-managed, which changes products, features, scopes, permissions, and the final verification surface.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S7",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "configuration",
+      "description": "A development OAuth redirect URL or endpoint is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "configuration",
+      "description": "At least one OAuth allow-list URL is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 14,
+      "type": "choice",
+      "description": "The developer must map the use case to applicable Zoom products and the Access, Surface, Embed, or Connect feature path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "permission",
+      "description": "Requested scopes determine allowed API methods and are subject to Zoom's stated minimal-access review principle.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 19,
+      "type": "configuration",
+      "description": "The Local Test wizard blocks progression by listing incomplete required fields that must be resolved.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S9"
+      ]
+    },
+    {
+      "at_step": 22,
+      "type": "permission",
+      "description": "The developer must select Allow on Zoom's authorization screen to add the app.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S9"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Zoom Developer Platform",
+      "url": "https://developers.zoom.us/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Hero",
+        "Start building"
+      ],
+      "evidence_supported": [
+        "Top-level Start building action",
+        "Link from the platform home to the unified build flow"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Zoom Developer Docs",
+      "url": "https://developers.zoom.us/docs/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Build platform",
+        "Apps",
+        "Zoom Workplace"
+      ],
+      "evidence_supported": [
+        "Existence of product-specific API, SDK, and app documentation alternatives"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Zoom App creation build flow",
+      "url": "https://developers.zoom.us/docs/build-flow/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "What, Where, Which questions",
+        "Development and Production filters"
+      ],
+      "evidence_supported": [
+        "Scope and purpose of the unified build flow",
+        "Required Zoom account and Key concepts",
+        "Use-case choices that drive the flow",
+        "Development view for app creation"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Quick start guide",
+      "url": "https://developers.zoom.us/docs/build-flow/quick-start-guide/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Step 1: Build a general app",
+        "Step 2: Maintain basic information",
+        "Step 3: Select Zoom products and features",
+        "Step 4: Select the scopes",
+        "Step 5: Test and preview your app"
+      ],
+      "evidence_supported": [
+        "Complete official General App quickstart sequence",
+        "Account and developer-permission gates",
+        "App creation and generated credentials",
+        "Management type, OAuth, feature, and scope configuration",
+        "Final Add App Now and Allow path"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Before you start: role permissions",
+      "url": "https://developers.zoom.us/docs/build-flow/before-you-build/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Role Permissions"
+      ],
+      "evidence_supported": [
+        "Administrator steps for granting Zoom for developers View and Edit permissions"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Key concepts for Zoom Developer Platform",
+      "url": "https://developers.zoom.us/docs/platform/key-concepts/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Private vs beta vs published vs unlisted apps",
+        "Adding apps vs installing apps",
+        "Who can add your app"
+      ],
+      "evidence_supported": [
+        "Required conceptual preparation",
+        "Distribution and management distinctions"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "App management",
+      "url": "https://developers.zoom.us/docs/build-flow/basic-info/app-mgmt/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Who can add and manage your app",
+        "Zoom product and in-client feature dependencies"
+      ],
+      "evidence_supported": [
+        "Admin-managed and user-managed choice",
+        "Effects of management type on features, scopes, products, and permissions"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "OAuth Information",
+      "url": "https://developers.zoom.us/docs/build-flow/basic-info/oauth-info/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "OAuth Redirect URL",
+        "Strict Mode URL",
+        "Subdomain Check",
+        "OAuth Allow Lists"
+      ],
+      "evidence_supported": [
+        "Required OAuth redirect and allow-list values",
+        "Optional strict-mode and subdomain checks",
+        "SDK app redirect-domain branch"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Local Test",
+      "url": "https://developers.zoom.us/docs/build-flow/local-test/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Requirements for local testing",
+        "Preview app",
+        "Add App"
+      ],
+      "evidence_supported": [
+        "Development-only Local Test page",
+        "Wizard check for incomplete fields",
+        "Authorization and app-add action",
+        "My apps completion signal for user-managed apps",
+        "Web-portal management for admin-managed apps"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Getting started guide for new users",
+      "url": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0061316",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How to sign up and activate your Zoom account",
+        "Create your own account"
+      ],
+      "evidence_supported": [
+        "Full free-account creation path",
+        "Birth-year and identity fields",
+        "Email verification wait and code",
+        "Basic account completion signal"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which management type is universal for a General App?",
+      "impact": "The final verification surface differs: My apps for user-managed apps versus web-portal management for admin-managed apps.",
+      "reason_unresolved": "Zoom's official quickstart requires the developer to confirm the choice based on who will add and manage the app; it does not specify a universal default.",
+      "checked_source_ids": [
+        "S4",
+        "S7",
+        "S9"
+      ]
+    },
+    {
+      "question": "Which Features configuration is required for every General App?",
+      "impact": "The number and type of configuration steps can expand substantially before Local Test.",
+      "reason_unresolved": "The official build flow is driven by the app's What, Where, and Which answers and presents Access, Surface, Embed, and Connect as conditional paths rather than one universal configuration.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "question": "Does Zoom Security Review add a wait before this local-test completion state?",
+      "impact": "A required review could lengthen the path between scope selection and app addition.",
+      "reason_unresolved": "The quickstart says that adding scopes submits a request and that unnecessary requests may be rejected, but it does not state whether or when that review blocks the documented Add App Now flow or provide a duration.",
+      "checked_source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Executing a Zoom REST API request or validating a returned resource",
+    "Implementing or running a Video SDK, Meeting SDK, Zoom Apps SDK, Contact Center SDK, or Phone SDK feature",
+    "Receiving and verifying a webhook or WebSocket event",
+    "Generating and sharing an Authorization URL with internal users",
+    "Beta testing with external users",
+    "Production configuration and production credentials",
+    "Marketplace review, unlisted or public distribution, and publishing"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

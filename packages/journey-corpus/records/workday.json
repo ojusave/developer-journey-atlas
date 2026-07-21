@@ -1,0 +1,832 @@
+{
+  "platform": {
+    "name": "Workday",
+    "slug": "workday",
+    "organization": "Workday, Inc."
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "Invite an Enterprise Developer Site user and connect App Builder to a Workday Development tenant",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Invite an Enterprise Developer Site user and connect App Builder to a Workday Development tenant. The official Enterprise user-management and App Builder connection guides form a bounded access-gated route with a green connection indicator as the documented terminal result. Prior surface before policy commit: Unresolved at developer program access, product surface, tenant, API family, endpoint, and OAuth flow.",
+    "alternatives_considered": [
+      {
+        "name": "REST API Explorer",
+        "url": "https://developer.workday.com/rest-api-explorer/get-started",
+        "reason_not_primary": "It requires selecting one of many functional services and versions, a tenant, endpoint, OAuth scope, and user security."
+      },
+      {
+        "name": "Graph API Explorer",
+        "url": "https://developer.workday.com/api-overview",
+        "reason_not_primary": "It is a peer GraphQL route with schema-specific scopes, queries, tenant, and user authorization."
+      },
+      {
+        "name": "SOAP API",
+        "url": "https://developer.workday.com/documentation/GUID-4c354bdb-06cd-461d-a632-ea8303beaedb-enHYPHENus/SOAPAPIAuthenticationandSecurity",
+        "reason_not_primary": "It uses XML, service/version selection, different integration contexts, and possibly Integration System User credentials."
+      },
+      {
+        "name": "External Workday Extend app with client credentials",
+        "url": "https://developer.workday.com/documentation/vle1524593542839/AuthenticateUsingtheClientCredentialsGrantType",
+        "reason_not_primary": "It adds Developer Site API-client registration, Integration System User, mapping, security-domain, and token-request work."
+      },
+      {
+        "name": "Workday Orchestrate for Integrations",
+        "url": "https://developer.workday.com/documentation/GUID-1293c9bb-ea02-48cd-a523-254b5060b3a6-enHYPHENus",
+        "reason_not_primary": "It is a low-code integration-app path with organizational subscription and innovation-services opt-in."
+      },
+      {
+        "name": "Workday Extend app",
+        "url": "https://developer.workday.com/documentation/yti1557429833671",
+        "reason_not_primary": "It is an app lifecycle through App Builder, App Hub, development tenant, build, deployment, and preview."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Obtain the required Workday developer and tenant access, choose an API or app surface, and define one first authenticated business-object or application result.",
+    "starting_url": "https://developer.workday.com/api-overview",
+    "assumed_prior_state": [
+      "The developer has not supplied a Workday customer organization, Developer Site account, Personal or Enterprise Extend account, development tenant, production tenant, subscription, or administrator role.",
+      "No API family, functional service, endpoint, user or integration identity, OAuth flow, or first data result is supplied."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "The selected App Builder route demonstrates first success when App Builder shows the Development tenant connection with a green status dot.",
+    "normalized_outcome": "The connection indicator is green.",
+    "observable_completion_signal": "The connection indicator is green.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The connection indicator is green.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S7"
+      ]
+    },
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S7"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "Access to the Workday Developer Site through a Personal or Enterprise developer arrangement or company invitation.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "access",
+      "requirement": "Access to a Workday development or customer tenant containing the data and features required by the selected route.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "The endpoint's OAuth scope plus the Workday domain or business-process security permissions for the acting user or Integration System User.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "knowledge",
+      "requirement": "A declared platform surface, API family, functional service, endpoint, tenant, actor, authorization flow, and terminal result.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S7"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Workday's API overview and Developer Site resources.",
+      "details": [
+        "The overview presents REST, SOAP, and Graph APIs for different transaction and data-exchange styles.",
+        "The Developer Site also supports building Extend and Integration apps."
+      ],
+      "input": "Intent to build on Workday.",
+      "output": "Protocol and app-surface options.",
+      "success_signal": "REST, SOAP, Graph, Extend, and Integration paths can be compared.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose direct API use, an Extend app, or an Integration app.",
+      "details": [
+        "REST is positioned for small, user-initiated self-service transactions with JSON.",
+        "SOAP is positioned for high-volume scheduled system-to-system work.",
+        "Graph returns selected data in one query.",
+        "Extend builds apps that run on Workday.",
+        "Orchestrate builds event-driven integrations."
+      ],
+      "input": "Business workflow, data volume, interaction model, UI needs, and system boundaries.",
+      "output": "One Workday developer surface.",
+      "success_signal": "The surface matches the use case.",
+      "failure_or_wait": "The roster provides no use case, so this choice is unresolved.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Obtain Developer Site and tenant access for the selected surface.",
+      "details": [
+        "Workday Extend customers receive Workday Cloud Platform Development tenants that host apps and API explorers.",
+        "Enterprise companies add Developer Site users by company administrator invitation and email setup link.",
+        "Orchestrate access can require subscription agreement checks, innovation-services opt-in, company creation, and designated administrator."
+      ],
+      "input": "Eligible Workday customer, partner, Personal Account, enterprise company, or administrator invitation.",
+      "output": "Authenticated Developer Site account and accessible development or customer tenant.",
+      "success_signal": "The developer can open the relevant console, App Builder, API Explorer, or tenant.",
+      "failure_or_wait": "Enrollment, licensing, subscription, invitation, MFA, administrator, and tenant-provisioning steps depend on organization and are not represented by one public self-service flow.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6",
+        "S7",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose the API service, version, endpoint or app tutorial, and acting identity.",
+      "details": [
+        "The REST explorer lists many finance, HR, platform, student, analytics, and miscellaneous services with separate versions.",
+        "The selected endpoint determines OAuth scopes and Workday security domains.",
+        "Interactive user and Integration System User routes return different authorized data."
+      ],
+      "input": "Functional area, desired business object or workflow, tenant data, and user or system actor.",
+      "output": "One endpoint or executable app tutorial with required scopes and policies.",
+      "success_signal": "Service, version, operation, identity, and expected response are known.",
+      "failure_or_wait": "No generic Workday endpoint represents every tenant or product.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Follow the selected guide's request, build, deploy, or orchestration steps and verify its terminal result.",
+      "details": [
+        "A direct API path sends the chosen request and inspects tenant data.",
+        "An Extend path builds through App Builder/App Hub and deploys to a development tenant for preview.",
+        "An Integration app path builds and executes an Orchestrate workflow."
+      ],
+      "input": "Resolved tenant, permission, authentication, tooling, and concrete operation.",
+      "output": "One observable Workday result.",
+      "success_signal": "The endpoint returns authorized data or the selected app/integration reaches its documented final state.",
+      "failure_or_wait": "Research stops here rather than fabricating tenant data, a business endpoint, or enterprise access.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "administrator",
+      "interface": "console",
+      "action": "Confirm that the company has eligible Enterprise Developer Site access, a provisioned Workday Cloud Platform Development tenant, and a company administrator who can invite the developer.",
+      "details": [
+        "Workday documents the Development tenant as an entitlement for eligible Extend customers, not a public self-service resource."
+      ],
+      "input": "The required Workday commercial arrangement, company, administrator, and Development tenant.",
+      "output": "An eligible enterprise onboarding context.",
+      "success_signal": "The administrator can open company user management and the Development tenant is available for assignment.",
+      "failure_or_wait": "Contract, enrollment, administrator designation, or tenant provisioning can require organizational coordination and waiting before this public workflow begins.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "access",
+      "actor": "administrator",
+      "interface": "console",
+      "action": "Open the Developer Site Console, go to Users, and select Add a User.",
+      "details": [
+        "Only a company administrator performs this Enterprise user invitation."
+      ],
+      "input": "Authenticated company-administrator access.",
+      "output": "The company user invitation form.",
+      "success_signal": "The Add a User fields are visible.",
+      "failure_or_wait": "A non-administrator cannot create the company user.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "administrator",
+      "interface": "console",
+      "action": "Enter the developer's first name, last name, company email, and company role, then select Add User.",
+      "details": [
+        "The email domain must match the company's domain."
+      ],
+      "input": "Developer identity, matching company email, and appropriate role.",
+      "output": "A submitted company-user invitation.",
+      "success_signal": "The new user is added and Workday initiates the setup email.",
+      "failure_or_wait": "An email outside the company domain or an invalid role blocks correct provisioning.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "authenticate",
+      "actor": "external-system",
+      "interface": "email",
+      "action": "Deliver the Workday Developer Site account-setup email to the invited developer.",
+      "details": [
+        "The email contains the setup link required to activate access."
+      ],
+      "input": "The accepted company-user invitation.",
+      "output": "An account-setup email.",
+      "success_signal": "The invited developer receives the setup link.",
+      "failure_or_wait": "Email delivery is an explicit wait; without the invitation message the developer cannot activate the account.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the setup link and complete the Developer Site access setup described by the invitation.",
+      "details": [
+        "The Manage Users guide documents this link as setting up Developer Site access; its separate MFA reset action applies to an existing user and is not part of the invitation setup sequence."
+      ],
+      "input": "The account-setup email and its setup link.",
+      "output": "Developer Site access for the invited enterprise user.",
+      "success_signal": "The setup link completes the user's Developer Site access setup.",
+      "failure_or_wait": "If the setup link cannot be used, access remains incomplete; the guide does not decompose a recovery flow.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign in to the Workday Developer Site and open App Builder.",
+      "details": [
+        "App Builder is the documented surface used to connect to the Development tenant."
+      ],
+      "input": "The enterprise user with completed Developer Site access setup.",
+      "output": "An authenticated App Builder session.",
+      "success_signal": "The App Builder workspace opens.",
+      "failure_or_wait": "Account, entitlement, or session errors prevent the connection controls from loading.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Open the tenant connection control represented by the cylinder and lightning icon.",
+      "details": [
+        "The same connection workflow can be initiated from API Explorers or App Builder."
+      ],
+      "input": "The authenticated App Builder session.",
+      "output": "The connection target menu.",
+      "success_signal": "API Explorers and App Builder connection targets are visible.",
+      "failure_or_wait": "A missing connection option indicates that the expected tenant entitlement or assignment is unavailable.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Select App Builder as the connection target.",
+      "details": [
+        "The official sequence requires choosing App Builder after opening the cylinder and lightning connection control."
+      ],
+      "input": "The connection target menu.",
+      "output": "The App Builder Development tenant selection dialog.",
+      "success_signal": "The dialog exposes the available Development tenant choice.",
+      "failure_or_wait": "Selecting API Explorers leaves this App Builder candidate route.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Select the Development tenant, choose Bypass SSO only if required, and confirm with OK.",
+      "details": [
+        "Bypass SSO is an optional documented selection, not a universal requirement."
+      ],
+      "input": "The assigned Development tenant and the applicable Bypass SSO choice.",
+      "output": "A submitted App Builder tenant connection.",
+      "success_signal": "The connection dialog closes after OK and App Builder evaluates the connection.",
+      "failure_or_wait": "A wrong tenant or Bypass SSO choice can leave the documented connection inactive or needing attention.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Verify that App Builder shows the Development tenant connection with a green status dot.",
+      "details": [
+        "Workday documents green as connected, orange as a session needing attention, and inactive as not connected."
+      ],
+      "input": "The completed tenant connection attempt.",
+      "output": "A confirmed active Development tenant connection.",
+      "success_signal": "The connection indicator is green.",
+      "failure_or_wait": "An orange or inactive indicator means the documented terminal state has not been reached and the session or authentication must be repaired.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The selected route is REST API exploration.",
+      "path": "Open the REST API Explorer, choose a functional service and highest appropriate production version, select an endpoint whose data exists in the tenant, inspect its description for OAuth scope and security domain, connect or sign in to the development tenant, obtain or copy an access token through the supported flow, fill tenant, path, and query parameters, send the request, and verify the JSON data array, total, object fields, or endpoint-specific response.",
+      "effect_on_first_success": "Defines success as one tenant-specific REST response and requires actual endpoint and data choices.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "An Enterprise company administrator invites the developer.",
+      "path": "In Developer Site Console open Users, click Add a User, enter company email, first name, last name, and company role, click Add User, wait for the email, follow its setup link, complete account and MFA setup, then sign in. The email domain must match the company domain.",
+      "effect_on_first_success": "Adds an administrator handoff and invitation wait before the developer can reach tools.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The selected external Extend app uses client credentials.",
+      "path": "Create an API client in Console with name, secure redirect URI if applicable, CORS domains, and endpoint scopes; save the client ID and secret; in Workday create an Integration System User; create a Client Credentials Mapping from the client ID to that user; configure domain security; create a POST to the token endpoint; Base64-encode Client ID:Client Secret; set Authorization to ID plus the encoded value; set an x-www-form-urlencoded body with grant_type=client_credentials and tenant_alias; send; and verify the returned access token.",
+      "effect_on_first_success": "Defines success as an OAuth access token for service-to-service Extend REST access, not business data.",
+      "source_ids": [
+        "S5",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The developer connects App Builder to a WCP Development tenant.",
+      "path": "Open App Builder, click the cylinder/lightning icon, choose API Explorers or App Builder, select a Development tenant, optionally select Bypass single sign-on, click OK, and verify the connection dot is green.",
+      "effect_on_first_success": "Defines an intermediate success as active tenant connectivity; the session later becomes orange near expiration and then inactive.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The selected path is Orchestrate for Integrations and the company is not enabled.",
+      "path": "Determine MSA versus UMSA through Workday Community; if MSA, in the production tenant open Innovation Services and Data Selection Opt-In, select WCP and Workday Orchestrate for Integration, click Next, Next, and OK; run Maintain Workday Build Company for Orchestrate for Integration; designate administrator name and email; then let that administrator create Developer Site users before starting the Orchestrate tutorial.",
+      "effect_on_first_success": "Adds subscription, security, production-tenant administrator, opt-in, company, and invitation gates.",
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The selected route is SOAP.",
+      "path": "Choose service and version in SOAP API Explorer, determine Extend versus Integration app versus traditional integration authentication, obtain the correct bearer token or integration identity, create POST to the API Gateway SOAP URL, set Content-Type text/xml, add the SOAP envelope, add Authorization Bearer, send, and inspect the XML response.",
+      "effect_on_first_success": "Changes protocol, payload, endpoint, and authentication context from REST or Graph.",
+      "source_ids": [
+        "S10"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "REST, SOAP, Graph, Extend apps, and Integration apps are materially different starting surfaces.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "account",
+      "description": "Developer Site and Workday tenant access are required for owned authenticated data or app paths.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "approval",
+      "description": "Company administrator invitation, Workday customer entitlement, subscription agreement, or innovation-services opt-in may be required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "verification",
+      "description": "Enterprise user onboarding uses an emailed setup link and companies manage MFA resets.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "permission",
+      "description": "Tenant, Developer Site, App Builder, API Explorer, or Orchestrate access depends on company and security roles.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "choice",
+      "description": "The developer must select a functional service, version, endpoint, tenant, and data-bearing identity.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "permission",
+      "description": "OAuth scope alone is insufficient; Workday domain and business-process security policies also govern access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "credential",
+      "description": "API client ID, secret, redirect/CORS settings, user or ISU identity, and access token vary by OAuth flow.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S9"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "choice",
+      "description": "Authorization code, client credentials, initiating-user token, ISU, or other documented flows must match the app context.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S9",
+        "S10"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "environment",
+      "description": "A selected tenant must contain business objects visible to the acting user for a meaningful response.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Workday APIs",
+      "url": "https://developer.workday.com/api-overview",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Workday APIs",
+        "Available APIs"
+      ],
+      "evidence_supported": [
+        "REST, SOAP, and Graph selection",
+        "Tenant and live-data requirement",
+        "Protocol positioning"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "REST APIs Overview and Explorer",
+      "url": "https://developer.workday.com/rest-api-explorer/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "REST APIs Overview",
+        "Production Services",
+        "Finance",
+        "HR",
+        "Platform",
+        "Student"
+      ],
+      "evidence_supported": [
+        "Service and version choices",
+        "Broad functional endpoint catalog",
+        "Use-case-driven API selection"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Workday REST API Security",
+      "url": "https://developer.workday.com/documentation/dan1370797986071/ConceptWorkdayRESTAPISecurity",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Security Policies",
+        "Related Information"
+      ],
+      "evidence_supported": [
+        "OAuth and user security model",
+        "Domain and business-process permission gates",
+        "Endpoint scopes and parent-resource access"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Connect to a Development Tenant",
+      "url": "https://developer.workday.com/documentation/GUID-f9ad6bdf-f687-4263-9cd0-12bd2b0ebf54-enHYPHENus",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Steps",
+        "Result"
+      ],
+      "evidence_supported": [
+        "Development-tenant entitlement",
+        "App Builder connection actions",
+        "Green, orange, and inactive connection signals"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Authenticate Using the Client Credentials Grant Type",
+      "url": "https://developer.workday.com/documentation/vle1524593542839/AuthenticateUsingtheClientCredentialsGrantType",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Context",
+        "Steps",
+        "Result"
+      ],
+      "evidence_supported": [
+        "API client and security prerequisites",
+        "ISU and client mapping",
+        "Base64 and token request",
+        "Access-token result"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Manage Users in Companies",
+      "url": "https://developer.workday.com/documentation/dnc1570465297115",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Context",
+        "Steps",
+        "Result",
+        "Next Steps"
+      ],
+      "evidence_supported": [
+        "Enterprise user invitation fields",
+        "Company-domain constraint",
+        "Email setup link",
+        "Company-admin and MFA management"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Getting Started with Integration Apps",
+      "url": "https://developer.workday.com/documentation/GUID-1293c9bb-ea02-48cd-a523-254b5060b3a6-enHYPHENus",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before You Begin",
+        "Build Essential Skills",
+        "Secure Your Data"
+      ],
+      "evidence_supported": [
+        "Integration-app peer surface",
+        "Orchestrate first integration",
+        "ISU and credential requirements"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Access Orchestrate for Integrations",
+      "url": "https://developer.workday.com/documentation/GUID-a6fbeb9f-2ef0-4838-9bf4-f5fd11b6d91a/AccessOrchestrateforIntegrations",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Context",
+        "Steps",
+        "Result"
+      ],
+      "evidence_supported": [
+        "MSA versus UMSA gate",
+        "Innovation-services opt-in",
+        "Company and administrator creation"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Create Your API Client",
+      "url": "https://developer.workday.com/documentation/zwx1518028675482/CreateYourAPIClient",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Context",
+        "Steps",
+        "Next Steps"
+      ],
+      "evidence_supported": [
+        "Console navigation",
+        "Client name, redirect, CORS, and scope fields",
+        "Generated client ID and secret",
+        "Tenant allowlist admin rule"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Call Workday SOAP APIs Using the API Gateway",
+      "url": "https://developer.workday.com/documentation/ouv1543606422515",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Steps",
+        "Example"
+      ],
+      "evidence_supported": [
+        "SOAP candidate request sequence",
+        "Service/version selection",
+        "Bearer token and API Explorer access-token shortcut"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Workday platform surface and business operation should define first success?",
+      "impact": "It changes protocol, product, tenant, actors, security, tools, and terminal result.",
+      "reason_unresolved": "Official entry points present REST, SOAP, Graph, Extend, and Orchestrate as peer routes.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "question": "What Developer Site and tenant access does the intended workshop participant actually have?",
+      "impact": "Many Workday paths cannot start without customer, partner, Personal or Enterprise program, company invitation, subscription, and provisioned tenant context.",
+      "reason_unresolved": "The public docs describe administrator and entitlement mechanisms but do not provide one universal self-service enrollment path.",
+      "checked_source_ids": [
+        "S4",
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "question": "Which tenant data and user or Integration System User permissions are safe to use for a first request?",
+      "impact": "The same endpoint can return different data or an authorization error based on security policies and tenant contents.",
+      "reason_unresolved": "Workday's configurable security and customer data are tenant-specific.",
+      "checked_source_ids": [
+        "S2",
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "question": "Should a copied token or green tenant-connection dot count as first success, or must the developer retrieve business data?",
+      "impact": "The boundary changes the measured journey after common access by multiple actions.",
+      "reason_unresolved": "Different Workday guides name these intermediate results, but no platform overview chooses one universal terminal milestone.",
+      "checked_source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "No implementation-specific downstream work can be excluded until developer access, tenant, platform surface, API family, endpoint, identity, OAuth flow, and terminal success are selected."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

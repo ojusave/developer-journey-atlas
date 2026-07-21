@@ -1,0 +1,514 @@
+{
+  "platform": {
+    "name": "PayPal",
+    "slug": "paypal",
+    "organization": "PayPal, Inc."
+  },
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "PayPal REST API get-started path through first sandbox OAuth access token",
+    "selection_basis": "PayPal's official REST API landing page is explicitly titled Get started with PayPal REST APIs and orders its path as credentials, access token, then API calls and sandbox accounts. This record follows its first cURL tab through the first returned access token, the earliest concrete API response required by all authenticated REST API families.",
+    "alternatives_considered": [
+      {
+        "name": "REST APIs in Postman without a PayPal Developer account",
+        "url": "https://developer.paypal.com/api/rest/postman/",
+        "reason_not_primary": "It delegates credentials and requests to a Postman workspace rather than measuring PayPal's own account, app, and credential path."
+      },
+      {
+        "name": "PayPal Checkout integration",
+        "url": "https://developer.paypal.com/platforms/checkout/standard/integrate",
+        "reason_not_primary": "It is a product-specific Node.js front-end and back-end build that starts after credentials and introduces payment approval and capture."
+      },
+      {
+        "name": "Orders v2 API checkout flow",
+        "url": "https://developer.paypal.com/api/rest/integration/orders-api/api-use-cases/standard/",
+        "reason_not_primary": "It requires product, intent, payment source, buyer approval, and capture choices after obtaining an access token."
+      },
+      {
+        "name": "Complete Payments Platform",
+        "url": "https://developer.paypal.com/platforms/get-started",
+        "reason_not_primary": "It is a partner platform path with business evaluation, seller onboarding, and approval requirements."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Obtain credentials for a PayPal sandbox REST app and make the first OAuth 2.0 token request.",
+    "starting_url": "https://developer.paypal.com/api/rest/",
+    "assumed_prior_state": [
+      "The developer does not yet have a PayPal Developer Dashboard session or copied sandbox REST app credentials.",
+      "The developer is testing a US integration, so a PayPal Developer account is sufficient for this sandbox token path.",
+      "The cURL variant is used because it is the first implementation tab on the official get-started page."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Get an OAuth 2.0 access token.",
+    "normalized_outcome": "The PayPal sandbox OAuth endpoint accepts the app's client ID and client secret and returns a bearer access token with its validity duration.",
+    "observable_completion_signal": "The JSON response includes access_token, token_type Bearer, and expires_in.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "Section 2 is Get access token and includes the token request plus a sample response; the next subsection explains how to use that token for later API calls.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The token is the first successful response from PayPal's authenticated REST API path and is a shared prerequisite across orders, payments, subscriptions, invoicing, and disputes. Selecting a later API would impose a product-specific outcome and request payload.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A PayPal Developer account for testing a US integration.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "account",
+      "requirement": "A PayPal Business account if testing outside the US or later going live.",
+      "required": false,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "cURL or Postman; this record uses cURL.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "access",
+      "requirement": "HTTPS access to the PayPal Developer Dashboard and api-m.sandbox.paypal.com.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Get started with PayPal REST APIs.",
+      "details": [
+        "The page covers shared setup for orders, payments, subscriptions, invoicing, and disputes."
+      ],
+      "input": "Intent to call a PayPal REST API.",
+      "output": "Ordered credentials and OAuth token instructions.",
+      "success_signal": "Get client ID and client secret is the first numbered section.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Log in to Dashboard.",
+      "details": [
+        "The documentation directs new developers to log in or sign up."
+      ],
+      "input": "PayPal account or intent to create one.",
+      "output": "PayPal authentication or signup flow.",
+      "success_signal": "The developer reaches a PayPal login or account-creation screen.",
+      "failure_or_wait": "The linked account flow can introduce region, identity, email, phone, or business-information screens that this API guide does not enumerate.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Log in to PayPal or complete sign-up, then reach the Developer Dashboard.",
+      "details": [
+        "A PayPal Developer account can test US integrations.",
+        "A Business account is required for testing outside the US or going live."
+      ],
+      "input": "Eligible PayPal identity and required account details.",
+      "output": "Authenticated Developer Dashboard session.",
+      "success_signal": "Developer Dashboard navigation is visible.",
+      "failure_or_wait": "Account creation, verification, eligibility, or risk checks are not decomposed in the developer guide.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Apps & Credentials.",
+      "details": [],
+      "input": "Authenticated Developer Dashboard.",
+      "output": "REST API apps and credentials view.",
+      "success_signal": "The Default Application or Create App action is visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Use the Default Application in the REST API apps section.",
+      "details": [
+        "New accounts include a Default Application.",
+        "Creating a new project is optional and uses Create App."
+      ],
+      "input": "REST API apps view.",
+      "output": "Selected sandbox REST application.",
+      "success_signal": "The application's client ID and client secret controls are visible.",
+      "failure_or_wait": "If the default application is absent, the guide says to select Create App but does not enumerate that form.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the app's client ID and client secret.",
+      "details": [
+        "The client ID identifies the app.",
+        "The client secret authenticates the client ID and must be kept safe."
+      ],
+      "input": "Selected REST app.",
+      "output": "Sandbox CLIENT_ID and CLIENT_SECRET values.",
+      "success_signal": "Both credential values are available for the OAuth request.",
+      "failure_or_wait": "A hidden secret may need to be revealed in the live interface, but the guide only says to copy it.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Select the cURL example in Get access token.",
+      "details": [
+        "Postman is the peer documented implementation."
+      ],
+      "input": "Copied credentials and cURL environment.",
+      "output": "Sandbox OAuth token command template.",
+      "success_signal": "The POST request to /v1/oauth2/token is visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Replace CLIENT_ID and CLIENT_SECRET in the cURL command with the sandbox app credentials.",
+      "details": [
+        "The command uses HTTP Basic authentication through -u CLIENT_ID:CLIENT_SECRET.",
+        "The guide notes that CLIENT_ID:CLIENT_SECRET is Base64-encoded before it is sent.",
+        "The request content type is application/x-www-form-urlencoded and the body is grant_type=client_credentials."
+      ],
+      "input": "Sandbox client ID and secret.",
+      "output": "Credentialed OAuth request command.",
+      "success_signal": "No placeholder credential names remain.",
+      "failure_or_wait": "Swapped, incomplete, or live-environment credentials will not authenticate against the sandbox endpoint.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Send the OAuth token request to PayPal's sandbox.",
+      "details": [
+        "POST https://api-m.sandbox.paypal.com/v1/oauth2/token.",
+        "Include client credentials, the form content type, and client_credentials grant."
+      ],
+      "input": "Credentialed cURL command and network access.",
+      "output": "HTTP response from PayPal OAuth.",
+      "success_signal": "PayPal returns a JSON token response rather than an authentication error.",
+      "failure_or_wait": "Authentication, endpoint, encoding, network, or environment mismatch can return a non-success HTTP response.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify the returned access token and its metadata.",
+      "details": [
+        "Confirm access_token is present.",
+        "Confirm token_type is Bearer.",
+        "Record expires_in because expired tokens must be replaced by calling the token endpoint again."
+      ],
+      "input": "OAuth JSON response.",
+      "output": "Usable PayPal sandbox bearer token.",
+      "success_signal": "The response contains access_token, token_type, and expires_in.",
+      "failure_or_wait": "If no token is returned, compare the request with the documented credentials, sandbox URL, and client-credentials grant.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer uses PayPal's Postman collection.",
+      "path": "Open the official Postman guide and workspace, use its supplied test credentials and requests, and try REST APIs without a PayPal Developer account.",
+      "effect_on_first_success": "Removes PayPal Dashboard account and app-credential steps but adds Postman account, workspace, environment, and collection interactions.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The developer needs a distinct app rather than Default Application.",
+      "path": "Select Create App, supply the app's requested project information, create it, then copy its sandbox client ID and secret.",
+      "effect_on_first_success": "Adds an app-creation form before token acquisition.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses Postman for OAuth while still using their own app credentials.",
+      "path": "Select the Postman tab, configure its variables or authorization with client ID and secret, send the token request, and inspect the response.",
+      "effect_on_first_success": "Replaces the CLI command with Postman UI steps.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "The next goal is a product API call.",
+      "path": "Choose an API family and endpoint, put Authorization: Bearer ACCESS-TOKEN in the header, provide any required headers and body, send the request, and inspect its HTTP and JSON response.",
+      "effect_on_first_success": "Adds a product-specific payload and terminal outcome that cannot be selected from the company name alone.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The integration is tested outside the US or moved to production.",
+      "path": "Obtain a PayPal Business account and use live credentials and https://api-m.paypal.com when the integration is ready.",
+      "effect_on_first_success": "Adds business-account, live-app, eligibility, and production-readiness gates.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 3,
+      "type": "account",
+      "description": "The documented own-credentials route requires a PayPal Developer account for US sandbox testing.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "verification",
+      "description": "The guide routes through PayPal login or signup but does not enumerate the account-verification flow.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "policy",
+      "description": "A PayPal Business account is required to test outside the US or go live.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "choice",
+      "description": "A new account can use Default Application or create a separate app.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "Both sandbox client ID and secret are required, and the secret must be protected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "choice",
+      "description": "The guide offers cURL and Postman token-request variants.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "wait",
+      "description": "Access tokens expire, so a later call may require another token request.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started with PayPal REST APIs",
+      "url": "https://developer.paypal.com/api/rest/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-06-04",
+      "sections_used": [
+        "Get client ID and client secret",
+        "Get access token",
+        "cURL",
+        "Modify the code",
+        "Sample response",
+        "Make API calls",
+        "Get sandbox account credentials"
+      ],
+      "evidence_supported": [
+        "Canonical REST entry path",
+        "Account and Business-account gates",
+        "Default app and credentials",
+        "Complete OAuth cURL request",
+        "Token response fields",
+        "Post-token branches"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API Requests",
+      "url": "https://developer.paypal.com/api/rest/requests/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "API Requests",
+        "Authorization",
+        "Content-Type"
+      ],
+      "evidence_supported": [
+        "Sandbox and live base URLs",
+        "Credential and bearer authorization behavior",
+        "Common REST request structure"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "API Responses",
+      "url": "https://developer.paypal.com/api/rest/responses/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "HTTP status codes",
+        "Error responses"
+      ],
+      "evidence_supported": [
+        "Response verification and failure behavior"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact screens, fields, verification challenges, and eligibility checks occur during PayPal signup for a new developer?",
+      "impact": "The account gate can contain additional pages before Apps & Credentials.",
+      "reason_unresolved": "The REST API guide links to log in or sign up but does not enumerate the current PayPal account flow.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Does the current Dashboard require a separate click to reveal the client secret?",
+      "impact": "It can add one credential-access action.",
+      "reason_unresolved": "The documentation says Copy the client ID and client secret but does not describe secret masking or reveal controls.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Which product API should follow token acquisition?",
+      "impact": "It changes request schema, permissions, actors, and observable first business result.",
+      "reason_unresolved": "The get-started page serves orders, payments, subscriptions, invoicing, and disputes without selecting one.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Selecting and calling a product-specific REST API.",
+    "Retrieving buyer and seller sandbox account credentials.",
+    "Signing in to personal and business sandbox accounts.",
+    "Creating, approving, and capturing a payment order.",
+    "Webhooks, idempotency, rate limits, and negative testing.",
+    "PayPal Business account setup and production go-live."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,910 @@
+{
+  "platform": {
+    "name": "Keycloak",
+    "slug": "keycloak",
+    "organization": "Keycloak project, Cloud Native Computing Foundation"
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Docker getting-started guide through first application sign-in",
+    "selection_basis": "Keycloak publishes separate getting-started guides for OpenJDK, Docker, Podman, Kubernetes, and OpenShift. This record uses the official Docker guide because it is a self-contained development path that continues beyond server startup through realm and user creation, client registration, and authentication to the supplied SPA test application. The deployment-platform alternatives are preserved as branches.",
+    "alternatives_considered": [
+      {
+        "name": "OpenJDK getting started",
+        "url": "https://www.keycloak.org/getting-started/getting-started-zip",
+        "reason_not_primary": "It requires a local JDK and archive installation before following the same administrative concepts."
+      },
+      {
+        "name": "Podman getting started",
+        "url": "https://www.keycloak.org/getting-started/getting-started-podman",
+        "reason_not_primary": "It is a peer container-runtime path rather than the selected Docker path."
+      },
+      {
+        "name": "Kubernetes getting started",
+        "url": "https://www.keycloak.org/getting-started/getting-started-kube",
+        "reason_not_primary": "It adds cluster and Kubernetes deployment prerequisites."
+      },
+      {
+        "name": "OpenShift getting started",
+        "url": "https://www.keycloak.org/getting-started/getting-started-openshift",
+        "reason_not_primary": "It adds OpenShift access and deployment-specific actions."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Start Keycloak locally, create the first realm and user, register the first OpenID Connect client, and authenticate to the supplied test application.",
+    "starting_url": "https://www.keycloak.org/getting-started/getting-started-docker",
+    "assumed_prior_state": [
+      "The developer has not started a Keycloak server.",
+      "The developer has Docker but no existing Keycloak realm, user, or client.",
+      "The development-only admin credentials and local HTTP endpoints from the guide are acceptable for the exercise."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Confirm the first client was created successfully by signing in to the Keycloak SPA testing application.",
+    "normalized_outcome": "A developer starts Keycloak, creates myrealm and myuser, registers the myclient OpenID Connect client, and authenticates that user to Keycloak's supplied SPA test application.",
+    "observable_completion_signal": "The SPA testing application completes Sign in through the locally running Keycloak server with myuser.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The guide says to confirm the client was created successfully with the SPA testing application, then ends the setup path after Click Sign in to authenticate to this application.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The sign-in test is the final verification action in Secure the first application. The next heading is Taking the next step and moves to production database, TLS, and admin-password recommendations.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "software",
+      "requirement": "Docker installed and able to run Linux container images.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "hardware",
+      "requirement": "Sufficient machine or container-platform memory and CPU for Keycloak.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "access",
+      "requirement": "Local port 8080 available and network access to pull quay.io/keycloak/keycloak:26.7.0.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "A browser that can reach localhost:8080 and https://www.keycloak.org/app/.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Keycloak's Docker getting-started guide.",
+      "details": [
+        "The guide is one of five platform-specific getting-started routes listed by Keycloak."
+      ],
+      "input": "Intent to try Keycloak with Docker.",
+      "output": "Ordered Docker setup and first-application instructions.",
+      "success_signal": "Before you start and Start Keycloak are visible.",
+      "failure_or_wait": "Choosing a different deployment platform changes the startup prerequisites and commands.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Confirm Docker is installed and that the machine has sufficient resources.",
+      "details": [
+        "The guide requires Docker and directs production sizing questions to the sizing guidance."
+      ],
+      "input": "Supported machine with Docker installation privileges.",
+      "output": "Runnable Docker environment.",
+      "success_signal": "The docker command is available and the Docker daemon is running.",
+      "failure_or_wait": "Docker installation and machine sizing are not decomposed in this guide.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Start Keycloak 26.7.0 in development mode with bootstrap administrator credentials.",
+      "details": [
+        "Run docker run with 127.0.0.1:8080 mapped to container port 8080.",
+        "Set KC_BOOTSTRAP_ADMIN_USERNAME=admin and KC_BOOTSTRAP_ADMIN_PASSWORD=admin.",
+        "Use quay.io/keycloak/keycloak:26.7.0 start-dev."
+      ],
+      "input": "Docker, local port 8080, image registry access, and development admin values.",
+      "output": "Running local Keycloak server and initial admin user.",
+      "success_signal": "Keycloak is exposed at local port 8080.",
+      "failure_or_wait": "The first run may need to pull the container image. Image, port, or resource failures prevent the Admin Console from opening.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Keycloak Admin Console at localhost:8080.",
+      "details": [],
+      "input": "Running Keycloak server.",
+      "output": "Admin Console login page.",
+      "success_signal": "The login form loads.",
+      "failure_or_wait": "If it does not load, the server or port mapping is not ready.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Log in with administrator username admin and password admin.",
+      "details": [
+        "These values were created by the Docker command."
+      ],
+      "input": "Bootstrap admin credentials.",
+      "output": "Authenticated Admin Console session in the master realm.",
+      "success_signal": "The Admin Console displays.",
+      "failure_or_wait": "Incorrect environment values or credentials cause login failure.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Manage realms in the left column.",
+      "details": [
+        "The master realm is only for managing Keycloak, not applications."
+      ],
+      "input": "Authenticated master-realm administrator.",
+      "output": "Realm-management view.",
+      "success_signal": "Create realm is available.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Create realm.",
+      "details": [],
+      "input": "Realm-management view.",
+      "output": "Create realm form.",
+      "success_signal": "Realm name can be entered.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter myrealm in the Realm name field.",
+      "details": [
+        "A realm is equivalent to a tenant and isolates applications and users."
+      ],
+      "input": "Realm name myrealm.",
+      "output": "Populated realm form.",
+      "success_signal": "The Realm name field contains myrealm.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Create to create myrealm.",
+      "details": [],
+      "input": "Populated realm form.",
+      "output": "New myrealm realm.",
+      "success_signal": "The current realm switches to myrealm.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify that myrealm appears next to Current realm.",
+      "details": [
+        "The guide requires remaining user actions to occur in myrealm."
+      ],
+      "input": "Created realm.",
+      "output": "Confirmed realm context.",
+      "success_signal": "myrealm is the current realm.",
+      "failure_or_wait": "If another realm is current, switch to myrealm before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Users in the left-hand menu.",
+      "details": [
+        "A new realm initially has no users."
+      ],
+      "input": "myrealm current realm.",
+      "output": "Users view.",
+      "success_signal": "Create new user is available.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Create new user.",
+      "details": [],
+      "input": "Users view.",
+      "output": "New-user form.",
+      "success_signal": "User fields are displayed.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Fill in the user form.",
+      "details": [
+        "Set Username to myuser.",
+        "Enter any first name.",
+        "Enter any last name."
+      ],
+      "input": "Username and chosen first and last names.",
+      "output": "Populated new-user form.",
+      "success_signal": "All three documented fields have values.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Create to create myuser.",
+      "details": [],
+      "input": "Populated user form.",
+      "output": "User myuser in myrealm.",
+      "success_signal": "The created user's detail page opens.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Credentials at the top of the user's page.",
+      "details": [
+        "The user needs a password before login."
+      ],
+      "input": "Created myuser account.",
+      "output": "Credential-management view.",
+      "success_signal": "Set password form is visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a password in the Set password form.",
+      "details": [
+        "The guide leaves the password value to the developer."
+      ],
+      "input": "Chosen user password.",
+      "output": "Password value ready to be set.",
+      "success_signal": "The password fields are populated.",
+      "failure_or_wait": "Password policy behavior is not described in the guide.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Toggle Temporary to Off.",
+      "details": [
+        "This prevents a forced password update at first login."
+      ],
+      "input": "Populated Set password form.",
+      "output": "Non-temporary initial password configuration.",
+      "success_signal": "Temporary is Off and the password is set for first login.",
+      "failure_or_wait": "The guide does not separately name the form-submission control after this toggle.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the Keycloak Account Console at localhost:8080.",
+      "details": [
+        "This is an intermediate check that the user was configured correctly."
+      ],
+      "input": "Running Keycloak and configured myuser.",
+      "output": "Account Console login flow.",
+      "success_signal": "The Account Console prompts for authentication.",
+      "failure_or_wait": "If unavailable, verify the server is still running.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Log in to the Account Console with myuser and the password just created.",
+      "details": [],
+      "input": "myuser credentials.",
+      "output": "Authenticated Account Console session.",
+      "success_signal": "The user's account-management page opens.",
+      "failure_or_wait": "Incorrect password, realm, or incomplete password setting blocks login.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Verify that the user can access the Account Console.",
+      "details": [
+        "The page lets the user manage profile, two-factor authentication, and identity-provider accounts."
+      ],
+      "input": "Authenticated myuser session.",
+      "output": "Confirmed realm user configuration.",
+      "success_signal": "Account-management options are visible.",
+      "failure_or_wait": "A failed login indicates the user or password configuration must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Return to or reopen the Keycloak Admin Console.",
+      "details": [],
+      "input": "Administrator credentials and running Keycloak.",
+      "output": "Admin Console.",
+      "success_signal": "Administrative navigation is available.",
+      "failure_or_wait": "Reauthenticate as admin if the session ended.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select myrealm next to Current realm.",
+      "details": [
+        "The first application must be registered in myrealm, not master."
+      ],
+      "input": "Admin Console session.",
+      "output": "myrealm administrative context.",
+      "success_signal": "myrealm is shown as current.",
+      "failure_or_wait": "Registering in another realm changes the issuer and users available to the client.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Clients.",
+      "details": [],
+      "input": "myrealm admin context.",
+      "output": "Clients view.",
+      "success_signal": "Create client is available.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Create client.",
+      "details": [],
+      "input": "Clients view.",
+      "output": "Create-client form.",
+      "success_signal": "Client type and Client ID fields appear.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Set Client type to OpenID Connect and Client ID to myclient.",
+      "details": [],
+      "input": "Documented client values.",
+      "output": "Initial client form values.",
+      "success_signal": "OpenID Connect and myclient are displayed.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Next.",
+      "details": [],
+      "input": "Initial client form.",
+      "output": "Capability configuration page.",
+      "success_signal": "Standard flow setting is visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm that Standard flow is enabled.",
+      "details": [
+        "The test application uses the standard OpenID Connect browser flow."
+      ],
+      "input": "Client capability settings.",
+      "output": "Standard flow enabled.",
+      "success_signal": "The Standard flow control is enabled.",
+      "failure_or_wait": "Enable it if it is not already enabled.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Next.",
+      "details": [],
+      "input": "Confirmed capability settings.",
+      "output": "Login settings page.",
+      "success_signal": "Valid redirect URIs and Web origins fields are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Set the client login URLs for the supplied test application.",
+      "details": [
+        "Set Valid redirect URIs to https://www.keycloak.org/app/*.",
+        "Set Web origins to https://www.keycloak.org."
+      ],
+      "input": "Documented Keycloak test-application URLs.",
+      "output": "Populated login settings.",
+      "success_signal": "Both URL fields match the guide.",
+      "failure_or_wait": "Incorrect URLs prevent the browser application from completing the flow.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Save to create the client.",
+      "details": [],
+      "input": "Completed client settings.",
+      "output": "Registered myclient OpenID Connect client.",
+      "success_signal": "The client settings are saved.",
+      "failure_or_wait": "Validation errors or incorrect fields must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 31,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the SPA testing application at https://www.keycloak.org/app/.",
+      "details": [
+        "The guide uses this application to confirm the client registration."
+      ],
+      "input": "Browser access to the Keycloak website.",
+      "output": "SPA testing application.",
+      "success_signal": "The test application's configuration interface loads.",
+      "failure_or_wait": "Network or browser policy can block the external test application.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 32,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Save to use the test application's default configuration.",
+      "details": [
+        "The client values created in the guide are designed for the supplied defaults."
+      ],
+      "input": "Default SPA test configuration.",
+      "output": "Saved test-application settings.",
+      "success_signal": "The Sign in action becomes available with the saved configuration.",
+      "failure_or_wait": "If defaults were changed, they must point to the local myrealm and myclient configuration.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 33,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Sign in and authenticate through the local Keycloak server as myuser.",
+      "details": [
+        "Use the myuser password created earlier when the Keycloak login flow requests it."
+      ],
+      "input": "Saved SPA configuration and myuser credentials.",
+      "output": "Authenticated test-application session.",
+      "success_signal": "The sign-in flow returns to the SPA as the authenticated user.",
+      "failure_or_wait": "A stopped server, mismatched realm/client URL, invalid redirect or origin, or incorrect user credentials prevents completion.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 34,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm that the first client successfully authenticated the test application.",
+      "details": [
+        "This is the guide's final verification before Taking the next step."
+      ],
+      "input": "Completed SPA sign-in flow.",
+      "output": "Verified realm, user, and OpenID Connect client path.",
+      "success_signal": "The SPA displays its authenticated state after returning from Keycloak.",
+      "failure_or_wait": "The guide does not decompose the test application's post-login screen or error messages.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer does not use Docker.",
+      "path": "Select Keycloak's OpenJDK, Podman, Kubernetes, or OpenShift getting-started guide, complete its platform-specific server startup, then perform the equivalent realm, user, client, and sign-in actions.",
+      "effect_on_first_success": "Changes installation, deployment, resource, and access steps while retaining the first authenticated-client concept.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The server is not a disposable local development instance.",
+      "path": "Use production mode, a production database, TLS certificates, secure bootstrap credentials, and the relevant deployment guide.",
+      "effect_on_first_success": "Adds infrastructure, security, database, hostname, and certificate work before sign-in.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "Temporary remains On.",
+      "path": "The user must update the password during first login before reaching the Account Console or test application.",
+      "effect_on_first_success": "Adds an end-user credential-change form and another authentication interaction.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 31,
+      "condition": "The developer uses their own application instead of Keycloak's SPA tester.",
+      "path": "Configure that application's redirect URI and origin, integrate an appropriate OpenID Connect library or adapter, initiate sign-in, handle the redirect, and verify authenticated state.",
+      "effect_on_first_success": "Adds application code and framework-specific integration beyond the supplied test client.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "Docker must be installed before the selected getting-started route can start Keycloak.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "environment",
+      "description": "The host must provide sufficient memory and CPU, and local port 8080 must be usable.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "Development bootstrap administrator credentials are passed as environment variables and grant administrative access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "credential",
+      "description": "The realm user needs a password before either documented login verification can succeed.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "choice",
+      "description": "Temporary must be turned Off to avoid a forced first-login password change in the documented path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 29,
+      "type": "configuration",
+      "description": "The redirect URI, web origin, realm, client ID, and standard flow must match the external SPA test application.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 31,
+      "type": "environment",
+      "description": "The browser must reach both the public Keycloak test application and the locally running identity server.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Docker: Get started with Keycloak on Docker",
+      "url": "https://www.keycloak.org/getting-started/getting-started-docker",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before you start",
+        "Start Keycloak",
+        "Log in to the Admin Console",
+        "Create a realm",
+        "Create a user",
+        "Log in to the Account Console",
+        "Secure the first application",
+        "Taking the next step"
+      ],
+      "evidence_supported": [
+        "Complete Docker startup command",
+        "Admin login",
+        "Realm and user creation",
+        "Password configuration",
+        "Intermediate user verification",
+        "OpenID Connect client registration",
+        "SPA sign-in verification",
+        "Post-success exclusions"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Keycloak Guides",
+      "url": "https://www.keycloak.org/guides",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Getting started",
+        "Securing applications"
+      ],
+      "evidence_supported": [
+        "Official deployment-platform alternatives",
+        "Downstream application-integration options"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Running Keycloak in a container",
+      "url": "https://www.keycloak.org/server/containers",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Trying Keycloak in development mode",
+        "Provide initial admin credentials when running in a container",
+        "Specifying different memory settings"
+      ],
+      "evidence_supported": [
+        "Development-mode constraints",
+        "Bootstrap-admin requirement",
+        "Container resource considerations"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which exact control submits the Set password form after the password is entered and Temporary is toggled Off?",
+      "impact": "The guide may omit one UI click in the user-credential sequence.",
+      "reason_unresolved": "The current guide lists entering the password and toggling Temporary but does not name a separate submit button in the text.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "What exact post-login content proves success in the current SPA testing application?",
+      "impact": "The final observable signal can be described only as returned authenticated state, not a precise label or field.",
+      "reason_unresolved": "The guide ends at Click Sign in and does not enumerate the external test application's credential prompts, callback screen, or error states.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Does the first docker run need to download the Keycloak image?",
+      "impact": "A registry download adds an unbounded wait before the server starts.",
+      "reason_unresolved": "It depends on the workstation's local image cache.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Switching to a production-ready database such as PostgreSQL.",
+    "Configuring SSL with production certificates.",
+    "Replacing the development administrator password.",
+    "Production hostname, proxy, clustering, monitoring, and hardening.",
+    "Integrating a developer-owned application or framework-specific adapter.",
+    "Stopping or removing the local development container."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,270 @@
+{
+  "platform": {
+    "name": "NVIDIA Developer",
+    "slug": "nvidia-developer",
+    "organization": "NVIDIA Corporation"
+  },
+  "category": "API infrastructure and developer tooling",
+  "surface": {
+    "name": "CUDA Quick Start Guide, Ubuntu Debian Installer through nbody",
+    "selection_basis": "Workshop selection policy (2026-07-19): commit to the fastest and most commonly used documented route. Prefer local/no-account when offered; otherwise the vendor's first-listed or recommended quickstart. Treat Sign up as one opaque step when form fields are not public. Selected the official CUDA Quick Start Guide Ubuntu Debian Installer path ending in building and running the nbody sample. It is local, package-manager based, and the guide's documented verification for Linux.",
+    "alternatives_considered": [
+      {
+        "name": "Ubuntu Runfile Installer",
+        "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+        "reason_not_primary": "Peer Ubuntu installer; Debian/network package path is the lighter download variant called out in the guide."
+      },
+      {
+        "name": "Windows Visual Studio nbody path",
+        "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+        "reason_not_primary": "Different OS surface; Linux Ubuntu is a primary documented Linux target."
+      },
+      {
+        "name": "Pip wheels runtime-only install",
+        "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+        "reason_not_primary": "Runtime-focused and does not include the full developer toolkit verification path."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Install CUDA on Ubuntu with the Debian installer and verify by building and running the nbody sample.",
+    "starting_url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+    "assumed_prior_state": [
+      "A supported Ubuntu system with a CUDA-capable NVIDIA GPU is available.",
+      "The developer can use sudo and reboot the machine."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Build and run the nbody sample",
+    "normalized_outcome": "CUDA Toolkit is installed on Ubuntu, environment variables are set, and the nbody sample from cuda-samples runs successfully.",
+    "observable_completion_signal": "The nbody sample executable runs from its build location after CUDA install and PATH setup.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Install a writable copy of the samples from github.com/nvidia/cuda-samples, then build and run the nbody sample using the Linux instructions.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The Ubuntu Debian Installer section ends verification by building and running nbody.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "hardware",
+      "requirement": "A CUDA-capable NVIDIA GPU on a supported Ubuntu system.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "sudo, apt, wget, git or equivalent to obtain cuda-samples, and a CMake-capable build environment for the samples.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the CUDA Quick Start Guide and select Ubuntu Debian Installer.",
+      "details": [],
+      "input": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+      "output": "Ubuntu Debian Installer steps are visible.",
+      "success_signal": "Section 4.1.9.1 is shown.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the CUDA repository package, refresh the CUDA keyring, add contrib, update apt, and install cuda.",
+      "details": [],
+      "input": "Documented apt/dpkg commands",
+      "output": "CUDA packages are installed.",
+      "success_signal": "apt-get install cuda completes.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Reboot the system to load the NVIDIA drivers.",
+      "details": [],
+      "input": "sudo reboot",
+      "output": "System returns with NVIDIA drivers loaded.",
+      "success_signal": "Machine boots after reboot.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export PATH and LD_LIBRARY_PATH for the installed CUDA toolkit bin and lib64 directories.",
+      "details": [],
+      "input": "shell profile or session exports",
+      "output": "nvcc and CUDA libraries are on the search path.",
+      "success_signal": "PATH includes /usr/local/cuda-*/bin.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone or download a writable copy of https://github.com/nvidia/cuda-samples.",
+      "details": [],
+      "input": "cuda-samples repository",
+      "output": "Sample sources are local.",
+      "success_signal": "Repository checkout exists.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Configure and build the samples with CMake/make, then run the nbody sample from its executable location.",
+      "details": [],
+      "input": "cuda-samples build tree",
+      "output": "nbody runs successfully.",
+      "success_signal": "nbody executable starts and locates dependent resources.",
+      "failure_or_wait": "Running from the wrong working directory can fail to locate dependent resources.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Prefer Runfile Installer",
+      "path": "Follow Ubuntu Runfile Installer steps instead of Debian packages.",
+      "effect_on_first_success": "Same nbody verification terminal after environment setup.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "hardware",
+      "description": "A supported NVIDIA GPU and Ubuntu platform are required for the guide's verification path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "wait",
+      "description": "A reboot is required to load NVIDIA drivers before verification.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "CUDA Quick Start Guide",
+      "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Ubuntu",
+        "Debian Installer",
+        "nbody verification"
+      ],
+      "evidence_supported": [
+        "apt install cuda",
+        "PATH exports",
+        "build and run nbody"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "NVIDIA cuda-samples",
+      "url": "https://github.com/nvidia/cuda-samples",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Getting Started",
+        "Building CUDA Samples - Linux",
+        "nbody sample path"
+      ],
+      "evidence_supported": [
+        "CMake build",
+        "nbody sample location"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which exact cuda-repo package filename and /usr/local/cuda-* version directory apply for the current toolkit release?",
+      "impact": "Install and PATH commands use placeholders that must be filled from the current CUDA downloads selector.",
+      "reason_unresolved": "The Quick Start Guide uses templated package and version paths that change with toolkit releases.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Nsight tooling setup",
+    "Cross-compilation",
+    "Production driver policy"
+  ]
+}

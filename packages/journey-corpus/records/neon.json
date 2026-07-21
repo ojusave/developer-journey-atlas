@@ -1,0 +1,877 @@
+{
+  "platform": {
+    "name": "Neon",
+    "slug": "neon",
+    "organization": "Neon, LLC"
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "Start with Neon, 1 - Basics",
+    "selection_basis": "The Neon documentation home orders the general onboarding sequence as Learn the basics, Connect Neon to your stack, Branching workflows, and production preparation. The first numbered guide is therefore the vendor-selected first path. Its complete tutorial ends only after the developer resets a development branch and verifies that its schema is identical to production.",
+    "alternatives_considered": [
+      {
+        "name": "2 - Connect",
+        "url": "https://neon.com/docs/get-started/connect-neon",
+        "reason_not_primary": "The docs navigation places this after 1 - Basics and labels Basics as the previous guide."
+      },
+      {
+        "name": "3 - Branching",
+        "url": "https://neon.com/docs/get-started/workflow-primer",
+        "reason_not_primary": "This is the third guide in the ordered Start with Neon sequence."
+      },
+      {
+        "name": "Production checklist",
+        "url": "https://neon.com/docs/get-started/production-checklist",
+        "reason_not_primary": "This guide prepares an existing project for production and is downstream of initial learning and connection."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Complete Neon's vendor-selected first tutorial by creating sample data, changing it on an isolated development branch, comparing schemas, and restoring that branch to its parent.",
+    "starting_url": "https://neon.com/docs/introduction",
+    "assumed_prior_state": [
+      "The developer does not yet have a Neon account, project, production branch, or development branch.",
+      "The developer can install command-line software on the local machine."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Complete 1 - Basics in the Start with Neon sequence.",
+    "normalized_outcome": "A Neon project contains sample data, a development branch is modified and compared with production, then the development branch is reset so the two schemas are identical again.",
+    "observable_completion_signal": "After the final reset, Schema Diff reports that the development and production branches are identical.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The final numbered step in Learn the basics instructs the developer to return to Schema Diff and observe that the branches are identical; the page then links to 2 - Connect.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the demonstrated terminal state of the first complete vendor-ordered tutorial. The earlier creation of a table and successful query are intermediate states because the same tutorial continues through CLI authentication, branch modification, comparison, and reset.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "An email address or a supported GitHub, Google, or partner identity for Neon sign-up.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Homebrew or npm to install the Neon CLI.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "The psql command-line client for the branch-modification exercise; the tutorial and psql guide provide platform-specific installation instructions if it is absent.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "access",
+      "requirement": "Network and browser access for Neon Console onboarding, browser-based CLI authorization, and database connectivity.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Neon Docs and select 1 - Basics from Start with Neon.",
+      "details": [
+        "The docs navigation places this guide before 2 - Connect, 3 - Branching, and 4 - Setup Neon Auth."
+      ],
+      "input": "Intent to learn the Neon platform.",
+      "output": "Learn the basics tutorial.",
+      "success_signal": "The tutorial heading and What you will learn outcomes are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign up for Neon.",
+      "details": [
+        "Open the free signup page.",
+        "Choose email, GitHub, Google, or another supported partner account."
+      ],
+      "input": "A supported sign-up identity.",
+      "output": "Authenticated Neon account and onboarding flow.",
+      "success_signal": "The onboarding flow is displayed.",
+      "failure_or_wait": "Provider-specific form fields, verification, and recovery are not decomposed in the tutorial.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Complete Neon Console onboarding to create a Project.",
+      "details": [
+        "The guide calls the onboarding selections self-explanatory and explains that the Project is the top-level container for branches, databases, and roles.",
+        "A project is typically created per application repository."
+      ],
+      "input": "Project selections requested by the current console.",
+      "output": "Neon Project.",
+      "success_signal": "The Project Dashboard opens.",
+      "failure_or_wait": "The guide does not enumerate the current onboarding form fields or defaults.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Provision the project's initial production resources.",
+      "details": [
+        "Current onboarding creates only the production root default branch.",
+        "The production branch hosts the onboarding-created database, role, and a compute endpoint.",
+        "Additional development, staging, and preview branches are created later as needed."
+      ],
+      "input": "Completed project onboarding.",
+      "output": "Project with production branch, neondb database, role, and compute.",
+      "success_signal": "The Project Dashboard shows production as the root default branch.",
+      "failure_or_wait": "Provisioning duration and recovery behavior are not documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open SQL Editor and confirm production and neondb are selected.",
+      "details": [
+        "Use the sidebar navigation to open SQL Editor.",
+        "The default production branch and onboarding-created neondb database should already be selected."
+      ],
+      "input": "Provisioned project.",
+      "output": "SQL Editor connected to production/neondb.",
+      "success_signal": "The branch and database selectors show production and neondb.",
+      "failure_or_wait": "A different selection sends later SQL to a different branch or database.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Run the placeholder SQL to create and populate playing_with_neon.",
+      "details": [
+        "The first SQL Editor visit for a new project includes SQL that creates playing_with_neon and inserts 10 generated rows.",
+        "Select Run.",
+        "The query is automatically saved to History with an AI-generated description such as create and populate sample table in Neon."
+      ],
+      "input": "Placeholder SQL in production/neondb.",
+      "output": "playing_with_neon table with 10 sample rows.",
+      "success_signal": "The query succeeds and production contains the table and data.",
+      "failure_or_wait": "SQL errors or the wrong branch/database prevent the documented state.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open AI Assistant and enter the tech-company prompt.",
+      "details": [
+        "Select AI Assistant in the upper-right corner.",
+        "Prompt: Add three more rows to the playing_with_neon table with tech company names.",
+        "The guide's example response generates an INSERT for Google, Apple, and Microsoft with sample values and an AI description of Add tech companies to playing_with_neon table."
+      ],
+      "input": "playing_with_neon sample table.",
+      "output": "Generated INSERT statement for three tech-company rows.",
+      "success_signal": "The assistant returns SQL matching the prompt.",
+      "failure_or_wait": "AI output is generated content and should be reviewed before execution.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the highest-value prompt in AI Assistant.",
+      "details": [
+        "Prompt: Show me the highest value in the table."
+      ],
+      "input": "playing_with_neon data.",
+      "output": "Generated SQL for the table's highest value.",
+      "success_signal": "The assistant returns a query that can show the highest value.",
+      "failure_or_wait": "The exact generated SQL and numeric result are not fixed by the guide because the initial values are random.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter the grouped-average prompt in AI Assistant.",
+      "details": [
+        "Prompt: Calculate the average value grouped by the first letter of the name."
+      ],
+      "input": "playing_with_neon data.",
+      "output": "Generated SQL for averages grouped by initial letter.",
+      "success_signal": "The assistant returns a grouped-average query.",
+      "failure_or_wait": "The exact generated SQL and result rows are not fixed by the guide.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Tables and inspect playing_with_neon.",
+      "details": [
+        "The Tables page uses an embedded visual interface for exploring and modifying data and schemas.",
+        "It supports adding, updating, deleting, filtering, exporting, and managing schema objects."
+      ],
+      "input": "Created sample table.",
+      "output": "Table data and schema visible in the console.",
+      "success_signal": "playing_with_neon and its rows are visible.",
+      "failure_or_wait": "The table will be absent if sample SQL failed or ran against another branch/database.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create the development branch from production.",
+      "details": [
+        "Open Branches in the Neon Console.",
+        "Select Create branch.",
+        "Name the branch development.",
+        "Select production as the parent branch.",
+        "Select Create new branch."
+      ],
+      "input": "Project with production data.",
+      "output": "Isolated development branch copied from production.",
+      "success_signal": "The Branches page shows development with production as its parent.",
+      "failure_or_wait": "A naming conflict, permission issue, or provisioning failure can prevent branch creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Neon CLI with Homebrew or npm.",
+      "details": [
+        "On macOS, run brew install neonctl.",
+        "On any Node.js-supported platform, run npm install -g neonctl."
+      ],
+      "input": "Homebrew or npm and local installation permission.",
+      "output": "neon command installed.",
+      "success_signal": "The Neon CLI is available in the shell.",
+      "failure_or_wait": "Package-manager or PATH problems can block the command.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run neon auth and authorize the CLI in the browser.",
+      "details": [
+        "The command opens a browser window for granting Neon CLI access to the account."
+      ],
+      "input": "Installed CLI, browser, and Neon account.",
+      "output": "Authenticated local CLI session.",
+      "success_signal": "Browser authorization completes and CLI commands can access the account.",
+      "failure_or_wait": "Authorization can fail or target the wrong Neon account.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run neon projects list.",
+      "details": [
+        "This command is required to discover the project ID before project-scoped branch commands."
+      ],
+      "input": "Authenticated Neon CLI.",
+      "output": "Organization-selection prompt followed by a project list.",
+      "success_signal": "The CLI asks the developer to select an organization.",
+      "failure_or_wait": "An account with no accessible organization or project cannot produce the required ID.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Select the organization that owns the tutorial project.",
+      "details": [
+        "The projects-list command prompts for organization selection."
+      ],
+      "input": "Organization choices from Neon CLI.",
+      "output": "Project list for the selected organization.",
+      "success_signal": "The output contains the tutorial project.",
+      "failure_or_wait": "Choosing another organization can hide the intended project.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Capture the tutorial project's ID from the projects-list output.",
+      "details": [
+        "The output table includes Id, Name, Region Id, and Created At.",
+        "The guide uses cool-forest-12345678 as an example ID; use the actual ID."
+      ],
+      "input": "Selected organization's Projects table.",
+      "output": "Actual project ID for later commands.",
+      "success_signal": "The intended project name and its Id are identified.",
+      "failure_or_wait": "Using the example ID or another project's ID targets the wrong project.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "List the project's branches with the captured project ID.",
+      "details": [
+        "Run neon branches list --project-id <actual-project-id>.",
+        "The guide notes that neon set-context can alternatively set a default project and organization to avoid repeating --project-id."
+      ],
+      "input": "Actual project ID.",
+      "output": "Branch list for the tutorial project.",
+      "success_signal": "The list includes development and production in ready state.",
+      "failure_or_wait": "A wrong project ID or account context lists the wrong branches or returns an error.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Reset development to its parent before making isolated changes.",
+      "details": [
+        "Run neon branches reset development --parent --project-id <actual-project-id>.",
+        "This makes development match production at the starting baseline."
+      ],
+      "input": "Development branch and actual project ID.",
+      "output": "Development reset to the current production state.",
+      "success_signal": "The CLI reports a successful reset.",
+      "failure_or_wait": "Reset discards child-branch changes; an incorrect project or branch target can affect the wrong resource.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install and configure psql if it is not already available.",
+      "details": [
+        "The tutorial shows the active operating-system tab; for Apple Silicon macOS it uses brew install libpq, adds /opt/homebrew/opt/libpq/bin to PATH, and sources the shell profile.",
+        "The separate psql guide provides platform-specific installation tabs."
+      ],
+      "input": "Supported operating system and installation permission.",
+      "output": "psql available on PATH.",
+      "success_signal": "The psql command is available in the shell.",
+      "failure_or_wait": "Package installation, architecture, or PATH configuration can add setup work.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Connect psql to development/neondb with the actual project ID.",
+      "details": [
+        "Run neon connection-string development --database-name neondb --project-id <actual-project-id> --psql.",
+        "The Neon CLI obtains the connection string and opens the psql terminal session.",
+        "Neon connections use SSL/TLS."
+      ],
+      "input": "Authenticated Neon CLI, psql, development branch, neondb, and actual project ID.",
+      "output": "Interactive psql session on development/neondb.",
+      "success_signal": "A psql prompt connected to the requested database appears.",
+      "failure_or_wait": "Connection, network, credential, client compatibility, branch, database, or project-ID errors prevent the prompt.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Add the description column on development.",
+      "details": [
+        "Run ALTER TABLE playing_with_neon ADD COLUMN description TEXT;."
+      ],
+      "input": "psql session on development/neondb.",
+      "output": "Development-only description column.",
+      "success_signal": "Postgres accepts ALTER TABLE.",
+      "failure_or_wait": "Running in production or another database modifies the wrong target.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create the current tutorial index on the new column.",
+      "details": [
+        "Run CREATE INDEX idx_playing_with_neon_description ON playing_with_neon (description);."
+      ],
+      "input": "playing_with_neon with description column.",
+      "output": "Development-only idx_playing_with_neon_description index.",
+      "success_signal": "Postgres accepts CREATE INDEX.",
+      "failure_or_wait": "A wrong table, column, existing index, or connection target causes failure.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Insert the development-only tutorial row.",
+      "details": [
+        "Insert name Your dev branch and description Exploring schema changes in the dev branch into playing_with_neon."
+      ],
+      "input": "Modified development table.",
+      "output": "Development-only sample row.",
+      "success_signal": "Postgres accepts the INSERT.",
+      "failure_or_wait": "Schema or connection mismatch can cause the INSERT to fail.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Query playing_with_neon and verify the isolated changes.",
+      "details": [
+        "Run SELECT * FROM playing_with_neon;.",
+        "The guide's illustrated result has the description column and a row named Your dev branch with the expected description.",
+        "Its illustrated table shows 11 rows based on the original 10-row sample."
+      ],
+      "input": "Development-only schema and row.",
+      "output": "Query result containing the new column and row.",
+      "success_signal": "The expected development-only column and row appear.",
+      "failure_or_wait": "If the AI-generated tech-company INSERT was also executed, the row count will exceed the guide's illustrated 11 rows even though the branch exercise remains valid.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Schema Diff for development.",
+      "details": [
+        "From Branches, open the detailed view for development.",
+        "Select Open schema diff."
+      ],
+      "input": "Development branch with schema changes.",
+      "output": "Schema Diff view.",
+      "success_signal": "The development branch comparison screen is visible.",
+      "failure_or_wait": "Wrong project or branch selection leads to a different comparison.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Compare development against production.",
+      "details": [
+        "Verify that the correct branches are selected.",
+        "Select Compare."
+      ],
+      "input": "Development and production branch selection.",
+      "output": "Schema comparison showing divergence.",
+      "success_signal": "The added description column and idx_playing_with_neon_description index are highlighted in green.",
+      "failure_or_wait": "Missing differences indicate that SQL ran against another target or did not apply.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Reset development to production again.",
+      "details": [
+        "Run neon branches reset development --parent --project-id <actual-project-id>.",
+        "This discards development changes and restores the current parent state."
+      ],
+      "input": "Changed development branch and actual project ID.",
+      "output": "Development restored to production.",
+      "success_signal": "The CLI reports a successful reset.",
+      "failure_or_wait": "The action discards unpreserved child-branch changes and must target the correct project.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Return to Schema Diff and compare development with production again.",
+      "details": [
+        "Use the same branch comparison after reset."
+      ],
+      "input": "Reset development branch.",
+      "output": "Final schema comparison.",
+      "success_signal": "Schema Diff shows that development and production are identical, completing 1 - Basics.",
+      "failure_or_wait": "Remaining differences mean the reset failed or the comparison targets are incorrect.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer chooses a federated identity instead of email.",
+      "path": "Sign up with GitHub, Google, or another supported partner account.",
+      "effect_on_first_success": "Only the provider-specific account and verification path changes.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer executes the AI Assistant's generated tech-company INSERT rather than only reviewing it.",
+      "path": "Review the generated SQL, run it, and confirm Google, Apple, and Microsoft rows are added. Continue with the highest-value and grouped-average prompts using the updated data.",
+      "effect_on_first_success": "The later development SELECT can contain at least 14 rows rather than the guide's illustrated 11 because three production rows were added before branching.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "Homebrew is unavailable or not preferred.",
+      "path": "Install neonctl globally with npm instead of Homebrew.",
+      "effect_on_first_success": "Only CLI installation changes.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "The developer prefers not to repeat --project-id.",
+      "path": "Run neon set-context and choose the default organization and project, then run the remaining commands in that context. Verify the context before any reset.",
+      "effect_on_first_success": "Replaces repeated --project-id arguments with persistent CLI context and adds a context-selection risk.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "psql is already installed and available on PATH.",
+      "path": "Skip installation and proceed to neon connection-string with --psql.",
+      "effect_on_first_success": "Removes one local installation gate.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A Neon account and supported identity are required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "Project onboarding requires configuration selections, but the tutorial does not enumerate them.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "configuration",
+      "description": "Current onboarding creates only production, so the developer must explicitly create development and select production as parent.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "installation",
+      "description": "The path adds the Neon CLI through Homebrew or npm.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "credential",
+      "description": "CLI access requires browser-based Neon authorization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "choice",
+      "description": "The developer must select the correct organization before identifying the project ID.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "configuration",
+      "description": "Every project-scoped CLI command needs the correct --project-id unless neon set-context is configured.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 19,
+      "type": "installation",
+      "description": "The branch exercise requires psql and may require platform-specific package and PATH setup.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 27,
+      "type": "policy",
+      "description": "Resetting development discards its changes; the tutorial uses this destructive action to return to production.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Neon Docs",
+      "url": "https://neon.com/docs/introduction",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get started",
+        "Start with Neon"
+      ],
+      "evidence_supported": [
+        "Official documentation entry",
+        "Ordered general onboarding sequence",
+        "Selection of Learn the basics as the first route"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Learn the basics",
+      "url": "https://neon.com/docs/get-started/signing-up",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "February 15, 2026",
+      "sections_used": [
+        "What you will learn",
+        "1 Sign up",
+        "2 Onboarding in the Neon Console",
+        "3 Add sample data",
+        "4 Try the AI Assistant",
+        "5 View and modify data in the console",
+        "6 Working with your development branch",
+        "7 Make some sample schema changes",
+        "8 Check your changes with Schema Diff",
+        "9 Reset your development branch to production"
+      ],
+      "evidence_supported": [
+        "Complete first tutorial",
+        "Account and project creation",
+        "Production-only automatic branch provisioning",
+        "Explicit development-branch creation",
+        "Current AI Assistant prompts",
+        "CLI installation and authentication",
+        "Organization and project-ID discovery",
+        "Project-scoped branch and connection commands",
+        "psql connection",
+        "Current schema and index changes",
+        "Schema comparison and final identical-state signal"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Connect with psql",
+      "url": "https://neon.com/docs/connect/query-with-psql-editor",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How to install psql",
+        "Connect to Neon with psql",
+        "Running queries"
+      ],
+      "evidence_supported": [
+        "psql installation requirement",
+        "Postgres connection workflow and success prompt"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which exact fields and defaults appear in the current project-onboarding UI?",
+      "impact": "The project-creation gate cannot be decomposed into one action per field from the inspected tutorial.",
+      "reason_unresolved": "The official tutorial calls the selections self-explanatory but does not enumerate them.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "question": "Does Try a few prompts require executing every generated AI query or only generating and inspecting it?",
+      "impact": "Executing the three-row INSERT changes the production data copied into development and makes the later illustrated 11-row output contain additional rows.",
+      "reason_unresolved": "The guide supplies three prompts and an example generated INSERT, but its later illustrated SELECT still shows the original 10 sample rows plus one development-only row.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "question": "Which operating-system tab applies for psql installation?",
+      "impact": "The package and PATH commands differ by platform and CPU architecture.",
+      "reason_unresolved": "The user environment is not part of the platform roster record.",
+      "checked_source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Connecting Neon to an application framework or language",
+    "Building a production branching workflow",
+    "Setting up Neon Auth",
+    "Migrating an existing database",
+    "Production readiness, observability, scaling, security, and billing configuration"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

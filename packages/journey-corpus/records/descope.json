@@ -1,0 +1,75 @@
+{
+  "platform": {"name": "Descope", "slug": "descope", "organization": "Descope, Inc."},
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Descope Flows Quickstart through a tested sign-up or sign-in",
+    "selection_basis": "Under the workshop policy, this is the fastest commonly used documented route: the official guide recommends Descope Flows as the easiest integration approach, and the React quickstart provides a concrete native path. Account creation is treated as one opaque step at the official Console URL; only documented post-login actions are reconstructed.",
+    "alternatives_considered": [
+      {"name": "Hosted Application with Descope Flows", "url": "https://docs.descope.com/getting-started", "reason_not_primary": "The guide presents Hosted Application and Native Implementation as two Flow-based options without selecting one for every developer."},
+      {"name": "Client SDKs without Flows", "url": "https://docs.descope.com/client-sdk", "reason_not_primary": "The guide recommends Flows as easiest and places Client SDKs under Not Using Flows for developers who build their own frontend login experience."},
+      {"name": "Backend SDKs without Flows", "url": "https://docs.descope.com/backend-sdk", "reason_not_primary": "This peer alternative requires the developer to own frontend and session behavior, while the guide recommends Flows."},
+      {"name": "React Flow integration", "url": "https://docs.descope.com/getting-started/react", "reason_not_primary": "React is one of many web, mobile, full-stack, backend, library, and generic choices. It is preserved as a downstream candidate outline, not asserted as universal."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Descope account and project, embed the recommended Descope Flow in an application, and test a sign-up or sign-in until the SDK reports an authenticated user and session.",
+    "starting_url": "https://docs.descope.com/getting-started",
+    "assumed_prior_state": [
+      "No Descope account, project, Project ID, configured Flow, SDK, application integration, user, or authenticated session is assumed.",
+      "The developer has a local application environment appropriate to the framework they select and can complete the end-user authentication method contained in the project's sign-up-or-in Flow.",
+      "No account signup, onboarding wizard, Flow modification, package installation, authentication, user creation, or session issuance was performed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Application is working",
+    "normalized_outcome": "A React app renders the Descope `sign-up-or-in` Flow and completes a test sign-up or sign-in, producing an authenticated user and session.",
+    "observable_completion_signal": "The `onSuccess` callback reports the user, the session hook reports an authenticated state, and the React quickstart checkpoint can be marked `Application is working`.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Application is working", "source_ids": ["S2"]},
+    "why_this_is_the_boundary": "The React quickstart identifies this checkpoint immediately after the first working authentication test. Backend session validation and customization are later work.",
+    "source_ids": ["S1", "S2", "S3", "S4"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Descope account and Console access.", "required": true, "source_ids": ["S1", "S3", "S4"]},
+    {"order": 2, "type": "configuration", "requirement": "A Descope project with a Project ID and a `sign-up-or-in` Flow available to embed.", "required": true, "source_ids": ["S1", "S2", "S4"]},
+    {"order": 3, "type": "software", "requirement": "A supported application framework and package manager for the selected quickstart; the documented candidate continuation uses React and `@descope/react-sdk`.", "required": true, "source_ids": ["S1", "S2"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Descope's Getting Started Quickstart Guide and select the recommended Descope Flows approach.", "details": ["Flows are described as the easiest, recommended, straightforward, and extensible approach."], "input": "https://docs.descope.com/getting-started", "output": "Flow-based implementation choices and framework quickstarts are available.", "success_signal": "The guide identifies Native Implementation and Hosted Application as Flow-based paths.", "failure_or_wait": "No navigation recovery behavior is documented.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "prepare", "actor": "developer", "interface": "documentation", "action": "Choose Native Implementation or Hosted Application and select the application's framework route.", "details": ["The Getting Started navigation includes full-stack, web, mobile, backend, library, generic, and web-platform options."], "input": "Application architecture and framework", "output": "A framework-specific or hosted Flow integration guide.", "success_signal": "No single implementation and framework combination is selected for all developers.", "failure_or_wait": "Installation, embedding, session handling, and terminal details vary by selection.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to Descope.", "details": ["Treat signup as one opaque workshop-policy step; do not infer form fields."], "input": "https://app.descope.com", "output": "An authenticated Descope Console session.", "success_signal": "The Console project settings are accessible.", "failure_or_wait": "Use the Console's displayed account recovery path.", "required": true, "source_ids": ["S1", "S3"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Open the project settings and copy the Project ID for the project containing the pre-created `sign-up-or-in` Flow.", "details": ["The onboarding wizard pre-creates Flows; the React guide uses `flowId=\"sign-up-or-in\"`."], "input": "Authenticated Console project", "output": "Project ID and Flow ID available for the app.", "success_signal": "The Project ID is copied and the Flow is available.", "failure_or_wait": "Create or select a project and verify the Flow in the Console.", "required": true, "source_ids": ["S1", "S2", "S4"]},
+    {"step_number": 5, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Descope React SDK.", "details": ["Install the `@descope/react-sdk` package in the React application."], "input": "React project and package manager", "output": "The SDK is installed.", "success_signal": "The package installation completes.", "failure_or_wait": "Resolve package-manager errors before continuing.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 6, "phase": "build", "actor": "developer", "interface": "code", "action": "Wrap the app with `AuthProvider` and render the Descope component.", "details": ["Pass the copied Project ID to `AuthProvider`.", "Render the Descope component with `flowId=\"sign-up-or-in\"` and the documented success and error callbacks.", "Use `useSession` and `useUser` to display authenticated content."], "input": "Project ID and installed SDK", "output": "A React authentication UI backed by the Descope Flow.", "success_signal": "The app compiles and displays the Flow.", "failure_or_wait": "The error callback reports Flow or configuration failures.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 7, "phase": "run", "actor": "developer", "interface": "browser", "action": "Start the React app and complete a test sign-up or sign-in through the embedded Flow.", "details": [], "input": "Running React application", "output": "An authenticated Descope user and session.", "success_signal": "The success callback reports the user and authenticated UI is visible.", "failure_or_wait": "Use the Flow error callback and browser console to diagnose failure.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 8, "phase": "verify", "actor": "developer", "interface": "documentation", "action": "Mark the React quickstart checkpoint as complete.", "details": [], "input": "Successful sign-up or sign-in", "output": "First-mile completion.", "success_signal": "The checkpoint reads `Application is working`.", "failure_or_wait": "Repeat the test after correcting the reported integration error.", "required": true, "source_ids": ["S2"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "Choose Native Implementation with React", "path": "Embed the sign-up-or-in Flow using `@descope/react-sdk`, AuthProvider, and the Descope component, then test sign-up or sign-in until the app reports an authenticated user.", "effect_on_first_success": "Requires a local React application and package installation; the terminal is observed through component callbacks and session hooks.", "source_ids": ["S2"]},
+    {"at_step": 2, "condition": "Choose Hosted Application", "path": "Use Descope's hosted Flow application instead of embedding the Flow natively.", "effect_on_first_success": "Changes domain, application, and integration steps while retaining a Flow-based authentication terminal.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "Do not use Flows", "path": "Use Client SDKs for custom frontend screens with Descope session management, or Backend SDKs for a developer-owned frontend and custom backend authentication APIs.", "effect_on_first_success": "Replaces the recommended Flow embedding route with materially different UI, API, and session work.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "Building a B2B app that requires SAML or OIDC SSO", "path": "Use the dedicated SSO quickstart to configure a connection, add SSO, and test with an identity provider or mock IdP.", "effect_on_first_success": "Introduces tenant and SSO connection configuration before the authentication terminal.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "choice", "description": "The recommended Flow route still requires Native versus Hosted implementation and framework choices that change required actions.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 3, "type": "account", "description": "A Descope account and project are required before a Project ID and Flow can be used.", "documented_requirement": true, "source_ids": ["S1", "S2", "S4"]},
+    {"at_step": 3, "type": "access", "description": "The public Console shell does not expose signup, verification, onboarding-wizard, project, or Project ID convergence states.", "documented_requirement": true, "source_ids": ["S3", "S4"]},
+    {"at_step": 3, "type": "configuration", "description": "The code route depends on an existing project and sign-up-or-in Flow before the SDK can show an authentication experience.", "documented_requirement": true, "source_ids": ["S1", "S2"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "in minutes", "source_ids": ["S4"]},
+  "sources": [
+    {"id": "S1", "title": "Quickstart Guide", "url": "https://docs.descope.com/getting-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Quickstart Guide", "How do you plan to use Descope?", "Building a B2B app with SSO?", "Not Using Flows?"], "evidence_supported": ["Flows recommendation", "Project ID requirement", "Native and Hosted alternatives", "Client, Backend, and SSO alternatives"]},
+    {"id": "S2", "title": "React Quickstart", "url": "https://docs.descope.com/getting-started/react", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Install React SDK", "Import and Wrap Application with AuthProvider", "Import Descope Functions and Add Flows Component", "Utilize the React SDK Hooks and Functions", "Add Logout Functionality", "Checkpoint"], "evidence_supported": ["Complete downstream React integration", "Project ID and Flow ID use", "Authenticated-user signals", "Logout action before the checkpoint", "Application is working checkpoint"]},
+    {"id": "S3", "title": "Descope Console", "url": "https://app.descope.com", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public Console response"], "evidence_supported": ["Client application shell", "Absence of public account and project states"]},
+    {"id": "S4", "title": "Create and customize your entire user journey in a workflow", "url": "https://www.descope.com/flows", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["What are Descope Flows?", "Get started in minutes"], "evidence_supported": ["Onboarding wizard pre-creates Flows after questions", "Vendor minutes claim", "Flow product purpose"]}
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "No complete end-to-end success is claimed while the Console account and project transition remains hidden.",
+    "Backend session validation, production token handling, custom domains, Flow customization, branding, additional authentication methods, SSO, authorization, MFA, fraud controls, and production deployment occur after the first working sign-up or sign-in."
+  ]
+}

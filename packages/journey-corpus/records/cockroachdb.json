@@ -1,0 +1,743 @@
+{
+  "platform": {
+    "name": "CockroachDB",
+    "slug": "cockroachdb",
+    "organization": "Cockroach Labs, Inc."
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "Quickstart with CockroachDB, Standard Java sample",
+    "selection_basis": "CockroachDB Cloud documentation exposes Quickstart as the general immediate-start route. The guide explicitly says it deploys a Standard cluster with trial credits and uses sample code to run first queries. Java is the first/default language tab; Node.js is a documented peer branch.",
+    "alternatives_considered": [
+      {
+        "name": "Node.js quickstart tab",
+        "url": "https://www.cockroachlabs.com/docs/cockroachcloud/quickstart/#run-the-nodejs-sample-code",
+        "reason_not_primary": "It is an equal language branch inside the same quickstart; Java appears first and is the default tab."
+      },
+      {
+        "name": "CockroachDB Basic cluster",
+        "url": "https://www.cockroachlabs.com/docs/cockroachcloud/create-a-basic-cluster",
+        "reason_not_primary": "The general quickstart currently selects Standard (Preview), while Basic has a separate creation guide."
+      },
+      {
+        "name": "Self-Hosted local cluster",
+        "url": "https://www.cockroachlabs.com/docs/stable/start-a-local-cluster",
+        "reason_not_primary": "The general Cloud quickstart lists self-hosting under alternative ways to get started after the sample succeeds."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Deploy a CockroachDB Standard trial cluster and run the vendor's Java sample so it creates, inserts, reads, and prints database data.",
+    "starting_url": "https://www.cockroachlabs.com/docs/cockroachcloud/index",
+    "assumed_prior_state": [
+      "The developer does not yet have a CockroachDB Cloud account or cluster.",
+      "The developer can use a terminal, Git, and the repository's Gradle wrapper."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Run your first queries using the CockroachDB quickstart sample code.",
+    "normalized_outcome": "A Standard trial cluster and SQL user exist, and the Java sample connects, creates a table, inserts and reads data, and prints Hello world with a successful Gradle build.",
+    "observable_completion_signal": "The terminal prints Hello world! and BUILD SUCCESSFUL after ./gradlew run.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The guide states that it will use sample code to run your first queries and ends its runnable path with the expected Hello world! and BUILD SUCCESSFUL output.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "The output completes every operational heading in the general quickstart. The following Learn more section labels CRUD applications, SQL learning, user management, migration, other plans, and other connection methods as later work.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "A supported GitHub, Google, Microsoft, organization SSO, or email identity for CockroachDB Cloud registration.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "plan",
+      "requirement": "Eligibility for a first-organization trial with active trial credits for the no-payment Standard path.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "A terminal with Git and the ability to run the Java sample's included Gradle wrapper.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open CockroachDB Cloud Documentation and select Quickstart.",
+      "details": [
+        "The docs hub exposes Quickstart and the Cloud overview routes immediate setup to account and cluster creation."
+      ],
+      "input": "Intent to try CockroachDB Cloud.",
+      "output": "General Quickstart with CockroachDB.",
+      "success_signal": "The quickstart purpose and Create a free trial cluster heading are visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open CockroachDB Cloud registration and choose the vendor-recommended SSO method.",
+      "details": [
+        "Click Sign up with the chosen GitHub, Google, or Microsoft provider."
+      ],
+      "input": "Supported SSO identity.",
+      "output": "Selected SSO registration flow.",
+      "success_signal": "The provider flow opens.",
+      "failure_or_wait": "Organization SSO users may instead use their organization's sign-in URL.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Accept the Terms of Service and Privacy Policy.",
+      "details": [],
+      "input": "Registration form.",
+      "output": "Accepted legal terms.",
+      "success_signal": "The registration flow allows continuation.",
+      "failure_or_wait": "Declining the terms blocks account creation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Authenticate with the SSO provider and authorize CockroachDB Cloud.",
+      "details": [
+        "Respond to any email or provider notification inviting authorization."
+      ],
+      "input": "SSO account and accepted terms.",
+      "output": "CockroachDB Cloud account and initial organization.",
+      "success_signal": "The CockroachDB Cloud Get Started page opens.",
+      "failure_or_wait": "Provider authentication, MFA, or authorization can add an external verification gate.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On Get Started, click Create cluster.",
+      "details": [],
+      "input": "Authenticated Cloud account.",
+      "output": "Select a plan page.",
+      "success_signal": "The plan selector opens.",
+      "failure_or_wait": "Missing cluster-creation permission can block this action.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Standard.",
+      "details": [],
+      "input": "Plan selector.",
+      "output": "Standard cluster configuration.",
+      "success_signal": "Cloud & Regions page opens.",
+      "failure_or_wait": "The quickstart is specific to Standard (Preview).",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select GCP or AWS as the cloud provider.",
+      "details": [],
+      "input": "Standard plan.",
+      "output": "Cloud provider choice.",
+      "success_signal": "The selected provider remains active.",
+      "failure_or_wait": "Azure is not offered in this quickstart.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select a deployment region.",
+      "details": [
+        "A multi-region cluster can be configured by clicking Add region and selecting additional regions."
+      ],
+      "input": "Selected provider and regional preference.",
+      "output": "One region selected.",
+      "success_signal": "The region appears in the cluster configuration.",
+      "failure_or_wait": "Region availability depends on Standard support.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Next: Capacity.",
+      "details": [],
+      "input": "Cloud and region configuration.",
+      "output": "Capacity page.",
+      "success_signal": "The Capacity page opens.",
+      "failure_or_wait": "Incomplete region configuration blocks progression.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Keep Provisioned capacity at the default 2 vCPUs.",
+      "details": [],
+      "input": "Capacity page.",
+      "output": "2-vCPU capacity selection.",
+      "success_signal": "The summary shows 2 vCPUs.",
+      "failure_or_wait": "Changing the capacity departs from the quickstart configuration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Next: Finalize.",
+      "details": [],
+      "input": "Default capacity.",
+      "output": "Finalize page.",
+      "success_signal": "The Finalize page opens.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Name the cluster.",
+      "details": [
+        "With an active free trial shown, no payment method is required for creation; payment is required by trial end to retain clusters."
+      ],
+      "input": "Finalize page, active trial, and valid cluster name.",
+      "output": "Named Standard cluster configuration.",
+      "success_signal": "The right pane shows the active trial and completed cluster summary.",
+      "failure_or_wait": "Without the active trial, billing requirements can differ.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Create cluster and wait for creation.",
+      "details": [
+        "The guide states that creation takes a few seconds."
+      ],
+      "input": "Final cluster configuration.",
+      "output": "Provisioned Standard cluster.",
+      "success_signal": "The Create SQL user dialog displays.",
+      "failure_or_wait": "Provisioning is asynchronous; the guide does not specify retry behavior.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter a SQL username or keep the default.",
+      "details": [
+        "New SQL users are currently created with admin privileges."
+      ],
+      "input": "Create SQL user dialog.",
+      "output": "SQL username.",
+      "success_signal": "The username field contains the intended value.",
+      "failure_or_wait": "Changing default privileges is later administration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Generate & save password.",
+      "details": [],
+      "input": "SQL username.",
+      "output": "Generated SQL password.",
+      "success_signal": "The password is displayed once for capture.",
+      "failure_or_wait": "A forgotten password requires a Cluster Admin reset.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy the generated password and store it securely.",
+      "details": [],
+      "input": "One-time displayed password.",
+      "output": "Stored SQL credential.",
+      "success_signal": "The credential is available for later connection.",
+      "failure_or_wait": "Leaving without saving it requires a reset.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Next.",
+      "details": [],
+      "input": "Created SQL user and stored password.",
+      "output": "Connect to cluster dialog.",
+      "success_signal": "Connection options appear.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Java from the language dropdown.",
+      "details": [],
+      "input": "Connect dialog.",
+      "output": "Java connection instructions.",
+      "success_signal": "JDBC_DATABASE_URL instructions appear.",
+      "failure_or_wait": "Node.js is the peer branch.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy and securely save the pre-populated JDBC_DATABASE_URL command.",
+      "details": [
+        "It includes username, password, cluster name, and other connection details; the password is provided only once."
+      ],
+      "input": "Java connection instructions.",
+      "output": "JDBC connection-string command.",
+      "success_signal": "The command is available locally without exposing it.",
+      "failure_or_wait": "If lost, a Cluster Admin can reset the SQL password.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set JDBC_DATABASE_URL in the terminal.",
+      "details": [
+        "Use export on macOS/Linux or the documented PowerShell assignment on Windows."
+      ],
+      "input": "Copied JDBC command.",
+      "output": "Environment variable consumed by the sample.",
+      "success_signal": "The current shell has JDBC_DATABASE_URL set.",
+      "failure_or_wait": "A new shell or incorrect quoting can lose or corrupt the value.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone cockroachdb/quickstart-code-samples with Git.",
+      "details": [],
+      "input": "Git and network access.",
+      "output": "Local quickstart-code-samples repository.",
+      "success_signal": "The clone command completes and creates the directory.",
+      "failure_or_wait": "Git or network errors require local recovery not described in the guide.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Change into quickstart-code-samples/java.",
+      "details": [],
+      "input": "Cloned repository.",
+      "output": "Java sample working directory.",
+      "success_signal": "The Gradle wrapper and sample files are present.",
+      "failure_or_wait": "Wrong directory prevents the next command.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run ./gradlew run.",
+      "details": [],
+      "input": "Java sample, Gradle wrapper, and JDBC_DATABASE_URL.",
+      "output": "Running sample application.",
+      "success_signal": "The Gradle task starts and connects to the cluster.",
+      "failure_or_wait": "Local Java, dependency, network, credential, or cluster errors can fail the build; no retry path is specified.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "sdk",
+      "action": "Connect, create a table, insert data, read it, and print it.",
+      "details": [
+        "These are the five operations the guide says the sample performs."
+      ],
+      "input": "Running Java sample and valid JDBC connection.",
+      "output": "Executed first database queries and printed row.",
+      "success_signal": "The sample reaches its print action.",
+      "failure_or_wait": "Any failed operation prevents terminal success.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify the expected terminal output.",
+      "details": [],
+      "input": "Completed sample run.",
+      "output": "Hello world! output and successful build.",
+      "success_signal": "The terminal shows Hello world! and BUILD SUCCESSFUL.",
+      "failure_or_wait": "Different output or a failed Gradle task means first success was not reached.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer registers with email instead of SSO.",
+      "path": "Click Sign up with email, enter email and password, accept terms, click Get Started, verify the email, enter name and company details, answer the onboarding survey, and click Finish Setup.",
+      "effect_on_first_success": "Adds email verification, profile fields, and survey actions before cluster creation.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "The organization uses CockroachDB Cloud Organization SSO.",
+      "path": "Use the organization-specific URL and follow the administrator-configured OIDC or SAML flow.",
+      "effect_on_first_success": "Registration may be automatic, but access depends on organization policy.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The developer needs more than one region.",
+      "path": "Click Add region and select each additional supported region.",
+      "effect_on_first_success": "Adds configuration choices but retains the same cluster and sample boundary.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "No active trial is available.",
+      "path": "Follow the billing requirement shown on Finalize rather than relying on trial credits.",
+      "effect_on_first_success": "May add a payment-method gate before cluster creation.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 18,
+      "condition": "The developer selects Node.js.",
+      "path": "Copy the General connection string, set DATABASE_URL, clone the same repo, enter the node directory, run npm install, then node app.js and verify Hello world!.",
+      "effect_on_first_success": "Replaces JDBC and Gradle with Node.js, npm, and DATABASE_URL while preserving the database-operation outcome.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 20,
+      "condition": "The developer uses Windows PowerShell.",
+      "path": "Set JDBC_DATABASE_URL with the documented $env assignment instead of export.",
+      "effect_on_first_success": "Only environment-variable syntax changes.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 3,
+      "type": "policy",
+      "description": "Registration requires acceptance of the Terms of Service and Privacy Policy.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "verification",
+      "description": "SSO authentication and CockroachDB Cloud authorization can require provider MFA, email, or other notification approval.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "choice",
+      "description": "Cloud provider and region must be selected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "billing",
+      "description": "The no-payment creation route depends on an active free trial; payment is required by trial end to maintain clusters.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "wait",
+      "description": "Cluster provisioning takes a vendor-stated few seconds before the SQL-user dialog appears.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "credential",
+      "description": "The generated SQL password is shown once and must be stored; recovery requires an administrator reset.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 20,
+      "type": "configuration",
+      "description": "A secret-bearing connection string must be set correctly in an OS-specific environment variable.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 21,
+      "type": "installation",
+      "description": "The sample requires a local repository clone and a runtime capable of executing its Gradle wrapper.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "CockroachDB Cloud Documentation",
+      "url": "https://www.cockroachlabs.com/docs/cockroachcloud/index",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "CockroachDB Cloud Overview",
+        "Plans",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Official Cloud entry point",
+        "Immediate-start route",
+        "Plan alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Quickstart with CockroachDB",
+      "url": "https://www.cockroachlabs.com/docs/cockroachcloud/quickstart/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a free trial cluster",
+        "Create a SQL user",
+        "Connect to the cluster",
+        "Configure the connection environment variable",
+        "Run the Java sample code",
+        "Run the Node.js sample code",
+        "Learn more"
+      ],
+      "evidence_supported": [
+        "Complete ordered quickstart",
+        "Trial and plan gates",
+        "Cluster provisioning wait",
+        "SQL credential creation",
+        "OS and language branches",
+        "Sample operations",
+        "Terminal output boundary",
+        "Post-success exclusions"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create a CockroachDB Cloud account",
+      "url": "https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Choose an authentication method",
+        "Register a new account",
+        "Log in to your account"
+      ],
+      "evidence_supported": [
+        "Recommended SSO path",
+        "Terms acceptance",
+        "Provider authorization",
+        "Email-registration branch",
+        "Organization SSO branch"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Java version and local runtime checks are required by the current sample?",
+      "impact": "The Gradle wrapper can fail before connecting even when the cloud path is correct.",
+      "reason_unresolved": "The quickstart commands the wrapper but does not state a Java-version prerequisite, and the sample directory exposes no README with one.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "question": "What billing screen appears if the account has no active first-organization trial?",
+      "impact": "The path can add a payment gate before cluster creation.",
+      "reason_unresolved": "The quickstart describes only the active-trial condition and does not decompose the alternative.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "CRUD application tutorials",
+    "CockroachDB SQL lessons",
+    "SQL-user privilege changes",
+    "Migration",
+    "Advanced or self-hosted deployment",
+    "Production networking and checklist",
+    "Payment setup needed only to retain clusters after the trial"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

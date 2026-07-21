@@ -1,0 +1,649 @@
+{
+  "platform": {
+    "name": "Anthropic",
+    "slug": "anthropic",
+    "organization": "Anthropic PBC"
+  },
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Get started with Claude",
+    "selection_basis": "Anthropic places Get started with Claude under First steps, and the API overview explicitly directs new direct-model-access developers to this guide. The guide names and demonstrates the terminal result as the first Claude API call.",
+    "alternatives_considered": [
+      {
+        "name": "Claude Managed Agents quickstart",
+        "url": "https://platform.claude.com/docs/en/managed-agents/quickstart",
+        "reason_not_primary": "The API overview routes managed-agent infrastructure to this separate surface and recommends the selected Get started guide for direct model access."
+      },
+      {
+        "name": "Workbench",
+        "url": "https://platform.claude.com/workbench",
+        "reason_not_primary": "The API overview presents Workbench as an in-browser way to try the API, while the selected First steps quickstart explicitly produces the first programmatic call."
+      },
+      {
+        "name": "Cloud platform access",
+        "url": "https://platform.claude.com/docs/en/api/overview",
+        "reason_not_primary": "AWS, Google Cloud, and Microsoft Foundry are alternatives for existing cloud commitments, IAM, compliance, or consolidated billing; Anthropic says the direct API is best for new integrations and full feature access."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Make the first direct Messages API call to Claude after selecting Anthropic.",
+    "starting_url": "https://platform.claude.com/docs/en/get-started",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Anthropic's direct Claude API.",
+      "The developer does not yet have a funded Console organization, API key, or configured client."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "You made your first API call",
+    "normalized_outcome": "The developer has sent the quickstart's renewable-energy prompt to the Claude Messages API and received Claude's assistant message.",
+    "observable_completion_signal": "The cURL route returns a JSON message with type message, role assistant, a text content block beginning with search strategies for renewable energy, stop_reason end_turn, and token usage; SDK and CLI routes print the equivalent assistant text.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "After the documented request and output, the Next steps section states You made your first API call.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "Anthropic explicitly labels the completed request as the first API call. Messages API patterns, model comparison, features, SDK reference, and the guide's aspirational web-search-assistant build are placed after this statement.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "An Anthropic Claude Console account and organization are required for the direct API path.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "billing",
+      "requirement": "A new Console organization must have prepaid usage credits before an API call can succeed; organization and use-case information plus payment details are required to fund it.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "credential",
+      "requirement": "An API key generated in Console Account Settings is required for the quickstart's direct API request.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S6"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "The cURL route requires a terminal with cURL. The CLI and seven SDK routes require their documented runtime, build tool, package manager, or Homebrew installation prerequisites.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "region",
+      "requirement": "The developer must be in a country or region supported by the Claude API.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Get started with Claude and confirm the direct Messages API path.",
+      "details": [
+        "The guide's stated purpose is to make the first API call to Claude.",
+        "Its prerequisite section requires a Console account and API key."
+      ],
+      "input": "Intent to build with Claude directly",
+      "output": "Official First steps quickstart",
+      "success_signal": "The Call the API section and language tabs are visible.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Create or log in to a Claude Console account and create or join a Console organization.",
+      "details": [
+        "Console is where organizations create keys, add team users, configure billing, and use Workbench.",
+        "API access is subject to Anthropic's Commercial Terms."
+      ],
+      "input": "Supported-region identity and organization",
+      "output": "Claude Console organization access",
+      "success_signal": "The organization Console is accessible.",
+      "failure_or_wait": "The public docs do not enumerate the signup form, identity verification, email verification, or organization-creation screens.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Fill out the requested organization and use-case information.",
+      "details": [],
+      "input": "New Console organization",
+      "output": "Organization eligible for funding",
+      "success_signal": "The billing flow accepts the organization and use-case information.",
+      "failure_or_wait": "The help article does not enumerate the fields or any review time.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Enter payment details in the organization billing flow.",
+      "details": [
+        "An Admin or Billing role can later update the payment method under Settings, Billing, by selecting the pencil icon, entering new card details, and selecting Update."
+      ],
+      "input": "Valid payment method",
+      "output": "Configured Console billing",
+      "success_signal": "The payment method is accepted.",
+      "failure_or_wait": "A billing or payment problem can cause a 402 billing_error on the API request.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Purchase prepaid usage credits for the organization.",
+      "details": [
+        "Navigate to the Billing page, select Buy credits, enter the credit amount, and complete the purchase.",
+        "Purchased credits become available immediately, expire after one year, cannot be extended, and are non-refundable.",
+        "Auto-reload is optional and can be configured later."
+      ],
+      "input": "Payment method and selected credit amount",
+      "output": "Positive organization credit balance",
+      "success_signal": "The credits appear as available on the Billing page.",
+      "failure_or_wait": "Without credits, API and Workbench calls are unavailable.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Create an API key in Console Account Settings.",
+      "details": [
+        "Open the API keys page from the profile and select Create Key.",
+        "Choose the key's expiration when creating it.",
+        "A workspace can be used to segment keys and control spend by use case."
+      ],
+      "input": "Funded Console organization and key expiration choice",
+      "output": "New Anthropic API key",
+      "success_signal": "The key value is displayed for secure storage.",
+      "failure_or_wait": "Organization or workspace permissions can prevent key creation or access to a model resource.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy the key to secure storage and export it as ANTHROPIC_API_KEY.",
+      "details": [
+        "Run export ANTHROPIC_API_KEY=your-api-key-here for the cURL route.",
+        "Avoid version control and use a secrets-management system for durable storage."
+      ],
+      "input": "New API key",
+      "output": "ANTHROPIC_API_KEY in the shell environment",
+      "success_signal": "The shell can substitute the key into the request header.",
+      "failure_or_wait": "A malformed, revoked, or expired key returns a 401 authentication_error.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Send the documented POST request to https://api.anthropic.com/v1/messages with cURL.",
+      "details": [
+        "Set content-type application/json, x-api-key from ANTHROPIC_API_KEY, and anthropic-version 2023-06-01.",
+        "Send model claude-opus-4-8, max_tokens 1000, and the user prompt asking what to search for to find the latest renewable-energy developments."
+      ],
+      "input": "Funded account, environment key, and request body",
+      "output": "Claude Messages API response",
+      "success_signal": "The request returns a message object instead of an API error.",
+      "failure_or_wait": "400 indicates invalid request content; 402 billing; 403 permission; 404 endpoint or resource; 429 rate limit; 500 should be retried with exponential backoff; 504 timed out; 529 temporarily overloaded.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify the returned JSON contains Claude's assistant message and completed turn.",
+      "details": [
+        "The demonstrated response includes model and message id, type message, role assistant, a text content block with renewable-energy search strategies, stop_reason end_turn, and input and output usage."
+      ],
+      "input": "Messages API response",
+      "output": "Verified first Claude API result",
+      "success_signal": "The assistant text and end_turn terminal state match the demonstrated response shape, and the next section says the first API call was made.",
+      "failure_or_wait": "An error response includes an error type, message, and request_id; use the request ID when contacting support.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer uses an existing organization rather than creating one.",
+      "path": "Log in or accept organization access, confirm the role permits billing and key creation as needed, then continue with existing funding or add credits.",
+      "effect_on_first_success": "Can remove organization creation and payment setup, but team role and available-credit gates remain.",
+      "source_ids": [
+        "S3",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The organization uses a paid API contract with monthly invoicing.",
+      "path": "Use the contracted invoicing and payment process instead of the standard new-account prepaid-credit flow.",
+      "effect_on_first_success": "Changes the billing path and may require contacting Anthropic for custom limits, invoicing, or support.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The organization uses Workload Identity Federation.",
+      "path": "Configure the federation rule and authenticate with a short-lived bearer token from POST /v1/oauth/token instead of an API key.",
+      "effect_on_first_success": "Replaces static key generation and x-api-key with organization identity configuration and Authorization Bearer token handling.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses the ant CLI tab.",
+      "path": "Install with brew install anthropics/tap/ant or another CLI installation method; run ant auth login, authorize the browser OAuth flow, then run ant auth status. On a remote host use --no-browser, open the URL on another device, and paste the returned code. Then run ant messages create with the quickstart request. ANTHROPIC_API_KEY, if set, takes precedence over login credentials.",
+      "effect_on_first_success": "Uses CLI OAuth and a CLI-native request instead of direct cURL headers; adds installation, browser authorization, and credential-status verification.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses Python.",
+      "path": "Export ANTHROPIC_API_KEY; create and enter claude-quickstart; create and activate .venv; install anthropic; create quickstart.py with Anthropic().messages.create and the documented prompt; run python quickstart.py; verify printed assistant text.",
+      "effect_on_first_success": "Adds a Python virtual environment, SDK installation, code file, and run command.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses TypeScript.",
+      "path": "Export the key; create and enter claude-quickstart; run npm init -y, set package type module, and install @anthropic-ai/sdk; create quickstart.ts with the Messages request; run npx tsx quickstart.ts; verify assistant text.",
+      "effect_on_first_success": "Adds Node package setup, TypeScript code, and the tsx runner.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses C#.",
+      "path": "Export the key; run dotnet new console -n ClaudeQuickstart, enter the directory, and add the Anthropic package; replace the program with the documented Messages request; run the .NET project and verify assistant text.",
+      "effect_on_first_success": "Adds .NET project creation, NuGet installation, C# code, and compilation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses Go.",
+      "path": "Export the key; create and enter claude-quickstart; initialize the Go module and get github.com/anthropics/anthropic-sdk-go; create the documented Go Messages program; run it and verify assistant text.",
+      "effect_on_first_success": "Adds Go module initialization, SDK retrieval, source code, and compilation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses Java.",
+      "path": "Install JDK 25 or later plus Gradle or Maven; create the quickstart project and the documented build.gradle.kts or Maven configuration and QuickStart source; run gradle run or mvn compile exec:java -Dexec.mainClass=QuickStart; verify assistant text.",
+      "effect_on_first_success": "Adds a JDK and a Gradle-versus-Maven build branch with project files and compilation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses PHP.",
+      "path": "Export the key; create and enter claude-quickstart; install anthropic-ai/sdk and guzzlehttp/guzzle:^7 with Composer; create quickstart.php with the documented Messages request; run php quickstart.php; verify assistant text.",
+      "effect_on_first_success": "Adds PHP, Composer dependencies, a PHP file, and execution.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer chooses Ruby.",
+      "path": "Export the key; create the quickstart project and documented Ruby dependency setup; create quickstart.rb with the Messages request; run bundle exec ruby quickstart.rb; verify assistant text.",
+      "effect_on_first_success": "Adds Ruby, Bundler dependency setup, a Ruby file, and execution.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer chooses AWS, Google Cloud, or Microsoft Foundry access.",
+      "path": "Follow the platform-specific documentation and use that provider's IAM, credential, billing, availability, and endpoint path instead of Console funding and direct API-key authentication.",
+      "effect_on_first_success": "Replaces the direct Anthropic account, billing, and authentication journey with a cloud-provider-specific one.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The direct API requires a Console account and organization, subject to Commercial Terms and regional availability.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "form",
+      "description": "A new organization must supply additional organization and use-case information before funding.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "billing",
+      "description": "The standard new-account path requires payment details and prepaid credit purchase before API use.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "A key must be created with an expiration choice, securely stored, and exposed to the runtime; workspace permissions can constrain it.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "choice",
+      "description": "The quickstart offers cURL, ant CLI, Python, TypeScript, C#, Go, Java, PHP, and Ruby routes with materially different installation and project setup.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "rate-limit",
+      "description": "The organization has automatic usage-tier spend and rate limits; 429 and acceleration limits can block a request.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S7"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Claude",
+      "url": "https://platform.claude.com/docs/en/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Call the API",
+        "cURL",
+        "CLI",
+        "Python",
+        "TypeScript",
+        "C#",
+        "Go",
+        "Java",
+        "PHP",
+        "Ruby",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Official quickstart selection",
+        "All tool and language branches",
+        "Request and demonstrated output",
+        "Explicit first-call completion statement",
+        "Post-success actions"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API overview",
+      "url": "https://platform.claude.com/docs/en/api/overview",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Authentication",
+        "Getting API keys",
+        "Claude API vs cloud platforms",
+        "Rate limits and availability"
+      ],
+      "evidence_supported": [
+        "New-user direct-access recommendation",
+        "Key and Workload Identity options",
+        "Key expiration and workspaces",
+        "Cloud platform alternatives",
+        "Limits and supported-region gate"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "How can I access the Claude API?",
+      "url": "https://support.claude.com/en/articles/8114521-how-can-i-access-the-claude-api",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-16",
+      "sections_used": [
+        "How can I access the Claude API?"
+      ],
+      "evidence_supported": [
+        "Console organization creation",
+        "Console capabilities",
+        "Commercial Terms gate"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How do I pay for my Claude API usage?",
+      "url": "https://support.claude.com/en/articles/8977456-how-do-i-pay-for-my-claude-api-usage",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-16",
+      "sections_used": [
+        "Prepaid usage credits",
+        "Buy credits",
+        "How to update your Console payment method"
+      ],
+      "evidence_supported": [
+        "Prepayment requirement",
+        "Billing actions",
+        "Immediate credit availability",
+        "Credit expiration and refund constraints",
+        "Payment update steps"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "I created a Claude Console organization: how do I start using the Claude API?",
+      "url": "https://support.claude.com/en/articles/8114531-i-created-a-claude-console-organization-how-do-i-start-using-the-claude-api",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-16",
+      "sections_used": [
+        "Organization information",
+        "Payment details",
+        "Fund account"
+      ],
+      "evidence_supported": [
+        "Organization and use-case form gate",
+        "Payment details",
+        "Funding requirement",
+        "Custom-contract alternative"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "What should I do if I suspect my API key has been compromised?",
+      "url": "https://support.claude.com/en/articles/8384961-what-should-i-do-if-i-suspect-my-api-key-has-been-compromised",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-16",
+      "sections_used": [
+        "Create Key",
+        "Secure key storage"
+      ],
+      "evidence_supported": [
+        "API keys page and Create Key control",
+        "Secure storage and version-control warning"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Claude API errors",
+      "url": "https://platform.claude.com/docs/en/api/errors",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "HTTP errors",
+        "Error shapes",
+        "Request ID"
+      ],
+      "evidence_supported": [
+        "Authentication, billing, permission, validation, rate, retry, timeout, and overloaded failures",
+        "Error response shape and support request ID"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact identity, email-verification, and organization-creation screens does a brand-new Console user encounter?",
+      "impact": "These screens can add steps or waiting before organization information and billing.",
+      "reason_unresolved": "Official docs state that a Console organization must be created but do not publish the full signup UI sequence.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "question": "Does Anthropic intend one quickstart client as the canonical default?",
+      "impact": "cURL has two runtime steps, CLI uses browser OAuth, and seven SDK routes add different toolchains and project files.",
+      "reason_unresolved": "The page presents all nine tabs without calling one recommended or default; cURL is used as the recorded primary because it is the first rendered tab and its complete response is demonstrated, while every other route is preserved as a branch.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Working with Messages API patterns",
+    "Building the web search assistant named in the page description",
+    "Comparing models",
+    "Exploring features and tools",
+    "Reading full SDK references",
+    "Configuring auto-reload",
+    "Production retries, streaming, and error handling",
+    "Additional Claude API calls"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

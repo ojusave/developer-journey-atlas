@@ -1,0 +1,443 @@
+{
+  "platform": {
+    "name": "Temporal",
+    "slug": "temporal",
+    "organization": "Temporal Technologies Inc."
+  },
+  "category": "Data pipelines and workflow automation",
+  "surface": {
+    "name": "Go SDK on macOS with local Hello World",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Go SDK on macOS with local Hello World. Go is the first language listed by the Quickstarts index, and the Go page provides a complete local setup, application, execution, and verification path. macOS Homebrew is one fully specified CLI installation branch. Prior surface before policy commit: Temporal local Hello World Quickstarts, with a Go and macOS candidate.",
+    "alternatives_considered": [
+      {
+        "name": "Java Hello World Quickstart",
+        "url": "https://docs.temporal.io/develop/java/set-up-your-local-java",
+        "reason_not_primary": "Java is a peer SDK with different runtime, build, Worker, and starter commands."
+      },
+      {
+        "name": "Python Hello World Quickstart",
+        "url": "https://docs.temporal.io/develop/python/set-up-your-local-python",
+        "reason_not_primary": "Python is a peer SDK and Temporal does not rank it below or above Go."
+      },
+      {
+        "name": "Temporal Cloud",
+        "url": "https://docs.temporal.io/cloud/get-started",
+        "reason_not_primary": "The Quickstarts index explicitly separates local language quickstarts from the account, Namespace, and authentication path for Temporal Cloud."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Use Temporal's official Quickstart to set up a local development service and run the documented Hello World Workflow.",
+    "starting_url": "https://docs.temporal.io/",
+    "assumed_prior_state": [
+      "A supported workstation, terminal, editor, and outbound package-download access are available.",
+      "No Temporal account, Cloud Namespace, SDK, CLI, local service, Workflow, Activity, Worker, or language selection is assumed."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Run a Hello World Workflow locally.",
+    "normalized_outcome": "In the Go candidate, the local Worker processes the Workflow and Activity, the starter prints `Workflow result: Hello Temporal`, and the execution is visible in the local Web UI.",
+    "observable_completion_signal": "The terminal prints `Workflow result: Hello Temporal`, while Worker processing and Workflow details are observable in the Worker terminal and Web UI.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "Run Hello World: Test Your Installation",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "The documentation home names a local Hello World Workflow as the Quickstart outcome, and the Go page has a Verify Success section that defines the exact terminal output and UI evidence before later tutorials.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "other",
+      "requirement": "Choose one supported Temporal SDK language; the Quickstarts index does not select a universal language.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "For the retained candidate, install Go and confirm it with `go version`; the tutorial was produced with Go 1.18.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "Install Temporal CLI for the workstation operating system; the retained candidate uses Homebrew on macOS.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "environment",
+      "requirement": "Keep the local Temporal development server and Worker running in separate terminal windows while executing the Workflow starter.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Temporal Docs and follow Quickstart to the local language index.",
+      "details": [],
+      "input": "https://docs.temporal.io/",
+      "output": "The local Hello World objective and eight SDK choices are visible.",
+      "success_signal": "Quickstarts says to choose a language to get started locally.",
+      "failure_or_wait": "Temporal Cloud is a separate path.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `go version` and confirm Go is installed.",
+      "details": [
+        "The tutorial was produced with Go 1.18 and shows `go1.18.1` as example output."
+      ],
+      "input": "Go installation",
+      "output": "The installed Go version",
+      "success_signal": "The command returns a Go version.",
+      "failure_or_wait": "Install Go before continuing if the command is unavailable.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `mkdir goproject`, `cd goproject`, `go mod init my-org/greeting`, `go get go.temporal.io/sdk`, `go get go.temporal.io/sdk/client`, and `go mod tidy`.",
+      "details": [],
+      "input": "Go toolchain and writable directory",
+      "output": "A Go module with the Temporal SDK and client dependencies",
+      "success_signal": "The module resolves and tidies its dependencies.",
+      "failure_or_wait": "No package-install recovery is documented on the page.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `brew install temporal` and ensure `temporal` is on PATH.",
+      "details": [],
+      "input": "macOS and Homebrew",
+      "output": "Temporal CLI is installed.",
+      "success_signal": "The `temporal` command is available in a new terminal.",
+      "failure_or_wait": "Windows and Linux use separate archive-download and PATH branches.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open a new terminal and run `temporal server start-dev`, leaving it running.",
+      "details": [],
+      "input": "Temporal CLI",
+      "output": "A local in-memory Temporal Service, default Namespace, and Web UI",
+      "success_signal": "The service listens on `localhost:7233` and the Web UI on `http://localhost:8233`.",
+      "failure_or_wait": "Pressing CTRL+C stops the service; the page documents `--ui-port` when a different Web UI port is needed.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Create `activity.go` in package `greeting` with the published `Greet` Activity that returns `Hello <name>`.",
+      "details": [],
+      "input": "Published Activity code",
+      "output": "A `Greet` Activity",
+      "success_signal": "The file defines `Greet(ctx, name)` and returns the formatted greeting.",
+      "failure_or_wait": "None documented for file creation.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Create `workflow.go` with `SayHelloWorkflow`, a 10-second Activity StartToClose timeout, and `ExecuteActivity(...).Get(...)` returning the Activity result.",
+      "details": [],
+      "input": "Published Workflow code and Activity",
+      "output": "A Workflow that orchestrates `Greet`",
+      "success_signal": "The Workflow returns the Activity result or its error.",
+      "failure_or_wait": "The Workflow returns an error if the Activity result cannot be obtained.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Create `worker/main.go` with the published client, Worker on `my-task-queue`, Workflow and Activity registrations, and `w.Run(worker.InterruptCh())`.",
+      "details": [],
+      "input": "Published Worker code",
+      "output": "A Worker executable",
+      "success_signal": "The Worker connects and registers both handlers.",
+      "failure_or_wait": "The program exits with `Unable to create client` or `Unable to start worker` when those documented operations fail.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "In another terminal, run `go run worker/main.go` and leave the Worker polling.",
+      "details": [],
+      "input": "Running local service and Worker code",
+      "output": "A Worker polling `my-task-queue`",
+      "success_signal": "The Worker remains running and ready to process Workflow and Activity tasks.",
+      "failure_or_wait": "Client or Worker startup errors use the messages defined in the published code.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Create `start/main.go` with the published client, Workflow ID `greeting-workflow`, task queue `my-task-queue`, `ExecuteWorkflow`, result wait, and result log.",
+      "details": [],
+      "input": "Published starter code and Workflow",
+      "output": "A Workflow starter executable",
+      "success_signal": "The code logs IDs after start and waits for the Workflow result.",
+      "failure_or_wait": "The program exits with the documented client, execution, or result error when those operations fail.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `go run start/main.go Temporal`.",
+      "details": [],
+      "input": "Running service, running Worker, starter code, and name argument `Temporal`",
+      "output": "A completed Hello World Workflow Execution",
+      "success_signal": "The starter prints `Workflow result: Hello Temporal`, the Worker processes the Workflow and Activity, and details appear in the local Web UI.",
+      "failure_or_wait": "The published starter logs fatal errors if it cannot create the client, execute the Workflow, or obtain the result.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Choose Java, PHP, Python, Ruby, TypeScript, .NET, or Rust",
+      "path": "Use that SDK's language-specific local Quickstart instead of the Go candidate.",
+      "effect_on_first_success": "Changes runtime, package manager, application structure, Worker, starter, and terminal output formatting while retaining a local Hello World Workflow.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Use Windows",
+      "path": "Download the matching amd64 or arm64 Temporal CLI archive, extract it, and add `temporal.exe` to PATH.",
+      "effect_on_first_success": "Replaces Homebrew installation with the Windows archive route.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Use Linux",
+      "path": "Download the matching Temporal CLI archive, extract it, and move the binary into PATH, such as `/usr/local/bin`.",
+      "effect_on_first_success": "Replaces Homebrew installation with the Linux archive route and may require elevated permission for the move.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "Use Temporal Cloud",
+      "path": "Follow the separate Cloud getting-started path with an account, Namespace, endpoint, and authentication instead of the local development server.",
+      "effect_on_first_success": "Adds managed-account and Cloud resource setup and changes client connection details.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Eight SDK language routes are presented as peers and no universal SDK is selected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Temporal CLI installation differs across macOS, Windows, and Linux.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "environment",
+      "description": "The local Temporal Service must remain running while the Worker and starter execute.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "environment",
+      "description": "The Worker must poll the same `my-task-queue` used by the starter before the Workflow can complete.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Temporal Docs | Temporal Platform Documentation",
+      "url": "https://docs.temporal.io/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Quickstart"
+      ],
+      "evidence_supported": [
+        "General first-mile surface",
+        "Local setup",
+        "Hello World objective",
+        "Cloud alternative"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Quickstarts | Temporal Platform Documentation",
+      "url": "https://docs.temporal.io/quickstarts",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Quickstarts"
+      ],
+      "evidence_supported": [
+        "Local-first language choice",
+        "Eight peer SDK routes",
+        "Separate Temporal Cloud path"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Set up your local with the Go SDK | Temporal Platform Documentation",
+      "url": "https://docs.temporal.io/develop/go/set-up-your-local-go",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install Go",
+        "Install the Temporal Go SDK",
+        "Install Temporal CLI and start the development server",
+        "Start the development server",
+        "Run Hello World: Test Your Installation",
+        "Create the Activity",
+        "Create the Workflow",
+        "Create and Run the Worker",
+        "Execute the Workflow",
+        "Verify Success"
+      ],
+      "evidence_supported": [
+        "Go and CLI setup",
+        "OS installation branches",
+        "Local service behavior",
+        "Activity and Workflow code",
+        "Worker and starter sequence",
+        "Documented errors",
+        "Exact Hello World terminal"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Temporal SDK language and workstation route should define the platform-wide first mile?",
+      "impact": "The answer changes prerequisites, package installation, application files, commands, and terminal presentation.",
+      "reason_unresolved": "The Quickstarts index presents eight languages as peers, and the Go and macOS candidate is first-listed rather than declared universal.",
+      "checked_source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Building a second application, completing Temporal courses, adding Signals or Queries, testing failure recovery, deploying Workers, self-hosting production, creating a Temporal Cloud account or Namespace, and production observability occur after the first local Hello World result."
+  ]
+}

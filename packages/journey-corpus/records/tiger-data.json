@@ -1,0 +1,427 @@
+{
+  "platform": {
+    "name": "Tiger Data",
+    "slug": "tiger-data",
+    "organization": "Timescale, Inc., d/b/a Tiger Data"
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "Self-hosted TimescaleDB from a Docker container",
+    "selection_basis": "Under the workshop policy, Tiger Data's official local Docker installation takes priority over Tiger Cloud signup. It is a no-account development route using a pre-built TimescaleDB container and ends at an interactive psql connection.",
+    "alternatives_considered": [
+      {
+        "name": "Tiger CLI",
+        "url": "https://www.tigerdata.com/docs/get-started/quickstart/tiger-cli",
+        "reason_not_primary": "The CLI provides a detailed service-creation terminal but adds local installation and still opens the same browser account or login gate through OAuth."
+      },
+      {
+        "name": "Tiger Cloud Free Plan",
+        "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service",
+        "reason_not_primary": "The managed route requires account signup and service provisioning, while the selected official Docker route has no account gate."
+      },
+      {
+        "name": "Thirty-day Performance trial",
+        "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service",
+        "reason_not_primary": "The current official Free Plan is no-card and has no time limit, while the trial adds a plan and credit lifecycle before the same database terminal."
+      },
+      {
+        "name": "AWS Marketplace",
+        "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service#create-a-tiger-cloud-account",
+        "reason_not_primary": "This adds marketplace pricing selection, subscription, account linking, billing, and connection confirmation."
+      },
+      {
+        "name": "Azure Marketplace",
+        "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service#create-a-tiger-cloud-account",
+        "reason_not_primary": "This adds marketplace purchase and account-linking steps rather than the standalone no-card route."
+      },
+      {
+        "name": "psql connection",
+        "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service#connect-to-your-service",
+        "reason_not_primary": "This adds a local psql installation and handling the downloaded service URL, while the browser editor reaches the same documented test query."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Start a local TimescaleDB development instance from Tiger Data's pre-built Docker image and connect with psql.",
+    "starting_url": "https://docs.tigerdata.com/docs/self-hosted/latest/install/installation-docker",
+    "assumed_prior_state": [
+      "No Tiger Cloud account, project, service, billing instrument, database, CLI, or local PostgreSQL client is assumed.",
+      "The developer can receive and follow an email-confirmation link.",
+      "The developer is authorized to accept any signup terms and create a free cloud service, but no account, agreement, or resource action was performed.",
+      "The intended use is schema exploration or small-scale testing because the docs position free services for those purposes."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Install and configure TimescaleDB on Postgres.",
+    "normalized_outcome": "A local TimescaleDB container is running and the developer reaches the psql shell.",
+    "observable_completion_signal": "The container is running and psql displays its interactive prompt.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "You have TimescaleDB running on a database on a self-hosted instance of Postgres.",
+      "source_ids": [
+        "S1",
+        "S3",
+        "S9"
+      ]
+    },
+    "why_this_is_the_boundary": "The official Docker page explicitly ends its install-and-configure section at a running TimescaleDB database. Tutorials and feature exploration are listed as next steps.",
+    "source_ids": [
+      "S1",
+      "S3",
+      "S9"
+    ]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "software", "requirement": "Install Docker.", "required": true, "source_ids": ["S9"]},
+    {"order": 2, "type": "software", "requirement": "Install the psql client.", "required": true, "source_ids": ["S9"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Install TimescaleDB from a Docker container.", "details": ["The page identifies the route as a development and testing installation on any local Docker system."], "input": "https://docs.tigerdata.com/docs/self-hosted/latest/install/installation-docker", "output": "The Docker install sequence is visible.", "success_signal": "The Install and configure TimescaleDB on Postgres section is reached.", "failure_or_wait": "", "required": true, "source_ids": ["S9"]},
+    {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Run the Docker commands published in the page's Docker tab to start the latest Tiger Data TimescaleDB container with the documented Postgres password and port mapping.", "details": [], "input": "The official Docker-tab commands and a local development password", "output": "A Postgres container with TimescaleDB starts locally.", "success_signal": "Docker reports the container as running.", "failure_or_wait": "Resolve local Docker image, port, or daemon errors before connecting.", "required": true, "source_ids": ["S9"]},
+    {"step_number": 3, "phase": "connect", "actor": "developer", "interface": "cli", "action": "Connect to the local database with the psql command published by the Docker guide.", "details": [], "input": "The local host, mapped PostgreSQL port, user, and password from step 2", "output": "The psql shell opens against the TimescaleDB instance.", "success_signal": "An interactive psql prompt is displayed.", "failure_or_wait": "Wait until Postgres accepts connections, then retry.", "required": true, "source_ids": ["S9"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Free Plan",
+      "path": "Select Free Plan, create one of up to two free services with shared compute in us-east-1, and provide no payment information.",
+      "effect_on_first_success": "Avoids card entry and trial expiry but limits user data to 750 MB and omits several production features.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Thirty-day trial",
+      "path": "Start the $1000-credit 30-day trial and select a pricing plan after confirming the email address.",
+      "effect_on_first_success": "Adds a time- and credit-limited paid-plan evaluation route before the same service and query terminal.",
+      "source_ids": [
+        "S1",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "AWS Marketplace",
+      "path": "Choose pay-as-you-go or annual commit, configure and subscribe, set up the account, then confirm the marketplace connection in Tiger Console.",
+      "effect_on_first_success": "Adds marketplace agreement, billing, account-linking, and connection steps.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Azure Marketplace",
+      "path": "Use the Azure-specific marketplace setup documented in the Azure tab.",
+      "effect_on_first_success": "Adds provider purchase and linking rather than the standalone route.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Connection interface",
+      "path": "Use Data view, SQL Editor, or install psql and connect with the service URL from the downloaded config.",
+      "effect_on_first_success": "All three run SELECT CURRENT_DATE, but psql adds local installation and explicit service-URL handling.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "CLI route",
+      "path": "Install Tiger CLI, authenticate in the browser with OAuth, select a project when more than one exists, and run service commands.",
+      "effect_on_first_success": "Adds local installation but gives detailed service defaults and readiness output; account signup remains behind the browser gate.",
+      "source_ids": [
+        "S8"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "access",
+      "description": "The unauthenticated static signup response contains only the JavaScript application shell and noscript message, while official prose says only to add details or sign up.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "A new user can choose the Free Plan or a 30-day performance trial, which changes limits, resources, and lifecycle.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "access",
+      "description": "The current service-creation flow has three steps and a persistent price display, but public docs do not enumerate every required field and default in those steps.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "credential",
+      "description": "The generated config includes passwords and connection information and must be stored securely.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "limit",
+      "description": "Warnings appear as the service approaches 750 MB; at the limit the service becomes read-only, with documented options to fork, delete data, or upgrade and convert.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "limit",
+      "description": "Free services omit connection pooling, compute resizing, dedicated support, high availability, advanced security, and enterprise features.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The quickstart says a service is constructed and ready in a few seconds, but it publishes no duration for the complete signup, email confirmation, plan selection, wizard, provisioning, and query sequence.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Create a Tiger Cloud service",
+      "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What is a Tiger Cloud service?",
+        "Create a Tiger Cloud account",
+        "Create a service",
+        "Connect to your service"
+      ],
+      "evidence_supported": [
+        "Selected Cloud route",
+        "Free and standard service distinction",
+        "Account, email confirmation, and trial route",
+        "Marketplace branches",
+        "Service wizard and provisioning",
+        "Config credential handling",
+        "Running checkpoint",
+        "Data view, SQL Editor, and psql connection routes",
+        "SELECT CURRENT_DATE result and explicit up-and-running statement"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Introducing Agentic Postgres Free Plan: The Fastest Way to Experiment with AI on Postgres",
+      "url": "https://www.tigerdata.com/blog/introducing-agentic-postgres-free-plan-experiment-ai-on-postgres",
+      "official_domain": true,
+      "source_type": "release-note",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Oct 21, 2025",
+      "sections_used": [
+        "Get Started",
+        "About the Free Plan",
+        "What Happens When You Hit the Limits"
+      ],
+      "evidence_supported": [
+        "Free Plan versus trial choice",
+        "No card and no time limit",
+        "Two free services",
+        "Shared compute",
+        "750 MB limit",
+        "us-east-1",
+        "Feature exclusions",
+        "Read-only transition and recovery options"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Changelog",
+      "url": "https://www.tigerdata.com/docs/get-started/news/new",
+      "official_domain": true,
+      "source_type": "release-note",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "July 1, 2026",
+      "sections_used": [
+        "Updated service creation flow on Tiger Cloud"
+      ],
+      "evidence_supported": [
+        "Current three-step service flow",
+        "Persistent price display",
+        "Updated GUI",
+        "Compute and region shown in official image"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Tiger Cloud",
+      "url": "https://console.cloud.tigerdata.com/signup",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public response"
+      ],
+      "evidence_supported": [
+        "Unauthenticated static response contains the JavaScript application shell and noscript message but no rendered signup form content"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Timescale Becomes Tiger Data, Defining a New Standard as the Fastest PostgreSQL Platform for Modern Applications",
+      "url": "https://www.tigerdata.com/newsroom/timescale-becomes-tiger-data-defining-a-new-standard-as-the-fastest-postgresql-platform-for-modern-applications",
+      "official_domain": true,
+      "source_type": "release-note",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 17, 2025",
+      "sections_used": [
+        "Announcement"
+      ],
+      "evidence_supported": [
+        "Timescale became Tiger Data",
+        "TimescaleDB remains a product"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Tiger Data Terms of Service",
+      "url": "https://www.tigerdata.com/legal/terms-of-service",
+      "official_domain": true,
+      "source_type": "policy",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "February 25, 2026",
+      "sections_used": [
+        "Registration",
+        "Notice",
+        "Definitions"
+      ],
+      "evidence_supported": [
+        "Timescale, Inc., d/b/a Tiger Data legal identity",
+        "Account required",
+        "Complete and accurate registration information",
+        "Authorized users assent to terms"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Billing and account management",
+      "url": "https://www.tigerdata.com/docs/deploy/tiger-cloud/tiger-cloud-aws/pricing-and-account-management",
+      "official_domain": true,
+      "source_type": "pricing",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Use Tiger Cloud for free"
+      ],
+      "evidence_supported": [
+        "$1000-credit 30-day trial",
+        "No card for trial",
+        "Two free services included",
+        "Free services beta"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Get started with Tiger CLI",
+      "url": "https://www.tigerdata.com/docs/get-started/quickstart/tiger-cli",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install and configure Tiger CLI",
+        "Create your first Tiger Cloud service"
+      ],
+      "evidence_supported": [
+        "CLI alternative",
+        "Browser OAuth account gate",
+        "Project-selection branch",
+        "Free-service flags",
+        "Service defaults and ready output"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Install TimescaleDB from a Docker container",
+      "url": "https://docs.tigerdata.com/docs/self-hosted/latest/install/installation-docker",
+      "official_domain": true,
+      "source_type": "installation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Prerequisites", "Install and configure TimescaleDB on Postgres", "Where to next"],
+      "evidence_supported": ["Workshop-policy local route selection", "Docker and psql prerequisites", "Pre-built container route", "Running TimescaleDB terminal"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact fields, agreements, password rules, authentication alternatives, and submission states appear in current Tiger Cloud signup?",
+      "impact": "The account pages and required inputs cannot be reconstructed.",
+      "reason_unresolved": "The unauthenticated static application response contains only the JavaScript shell and noscript message, and the docs say only add your details or sign up.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "question": "At what point does a new account choose Free Plan rather than the 30-day trial, and does email confirmation precede that choice?",
+      "impact": "The order and convergence of account, verification, and plan selection remain unknown.",
+      "reason_unresolved": "The quickstart documents the trial route, while the newer Free Plan article gives only three coarse console steps.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "question": "What are all required fields and defaults in the current three-step service wizard?",
+      "impact": "Material resource and possibly price choices before Create service cannot be recorded chronologically.",
+      "reason_unresolved": "The changelog states that there are three steps and shows compute and region selection, while the quickstart says only to follow the wizard depending on service type.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "question": "Does the Free Plan route always auto-select shared compute and us-east-1, or must the user explicitly choose them?",
+      "impact": "The action versus automatic-default status of two resource decisions is unresolved.",
+      "reason_unresolved": "Official sources document the constraints but not their exact presentation in the wizard.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "No complete first-success boundary is claimed while account creation and the current service wizard remain incompletely documented.",
+    "Creating schema objects, enabling PostgreSQL extensions, inserting application data, building hypertables, migration, dashboards, application connections, and production tuning are after the SELECT CURRENT_DATE terminal.",
+    "CLI and MCP installation, REST API setup, VPCs, replicas, high availability, data tiering, forking, paid upgrades, and marketplace billing are outside the blocked selected path."
+  ]
+}

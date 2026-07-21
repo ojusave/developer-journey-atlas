@@ -1,0 +1,545 @@
+{
+  "platform": {
+    "name": "X Developer Platform",
+    "slug": "x-developer-platform",
+    "organization": "X Corp."
+  },
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "X API pay-per-use Getting Access and Make Your First Request",
+    "selection_basis": "The X Developer Platform overview calls Quickstart the route to get API keys and make the first request in minutes. Its pay-per-use Getting Access guide provides the required account, app, and credential sequence, then explicitly links Make Your First Request as the next step. The first-request guide calls cURL the fastest test route.",
+    "alternatives_considered": [
+      {
+        "name": "X API Enterprise",
+        "url": "https://docs.x.com/x-api/enterprise",
+        "reason_not_primary": "It is presented for high-volume endpoints, custom rate limits, and account management, while pay-per-use has no commitments and is the general self-service route."
+      },
+      {
+        "name": "OAuth user-context request",
+        "url": "https://docs.x.com/fundamentals/authentication/oauth-2-0/overview",
+        "reason_not_primary": "OAuth 2.0 is recommended when acting for users, but the official first-request guide uses app-only Bearer Token user lookup for the initial read-only result."
+      },
+      {
+        "name": "Official Python and TypeScript SDKs",
+        "url": "https://docs.x.com/tools-and-libraries",
+        "reason_not_primary": "The first-request guide recommends official SDKs for production, but explicitly calls cURL the fastest way to test the API."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Obtain self-service X API access and make the first read-only API v2 request.",
+    "starting_url": "https://docs.x.com/overview",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected X API pay-per-use.",
+      "The developer has an X account but no developer profile, app, API credentials, or purchased API credits."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Make Your First Request",
+    "normalized_outcome": "The developer has used the app's Bearer Token to look up @xdevelopers through X API v2 and received its user object.",
+    "observable_completion_signal": "GET https://api.x.com/2/users/by/username/xdevelopers returns JSON whose data object contains id 2244994945, name X Developers, and username xdevelopers.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Quickstart promises API keys and a first request; the dedicated Make Your First Request guide demonstrates the user-lookup JSON response as its first result.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the terminal result explicitly demonstrated by the platform quickstart. Additional fields, other endpoints, SDK use, OAuth, and application building follow only after the first returned data object.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "An X account is required to sign in to the Developer Console and create the developer account.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "The developer must review and accept the Developer Agreement and Policy.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "billing",
+      "requirement": "Pay-per-use requires X API credits purchased upfront in the Developer Console; the user lookup charges for the user resource returned.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "A created app and its one-time-displayed Bearer Token are required for the quickstart's public-data request.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "The selected fastest route requires a terminal with cURL; Postman, Python, JavaScript, an official SDK, or another HTTP client can be used instead.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the X Developer Platform overview and follow Quickstart into Getting Access.",
+      "details": [
+        "The platform overview distinguishes self-service pay-per-use from Enterprise.",
+        "Quickstart says it gets API keys and makes the first request in minutes."
+      ],
+      "input": "Intent to start with the X API",
+      "output": "Pay-per-use onboarding guide",
+      "success_signal": "The three-step sign-up, app, and credential guide is visible.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Go to console.x.com and sign in with the X account.",
+      "details": [],
+      "input": "X account credentials",
+      "output": "Developer Console signup",
+      "success_signal": "The Developer Agreement is presented.",
+      "failure_or_wait": "The public guide does not enumerate X account creation, login challenge, or verification screens.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review and accept the Developer Agreement and Policy.",
+      "details": [],
+      "input": "Agreement acceptance",
+      "output": "Developer profile flow",
+      "success_signal": "The profile step becomes available.",
+      "failure_or_wait": "Declining prevents account creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Complete the developer profile with basic information about API use.",
+      "details": [],
+      "input": "API-use information",
+      "output": "X developer account",
+      "success_signal": "The Developer Console dashboard is available.",
+      "failure_or_wait": "The guide does not list the fields or any review state.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "From the Developer Console dashboard, select New App.",
+      "details": [],
+      "input": "Developer account",
+      "output": "New-app form",
+      "success_signal": "App detail fields are visible.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Enter the app name, description, and use case, then create the app.",
+      "details": [],
+      "input": "App metadata and use case",
+      "output": "Created developer app",
+      "success_signal": "The Console generates the app's keys and tokens.",
+      "failure_or_wait": "The guide does not document validation constraints or review.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Immediately save the generated credentials, especially the Bearer Token.",
+      "details": [
+        "Possible credentials are API Key and Secret, Bearer Token, Access Token and Secret, and OAuth 2.0 Client ID and Secret.",
+        "Credentials are displayed only once; losing them requires regeneration, which invalidates the old credentials.",
+        "Store them in a password manager or secure vault, not source control."
+      ],
+      "input": "One-time credential display",
+      "output": "Securely stored app credentials",
+      "success_signal": "The Bearer Token is available for the public-data request.",
+      "failure_or_wait": "Navigating away without saving requires credential regeneration.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Purchase X API credits upfront in the Developer Console.",
+      "details": [
+        "Pay-per-use has no subscription, contract, or minimum spend.",
+        "Endpoint prices differ and current rates are shown in the Developer Console.",
+        "The balance updates in real time as requests consume credits."
+      ],
+      "input": "Payment method and chosen credit purchase",
+      "output": "Positive X API credit balance",
+      "success_signal": "The credit balance is displayed and sufficient for the first user read.",
+      "failure_or_wait": "At zero or a negative balance, API requests are blocked until credits are added. The public guide does not enumerate payment-method and purchase UI controls.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Make the saved Bearer Token available to cURL as BEARER_TOKEN.",
+      "details": [
+        "The guide shows the request using $BEARER_TOKEN and says to replace it with the actual token."
+      ],
+      "input": "Saved app-only Bearer Token",
+      "output": "Bearer token available to the shell",
+      "success_signal": "The Authorization header can interpolate the token.",
+      "failure_or_wait": "An incorrect, regenerated, or incorrectly formatted token causes 401 Unauthorized.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Send the user-lookup GET request with cURL and the Bearer Authorization header.",
+      "details": [
+        "Call https://api.x.com/2/users/by/username/xdevelopers.",
+        "Set Authorization to Bearer $BEARER_TOKEN."
+      ],
+      "input": "Funded app and Bearer Token",
+      "output": "X API v2 JSON response",
+      "success_signal": "The request returns a data object instead of an error.",
+      "failure_or_wait": "403 can mean endpoint access or authentication context is wrong; 429 means a rate limit and the x-rate-limit-reset header gives retry timing.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Parse and verify the JSON data field contains the X Developers user.",
+      "details": [
+        "The demonstrated data contains id 2244994945, name X Developers, and username xdevelopers."
+      ],
+      "input": "Successful JSON response",
+      "output": "Verified first X API result",
+      "success_signal": "The expected user id, name, and username appear in data.",
+      "failure_or_wait": "An error payload or missing data means the request has not reached the demonstrated terminal state.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "Enterprise access is required.",
+      "path": "Use the Enterprise request-access route for high volume, dedicated account management, and custom limits instead of self-service pay-per-use.",
+      "effect_on_first_success": "Introduces sales or account-management approval and a different commercial path.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The first application must act on behalf of users.",
+      "path": "Use OAuth 2.0, which X recommends, or OAuth 1.0a; request only needed scopes; configure Client ID and Secret or API Key and Secret; complete user authorization before calling a user-context endpoint.",
+      "effect_on_first_success": "Adds redirect, scope, consent, and token-exchange steps and changes the first endpoint.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The first application acts only as the app owner's account.",
+      "path": "Use the Access Token and Secret representing the account that owns the app, suitable for testing, personal bots, or the owner's automation.",
+      "effect_on_first_success": "Uses OAuth 1.0a user context rather than the simple app-only Bearer Token.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "Post lookup or recent search is selected instead of user lookup.",
+      "path": "Choose the beginner-friendly post-by-ID or last-seven-days recent-search endpoint, supply a matching identifier or query, and parse its JSON data. Pricing and returned resource counts differ.",
+      "effect_on_first_success": "Changes request URL, input, response, and billable resources.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "Postman, Python, JavaScript, an official SDK, or another HTTP client is selected.",
+      "path": "Send the same Bearer-authenticated user lookup through the chosen client. The guide shows Python requests.get and JavaScript fetch, links Postman, and recommends official Python and TypeScript SDKs for production authentication, pagination, and rate limiting.",
+      "effect_on_first_success": "Adds client installation or Postman setup but preserves the same returned user data.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "Auto-recharge or a spending limit is configured.",
+      "path": "Save a default payment method; choose recharge amount and trigger threshold, subject to one automatic top-up per five minutes and no auto-recharge at zero or negative balance; optionally set a billing-cycle spending maximum.",
+      "effect_on_first_success": "Adds cost-control configuration and can still block bursts or requests at the configured limits; it is optional for the first call.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "Developer Console onboarding requires an existing X account sign-in.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "legal",
+      "description": "Developer Agreement and Policy acceptance is mandatory.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "form",
+      "description": "The developer profile and new app both require API use-case information; the app also requires name and description.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "credential",
+      "description": "Multiple secrets are shown only once; losing them forces regeneration and invalidates old credentials.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "billing",
+      "description": "Credits must be bought upfront; zero, negative, or spending-limit balances block requests.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "rate-limit",
+      "description": "429 responses require waiting until x-rate-limit-reset and using backoff.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "in minutes",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "X Developer Platform",
+      "url": "https://docs.x.com/overview",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Products",
+        "Get started",
+        "Quickstart"
+      ],
+      "evidence_supported": [
+        "Pay-per-use and Enterprise choice",
+        "Quickstart purpose and vendor time claim",
+        "SDK and resource alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting Access",
+      "url": "https://docs.x.com/x-api/getting-started/getting-access",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a developer account",
+        "Create an app",
+        "Save your credentials",
+        "Which credentials do you need?",
+        "Credential security best practices",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Complete account, agreement, profile, app, and credential journey",
+        "Authentication branches",
+        "One-time secret display",
+        "Transition to first request"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Make Your First Request",
+      "url": "https://docs.x.com/make-your-first-request",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Quick start with cURL",
+        "Step-by-step guide",
+        "Using code instead of cURL",
+        "Troubleshooting",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Fastest-route statement",
+        "Complete Bearer Token user lookup",
+        "Demonstrated JSON result",
+        "Endpoint and client alternatives",
+        "Failure handling"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "X API pay-per-usage pricing and credits",
+      "url": "https://docs.x.com/x-api/getting-started/pricing",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How it works",
+        "Credit consumption details",
+        "Credit balance",
+        "Auto-recharge",
+        "Spending limits"
+      ],
+      "evidence_supported": [
+        "Upfront credit requirement",
+        "User-read billing",
+        "Zero-balance block",
+        "Optional auto-recharge and spending-limit branches"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Where exactly does the Developer Console place payment-method entry and credit purchase relative to app creation for a brand-new account?",
+      "impact": "The live screen order can change the journey between account, app, credentials, and the first request.",
+      "reason_unresolved": "Official pricing requires purchasing credits upfront and links the Console but does not publish the payment UI sequence; the Getting Access guide omits billing from its three steps.",
+      "checked_source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "question": "What exact fields and possible review states appear in the developer profile and app use-case forms?",
+      "impact": "Extra fields or review could add effort or waiting.",
+      "reason_unresolved": "The guide names basic information, app name, description, and use case but does not enumerate fields, validation, or review behavior.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Requesting extra user fields",
+    "Looking up posts, searching recent posts, or retrieving a user's posts after the first user result",
+    "OAuth user authorization unless required by the selected intent",
+    "Official SDK installation and production pagination or rate handling",
+    "Usage API monitoring",
+    "Auto-recharge, spending limits, and xAI reward linking"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

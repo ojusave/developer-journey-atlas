@@ -1,0 +1,74 @@
+{
+  "platform": {"name": "Checkout.com", "slug": "checkout-com", "organization": "Checkout Ltd"},
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "Flow sandbox card payment",
+    "selection_basis": "Under the workshop policy, Checkout.com's first-listed Get started route is the fastest documented path: Flow is the pre-built UI and the guide covers Payment Session creation through a successful sandbox payment.",
+    "alternatives_considered": [
+      {"name": "Hosted Payments Page", "url": "https://www.checkout.com/docs/payments/accept-payments/accept-a-payment-on-your-hosted-payments-page", "reason_not_primary": "The official Get started page teaches Flow, while Hosted Payments Page is a separate integration."},
+      {"name": "Payments API", "url": "https://api-reference.checkout.com/", "reason_not_primary": "The API reference exposes individual endpoints but does not replace the guided Flow first path."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Checkout.com sandbox account and complete the documented Flow integration until a test card payment succeeds.",
+    "starting_url": "https://www.checkout.com/docs/get-started",
+    "assumed_prior_state": [
+      "No Checkout.com account, Dashboard access, entity, processing channel, public key, secret key, webhook endpoint, application, Payment Session, or payment is assumed.",
+      "The developer can run a server and browser client for the Flow example.",
+      "No account creation, key generation, payment request, test card submission, or external write was performed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Complete a successful Flow sandbox payment.",
+    "normalized_outcome": "A test card payment completes through an embedded Flow component in the sandbox.",
+    "observable_completion_signal": "Downstream, a synchronous payment raises onPaymentCompleted with a payment ID, an asynchronous return can carry status=succeeded, and the payment status appears on the Dashboard Payments page.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The sample displays `The payment was successful`, emits `onPaymentCompleted` with a payment ID, and shows the payment in Dashboard.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "This is the guide's first completed payment outcome; customization and production activation follow it.",
+    "source_ids": ["S1", "S2"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Checkout.com sandbox test account.", "required": true, "source_ids": ["S1", "S2"]},
+    {"order": 2, "type": "credential", "requirement": "A public key scoped for payment-sessions:pay and vault-tokenization and a secret key scoped for payment-sessions.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "configuration", "requirement": "A server endpoint that can create Payment Sessions and a webhook endpoint for payment status changes.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "software", "requirement": "A server and checkout page able to load Checkout Web Components from npm or Checkout.com's CDN.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Checkout.com's Get started guide.", "details": [], "input": "https://www.checkout.com/docs/get-started", "output": "The Flow sandbox sequence is visible.", "success_signal": "Payment Session, mount, response, and testing sections open.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create a Checkout.com sandbox test account using the official account URL.", "details": ["Treat signup as one opaque prerequisite under the workshop policy."], "input": "Official Get test account link", "output": "Sandbox Dashboard access is available.", "success_signal": "The Dashboard opens.", "failure_or_wait": "Signup fields and activation states are not publicly enumerated.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Create a public key with `payment-sessions:pay` and `vault-tokenization`, and a secret key with `payment-sessions`.", "details": [], "input": "Sandbox Dashboard", "output": "Scoped sandbox keys are available.", "success_signal": "Both keys can be copied.", "failure_or_wait": "Incorrect scopes prevent Flow setup.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Configure a webhook endpoint for payment events and retrieve the account's sandbox API prefix.", "details": [], "input": "Dashboard configuration", "output": "Webhook and base URL are known.", "success_signal": "The endpoint and prefix are available to the server.", "failure_or_wait": "Webhook delivery requires a reachable endpoint.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "build", "actor": "developer", "interface": "api", "action": "Implement the server-side POST to `https://{prefix}.api.checkout.com/payment-sessions` with the secret key and published request body.", "details": [], "input": "Amount, currency, reference, billing country, customer, success URL, and failure URL", "output": "A Payment Session response is returned.", "success_signal": "The response includes `id` and `payment_session_token`.", "failure_or_wait": "Additional fields can be required for some payment methods.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "install", "actor": "developer", "interface": "code", "action": "Load Checkout Web Components from Checkout.com's hosted script URL.", "details": ["The guide says not to self-host or bundle the script."], "input": "Checkout page", "output": "The Flow library is available.", "success_signal": "`CheckoutWebComponents` can be initialized.", "failure_or_wait": "Loading from another origin can break PCI guidance.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 7, "phase": "build", "actor": "developer", "interface": "code", "action": "Add `#flow-container`, initialize CheckoutWebComponents with the public key, sandbox environment, and Payment Session, create `flow`, and mount it.", "details": [], "input": "Public key and Payment Session response", "output": "Flow renders available payment methods.", "success_signal": "The card form appears.", "failure_or_wait": "Flow cannot be embedded in an iframe or Shadow DOM.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 8, "phase": "execute", "actor": "developer", "interface": "browser", "action": "Enter the documented test card and select Pay.", "details": ["Jordan Smith; 4242 4242 4242 4242; 12/30; 100."], "input": "Published sandbox card details", "output": "Flow performs the sandbox payment.", "success_signal": "Any required 3DS or redirect action completes.", "failure_or_wait": "A failure route can redirect to the configured failure URL.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 9, "phase": "verify", "actor": "system", "interface": "code", "action": "Handle `onPaymentCompleted` for the synchronous card result.", "details": [], "input": "Payment completion event", "output": "The application receives a payment ID.", "success_signal": "The sample displays `The payment was successful`.", "failure_or_wait": "Asynchronous methods use the success URL and webhook instead.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 10, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Open Payments in the Dashboard and verify the sandbox payment status.", "details": [], "input": "Completed payment ID", "output": "The payment appears in Dashboard.", "success_signal": "The successful status is visible.", "failure_or_wait": "Wait for the status webhook before fulfillment.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "Use npm", "path": "Install @checkout.com/checkout-web-components with npm.", "effect_on_first_success": "Changes package loading only; the Payment Session, Flow mount, and payment terminal remain the same.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "Use the direct script", "path": "Load https://checkout-web-components.checkout.com/index.js directly and do not self-host or bundle it.", "effect_on_first_success": "Avoids npm but retains the same client initialization and Flow terminal.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "The payment method redirects", "path": "Handle the success or failure URL and wait for the webhook.", "effect_on_first_success": "The browser terminal is a redirect rather than onPaymentCompleted.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "account", "description": "A test account is mandatory before the documented key and Flow steps.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 2, "type": "access", "description": "Public official sources link the account form but do not expose its complete action and state sequence.", "documented_requirement": true, "source_ids": ["S2"]},
+    {"at_step": 2, "type": "credential", "description": "Flow requires separately scoped public and secret keys from Dashboard.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Get started", "url": "https://www.checkout.com/docs/get-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": "October 15, 2025", "sections_used": ["How it works", "Before you start", "Request a Payment Session", "Initialize and mount Flow", "Handle the payment response", "Test the integration"], "evidence_supported": ["Test account and key prerequisites", "Complete downstream Flow sequence", "Successful payment signals and Dashboard verification"]},
+    {"id": "S2", "title": "Create a sandbox account", "url": "https://support.checkout.com/hc/en-us/articles/14327083327890-Create-a-sandbox-account", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": "May 01, 2026 15:02", "sections_used": ["Create a sandbox account"], "evidence_supported": ["Official signup link", "Immediate sandbox card-testing capability", "Absence of atomic signup fields on the help page"]}
+  ],
+  "uncertainties": [
+    {"question": "What exact fields, consent steps, verification actions, email transitions, and initial Dashboard states currently create a Checkout.com test account?", "impact": "The mandatory no-account-to-credentials segment cannot be counted or independently followed.", "reason_unresolved": "Official sources link the signup experience but do not enumerate its atomic actions or completion state.", "checked_source_ids": ["S1", "S2"]}
+  ],
+  "excluded_after_success": [
+    "Live-account application, underwriting, contract execution, production credentials, and production testing occur after the first successful sandbox payment.",
+    "Additional payment-method activation, customization, localization, stored payment details, and order fulfillment are outside this first-success boundary."
+  ]
+}

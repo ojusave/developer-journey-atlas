@@ -1,0 +1,423 @@
+{
+  "platform": {
+    "name": "Django",
+    "slug": "django",
+    "organization": "Django Software Foundation"
+  },
+  "category": "Frameworks, mobile, games, hardware, and creative ecosystems",
+  "surface": {
+    "name": "Writing your first Django app, part 1",
+    "selection_basis": "The Django 6.0 documentation places the quick install guide immediately before its official first-app tutorial. Part 1 is a bounded guide that ends by verifying the first polls view in a browser and then directs the reader to part 2.",
+    "alternatives_considered": [
+      {
+        "name": "Quick install guide",
+        "url": "https://docs.djangoproject.com/en/6.0/intro/install/",
+        "reason_not_primary": "This is required setup and ends by directing the reader to the tutorial; it does not create or run an application."
+      },
+      {
+        "name": "Django at a glance",
+        "url": "https://docs.djangoproject.com/en/6.0/intro/overview/",
+        "reason_not_primary": "This is an architectural overview rather than the named first-app tutorial."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Install Django, create the tutorial project and polls app, and serve the first view locally.",
+    "starting_url": "https://docs.djangoproject.com/en/6.0/intro/install/",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Django.",
+      "The developer has a computer, shell, browser, and permission to install Python packages and create local files."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Write your first view",
+    "normalized_outcome": "A locally running Django 6.0 development server routes /polls/ to the tutorial's index view.",
+    "observable_completion_signal": "The browser at http://localhost:8000/polls/ displays: Hello, world. You're at the polls index.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Part 1 explicitly says to verify the wired index view in the browser, gives the expected text, and then sends the reader to part 2.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the final verification in the official part 1 journey. The earlier rocket page verifies only the project scaffold; the final polls response verifies an application, view, URL configuration, server, and browser request together.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "software",
+      "requirement": "Python 3.12 or later for the Django 6.0 tutorial, plus a shell and browser.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Django 6.0 installed in the selected Python environment; the official release is the recommended installation choice for most users.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "knowledge",
+      "requirement": "Use documentation matching the installed Django version; switch tutorial versions or upgrade if the installed version differs.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the latest compatible Python if it is not already available, then verify it from the shell.",
+      "details": [
+        "Django 6.0 supports Python 3.12 and later.",
+        "SQLite ships with Python, so no external database is needed for this first path."
+      ],
+      "input": "A supported operating system and package installation access",
+      "output": "Working Python 3.12 or later",
+      "success_signal": "The Python shell starts and prints its version.",
+      "failure_or_wait": "An older Python version requires either a compatible older Django documentation version or a Python upgrade.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install an official Django release in the Python environment.",
+      "details": [
+        "The quick install guide recommends an official release for most users.",
+        "Operating-system packages and the development version are documented alternatives."
+      ],
+      "input": "Working Python environment",
+      "output": "Installed Django package",
+      "success_signal": "Python can import Django and print its version.",
+      "failure_or_wait": "Package installation or import errors block the tutorial.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run python -m django --version, or py -m django --version on Windows, and confirm the result matches the Django 6.0 tutorial.",
+      "details": [
+        "No module named django means Django is not installed in that Python environment."
+      ],
+      "input": "Installed Django",
+      "output": "Reported Django version",
+      "success_signal": "The command prints a Django version compatible with the selected documentation.",
+      "failure_or_wait": "If the version differs, use the version switcher or update Django before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Change to the intended parent directory and run django-admin startproject mysite djangotutorial.",
+      "details": [
+        "Do not use names such as django or test because they conflict with built-in packages."
+      ],
+      "input": "Writable parent directory",
+      "output": "djangotutorial directory containing manage.py and the mysite package",
+      "success_signal": "The documented project file tree is created.",
+      "failure_or_wait": "If django-admin fails, use the linked troubleshooting guidance before continuing.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Change into djangotutorial and run python manage.py runserver, or py manage.py runserver on Windows.",
+      "details": [
+        "Ignore the initial unapplied-migrations warning for this part of the tutorial.",
+        "The development server is only for development, not production."
+      ],
+      "input": "Generated Django project",
+      "output": "Development server listening on 127.0.0.1:8000",
+      "success_signal": "System checks report no issues and the server start address is printed.",
+      "failure_or_wait": "A port or environment error must be resolved; adding files later can require restarting because not every new file triggers automatic reload.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Open http://127.0.0.1:8000/ in a browser.",
+      "details": [
+        "This is the intermediate project-scaffold verification."
+      ],
+      "input": "Running development server",
+      "output": "Django default start page",
+      "success_signal": "A Congratulations page with a rocket appears and states that it worked.",
+      "failure_or_wait": "No specific retry is documented beyond checking the running server and URL.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "From the directory containing manage.py, run python manage.py startapp polls, or the Windows py equivalent.",
+      "details": [
+        "The command scaffolds the polls Python package with views.py and other app files."
+      ],
+      "input": "Django project directory",
+      "output": "polls application directory",
+      "success_signal": "The documented polls file tree exists.",
+      "failure_or_wait": "If a newly added file is not detected, restart runserver as the guide notes.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Replace polls/views.py with the documented HttpResponse index view.",
+      "details": [
+        "Import HttpResponse and return the exact tutorial greeting from index(request)."
+      ],
+      "input": "Scaffolded views.py",
+      "output": "Polls index view",
+      "success_signal": "views.py defines index and its response text.",
+      "failure_or_wait": "Python syntax or import errors prevent the server from loading the view.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Create polls/urls.py and map the empty app route to views.index with the name index.",
+      "details": [
+        "Import path from django.urls and views from the current app."
+      ],
+      "input": "Polls index view",
+      "output": "Polls application URL configuration",
+      "success_signal": "polls/urls.py contains the documented urlpatterns list.",
+      "failure_or_wait": "A missing file, import, or route prevents URL resolution.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Update mysite/urls.py to import include and mount polls.urls at polls/.",
+      "details": [
+        "Keep the existing admin route and add path('polls/', include('polls.urls'))."
+      ],
+      "input": "Project URL configuration and polls URL configuration",
+      "output": "Root route connected to the polls app",
+      "success_signal": "The root urlpatterns list contains both polls and admin routes.",
+      "failure_or_wait": "A missing include import or incorrect module string causes startup or routing errors.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Ensure runserver is running, then open http://localhost:8000/polls/ in the browser.",
+      "details": [
+        "If the server stopped or did not reload after new files were added, run the documented runserver command again."
+      ],
+      "input": "Running server and wired polls route",
+      "output": "HTTP response from the first Django view",
+      "success_signal": "The browser shows: Hello, world. You're at the polls index.",
+      "failure_or_wait": "If a page-not-found response appears, confirm the URL includes /polls/ rather than opening only the site root.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer uses an older supported Python release.",
+      "path": "Select the Django version and matching documentation compatible with that Python version instead of following the 6.0 route.",
+      "effect_on_first_success": "The same conceptual journey applies, but commands or generated code may differ by documentation version.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer does not choose the recommended official release.",
+      "path": "Install a distribution-provided package or the development version and use matching documentation.",
+      "effect_on_first_success": "Adds platform-specific installation behavior or development-version compatibility risk.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "The browser shows a 404 page.",
+      "path": "Open http://localhost:8000/polls/ exactly, not only http://localhost:8000/, and retry.",
+      "effect_on_first_success": "Corrects the requested route without changing the app.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "environment",
+      "description": "Django 6.0 requires Python 3.12 or later and version-matched documentation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "Python and Django must be installed locally before the first-app tutorial can begin.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "environment",
+      "description": "A local TCP port and long-running development-server process must remain available through verification.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "configuration",
+      "description": "The developer must create and connect a view, an app URLconf, and the project URLconf before the first application response appears.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quick install guide",
+      "url": "https://docs.djangoproject.com/en/6.0/intro/install/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install Python",
+        "Set up a database",
+        "Install Django",
+        "Verifying",
+        "That's it!"
+      ],
+      "evidence_supported": [
+        "Python and Django installation prerequisites",
+        "SQLite requires no setup",
+        "Official-release recommendation",
+        "Import verification",
+        "Transition to tutorial"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Writing your first Django app, part 1",
+      "url": "https://docs.djangoproject.com/en/6.0/intro/tutorial01/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Creating a project",
+        "The development server",
+        "Creating the Polls app",
+        "Write your first view"
+      ],
+      "evidence_supported": [
+        "Django 6.0 and Python requirements",
+        "Complete ordered project and app path",
+        "Intermediate rocket-page check",
+        "Final polls-view success",
+        "404 recovery",
+        "Boundary before part 2"
+      ]
+    }
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Database migration and model setup in part 2",
+    "Django admin setup",
+    "Templates and forms",
+    "Automated testing",
+    "Static files",
+    "Production deployment",
+    "Alternative databases"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

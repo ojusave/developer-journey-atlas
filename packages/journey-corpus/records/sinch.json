@@ -1,0 +1,77 @@
+{
+  "platform": {"name": "Sinch", "slug": "sinch", "organization": "Sinch"},
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "Sinch Conversation API Getting Started through a first SMS send",
+    "selection_basis": "Under the workshop policy, the official Sinch CLI Quickstart is the fastest documented route: it explicitly promises a rented number and SMS to the developer's phone with no code or deployment. Signup is one opaque step, followed by the published CLI commands.",
+    "alternatives_considered": [
+      {"name": "Standalone SMS API", "url": "https://developers.sinch.com/docs/sms/getting-started", "reason_not_primary": "This is a peer product-specific route; the developer home's general Messaging Get started action resolves to Conversation API instead."},
+      {"name": "Voice API", "url": "https://developers.sinch.com/docs/voice/api-reference", "reason_not_primary": "The home presents Voice and Video as a separate peer product family with its own first-call requirements."},
+      {"name": "Verification API", "url": "https://developers.sinch.com/docs/verification/getting-started", "reason_not_primary": "This is a separate verification product route rather than the homepage's Messaging path."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Sinch account and follow Conversation API Getting Started until its SMS message request is sent.",
+    "starting_url": "https://developers.sinch.com/docs/conversation/getting-started",
+    "assumed_prior_state": [
+      "No Sinch account, verified phone, project, Conversation API access, accepted product terms, access key, app, service plan, Sinch number, channel, or message is assumed.",
+      "A phone for required signup verification and a way to make an HTTP request are available; no signup, terms acceptance, credential creation, resource configuration, or message send was performed."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Send an SMS with the Sinch CLI",
+    "normalized_outcome": "The CLI sends an SMS from the rented Sinch number to the developer's phone.",
+    "observable_completion_signal": "The developer receives the text message on the destination phone and the CLI prints the send result.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "A rented phone number and an SMS sent to your own phone", "source_ids": ["S7"]},
+    "why_this_is_the_boundary": "Receipt on the destination phone is the first end-to-end proof that account credentials, number rental, Conversation API configuration, and messaging work.",
+    "source_ids": ["S3", "S5", "S7"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "Create a free Sinch Build Dashboard account; signup creates a Sinch account and user account, but the current public registration screens are not enumerated.", "required": true, "source_ids": ["S2", "S3", "S4"]},
+    {"order": 2, "type": "verification", "requirement": "Provide and verify a phone number during signup for two-factor authentication and test messaging.", "required": true, "source_ids": ["S5"]},
+    {"order": 3, "type": "legal", "requirement": "Review and accept the Conversation API terms and conditions before selecting GET ACCESS.", "required": true, "source_ids": ["S2"]},
+    {"order": 4, "type": "credential", "requirement": "Create an access key and retain its key, secret, and project ID for authentication.", "required": true, "source_ids": ["S2"]},
+    {"order": 5, "type": "configuration", "requirement": "Create a Conversation API app, obtain a Sinch number and service plan, then configure the app's SMS channel.", "required": true, "source_ids": ["S2"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the official Sinch CLI Quickstart.", "details": ["It is the documented no-code route to a rented number and first SMS."], "input": "https://developers.sinch.com/docs/functions/cli/quickstart", "output": "The CLI sequence is visible.", "success_signal": "Prerequisites and commands load.", "failure_or_wait": "", "required": true, "source_ids": ["S7"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for a free Sinch account at the official signup URL.", "details": ["Treat signup as one opaque step."], "input": "https://dashboard.sinch.com/signup", "output": "An authenticated account and project are available.", "success_signal": "Project ID, access key ID, and key secret can be obtained.", "failure_or_wait": "Complete required phone verification.", "required": true, "source_ids": ["S3", "S4", "S5"]},
+    {"step_number": 3, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Sinch CLI with `npm install -g @sinch/cli`.", "details": [], "input": "Node.js and npm", "output": "The `sinch` command is installed.", "success_signal": "The CLI can be invoked.", "failure_or_wait": "Resolve npm installation permissions or PATH configuration.", "required": true, "source_ids": ["S7"]},
+    {"step_number": 4, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Run `sinch auth login` and provide the project ID, key ID, and key secret.", "details": ["The CLI stores credentials in the operating-system keychain."], "input": "Sinch project credentials", "output": "The CLI is authenticated.", "success_signal": "Authentication completes without error.", "failure_or_wait": "Recheck the project and access-key credentials.", "required": true, "source_ids": ["S7"]},
+    {"step_number": 5, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Search for an SMS-capable number and rent the selected number.", "details": ["Use the documented available-number search with region, type, and SMS capability, then the rent command shown by the guide."], "input": "Desired region and number type", "output": "A Sinch number is assigned to the account.", "success_signal": "The CLI reports the rented number.", "failure_or_wait": "Choose another available number or ensure account balance permits rental.", "required": true, "source_ids": ["S7"]},
+    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `sinch conversation send <your_phone_number> \"Hello from the Sinch CLI!\"`.", "details": [], "input": "The developer's destination number", "output": "Sinch submits the outbound SMS.", "success_signal": "The CLI prints a successful send result.", "failure_or_wait": "Verify destination formatting, rented-number capabilities, and account balance.", "required": true, "source_ids": ["S7"]},
+    {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "device", "action": "Confirm the SMS arrives on the destination phone.", "details": [], "input": "The outbound message", "output": "The text message is visible on the phone.", "success_signal": "The phone receives `Hello from the Sinch CLI!`.", "failure_or_wait": "Check the CLI response and messaging configuration.", "required": true, "source_ids": ["S7"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 1, "condition": "Use the standalone SMS API", "path": "Follow SMS Getting Started to copy the free virtual number, retrieve the automatically created Service Plan ID and API Token, and select a language guide.", "effect_on_first_success": "Uses the standalone SMS authentication and batch endpoint instead of Conversation API resources.", "source_ids": ["S6"]},
+    {"at_step": 2, "condition": "Use an SDK guide after account setup", "path": "Select Node, Java, .NET, or Python and build the simple application supplied for that language.", "effect_on_first_success": "Adds runtime and SDK setup but converges on the same Conversation API message request.", "source_ids": ["S2"]},
+    {"at_step": 2, "condition": "Use production authentication", "path": "Exchange the access key and secret for a short-lived OAuth 2.0 token instead of using basic authentication.", "effect_on_first_success": "Adds a token exchange; the guide recommends this for production but uses basic authentication for its test.", "source_ids": ["S2"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "access", "description": "The mandatory Sinch ID signup continuation is absent from the public response.", "documented_requirement": true, "source_ids": ["S2", "S3", "S4"]},
+    {"at_step": 2, "type": "verification", "description": "Signup requires a phone number that Sinch verifies and uses for two-factor authentication and test messaging.", "documented_requirement": true, "source_ids": ["S5"]},
+    {"at_step": 2, "type": "terms", "description": "Conversation API access requires accepting product terms and conditions.", "documented_requirement": true, "source_ids": ["S2"]},
+    {"at_step": 2, "type": "credential", "description": "The access key, secret, and project ID must be retained for the first request.", "documented_requirement": true, "source_ids": ["S2"]},
+    {"at_step": 2, "type": "configuration", "description": "An app, Sinch number, configured service plan, and active SMS channel are required before sending.", "documented_requirement": true, "source_ids": ["S2"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Sinch Developer Documentation | Sinch", "url": "https://developers.sinch.com/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Building blocks to enable rich customer communication", "Messaging"], "evidence_supported": ["Product-family inventory", "Messaging Get started route to Conversation API"]},
+    {"id": "S2", "title": "Getting started | Conversation API | Sinch", "url": "https://developers.sinch.com/docs/conversation/getting-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": "1 month ago", "sections_used": ["Get access", "Create an app", "Configure the SMS channel", "Send the message"], "evidence_supported": ["Account prerequisite", "Terms gate", "Access-key and project credentials", "App creation", "Number and channel configuration", "Payload and POST request", "Absence of response terminal"]},
+    {"id": "S3", "title": "dashboard.sinch.com", "url": "https://dashboard.sinch.com/signup", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public redirect response"], "evidence_supported": ["Redirect to client-rendered Sinch ID application", "Absence of public registration states"]},
+    {"id": "S4", "title": "Creating an account on the Sinch Build Dashboard", "url": "https://community.sinch.com/t5/Build-Dashboard/Creating-an-account-on-the-Sinch-Build-Dashboard/ta-p/13952", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": "01-13-2025 04:27 AM", "sections_used": ["Creating an account on the Sinch Build Dashboard"], "evidence_supported": ["Signup creates Sinch account and user account", "Dashboard access purpose"]},
+    {"id": "S5", "title": "Sinch Build Dashboard Authentication", "url": "https://community.sinch.com/t5/Build-Dashboard/Sinch-Build-Dashboard-Authentication/ta-p/7201", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": "01-09-2025 07:47 AM", "sections_used": ["Sinch Build Dashboard Authentication"], "evidence_supported": ["Signup phone requirement", "Phone verification", "Two-factor authentication and test-message use"]},
+    {"id": "S6", "title": "Getting started | SMS API | Sinch", "url": "https://developers.sinch.com/docs/sms/getting-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": "1 month ago", "sections_used": ["Get a number", "Get credentials", "Select a language"], "evidence_supported": ["Standalone SMS alternative"]},
+    {"id": "S7", "title": "Sinch CLI quickstart", "url": "https://developers.sinch.com/docs/functions/cli/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Prerequisites", "Log in", "Search for an available number", "Rent it", "Send an SMS"], "evidence_supported": ["no-code route", "CLI installation and authentication", "number search and rental", "send command", "phone receipt terminal"]}
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "No complete first-success boundary is claimed while signup and the send terminal remain undocumented.",
+    "Inbound callbacks, two-way reply handling, OAuth production authentication, additional channels, templates, and production service plans occur after the first outbound request."
+  ]
+}

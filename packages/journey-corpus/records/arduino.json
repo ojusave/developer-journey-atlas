@@ -1,0 +1,505 @@
+{
+  "platform": {
+    "name": "Arduino",
+    "slug": "arduino",
+    "organization": "Arduino"
+  },
+  "category": "Frameworks, mobile, games, hardware, and creative ecosystems",
+  "surface": {
+    "name": "Official Arduino IDE sketch upload path",
+    "selection_basis": "The Arduino documentation home prominently routes new developers to `Set Up Your Arduino Board`, and the official Help Center publishes a platform-level guide titled `Upload a sketch in Arduino IDE`. That guide accounts for board-package and port variation, offers the built-in Blink example, and ends with the uploaded sketch starting on the board. Arduino separately recommends the current IDE 2 release.",
+    "alternatives_considered": [
+      {
+        "name": "Arduino Cloud Editor",
+        "url": "https://docs.arduino.cc/arduino-cloud/",
+        "reason_not_primary": "The official upload guide uses desktop Arduino IDE, while Cloud Editor adds an account and Cloud Agent route."
+      },
+      {
+        "name": "Arduino CLI",
+        "url": "https://docs.arduino.cc/arduino-cli/",
+        "reason_not_primary": "The docs home and support first-upload guide select the graphical IDE route for board setup."
+      },
+      {
+        "name": "Arduino App Lab and UNO Q",
+        "url": "https://docs.arduino.cc/software/app-lab/tutorials/examples/",
+        "reason_not_primary": "App Lab is a board-family-specific application surface, not the general sketch-upload guide."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Program a connected Arduino board for the first time with the current desktop Arduino IDE.",
+    "starting_url": "https://support.arduino.cc/hc/en-us/articles/4733418441116-Upload-a-sketch-in-Arduino-IDE",
+    "assumed_prior_state": [
+      "The developer has a supported computer but Arduino IDE is not assumed installed.",
+      "The developer has an Arduino board and compatible data USB cable but no board package, board, or port selection is assumed."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Upload a sketch in Arduino IDE",
+    "normalized_outcome": "Arduino IDE compiles and uploads a sketch to the selected board, and the sketch starts running on the hardware.",
+    "observable_completion_signal": "The upload finishes without an error and the selected sketch starts running on the board; when using the built-in Blink example named by the guide, the board's `LED_BUILTIN` behavior provides the visible program output on boards that expose it.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The official guide ends its upload section with `Your sketch will start running on the board. It will run again each time the board is reset.`",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the first end-to-end proof across IDE installation, USB connection, board support package, board and port selection, compilation, transfer, and execution. Custom projects and cloud features follow later.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "hardware",
+      "requirement": "A supported Windows, macOS, or 64-bit Linux computer is required for Arduino IDE 2.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "hardware",
+      "requirement": "An Arduino board and a compatible data USB cable, not a charge-only cable, are required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "The computer must allow application installation and USB-device access; some operating systems or board packages can require driver or port permissions.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "network",
+      "requirement": "Network access is required to download Arduino IDE and any missing board package.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Download the latest Arduino IDE 2 release for the computer's operating system and install or launch it using the official OS-specific instructions.",
+      "details": [
+        "Windows runs the downloaded executable and follows the installer.",
+        "macOS opens the disk image and moves Arduino IDE to Applications; Linux marks the AppImage executable and launches it."
+      ],
+      "input": "Supported computer, installation permission, storage, and network access.",
+      "output": "Running current Arduino IDE 2 application.",
+      "success_signal": "Arduino IDE opens successfully.",
+      "failure_or_wait": "Unsupported OS, blocked installation, missing Linux FUSE dependency, or incomplete download prevents launch.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "connect",
+      "actor": "developer",
+      "interface": "hardware",
+      "action": "Connect the Arduino board directly to the computer with a compatible data USB cable.",
+      "details": [
+        "The USB connection powers the board and carries the program from the IDE.",
+        "Connector type varies by board family and computer."
+      ],
+      "input": "Arduino board, compatible data cable, and available USB port.",
+      "output": "Powered, physically connected board visible to the operating system or ready for detection.",
+      "success_signal": "The board powers on and appears as a port or unknown connected device in the IDE.",
+      "failure_or_wait": "Charge-only cable, incompatible connector, hub problems, missing permission, damaged cable, or board state can prevent detection.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Install the board package when Arduino IDE reports that support files for the detected board are missing.",
+      "details": [
+        "In IDE 2, click Yes on the automatic package prompt.",
+        "If no prompt appears, continue; an unknown or unsupported selection may require manual Board Manager setup."
+      ],
+      "input": "Detected board identity and network access.",
+      "output": "Compiler, uploader, definitions, and related files for the board family.",
+      "success_signal": "The board can be selected without a missing-platform warning.",
+      "failure_or_wait": "Unknown board identity, package-index or download failure, missing driver, or wrong package blocks compilation or upload.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Select the correct board and serial port using the IDE 2 board selector.",
+      "details": [
+        "Open the board selector and choose the port that shows the connected board.",
+        "If it appears as Unknown, use Select Other board and port; the Tools > Board and Tools > Port menus are the documented alternative."
+      ],
+      "input": "Connected board, installed package, and enumerated serial port.",
+      "output": "Arduino IDE configured for the exact board and upload port.",
+      "success_signal": "The board selector displays the intended board and port.",
+      "failure_or_wait": "No port, an unknown or incorrect board, busy port, Linux port permission, or missing driver requires the linked detection troubleshooting before proceeding.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Open a sketch, using the guide's built-in Blink example through File > Examples > 01.Basics > Blink for a no-authoring first run.",
+      "details": [
+        "The guide also permits writing a custom sketch.",
+        "Built-in examples are shipped in the IDE; most boards expose an onboard LED through `LED_BUILTIN`, but board behavior can vary."
+      ],
+      "input": "Configured Arduino IDE and selected board.",
+      "output": "Blink or another valid sketch open in the editor.",
+      "success_signal": "The intended sketch is loaded and ready to compile.",
+      "failure_or_wait": "Board-specific example incompatibility or edited syntax errors can prevent compilation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Optionally click Verify to compile first, then click Upload and wait while the IDE compiles and programs the board.",
+      "details": [
+        "Verify is optional in the official upload path because Upload performs compilation.",
+        "Do not disconnect or reset the board while the transfer is in progress."
+      ],
+      "input": "Valid sketch, correct board package, board selection, port, and working USB connection.",
+      "output": "Compiled program transferred to board flash memory.",
+      "success_signal": "The upload completes without a failed-upload error and the IDE no longer reports the transfer in progress.",
+      "failure_or_wait": "Compile failure, wrong board or processor, unavailable or blocked port, lost USB connection, bootloader state, driver, or upload-tool error requires correction and another Upload attempt.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "hardware",
+      "action": "Observe the uploaded sketch starting on the board.",
+      "details": [
+        "The guide states that the sketch runs again on each board reset.",
+        "With the named Blink example and a board exposing `LED_BUILTIN`, observe the corresponding onboard LED program behavior."
+      ],
+      "input": "Successfully uploaded sketch.",
+      "output": "Arduino board executing the program.",
+      "success_signal": "The expected sketch behavior is visible or otherwise observable on the hardware; for Blink, the built-in LED changes state repeatedly on a compatible board.",
+      "failure_or_wait": "A successful transfer with incorrect or absent behavior requires checking the sketch's expected output and board-specific LED or pin mapping; it is not yet verified first success.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer uses a Chromebook or chooses Arduino Cloud Editor.",
+      "path": "Leave the desktop-IDE route and use Arduino's Chromebook or Cloud Editor guide, including the Cloud Agent and account requirements where documented.",
+      "effect_on_first_success": "Installation, account, browser agent, detection, and upload interfaces change, though the board-programmed result can remain similar.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The IDE automatically identifies the board and all support files are already installed.",
+      "path": "Accept the recognized board in the board selector and skip package installation.",
+      "effect_on_first_success": "One installation gate disappears.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "The board is unknown, absent, or incorrectly identified.",
+      "path": "Refresh after disconnect and reconnect, allow USB permissions, verify a direct data-cable connection and power, try another port or cable, use a supported bootloader reset where applicable, inspect the OS USB-device list, install board-specific drivers or firmware if the official troubleshooting identifies them, then return to the selector and choose the correct board and port.",
+      "effect_on_first_success": "Detection recovery adds hardware and operating-system steps before compilation can begin.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Compilation or upload fails.",
+      "path": "Compile with Verify to isolate a code error; confirm board and port; reconnect with a working data cable; remove interfering shields or jumper wires; try a supported bootloader reset; close software holding the port; inspect the specific console error; apply board-specific guidance; then retry Upload.",
+      "effect_on_first_success": "The loop repeats at configuration or upload until a program transfers and runs.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "installation",
+      "description": "The current desktop IDE is a separate OS-specific download and installation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "hardware",
+      "description": "A compatible board, data-capable cable, connector, and usable computer port are required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "Each board family can require a separate board package and drivers before compilation and upload.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "permission",
+      "description": "USB enumeration and serial-port access can require OS permission or Linux configuration.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "choice",
+      "description": "The exact board model and serial port must match the connected hardware.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "wait",
+      "description": "Board-package installation, compilation, and transfer must finish before execution can be checked.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "verification",
+      "description": "A clean upload is followed by a hardware behavior check; the sketch starting on the board is the guide's terminal state.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Upload a sketch in Arduino IDE",
+      "url": "https://support.arduino.cc/hc/en-us/articles/4733418441116-Upload-a-sketch-in-Arduino-IDE",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2024-12-17",
+      "sections_used": [
+        "What you'll need",
+        "Open Arduino IDE",
+        "Connect the board",
+        "Install board package",
+        "Select board and port",
+        "Upload a sketch",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "End-to-end official path",
+        "Hardware prerequisites",
+        "Board package branches",
+        "Board and port alternatives",
+        "Blink example",
+        "Upload and terminal execution state"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Download and install Arduino IDE",
+      "url": "https://support.arduino.cc/hc/en-us/articles/360019833020-Download-and-install-Arduino-IDE",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2025-06-23",
+      "sections_used": [
+        "Installation instructions",
+        "Additional download options",
+        "If you need help"
+      ],
+      "evidence_supported": [
+        "Windows, macOS, and Linux installation",
+        "Supported OS baseline",
+        "Linux FUSE failure",
+        "Chromebook and Cloud alternatives"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Supported versions of Arduino IDE",
+      "url": "https://support.arduino.cc/hc/en-us/articles/22301294333084-Supported-versions-of-Arduino-IDE",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2025-09-12",
+      "sections_used": [
+        "Arduino IDE 2.x (Latest)",
+        "Arduino IDE 1.8.19 (Legacy)"
+      ],
+      "evidence_supported": [
+        "IDE 2 current recommendation",
+        "Legacy status"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "If your board is not detected by Arduino IDE",
+      "url": "https://support.arduino.cc/hc/en-us/articles/4412955149586-If-your-board-is-not-detected-by-Arduino-IDE",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2024-11-13",
+      "sections_used": [
+        "Disconnect and reconnect your board",
+        "Check board connection",
+        "Try a bootloader reset",
+        "Check for Unknown or incorrect board name",
+        "Check for additional system information"
+      ],
+      "evidence_supported": [
+        "Detection failure and recovery",
+        "Cable and hub issues",
+        "USB permission",
+        "Bootloader and driver branches"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Built-in Examples",
+      "url": "https://docs.arduino.cc/built-in-examples",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Built-in Examples",
+        "Basics"
+      ],
+      "evidence_supported": [
+        "Examples ship in IDE",
+        "Blink as a Basics example"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "If your sketch doesn't upload",
+      "url": "https://support.arduino.cc/hc/en-us/articles/4403365313810-If-your-sketch-doesn-t-upload",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2025-06-11",
+      "sections_used": [
+        "Check your sketch for errors",
+        "Select the correct board and port",
+        "Check board connection",
+        "Try a bootloader reset",
+        "Check for busy or blocked ports",
+        "Check the console output",
+        "Board-specific troubleshooting"
+      ],
+      "evidence_supported": [
+        "Compile and upload retry loop",
+        "Connection and port recovery",
+        "Board-specific failure modes"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact visible output does Blink produce on every Arduino-compatible board?",
+      "impact": "LED color, active-high versus active-low behavior, or absence of an exposed onboard LED can change the final visual observation.",
+      "reason_unresolved": "The platform-level upload guide promises that the sketch starts but does not enumerate every board's LED hardware; use the selected board's official guide if Blink behavior differs.",
+      "checked_source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Editing or authoring a custom sketch",
+    "Libraries and serial communication",
+    "Sensors, actuators, shields, and external circuits",
+    "Arduino Cloud provisioning and dashboards",
+    "Arduino CLI, App Lab, MicroPython, and production device fleets"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

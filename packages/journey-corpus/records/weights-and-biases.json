@@ -1,0 +1,67 @@
+{
+  "platform": {"name": "Weights & Biases", "slug": "weights-and-biases", "organization": "Weights & Biases"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "W&B Models Quickstart through a first tracked training run",
+    "selection_basis": "The official W&B Quickstart is the general Models route and demonstrates a first Python run that logs accuracy and loss. Under the workshop policy, signup is one opaque step at the official URL, followed by the fully documented personal API-key, install, login, run, and metrics-view sequence.",
+    "alternatives_considered": [
+      {"name": "W&B Weave Python SDK quickstart", "url": "https://docs.wandb.ai/weave/quickstart", "reason_not_primary": "The Models quickstart explicitly redirects developers seeking Weave to this separate product surface."},
+      {"name": "Service account API key", "url": "https://docs.wandb.ai/models/quickstart", "reason_not_primary": "The official personal-key tab is the direct individual-developer route; service accounts require team or organization settings."},
+      {"name": "Python notebook route", "url": "https://docs.wandb.ai/models/quickstart", "reason_not_primary": "This is a peer execution environment for the same experiment; the Python script route is fully shown without a notebook dependency."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a W&B account and run the official Python experiment until accuracy and loss are recorded for viewing in W&B.",
+    "starting_url": "https://docs.wandb.ai/models/quickstart",
+    "assumed_prior_state": [
+      "No W&B account, API key, project, run, local wandb package, or logged metric is assumed.",
+      "Python and pip are available locally; no account, key, package installation, login, run, or metric was created during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Create a machine learning training experiment and view recorded metrics.",
+    "normalized_outcome": "The published mock training run records accuracy and loss in the `my-awesome-project` W&B project.",
+    "observable_completion_signal": "wandb.ai/home shows a generated run with accuracy and loss changing across training steps.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "Visit wandb.ai/home to view recorded metrics such as accuracy and loss.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The metrics page is the first demonstrated value result after authentication. Reports, Artifacts, Sweeps, and other features are listed as next steps.",
+    "source_ids": ["S1", "S2"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A W&B user account is required before the personal API-key steps; the current public registration form is not enumerated.", "required": true, "source_ids": ["S1", "S2"]},
+    {"order": 2, "type": "credential", "requirement": "Create a named personal API key in User Settings and copy it at its one-time full display.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "software", "requirement": "Have Python and pip to install and run the wandb library.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the W&B Models Quickstart.", "details": [], "input": "https://docs.wandb.ai/models/quickstart", "output": "The personal API-key and Python experiment route is visible.", "success_signal": "Sign up and create an API key is reached.", "failure_or_wait": "", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for W&B using the official signup URL.", "details": ["Signup is intentionally represented as one opaque policy step; no fields are asserted."], "input": "https://wandb.ai/login?signup=true", "output": "An authenticated W&B user account is available.", "success_signal": "User Settings can be opened.", "failure_or_wait": "Use recovery presented by the live account service.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Open User Settings, click Create new API key, provide a descriptive name, click Create, and copy the displayed key.", "details": ["The full key is displayed only once."], "input": "A descriptive API-key name", "output": "A personal API key is copied.", "success_signal": "The key is stored securely before closing the dialog.", "failure_or_wait": "If lost, create a new key.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "install", "actor": "developer", "interface": "cli", "action": "Set the key, install W&B, and log in.", "details": [], "input": "export WANDB_API_KEY=<your_api_key>; pip install wandb; wandb login", "output": "The local machine is authenticated to W&B.", "success_signal": "wandb login completes successfully.", "failure_or_wait": "Verify the copied key and environment variable.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "code", "action": "Copy and run the published mock training script.", "details": ["It initializes `my-awesome-project` and logs simulated accuracy and loss for epochs 2 through 9."], "input": "The Create a machine learning training experiment Python listing", "output": "A W&B run records metrics.", "success_signal": "The script prints epoch accuracy and loss without an authentication or run error.", "failure_or_wait": "Correct Python, network, or authentication errors and rerun.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Open W&B Home and inspect the generated run.", "details": [], "input": "https://wandb.ai/home", "output": "The run's tracked metrics are visible.", "success_signal": "Accuracy and loss charts show values changing across training steps.", "failure_or_wait": "Open the `my-awesome-project` run recorded by the script.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "Use a service account", "path": "Open team or organization Service Accounts, select the account action menu, create and name a key, copy it once, and select Done.", "effect_on_first_success": "Adds team or organization access and replaces the personal key owner.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "Use Python or a notebook for login", "path": "Install wandb and call `wandb.login()` instead of exporting WANDB_API_KEY and running `wandb login`.", "effect_on_first_success": "Changes authentication interface but converges on the same training script.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "access", "description": "The required registration interface is client-rendered and its complete form and transitions are absent from public official documentation.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 2, "type": "credential", "description": "The full W&B API key is shown only once; if lost, the documented recovery is to create a new key.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "The Quickstart says developers can install W&B and start tracking, visualizing, and managing experiments in minutes, but gives no signup-to-recorded-metrics duration.", "source_ids": ["S1"]},
+  "sources": [
+    {"id": "S1", "title": "W&B Quickstart", "url": "https://docs.wandb.ai/models/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Sign up and create an API key", "Install the wandb library and log in", "Initialize a run and track hyperparameters", "Create a machine learning training experiment"], "evidence_supported": ["Authenticated personal-key sequence", "One-time key display", "CLI and Python login routes", "Published experiment", "Recorded accuracy and loss terminal", "Minutes claim"]},
+    {"id": "S2", "title": "login", "url": "https://wandb.ai/login?signup=true", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public HTML response"], "evidence_supported": ["Redirected client application", "Empty application root without rendered signup form"]}
+  ],
+  "uncertainties": [
+    {"question": "What exact authentication choices, fields, terms, verification actions, and post-submit states appear in current W&B signup?", "impact": "The account portion of the first mile cannot be reconstructed or counted.", "reason_unresolved": "The Quickstart assumes login and the public application response contains no rendered registration form.", "checked_source_ids": ["S1", "S2"]}
+  ],
+  "excluded_after_success": [
+    "No complete first-success boundary is claimed while account registration remains undocumented.",
+    "Reports, Artifacts, Sweeps, Tables, integrations, and Weave occur after the documented first tracked experiment."
+  ]
+}

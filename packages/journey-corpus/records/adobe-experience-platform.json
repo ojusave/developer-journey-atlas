@@ -1,0 +1,497 @@
+{
+  "platform": {
+    "name": "Adobe Experience Platform",
+    "slug": "adobe-experience-platform",
+    "organization": "Adobe"
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "Experience Platform API authentication tutorial and XDM classes credential test",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Committed to already-reconstructed surface `Experience Platform API authentication tutorial and XDM classes credential test`. Prior basis: Adobe's official Authenticate and access Experience Platform APIs tutorial explicitly promises the three headers required for Platform calls, orders the one-time access and project setup, generates an OAuth Server-to-Server token, and ends by testing the credentials with a standard XDM classes GET. It is the clearest platform-wide API first success, though product-specific workflows and the newer API-reference credential UI are co-equal alternatives.",
+    "alternatives_considered": [
+      {
+        "name": "Credentials directly in API reference",
+        "url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication#get-credentials-functionality",
+        "reason_not_primary": "Adobe documents this newer shortcut, but the main tutorial still explains the complete Developer Console integration and permission model."
+      },
+      {
+        "name": "Adobe Postman environments and collections",
+        "url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication#use-postman",
+        "reason_not_primary": "The credential test itself uses Postman, but Adobe's optional downloadable environments and collections add broader reusable setup beyond importing the one displayed cURL request."
+      },
+      {
+        "name": "Deprecated Service Account JWT",
+        "url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication#jwt",
+        "reason_not_primary": "Adobe says JWT is deprecated and OAuth Server-to-Server is the only supported method for new integrations."
+      },
+      {
+        "name": "Product-specific Experience Platform APIs",
+        "url": "https://developer.adobe.com/experience-platform-apis/",
+        "reason_not_primary": "Schema, Catalog, Ingestion, Segmentation, Destinations, Privacy, and other APIs add different sandbox, permission, payload, and terminal outcomes."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Obtain authorized Adobe Experience Platform API credentials and prove them by listing the standard XDM classes available to the organization.",
+    "starting_url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected Adobe Experience Platform APIs.",
+      "The organization is licensed for Experience Platform, but the developer's Adobe ID, product-profile assignments, project, credentials, and token have not been established.",
+      "An Admin Console administrator is available for the developer and user product-profile grants required before integration creation."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Test access credentials",
+    "normalized_outcome": "The developer is added as both developer and user for an Experience Platform product profile, creates an Adobe Developer Console project with Experience Platform API and OAuth Server-to-Server credentials, generates an access token, imports Adobe's displayed global Schema Registry classes cURL request into Postman, executes it, and receives standard XDM classes.",
+    "observable_completion_signal": "GET https://platform.adobe.io/data/foundation/schemaregistry/global/classes returns a results array containing entries such as XDM ExperienceEvent and XDM Individual Profile, after which the guide says the credentials are valid and working.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The tutorial's Test access credentials section says a response similar to its XDM classes example means the credentials are valid and working; Next steps says the credentials were gathered and successfully tested.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is Adobe's explicit end of the authentication tutorial and proves enterprise entitlement, administrator assignments, Developer Console integration, API key, organization ID, OAuth token, and a real Platform API response. Product-specific resource work follows later.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "plan",
+      "requirement": "An organization with access to Adobe Experience Platform is required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "identity",
+      "requirement": "An Adobe ID is required; a developer without one must use Create a new account in Adobe Developer Console and complete signup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "approval",
+      "requirement": "An Admin Console administrator must add the developer as both a developer and a user for an Experience Platform product profile.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "permission",
+      "requirement": "An Experience Platform system administrator is required later to grant attribute-based access controls and assign API credentials to a role for protected resource operations, but Adobe explicitly says the global classes call is sufficient to test credentials before that grant.",
+      "required": false,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "A browser and Postman are needed for the tutorial's literal credential test, which says to import and execute the displayed cURL request in Postman.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "billing",
+      "requirement": "No card-entry step is documented, but the organization-level Experience Platform entitlement is a prerequisite.",
+      "required": false,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Sign in to Adobe Developer Console with an Adobe ID or select Create a new account and complete signup.",
+      "details": [],
+      "input": "Adobe identity",
+      "output": "Adobe ID and Developer Console session",
+      "success_signal": "The correct organization's Developer Console is accessible.",
+      "failure_or_wait": "The tutorial does not enumerate Adobe ID signup, verification, organization invitation, or enterprise identity-provider screens.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "administrator",
+      "interface": "console",
+      "action": "Add the developer to an Experience Platform product profile as a developer and as a user.",
+      "details": [
+        "In Admin Console, choose Products, Adobe Experience Platform, the relevant profile such as AEP-Default-All-Users, Developers, Add Developer, enter email or username, and Save.",
+        "User access is separately required to see UI outcomes."
+      ],
+      "input": "Organization, product profile, developer identity",
+      "output": "Developer and user product-profile access",
+      "success_signal": "The developer appears in the profile and can create Platform integrations.",
+      "failure_or_wait": "Missing administrator authority or unprovisioned product access blocks the integration and requires organizational action.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create an empty project in Adobe Developer Console, using the organization selector to confirm the intended organization.",
+      "details": [],
+      "input": "Authorized Adobe ID and organization",
+      "output": "Empty Developer Console project",
+      "success_signal": "Project Overview shows Add API.",
+      "failure_or_wait": "Wrong organization or missing developer access prevents the needed API from being available.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Add API, choose Adobe Experience Platform, select Experience Platform API, and select Next.",
+      "details": [],
+      "input": "Developer Console project",
+      "output": "Experience Platform API integration setup",
+      "success_signal": "Authentication-type selection is displayed.",
+      "failure_or_wait": "The API is absent when entitlement or product-profile developer access is missing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose OAuth Server-to-Server, enter a meaningful credential name, and select Next.",
+      "details": [
+        "Adobe says this is the only token-generation method supported for new integrations.",
+        "Do not choose the deprecated JWT route."
+      ],
+      "input": "Credential name",
+      "output": "OAuth Server-to-Server credential configuration",
+      "success_signal": "Product-profile selection appears.",
+      "failure_or_wait": "Using legacy JWT conflicts with the documented new-integration path.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select AEP-Default-All-Users and any additional required product profiles, then select Save configured API.",
+      "details": [],
+      "input": "Required Experience Platform product profiles",
+      "output": "Configured Experience Platform API credential",
+      "success_signal": "The OAuth Server-to-Server project page shows Client ID and Organization ID.",
+      "failure_or_wait": "Selecting an insufficient profile or lacking profile access can later produce authorization failures.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Copy API_KEY (Client ID) and ORG_ID, select Generate access token, and copy ACCESS_TOKEN.",
+      "details": [
+        "Client ID and Organization ID are reusable.",
+        "The access token must be regenerated every 24 hours."
+      ],
+      "input": "Configured OAuth credential",
+      "output": "API key, organization ID, and access token",
+      "success_signal": "All three required header values are available.",
+      "failure_or_wait": "A missing product profile, invalid credential, or expired token blocks API calls.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Copy Adobe's displayed cURL request for GET https://platform.adobe.io/data/foundation/schemaregistry/global/classes, import it into Postman, substitute ACCESS_TOKEN, API_KEY, and ORG_ID, and execute it.",
+      "details": [
+        "The request uses Accept: application/vnd.adobe.xed-id+json, Authorization: Bearer {{ACCESS_TOKEN}}, x-api-key: {{API_KEY}}, and x-gw-ims-org-id: {{ORG_ID}}.",
+        "The global classes test does not show a sandbox-name header, though many other Platform APIs require one.",
+        "Adobe's ordered instruction is to import and execute this cURL artifact in Postman; direct terminal execution is a technically possible branch, not the literal primary tool journey."
+      ],
+      "input": "Displayed cURL request, Postman, ACCESS_TOKEN, API_KEY, and ORG_ID",
+      "output": "Schema Registry XDM classes response in Postman",
+      "success_signal": "Postman receives a results array rather than an authentication error.",
+      "failure_or_wait": "Expired token, wrong organization, API-key mismatch, missing profile, malformed import, or unreplaced placeholders requires correcting the credential or Postman request and retrying.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Verify the Postman response resembles Adobe's example and includes standard XDM class entries.",
+      "details": [
+        "The example includes XDM ExperienceEvent and XDM Individual Profile with ids and versions.",
+        "Adobe says this response means the credentials are valid and working, while separately warning that protected resources require later attribute-based access-control permissions."
+      ],
+      "input": "Schema Registry response",
+      "output": "Successfully tested Experience Platform API credentials",
+      "success_signal": "The expected standard XDM class objects appear in results.",
+      "failure_or_wait": "An empty, malformed, authentication-error, or other error response does not satisfy the tutorial's credential-valid boundary.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer has no Adobe ID.",
+      "path": "Open Adobe Developer Console, select Create a new account, complete signup and any verification, then sign in and confirm the organization.",
+      "effect_on_first_success": "Adds identity creation before enterprise access can be assigned.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer or user profile assignment is missing.",
+      "path": "Have an Admin Console administrator add the identity to both roles in the Experience Platform product profile, wait for access to propagate, sign in again, and retry project setup.",
+      "effect_on_first_success": "Adds administrator coordination and a potential propagation wait.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The API-reference credential shortcut is preferred.",
+      "path": "Open an Experience Platform API reference page, select Sign in, choose Personal or Company or School Account, select Create new credential, use the credentials dropdown to generate a token and copy API key and organization ID, then populate Try it or the cURL test.",
+      "effect_on_first_success": "Bypasses the separate Developer Console project screens but still depends on enterprise permissions.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The access token is older than 24 hours or rejected as expired.",
+      "path": "Return to the OAuth Server-to-Server credential page, select Generate access token, copy the new value, replace the Bearer token, and resend the request.",
+      "effect_on_first_success": "Adds token regeneration before execution.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The developer chooses to execute the displayed cURL artifact directly in a terminal instead of following Adobe's Postman instruction.",
+      "path": "Replace ACCESS_TOKEN, API_KEY, and ORG_ID in the displayed request, execute that same GET and four headers with cURL, and inspect the JSON response. Treat this as a tool substitution using Adobe's artifact, not as the ordered primary interface documented by the tutorial.",
+      "effect_on_first_success": "Removes the Postman import while preserving the same endpoint, headers, and terminal signal.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "After credential success, the developer calls a protected Experience Platform resource.",
+      "path": "Have an Experience Platform system administrator grant the needed attribute-based permissions and assign the API credential to the appropriate role, wait for access, then call the protected resource.",
+      "effect_on_first_success": "Does not alter the completed global-classes credential test; it adds a later administrator gate for protected operations.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The developer adopts Adobe's reusable Postman environments and collections after the one-request test.",
+      "path": "Download and import the Experience Platform Postman environment and Identity Management Service or product collection, populate or generate credentials, select the environment, and use collection requests.",
+      "effect_on_first_success": "Adds reusable Postman setup after the single imported cURL request already proved the credentials.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "A later API requires a sandbox header.",
+      "path": "Determine a valid sandbox available to the organization and add x-sandbox-name with that value before sending the product-specific request.",
+      "effect_on_first_success": "Adds sandbox discovery and selection beyond the global classes credential test.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "An Adobe ID and licensed Experience Platform organization are required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "approval",
+      "description": "An Admin Console administrator must grant both developer and user product-profile access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "Developers with multiple organizations must select the correct enterprise organization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "permission",
+      "description": "Product-profile selection determines what the integration can access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "credential",
+      "description": "Three headers are required, and the OAuth access token expires every 24 hours.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "installation",
+      "description": "The literal test journey requires Postman so the displayed cURL request can be imported and executed as Adobe directs.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Authenticate and access Experience Platform APIs",
+      "url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-07-10",
+      "sections_used": [
+        "Prerequisites",
+        "Gain developer and user access",
+        "Generate an API key and organization ID",
+        "Add Experience Platform to a project",
+        "Select OAuth Server-to-Server",
+        "Select product profiles",
+        "Gather credentials",
+        "Generate an access token",
+        "Credentials in API reference",
+        "Test access credentials",
+        "Get access-control permissions",
+        "Use Postman",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Complete account, administrator, project, credential, token, execution, verification, expiration, and alternative-route journey"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sandboxes overview",
+      "url": "https://experienceleague.adobe.com/en/docs/experience-platform/sandbox/home",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sandboxes overview"
+      ],
+      "evidence_supported": [
+        "Organization sandbox partitions and later x-sandbox-name branch"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Experience Platform API and business workflow should represent the workshop after generic authentication?",
+      "impact": "Schema, ingestion, catalog, profile, segmentation, destinations, privacy, and other APIs add different roles, sandbox headers, payloads, and success signals.",
+      "reason_unresolved": "The authentication tutorial intentionally stops at a generic global XDM classes credential test.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "What exact enterprise procurement, organization invitation, and identity-provider journey precedes Admin Console access?",
+      "impact": "This can add contract, administrator, SSO, invitation, and waiting gates before the documented developer steps.",
+      "reason_unresolved": "The tutorial assumes an organization already has Experience Platform and begins with administrator assignments.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Should the workshop use the full Developer Console project route or the newer API-reference credential shortcut?",
+      "impact": "The shortcut removes several pages, but the full route teaches the reusable project and permission model.",
+      "reason_unresolved": "Adobe documents both as valid and does not declare one universally preferred.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Purchasing or provisioning the Experience Platform organization",
+    "Product-specific schemas, datasets, ingestion, profiles, segments, destinations, queries, and privacy workflows",
+    "Attribute-based access-control grants and API-role assignment for protected resource operations after the global classes credential test",
+    "Sandbox creation or administration beyond noting later header requirements",
+    "Production credential rotation, secret storage, token automation, retries, and monitoring",
+    "Deprecated JWT implementation",
+    "Reusable Postman environment and collection setup beyond importing the one displayed credential-test request"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

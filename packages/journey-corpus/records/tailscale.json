@@ -1,0 +1,292 @@
+{
+  "platform": {
+    "name": "Tailscale",
+    "slug": "tailscale",
+    "organization": "Tailscale Inc."
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Tailscale browser-led quickstart",
+    "selection_basis": "Tailscale's install documentation directly routes new users to the Tailscale quickstart, which explicitly creates a tailnet, installs the client on two devices, displays both devices, and redirects to the admin console.",
+    "alternatives_considered": [
+      {
+        "name": "Install client first",
+        "url": "https://tailscale.com/docs/install",
+        "reason_not_primary": "The quickstart permits this order, but the browser-led Get Started path includes account and plan setup in one sequence."
+      },
+      {
+        "name": "Server auth-key onboarding",
+        "url": "https://tailscale.com/docs/how-to/quickstart",
+        "reason_not_primary": "This is a later device-addition method; the primary quickstart uses interactive SSO on personal machines."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a private tailnet and enroll two devices into it.",
+    "starting_url": "https://tailscale.com/docs/how-to/quickstart",
+    "assumed_prior_state": [
+      "The developer has arrived at the Tailscale quickstart.",
+      "No tailnet or enrolled devices exist yet."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Create a tailnet",
+    "normalized_outcome": "A new tailnet contains two authenticated devices, both are visible in onboarding, and the developer reaches the Tailscale admin console.",
+    "observable_completion_signal": "After the second device authenticates, both devices display; selecting Take me home opens the admin console.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The official Create a tailnet sequence ends after both devices display and the user is redirected to the admin console.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It completes the named private-network creation sequence before optional renaming, DNS, invites, routing, and policies.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "A supported SSO identity-provider account is required for signup and device authentication.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "hardware",
+      "requirement": "Two supported devices are needed to complete the documented two-device tailnet sequence.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Go to tailscale.com, select Get Started, and sign in with a supported SSO identity provider.",
+      "details": [
+        "A public-domain identity enters the Personal plan; a custom-owned domain starts a 14-day Enterprise trial."
+      ],
+      "input": "SSO identity.",
+      "output": "New tailnet account and plan assignment.",
+      "success_signal": "The Welcome to Tailscale page appears.",
+      "failure_or_wait": "Plan assignment differs by identity domain.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Business use or Personal use.",
+      "details": [
+        "This is part of the onboarding sequence."
+      ],
+      "input": "Intended use choice.",
+      "output": "Let's add your first device page.",
+      "success_signal": "Operating-system options are shown.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Select the first device's OS, download and install the client, then authenticate with the same identity.",
+      "details": [
+        "Platform-specific install routes are linked."
+      ],
+      "input": "First supported device and SSO credentials.",
+      "output": "First authenticated tailnet device.",
+      "success_signal": "The device appears in the browser onboarding window.",
+      "failure_or_wait": "If device approval is enabled in an existing tailnet, an administrator approval state can appear; this new-tailnet quickstart does not introduce it.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Select the second device's OS, copy the provided link to that device, install the client, and authenticate it.",
+      "details": [
+        "The same tailnet identity is used."
+      ],
+      "input": "Second supported device and onboarding link.",
+      "output": "Second authenticated tailnet device.",
+      "success_signal": "Both devices display in the onboarding page.",
+      "failure_or_wait": "The second device must be accessible to complete this step.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Take me home and review the admin console.",
+      "details": [
+        "The admin console manages users, devices, DNS, permissions, and keys."
+      ],
+      "input": "Two visible devices.",
+      "output": "Tailnet admin console.",
+      "success_signal": "The Machines view can show enrolled devices with their Tailscale identities and addresses.",
+      "failure_or_wait": "No wait is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "Signup begins from an installed client.",
+      "path": "Download and install the client first, then sign up and authenticate it to create the tailnet.",
+      "effect_on_first_success": "Account and installation order changes, not the two-device result.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The device is a server.",
+      "path": "Use a tag identity and an authentication key as recommended by the add-device documentation.",
+      "effect_on_first_success": "Admin permissions, key generation, and policy configuration replace interactive SSO.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "account",
+      "description": "A supported SSO identity is required and determines the initial plan route.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Business versus Personal use and device operating systems must be selected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "A native Tailscale client must be downloaded and installed on each device.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "environment",
+      "description": "The documented terminal sequence requires access to a second device.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "under 10 minutes",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Tailscale quickstart",
+      "url": "https://tailscale.com/docs/how-to/quickstart",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Jan 5, 2026",
+      "sections_used": [
+        "Create a tailnet",
+        "Add devices"
+      ],
+      "evidence_supported": [
+        "Under-10-minute claim",
+        "SSO and plan route",
+        "Complete two-device enrollment and console boundary"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Add a device",
+      "url": "https://tailscale.com/docs/features/access-control/device-management/how-to/set-up",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "Jan 5, 2026",
+      "sections_used": [
+        "Prerequisites",
+        "Install Tailscale",
+        "Add a device",
+        "Permissions"
+      ],
+      "evidence_supported": [
+        "Installation and authentication behavior",
+        "Device approval branch",
+        "Server tag and auth-key branch"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does the under-10-minute claim include downloading and configuring both devices on every supported OS?",
+      "impact": "Actual elapsed time varies with installers, app stores, permissions, and access to the second device.",
+      "reason_unresolved": "The quickstart video title provides the claim but does not define its timing envelope.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Renaming devices",
+    "MagicDNS customization",
+    "Inviting more users",
+    "Exit nodes and subnet routers",
+    "Access-control policies",
+    "Production server enrollment and MDM"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,218 @@
+{
+  "platform": {
+    "name": "Chronosphere",
+    "slug": "chronosphere",
+    "organization": "Chronosphere, Inc."
+  },
+  "category": "Observability, testing, and release engineering",
+  "surface": {
+    "name": "Chronosphere developer metrics query with Query Builder",
+    "selection_basis": "Workshop selection policy (2026-07-19): select the first developer path when one exists rather than an administrator-only route. The general guide lists Query telemetry data first for developers and recommends Query Builder; a returned graph or table is the fastest documented developer terminal.",
+    "alternatives_considered": [
+      {
+        "name": "OpenTelemetry Collector",
+        "url": "https://docs.chronosphere.io/ingest/metrics-traces/otel",
+        "reason_not_primary": "Docs recommend Chronosphere Collector for Prometheus discovery/scrape workloads."
+      },
+      {
+        "name": "Kubernetes DaemonSet Collector",
+        "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector/install/kubernetes",
+        "reason_not_primary": "Recommended inside Kubernetes, but requires a cluster; standalone is faster when Kubernetes is not already available."
+      },
+      {
+        "name": "Administrator Collector ingestion",
+        "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector",
+        "reason_not_primary": "This requires SysAdmin access, service-account credentials, Collector installation, and telemetry configuration; the policy explicitly prefers the first developer path."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Authenticate to an existing Observability Platform tenant and run a first Prometheus metric query with Query Builder.",
+    "starting_url": "https://docs.chronosphere.io/overview/get-started",
+    "assumed_prior_state": [
+      "An Observability Platform tenant exists or can be obtained through Chronosphere's commercial onboarding.",
+      "Prometheus metrics are already ingested and visible to the developer."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Query telemetry data with Query Builder.",
+    "normalized_outcome": "The developer selects an available Prometheus metric and runs a query in Metrics Explorer.",
+    "observable_completion_signal": "The Results section displays matching series and values in Table and Graph.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Click Run to run the query; the graph updates.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    "why_this_is_the_boundary": "The policy resolves the role choice by taking the first developer path. A returned query result is the earliest demonstrated developer value; saving, dashboarding, alerting, and deeper investigation follow later.",
+    "source_ids": [
+      "S1",
+      "S4",
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "access",
+      "requirement": "Access to an organization-specific Chronosphere Observability Platform tenant.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "Developer permission to use Metrics Explorer and query at least one metric.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "environment",
+      "requirement": "Prometheus metrics are already ingested into the tenant.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Get started with Observability Platform and select the first developer task, Query telemetry data.", "details": [], "input": "https://docs.chronosphere.io/overview/get-started", "output": "The Metrics Explorer and Query Builder route is selected.", "success_signal": "Query Builder is recommended for constructing PromQL.", "failure_or_wait": "", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "access", "actor": "developer", "interface": "browser", "action": "Obtain organization-provisioned access and authenticate at the tenant URL.", "details": ["Account enrollment is one opaque access step under policy; no unlisted signup fields are asserted."], "input": "The organization tenant URL and provisioned identity", "output": "The Observability Platform home page opens.", "success_signal": "The authenticated home page is displayed.", "failure_or_wait": "An administrator must provision the user or enable the SSO identity.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "prepare", "actor": "developer", "interface": "web-ui", "action": "Open Metrics Explorer and click Builder for a query.", "details": ["The route assumes Prometheus metrics are already ingested."], "input": "An authenticated tenant with metric data", "output": "Query Builder opens.", "success_signal": "Metric, label, function, and rollup controls are available.", "failure_or_wait": "Ask an administrator to ingest or grant access to metrics if none are available.", "required": true, "source_ids": ["S4", "S5"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Select an available metric and any desired labels or rollup.", "details": ["The builder suggests metric names, labels, values, and functions."], "input": "One available Prometheus metric", "output": "A valid PromQL expression is constructed.", "success_signal": "The expression appears in the query field.", "failure_or_wait": "If type information is unavailable, select the rollup manually.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "web-ui", "action": "Click Run.", "details": [], "input": "The constructed query", "output": "Chronosphere evaluates the query.", "success_signal": "The graph updates and Results shows matching series and values in Graph and Table.", "failure_or_wait": "Adjust the metric, labels, time range, or expression and run again.", "required": true, "source_ids": ["S4", "S5"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A provisioned tenant is required; public docs start after authenticate rather than self-serve signup fields.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "permission",
+      "description": "Creating the service-account API token requires SysAdmin team membership.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Observability Platform",
+      "url": "https://docs.chronosphere.io/overview/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "authenticate",
+        "Administrators ingest telemetry"
+      ],
+      "evidence_supported": [
+        "authenticate first",
+        "admin ingest card"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Chronosphere Collector",
+      "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get started",
+        "Chronosphere Collector or OpenTelemetry Collector"
+      ],
+      "evidence_supported": [
+        "recommended for Prometheus scrape",
+        "verify streaming step"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Standalone Collector installation to retrieve metrics",
+      "url": "https://docs.chronosphere.io/ingest/metrics-traces/collector/install/standalone",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create an API token",
+        "Download the Collector binary",
+        "Define the Collector configuration file",
+        "Run the Collector"
+      ],
+      "evidence_supported": [
+        "SysAdmin service account",
+        "gateway TENANT:443",
+        "binary/Docker run commands"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create PromQL queries with the query builder",
+      "url": "https://docs.chronosphere.io/investigate/querying/metrics/query-builder",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Create the query", "Query actions"],
+      "evidence_supported": ["Builder entry", "Metric and label suggestions", "Rollup behavior", "Run action", "Graph terminal"]
+    },
+    {
+      "id": "S5",
+      "title": "Metrics Explorer",
+      "url": "https://docs.chronosphere.io/investigate/querying/metrics/explorer",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": ["Metrics Explorer"],
+      "evidence_supported": ["Prometheus metric prerequisite", "Query Builder link", "Query execution", "Graph and Table results"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "How is a new Observability Platform tenant provisioned for a developer with no existing Chronosphere access?",
+      "impact": "The path assumes an existing tenant and authenticated session before Collector install.",
+      "reason_unresolved": "Public get-started docs begin at authenticate and do not publish a self-serve tenant signup sequence.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Service discovery tuning",
+    "Collector optimizations",
+    "Dashboard and alert creation"
+  ]
+}

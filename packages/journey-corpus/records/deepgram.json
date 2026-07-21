@@ -1,0 +1,73 @@
+{
+  "platform": {"name": "Deepgram", "slug": "deepgram", "organization": "Deepgram"},
+  "category": "Communications, media, and social",
+  "surface": {
+    "name": "Deepgram Playground no-signup transcription",
+    "selection_basis": "Under the workshop policy, Deepgram Playground takes priority: the official first-request guide explicitly says it makes an API request without code or signup.",
+    "alternatives_considered": [
+      {"name": "Deepgram Playground", "url": "https://playground.deepgram.com/", "reason_not_primary": "The Fundamentals guide presents this as a no-code, no-signup way to try the API rather than the authenticated developer API path."},
+      {"name": "Deepgram SDK route", "url": "https://developers.deepgram.com/guides/fundamentals/make-your-first-api-request", "reason_not_primary": "The page requires language-specific environment setup and then redirects developers to a product Getting Started guide."},
+      {"name": "Streaming Speech-to-Text", "url": "https://developers.deepgram.com/docs/stt/getting-started", "reason_not_primary": "The Speech-to-Text overview presents streaming and pre-recorded audio as use-case choices; the Fundamentals cURL example selects a hosted pre-recorded file."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Use Deepgram Playground without an account to submit audio and observe a transcript.",
+    "starting_url": "https://playground.deepgram.com/",
+    "assumed_prior_state": [
+      "No Deepgram account, project, API key, billing method, request, or transcript is assumed.",
+      "A shell with cURL and network access is available; no signup, credential creation, credit use, or API request was performed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Make a no-signup request in Deepgram Playground.",
+    "normalized_outcome": "Deepgram Playground processes audio and displays a transcript.",
+    "observable_completion_signal": "Recognized text appears in the Playground's Transcript panel.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The first-request guide says Playground can make a request with no signup, and the live Playground exposes a Transcript panel.", "source_ids": ["S2", "S7"]},
+    "why_this_is_the_boundary": "Visible transcript text is the first completed output of the accountless Playground route.",
+    "source_ids": ["S2", "S7"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "Create a Deepgram account before creating the first API key; the current signup transition is client-rendered and not publicly enumerated.", "required": true, "source_ids": ["S2", "S3"]},
+    {"order": 2, "type": "credential", "requirement": "Create the first project API key in the Deepgram Console, assign its role and expiration settings, and copy its secret at the one-time display.", "required": true, "source_ids": ["S2", "S4"]},
+    {"order": 3, "type": "software", "requirement": "Have a shell with cURL for the published raw HTTP route.", "required": true, "source_ids": ["S2"]},
+    {"order": 4, "type": "billing", "requirement": "The pay-as-you-go signup includes $200 credit and does not require a credit card for the first request.", "required": false, "source_ids": ["S2", "S6"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Deepgram's Make Your First API Request guide and select the Playground route.", "details": [], "input": "https://developers.deepgram.com/guides/fundamentals/make-your-first-api-request", "output": "The no-code, no-signup route is identified.", "success_signal": "The guide states `No sign-up required!`.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 2, "phase": "arrive", "actor": "developer", "interface": "browser", "action": "Open Deepgram Playground on a large-screen browser.", "details": [], "input": "https://playground.deepgram.com/", "output": "The trial controls and Transcript panel load.", "success_signal": "The Playground displays input, model, feature, and transcript controls.", "failure_or_wait": "The site recommends widening small browser windows.", "required": true, "source_ids": ["S2", "S7"]},
+    {"step_number": 3, "phase": "prepare", "actor": "developer", "interface": "web-ui", "action": "Select or provide the audio input and retain the desired language, model, and feature settings.", "details": [], "input": "Audio to transcribe", "output": "The trial request is configured.", "success_signal": "The input and selected model are shown.", "failure_or_wait": "Available options differ between pre-recorded and live input.", "required": true, "source_ids": ["S7"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "web-ui", "action": "Start the Playground transcription request.", "details": [], "input": "Configured audio request", "output": "Deepgram processes the audio.", "success_signal": "The Playground begins listening or processing.", "failure_or_wait": "Wait for speech processing to complete.", "required": true, "source_ids": ["S2", "S7"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Read the Transcript panel.", "details": [], "input": "Completed Playground request", "output": "Recognized transcript text is visible.", "success_signal": "The Transcript panel contains text from the submitted audio.", "failure_or_wait": "Check audio input and model settings if no transcript appears.", "required": true, "source_ids": ["S7"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 1, "condition": "Use the no-code route", "path": "Open Deepgram Playground, which the Fundamentals guide says can make a request without signup.", "effect_on_first_success": "Avoids account and credential setup but changes the surface from an authenticated developer API request to a no-code trial.", "source_ids": ["S2"]},
+    {"at_step": 1, "condition": "Use an official SDK", "path": "Configure the selected language environment, install its Deepgram SDK, and continue to a product-specific Getting Started guide.", "effect_on_first_success": "Adds runtime and package setup and changes the execution route.", "source_ids": ["S2"]},
+    {"at_step": 2, "condition": "Transcribe a local file after account setup", "path": "Send the audio bytes with the documented content type instead of submitting the hosted remote URL.", "effect_on_first_success": "Adds local-file selection while preserving the transcription response terminal.", "source_ids": ["S5"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "access", "description": "The mandatory signup application does not expose its form or transitions in the public official response.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
+    {"at_step": 2, "type": "credential", "description": "The first API key must be created in the console, and its full secret is shown only once.", "documented_requirement": true, "source_ids": ["S4"]},
+    {"at_step": 2, "type": "permission", "description": "API-key creation requires choosing a role that controls the key's permitted actions.", "documented_requirement": true, "source_ids": ["S4"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Welcome to Deepgram's Docs!", "url": "https://developers.deepgram.com/home", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Build with Deepgram", "Developer Tools"], "evidence_supported": ["Documentation-home surface inventory", "Fundamentals route discovery"]},
+    {"id": "S2", "title": "Make Your First API Request", "url": "https://developers.deepgram.com/guides/fundamentals/make-your-first-api-request", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Create a Deepgram API Key", "Make a Request to the API", "Deepgram Playground", "CURL", "Deepgram SDKs"], "evidence_supported": ["Account and API-key prerequisites", "$200 signup credit", "Peer request routes", "Published cURL request", "SDK environment requirements"]},
+    {"id": "S3", "title": "Deepgram", "url": "https://console.deepgram.com/signup", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public JavaScript application response"], "evidence_supported": ["Client-rendered signup gate", "Absence of public registration states"]},
+    {"id": "S4", "title": "Creating API Keys", "url": "https://developers.deepgram.com/docs/create-additional-api-keys", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Create an API key using the Deepgram Console"], "evidence_supported": ["Automatic first project", "First-key console requirement", "Key fields and role choice", "One-time secret display"]},
+    {"id": "S5", "title": "Getting Started", "url": "https://developers.deepgram.com/docs/pre-recorded-audio", "official_domain": true, "source_type": "tutorial", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["cURL", "Results", "Analyze the response"], "evidence_supported": ["Remote and local transcription routes", "Processing wait", "JSON transcript response terminal"]},
+    {"id": "S6", "title": "Deepgram Pricing", "url": "https://deepgram.com/pricing", "official_domain": true, "source_type": "pricing", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Pay As You Go"], "evidence_supported": ["No-credit-card requirement", "$200 free credit"]},
+    {"id": "S7", "title": "Deepgram Playground", "url": "https://playground.deepgram.com/", "official_domain": true, "source_type": "tutorial", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Trial", "Features", "Transcript"], "evidence_supported": ["No-code trial interface", "Audio and model controls", "Transcript completion panel"]}
+  ],
+  "uncertainties": [
+    {"question": "What exact signup fields, identity-provider choices, terms, verification actions, and completed-account state appear in the current Deepgram Console?", "impact": "The required account portion cannot be reconstructed or counted.", "reason_unresolved": "The official guide links into a client-rendered application whose public response contains no signup states.", "checked_source_ids": ["S2", "S3", "S4"]}
+  ],
+  "excluded_after_success": [
+    "Streaming transcription, text-to-speech, Voice Agent, custom models, callbacks, production key rotation, and paid credit loading occur outside the documented first pre-recorded request."
+  ]
+}

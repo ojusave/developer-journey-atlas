@@ -1,0 +1,57 @@
+{
+  "platform": {"name": "GoCardless", "slug": "gocardless", "organization": "GoCardless"},
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "GoCardless Getting Started through the first test payment authorisation",
+    "selection_basis": "Under the workshop policy, the direct HTTP/cURL tab in the numbered Getting Started sequence is the fastest documented route because it avoids a language SDK installation and leads to the explicit first test payment-authorisation milestone. Sandbox signup is one opaque step at the official URL.",
+    "alternatives_considered": [
+      {"name": "Create a payment", "url": "https://developer.gocardless.com/getting-started/create-a-payment/", "reason_not_primary": "This is the next Getting Started stage after the first payment-authorisation request."},
+      {"name": "Direct Debit mandate guide", "url": "https://developer.gocardless.com/billing-requests/setting-up-a-dd-mandate/", "reason_not_primary": "This is a deeper product flow rather than the general first-request route."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Follow the official GoCardless getting-started route from no account to the first test payment authorisation.", "starting_url": "https://developer.gocardless.com/getting-started/set-up/", "assumed_prior_state": ["No GoCardless account", "No sandbox access token"]},
+  "documented_first_success": {
+    "official_milestone": "Create your first test payment authorisation in 5 minutes",
+    "normalized_outcome": "The developer creates and completes a sandbox Billing Request, then sees the resulting customer in the GoCardless dashboard.",
+    "observable_completion_signal": "The newly created customer appears on the Customers page after the hosted sandbox Billing Request is completed.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Create your first test payment authorisation in 5 minutes.", "source_ids": ["S3"]},
+    "why_this_is_the_boundary": "The guide ends its first payment-authorisation walkthrough by verifying the created customer. Creating an actual test payment is the next stage.",
+    "source_ids": ["S1", "S2", "S3"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "Create a free GoCardless Sandbox account; the public official sources do not enumerate the signup sequence.", "required": true, "source_ids": ["S1", "S2"]},
+    {"order": 2, "type": "credential", "requirement": "Create and securely copy a Read-Write sandbox access token from the Developers tab.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "environment", "requirement": "Use a developer environment capable of making GoCardless API requests.", "required": true, "source_ids": ["S1", "S3"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the official Set up page and choose the Sandbox environment used by the guide.", "details": ["The Sandbox dashboard is `manage-sandbox.gocardless.com` and the Sandbox API is `https://api-sandbox.gocardless.com/`."], "input": "Intent to follow Getting Started", "output": "The sandbox account and token prerequisites", "success_signal": "The Set up step is visible.", "failure_or_wait": "No navigation failure is documented.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to the GoCardless Sandbox.", "details": ["Treat signup as one opaque workshop-policy step at the official URL."], "input": "https://manage-sandbox.gocardless.com/sign-up", "output": "Authenticated sandbox dashboard.", "success_signal": "The Developers tab is accessible.", "failure_or_wait": "Follow the displayed account recovery path.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Create a Read-Write sandbox access token.", "details": ["Open Developers, select Create access token, provide a token name, choose Read-Write, and copy the token when displayed."], "input": "Authenticated sandbox account", "output": "Sandbox API access token.", "success_signal": "The one-time token value is copied.", "failure_or_wait": "Create a replacement token if the value was not saved.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Create a BACS Billing Request with cURL.", "details": ["Export the token and POST a `mandate_request` with scheme `bacs` to the sandbox billing_requests endpoint.", "Record the returned Billing Request ID."], "input": "Read-Write sandbox token", "output": "HTTP 201 Billing Request response.", "success_signal": "The response contains a Billing Request ID such as `BRQ123`.", "failure_or_wait": "Correct authorization, headers, endpoint, or request JSON.", "required": true, "source_ids": ["S1", "S3"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Create a Billing Request Flow for the Billing Request.", "details": ["POST the Billing Request ID to the sandbox billing_request_flows endpoint.", "Record the returned `authorisation_url`."], "input": "Billing Request ID", "output": "HTTP 201 Billing Request Flow response.", "success_signal": "The response contains a hosted authorisation URL.", "failure_or_wait": "Verify the Billing Request ID and request payload.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 6, "phase": "authenticate", "actor": "developer", "interface": "browser", "action": "Open the hosted authorisation URL and complete the sandbox payer flow.", "details": ["Use the test bank details published by the guide."], "input": "Billing Request Flow authorisation URL", "output": "Completed sandbox Billing Request.", "success_signal": "The hosted flow confirms completion.", "failure_or_wait": "Correct test payer details and retry in Sandbox.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Open Customers in the sandbox dashboard and verify the new customer.", "details": [], "input": "Completed Billing Request", "output": "First-mile completion.", "success_signal": "The newly created customer is visible on the Customers page.", "failure_or_wait": "Refresh after the hosted flow completes and inspect the Billing Request status.", "required": true, "source_ids": ["S3"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "After the hidden account gate, choose an official client library", "path": "Install one of the listed official language libraries and initialize its sandbox client with the access token; the guide marks a client library as Recommended.", "effect_on_first_success": "Replaces direct HTTP setup while preserving the later Billing Request terminal.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "After the hidden account gate, choose direct HTTP", "path": "Export the access token and send authenticated HTTP or cURL requests directly.", "effect_on_first_success": "Requires constructing request headers instead of using a client library.", "source_ids": ["S1", "S3"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "account", "description": "The mandatory sandbox signup sequence is not publicly enumerated.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 2, "type": "credential", "description": "The downstream Read-Write access token is displayed once and cannot be viewed again.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "choice", "description": "The downstream setup offers a recommended client-library route and a direct-HTTP route, with language selection inside the library route.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "5 minutes for the first test payment authorisation", "source_ids": ["S3"]},
+  "sources": [
+    {"id": "S1", "title": "Set up", "url": "https://developer.gocardless.com/getting-started/set-up/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["What you'll learn", "Get your sandbox access token", "Set up your client", "You're ready to go"], "evidence_supported": ["Sandbox prerequisite", "Token actions", "Client and HTTP alternatives", "One-time token display"]},
+    {"id": "S2", "title": "GoCardless Sandbox sign up", "url": "https://manage-sandbox.gocardless.com/sign-up", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public response"], "evidence_supported": ["Current official client-rendered signup gate", "Absence of publicly rendered signup states"]},
+    {"id": "S3", "title": "Send your first API request", "url": "https://developer.gocardless.com/getting-started/send-your-first-api-request/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Create your first test payment authorisation in 5 minutes", "Create your first billing request", "Create your payment link", "Customer completes billing request", "View your first customer"], "evidence_supported": ["Explicit milestone and time", "Billing Request sequence", "Test bank details", "Dashboard customer terminal"]}
+  ],
+  "uncertainties": [],
+  "excluded_after_success": ["Creating the later first test payment", "Webhooks", "Partner OAuth integrations", "Live go-live checklist and production processing"]
+}

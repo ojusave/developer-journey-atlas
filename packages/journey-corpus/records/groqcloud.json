@@ -1,0 +1,66 @@
+{
+  "platform": {"name": "GroqCloud", "slug": "groqcloud", "organization": "Groq, Inc."},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Groq API Quickstart, Python chat-completion route",
+    "selection_basis": "Under the workshop policy, the Python SDK tab in the general Quickstart is the fastest commonly used documented route: it provides one install command and a complete chat-completion program. Signup is one opaque step at the official login URL; documented key, environment, install, and request steps follow.",
+    "alternatives_considered": [
+      {"name": "cURL", "url": "https://console.groq.com/docs/quickstart", "reason_not_primary": "It is a peer language tab; Python is the fully visible SDK route on the inspected page."},
+      {"name": "JavaScript", "url": "https://console.groq.com/docs/quickstart", "reason_not_primary": "It is a peer language tab rather than a separately recommended getting-started surface."},
+      {"name": "Playground", "url": "https://console.groq.com/playground", "reason_not_primary": "The Quickstart lists Playground after the first chat completion as a next step."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a GroqCloud account and API key, then run the official Python first chat completion.",
+    "starting_url": "https://console.groq.com/docs/quickstart",
+    "assumed_prior_state": [
+      "No GroqCloud account, organization, project, API key, SDK, or request is assumed.",
+      "Python and pip are available locally; no package installation or API request was executed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Successfully received a chat completion",
+    "normalized_outcome": "The published Python program sends a request to Groq and prints the returned chat-completion content.",
+    "observable_completion_signal": "`print(chat_completion.choices[0].message.content)` outputs the model response.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Successfully received a chat completion.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The Quickstart explicitly identifies the received chat completion as success and places Playground and other endpoints in Next Steps.",
+    "source_ids": ["S1", "S2", "S5"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A GroqCloud Account is required to use the Cloud Services.", "required": true, "source_ids": ["S3"]},
+    {"order": 2, "type": "permission", "requirement": "Only a team owner or a user with the developer role may create or manage API keys.", "required": true, "source_ids": ["S2"]},
+    {"order": 3, "type": "credential", "requirement": "A Groq API key is required by the Quickstart request.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "software", "requirement": "Python and pip are needed for the visible Python SDK route.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Groq API Quickstart.", "details": [], "input": "https://console.groq.com/docs/quickstart", "output": "The ordered Create an API Key, key setup, and first chat completion sections are visible.", "success_signal": "The Create API Key link is available.", "failure_or_wait": "No navigation recovery is documented.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to GroqCloud.", "details": ["Treat signup as one opaque workshop-policy step at the official URL.", "Continuing accepts the Services Agreement and acknowledges the Privacy Policy."], "input": "https://console.groq.com/login", "output": "Authenticated GroqCloud Console access.", "success_signal": "The API Keys page is accessible.", "failure_or_wait": "Follow the displayed authentication recovery path.", "required": true, "source_ids": ["S3", "S5"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Create and copy an API key.", "details": ["Open API Keys and select `Create API Key`.", "Use an owner or developer-role identity."], "input": "Authenticated authorized account", "output": "Groq API key.", "success_signal": "The new key value is available to copy.", "failure_or_wait": "Ask a team owner for the developer role if key creation is unavailable.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Export the key as `GROQ_API_KEY`.", "details": [], "input": "Copied Groq API key", "output": "Credential available to the Python process.", "success_signal": "The environment variable is set.", "failure_or_wait": "Correct shell quoting or environment configuration.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Groq Python library.", "details": ["Run `pip install groq`."], "input": "Python and pip", "output": "Installed Groq SDK.", "success_signal": "pip completes successfully.", "failure_or_wait": "Resolve Python environment or package errors.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published first chat-completion program.", "details": ["Use model `llama-3.3-70b-versatile`.", "Send the prompt `Explain the importance of fast language models` and print the first response message."], "input": "Installed SDK and exported key", "output": "Groq chat completion.", "success_signal": "The program prints `chat_completion.choices[0].message.content`.", "failure_or_wait": "Check the API key, model identifier, account limits, and network response.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "Existing authenticated GroqCloud account and project", "path": "The user may already have console access and generate a project-specific key, but the current public key-generation UI sequence remains undocumented.", "effect_on_first_success": "Could bypass signup while leaving the required key form and one-time-secret behavior unestablished.", "source_ids": ["S2", "S4"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "account", "description": "The key link requires an Account and authenticated GroqCloud console state.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
+    {"at_step": 2, "type": "credential", "description": "The public API Keys shell exposes the action but not the authenticated key form or secret-display sequence.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 2, "type": "terms", "description": "The public Login shell says continuing accepts the Groq Services Agreement and acknowledges the Privacy Policy.", "documented_requirement": true, "source_ids": ["S5"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "The Quickstart says the Groq API can be running in a few minutes; the blocked public route prevents an end-to-end verification of that claim.", "source_ids": ["S1"]},
+  "sources": [
+    {"id": "S1", "title": "Quickstart", "url": "https://console.groq.com/docs/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Create an API Key", "Set up your API Key", "Requesting your first chat completion", "Next Steps"], "evidence_supported": ["Primary route", "key requirement", "Python install and program", "published completion terminal", "time claim"]},
+    {"id": "S2", "title": "API Keys", "url": "https://console.groq.com/keys", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public API Keys shell"], "evidence_supported": ["Create API Key action", "Key table structure", "Owner or developer-role permission", "Authenticated key form and secret transition are not publicly exposed"]},
+    {"id": "S3", "title": "Groq Services Agreement", "url": "https://console.groq.com/docs/legal/services-agreement", "official_domain": true, "source_type": "policy", "accessed_at": "2026-07-18", "last_updated_if_shown": "October 15, 2025", "sections_used": ["Introduction", "Definitions", "Accounts"], "evidence_supported": ["Cloud Services scope", "Account requirement", "regional Groq contracting entities"]},
+    {"id": "S4", "title": "Projects", "url": "https://console.groq.com/docs/projects", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Creating Your First Project"], "evidence_supported": ["Project creation and project-specific API keys after console access"]},
+    {"id": "S5", "title": "GroqCloud", "url": "https://console.groq.com/login", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public login shell"], "evidence_supported": ["Legal acceptance notice", "Public signup and authentication sequence remains unexposed"]}
+  ],
+  "uncertainties": [],
+  "excluded_after_success": ["Playground", "third-party libraries", "production rate limits and billing upgrades"]
+}

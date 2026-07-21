@@ -1,0 +1,463 @@
+{
+  "platform": {
+    "name": "JetBrains",
+    "slug": "jetbrains",
+    "organization": "JetBrains s.r.o."
+  },
+  "category": "API infrastructure and developer tooling",
+  "surface": {
+    "name": "IntelliJ Platform Plugin SDK first local plugin run",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: IntelliJ Platform Plugin SDK first local plugin run. The Plugin SDK fully documents a minimal Gradle project and an explicit local execution terminal. Prior surface before policy commit: JetBrains product catalog, with the IntelliJ Platform Plugin SDK first local plugin run as one complete candidate.",
+    "alternatives_considered": [
+      {
+        "name": "TeamCity",
+        "url": "https://www.jetbrains.com/teamcity/",
+        "reason_not_primary": "It is a peer CI product with cloud and self-hosted onboarding rather than an IntelliJ Platform plugin-development journey."
+      },
+      {
+        "name": "YouTrack",
+        "url": "https://www.jetbrains.com/youtrack/",
+        "reason_not_primary": "It is a peer project-management product with cloud and server onboarding rather than a local IDE plugin run."
+      },
+      {
+        "name": "IntelliJ Platform Plugin Template",
+        "url": "https://plugins.jetbrains.com/docs/intellij/plugin-template.html",
+        "reason_not_primary": "Inside the selected plugin surface, the template is a documented peer with CI configuration. The New Project Wizard is the workflow described directly by the Plugin SDK."
+      },
+      {
+        "name": "Create a visible custom action",
+        "url": "https://plugins.jetbrains.com/docs/intellij/creating-actions-tutorial.html",
+        "reason_not_primary": "Adding an action provides visible behavior but follows project creation. The generated run configuration already defines the earliest documented local plugin execution boundary."
+      },
+      {
+        "name": "Publish to JetBrains Marketplace",
+        "url": "https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html",
+        "reason_not_primary": "Publication requires packaging, signing, Marketplace access, review, and distribution after the plugin has run locally."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Choose a JetBrains developer product and reach the first terminal state that its official getting-started material defines; for the retained candidate, run a generated IntelliJ Platform plugin locally.",
+    "starting_url": "https://www.jetbrains.com/products/",
+    "assumed_prior_state": [
+      "No JetBrains account, subscription, Toolbox App, IntelliJ IDEA installation, Plugin DevKit, JDK selection, Gradle project, source code, run configuration, or Marketplace listing is assumed.",
+      "A supported Windows, macOS, or Linux computer, browser, network connection, and permission to install desktop software are available.",
+      "No software download, installation, account login, plugin creation, Gradle dependency download, or IDE execution was performed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "For the selected IntelliJ Platform candidate, execute the generated plugin with Run IDE with Plugin or the `runIde` Gradle task.",
+    "normalized_outcome": "The wizard-generated Gradle plugin project starts the target IntelliJ Platform IDE in a standalone development instance with the plugin loaded.",
+    "observable_completion_signal": "A separate IDE instance launches from the generated Run IDE with Plugin configuration or `runIde` task without a build or launch error.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The Plugin SDK has an Executing the Plugin section and states that the generated project contains a Run IDE with Plugin configuration that can be executed.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "Local execution is the earliest documented proof that the generated plugin project builds and can be loaded by its target IDE. Adding visible actions, tests, compatibility verification, signing, packaging, and Marketplace publication are later work.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "hardware",
+      "requirement": "Use a computer and operating system supported by the current IntelliJ IDEA installation guide and select the matching Toolbox App installer.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Install the JetBrains Toolbox App and then install IntelliJ IDEA; Toolbox is the recommended installation method.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "Install and enable Plugin DevKit from JetBrains Marketplace and ensure Gradle support is enabled, because Plugin DevKit is no longer bundled.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "Select a JDK compatible with the target IntelliJ Platform version, such as Java 21 for platform 2024.2 or later.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "configuration",
+      "requirement": "Choose a project name and location, plugin Group, Artifact, target platform, and compatible JDK in the IDE Plugin wizard.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the JetBrains product catalog and choose the product surface whose first mile is being measured.",
+      "details": [
+        "The catalog presents IDEs, team tools, language and framework tools, and other developer products as peers."
+      ],
+      "input": "https://www.jetbrains.com/products/",
+      "output": "Product-specific entry points are visible.",
+      "success_signal": "A product and its own documentation can be selected.",
+      "failure_or_wait": "JetBrains does not name one company-wide developer first mile.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "For the retained candidate, choose IntelliJ Platform plugin development and open Developing a Plugin.",
+      "details": [
+        "The page recommends the Gradle-based model and exposes the New Project Wizard and Plugin Template as project-creation routes."
+      ],
+      "input": "A product and extensibility-surface choice",
+      "output": "The local plugin-development route is selected.",
+      "success_signal": "Creating a Plugin Gradle Project is listed as the first workflow step.",
+      "failure_or_wait": "Choosing a different JetBrains product changes the complete first-success journey.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Developing a Plugin and select the recommended Gradle-based New Project Wizard workflow.",
+      "details": [
+        "The page recommends the IntelliJ Platform Gradle Plugin for current platform versions.",
+        "It identifies the New Project Wizard and IntelliJ Platform Plugin Template as the two main project-creation routes."
+      ],
+      "input": "https://plugins.jetbrains.com/docs/intellij/developing-plugins.html",
+      "output": "The local wizard route and its required IntelliJ IDEA, Gradle, and Plugin DevKit tooling are identified.",
+      "success_signal": "Creating a Plugin Gradle Project is listed as the first workflow step.",
+      "failure_or_wait": "A theme plugin or Scala plugin uses an alternative documented model.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "desktop-app",
+      "action": "Install the JetBrains Toolbox App using the operating-system-specific instructions, launch it, and select IntelliJ IDEA to install.",
+      "details": [
+        "Windows uses the installer wizard, macOS mounts the matching Intel or Apple Silicon image and moves Toolbox to Applications, and Linux extracts and runs the Toolbox distribution.",
+        "A JetBrains Account login is documented for automatic license activation but is not stated as required to install the product."
+      ],
+      "input": "https://www.jetbrains.com/help/idea/installation-guide.html",
+      "output": "IntelliJ IDEA is installed and available to launch.",
+      "success_signal": "IntelliJ IDEA appears as an installed Toolbox product and launches.",
+      "failure_or_wait": "The selected guide does not document an installation recovery path.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "desktop-app",
+      "action": "In IntelliJ IDEA, install and enable Plugin DevKit from JetBrains Marketplace and verify Gradle support is enabled.",
+      "details": [
+        "Plugin DevKit must be installed separately because it has not been bundled since IntelliJ IDEA 2023.3."
+      ],
+      "input": "A running IntelliJ IDEA installation",
+      "output": "The IDE Plugin project wizard is enabled.",
+      "success_signal": "IDE Plugin is available as a New Project type.",
+      "failure_or_wait": "The wizard requires both Gradle and Plugin DevKit to be installed and enabled.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Open File > New > Project, select IDE Plugin, and configure the plugin project.",
+      "details": [
+        "Enter Name and Location, choose Plugin type, provide Group and Artifact, and select the target-compatible JDK.",
+        "For IntelliJ IDEA 2023.1 and later, the generated project supports Kotlin and Java sources; older IDEs also ask for language.",
+        "Click Create."
+      ],
+      "input": "Project identity, location, Group, Artifact, and compatible JDK",
+      "output": "A Gradle plugin project is generated with wrapper files, `plugin.xml`, build configuration, and Run IDE with Plugin configuration.",
+      "success_signal": "The project opens and contains the documented generated structure and run configuration.",
+      "failure_or_wait": "The selected guide does not document a project-creation recovery path.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Execute Run IDE with Plugin from Run > Run or the Gradle Run Configurations node.",
+      "details": [
+        "The same result can be started by locating and double-clicking `runIde` in the Gradle Tasks node."
+      ],
+      "input": "The wizard-generated plugin project",
+      "output": "Gradle builds the project and launches a standalone target IDE instance with the plugin.",
+      "success_signal": "The standalone IDE opens without a build or launch error.",
+      "failure_or_wait": "If `runIde` is absent, click Sync All Gradle Projects, locate the task again, and double-click it.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The host is Windows",
+      "path": "Download the Toolbox `.exe`, run it, follow the installer wizard, launch Toolbox from the notification area, and select IntelliJ IDEA.",
+      "effect_on_first_success": "Changes only desktop installation steps.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The host is macOS",
+      "path": "Download the correct Intel or Apple Silicon `.dmg`, mount it, drag Toolbox to Applications, launch it, and select IntelliJ IDEA.",
+      "effect_on_first_success": "Adds an architecture-specific installer choice.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The host is Linux",
+      "path": "Install required system packages, extract the Toolbox archive, run its executable, and select IntelliJ IDEA.",
+      "effect_on_first_success": "Adds package and archive steps before the common IDE workflow.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Inside the candidate, the target platform is 2024.2 or later",
+      "path": "Use the IntelliJ Platform Gradle Plugin 2.x and Java 21-compatible project settings.",
+      "effect_on_first_success": "Determines Gradle plugin and JDK compatibility.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Inside the candidate, use the Gradle task directly",
+      "path": "Open the Gradle tool window, find `runIde` under Tasks, sync if it is absent, and double-click it.",
+      "effect_on_first_success": "Replaces the generated run-configuration menu action with the equivalent Gradle task.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The installer and exact Toolbox procedure differ by operating system and, on macOS and Linux, processor architecture.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "The path requires Toolbox and IntelliJ IDEA desktop installation with permission to run downloaded software.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "Inside the selected candidate, Plugin DevKit is no longer bundled and must be installed from JetBrains Marketplace.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "Inside the selected candidate, target platform, Gradle plugin generation, and JDK versions must be compatible.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "download",
+      "description": "Inside the selected candidate, the generated wrapper can download its specified Gradle version automatically.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developing a Plugin | IntelliJ Platform Plugin SDK",
+      "url": "https://plugins.jetbrains.com/docs/intellij/developing-plugins.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "01 April 2026",
+      "sections_used": [
+        "Gradle Plugin",
+        "Plugin Development Workflow",
+        "Alternatives"
+      ],
+      "evidence_supported": [
+        "Recommended Gradle route",
+        "Current platform-version mapping",
+        "IDE tooling",
+        "Separate Plugin DevKit installation",
+        "Wizard and template alternatives",
+        "Run and publish capabilities"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Creating a Plugin Gradle Project | IntelliJ Platform Plugin SDK",
+      "url": "https://plugins.jetbrains.com/docs/intellij/creating-plugin-project.html",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "20 April 2026",
+      "sections_used": [
+        "Creating a Plugin with New Project Wizard",
+        "Create IDE Plugin",
+        "Components of a Wizard-Generated Gradle IntelliJ Platform Plugin",
+        "Running a Plugin With the runIde Gradle task",
+        "Executing the Plugin"
+      ],
+      "evidence_supported": [
+        "Wizard prerequisites",
+        "All wizard fields and Create action",
+        "JDK mapping",
+        "Generated project contents",
+        "Run IDE with Plugin",
+        "runIde and sync fallback"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Install IntelliJ IDEA | IntelliJ IDEA Documentation",
+      "url": "https://www.jetbrains.com/help/idea/installation-guide.html",
+      "official_domain": true,
+      "source_type": "installation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "19 May 2026",
+      "sections_used": [
+        "System requirements",
+        "Install using the Toolbox App"
+      ],
+      "evidence_supported": [
+        "Supported host systems",
+        "Toolbox recommendation",
+        "Windows, macOS, and Linux installation branches",
+        "Architecture choices",
+        "IDE product selection",
+        "Optional account login for license activation"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "All Developer Tools and Products by JetBrains",
+      "url": "https://www.jetbrains.com/products/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Find the right tool",
+        "Product catalog"
+      ],
+      "evidence_supported": [
+        "Peer IDE, team-tool, language, framework, and developer-product surfaces",
+        "No company-wide product default"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which JetBrains product surface should represent the umbrella company for a user with no stated goal?",
+      "impact": "An IDE user, plugin developer, YouTrack integrator, and TeamCity user have different first miles.",
+      "reason_unresolved": "JetBrains publishes several independent developer products without naming one default; the record retains IntelliJ Platform extensibility only as a complete candidate.",
+      "checked_source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "question": "Does a generated plugin without custom code expose a visible in-product behavior?",
+      "impact": "The terminal proves build and loading but not a user-facing feature.",
+      "reason_unresolved": "The project guide treats plugin execution as the terminal and sends developers to the separate Creating Actions tutorial for basic visible functionality.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Adding actions or services, plugin UX, automated tests, compatibility verification, split-mode architecture, signing, packaging, JetBrains Account and Marketplace setup, review, publication, distribution, analytics, and maintenance occur after the first local plugin run."
+  ]
+}

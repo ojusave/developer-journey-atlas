@@ -1,0 +1,944 @@
+{
+  "platform": {
+    "name": "HubSpot",
+    "slug": "hubspot",
+    "organization": "HubSpot, Inc."
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "Latest developer-platform Quickstart through local app-card preview",
+    "selection_basis": "HubSpot's Introduction directs new developers to Quickstart to create their first app, and the current Quickstart explicitly builds, deploys, installs, locates, and previews a boilerplate app card. This is the official latest-platform route, distinct from legacy private-app and public-app token paths.",
+    "alternatives_considered": [
+      {
+        "name": "Legacy private app access token",
+        "url": "https://developers.hubspot.com/docs/apps/legacy-apps/private-apps/build-with-projects/create-private-apps-with-projects",
+        "reason_not_primary": "HubSpot positions it as a legacy route for limited API-token needs, while the current Quickstart is the named first-app path on the latest developer platform."
+      },
+      {
+        "name": "OAuth public or marketplace app",
+        "url": "https://developers.hubspot.com/docs/api-reference/latest/authentication/manage-oauth-tokens",
+        "reason_not_primary": "It adds distribution, scopes, redirect URL, install consent, authorization-code exchange, access token, and refresh behavior."
+      },
+      {
+        "name": "Direct API request with hs api",
+        "url": "https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/commands/account-commands",
+        "reason_not_primary": "It requires selecting an endpoint and Personal Access Key permission, and does not exercise the current first-app Quickstart."
+      },
+      {
+        "name": "Full hs project create flow",
+        "url": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/create-an-app",
+        "reason_not_primary": "HubSpot tells new app developers to use the streamlined hs get-started Quickstart first."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Build, deploy, install, and preview HubSpot's boilerplate Get Started App Card on a contact record.",
+    "starting_url": "https://developers.hubspot.com/docs/getting-started/quickstart",
+    "assumed_prior_state": [
+      "The developer has no authenticated HubSpot CLI configuration or local quickstart project.",
+      "The developer has or can create a standard HubSpot account with permission to use developer tools.",
+      "Node.js 20 or later and npm can be installed.",
+      "The selected testing account contains at least one contact record to open for the final preview."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Successfully deploy the quickstart app and preview its Get Started App Card.",
+    "normalized_outcome": "The boilerplate app is built, deployed, installed, assigned to the default contact record view, served from local development, and visibly rendered on a contact.",
+    "observable_completion_signal": "A contact's Overview tab displays Get Started App Card with the Developing locally badge while hs project dev is running.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Preview your app card ends with the card visible on a contact record with a Developing locally badge; the following section is Continue local development and the final heading says the quickstart app was successfully deployed.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The visible app card proves the account, Personal Access Key, CLI, project generation, cloud build/deploy, app install, card placement, testing-account selection, and local development bridge all worked. Editing the example React component is the next development loop, not necessary for first visibility.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A standard HubSpot account; it may be free or paid.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "A user whose permissions allow a Personal Access Key with Developer tools access to upload developer projects.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "Node.js 20 or later, npm, a terminal, and a browser.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "other",
+      "requirement": "At least one contact in the selected testing account for the final app-card preview.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "access",
+      "requirement": "Access to npm, HubSpot's API and app, and the local development connection.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open HubSpot's current developer-platform Quickstart.",
+      "details": [
+        "The guide promises a simple boilerplate app on the latest developer platform."
+      ],
+      "input": "Intent to build a first HubSpot app.",
+      "output": "Ordered account, CLI, project, install, location, and preview path.",
+      "success_signal": "Set up your local environment is visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a HubSpot account if one is not already available.",
+      "details": [
+        "The Quickstart links to account creation before its numbered work.",
+        "A standard account can be free or paid and provides the developer overview."
+      ],
+      "input": "Eligible user and organization information.",
+      "output": "Accessible standard HubSpot account.",
+      "success_signal": "The user can sign in to HubSpot.",
+      "failure_or_wait": "The linked account-creation flow and any email or identity verification are not enumerated in the developer docs.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install Node.js 20 or later if it is not already available.",
+      "details": [
+        "HubSpot's CLI installation guide requires Node.js and supports versions 20 or later."
+      ],
+      "input": "Supported workstation and installation permission.",
+      "output": "Working node and npm commands.",
+      "success_signal": "The supported Node and npm environment is available.",
+      "failure_or_wait": "Operating-system installation is delegated to Node or package-manager guidance.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the latest HubSpot CLI globally.",
+      "details": [
+        "Run npm install -g @hubspot/cli.",
+        "The CLI guide identifies 8.6.0 as the latest recommended version at research time."
+      ],
+      "input": "Node.js, npm, registry access, and global install permission.",
+      "output": "HubSpot hs command.",
+      "success_signal": "The installation completes and hs can run.",
+      "failure_or_wait": "The CLI guide links to npm EACCES guidance if global installation lacks permission.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run hs account auth.",
+      "details": [
+        "This connects HubSpot local development tools to the account."
+      ],
+      "input": "Installed HubSpot CLI.",
+      "output": "Interactive account-authentication prompts.",
+      "success_signal": "The CLI opens or presents the Personal Access Key flow.",
+      "failure_or_wait": "An existing key can be supplied with the command flag instead.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Follow the prompt into HubSpot and generate or view a Personal Access Key.",
+      "details": [
+        "The key can also be found under Development, Keys, Personal Access Key.",
+        "Key scopes are limited by the current user's HubSpot permissions.",
+        "Developer tools access is needed to upload projects."
+      ],
+      "input": "Authenticated HubSpot user with adequate permission.",
+      "output": "Personal Access Key passed back to or available for the CLI.",
+      "success_signal": "The CLI receives the key and authenticates the account.",
+      "failure_or_wait": "Insufficient user permissions can produce a key that cannot upload developer projects.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose whether to make this HubSpot account the CLI default.",
+      "details": [
+        "The Quickstart recommends setting it as default so later commands do not need --account."
+      ],
+      "input": "Authenticated account in CLI configuration.",
+      "output": "Default-account choice stored in the global CLI config.",
+      "success_signal": "The CLI records the account, and if chosen, marks it default.",
+      "failure_or_wait": "If not default, later commands need explicit account selection.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run hs get-started.",
+      "details": [
+        "This initializes the streamlined boilerplate project."
+      ],
+      "input": "Authenticated HubSpot CLI.",
+      "output": "Welcome message and project/app prompts.",
+      "success_signal": "The CLI asks what to build.",
+      "failure_or_wait": "Authentication or CLI errors prevent initialization.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Select App in the get-started prompts.",
+      "details": [],
+      "input": "Project-type prompt.",
+      "output": "App boilerplate path selected.",
+      "success_signal": "The CLI advances to project details.",
+      "failure_or_wait": "Other project types lead outside this quickstart.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Give the project a name.",
+      "details": [
+        "The later cd command uses this local project name."
+      ],
+      "input": "Unique project name.",
+      "output": "Named HubSpot project.",
+      "success_signal": "The CLI accepts the name.",
+      "failure_or_wait": "The guide does not enumerate naming validation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set the project's local directory.",
+      "details": [
+        "The current working directory is the default."
+      ],
+      "input": "Writable local destination.",
+      "output": "Local project path.",
+      "success_signal": "The CLI accepts the directory.",
+      "failure_or_wait": "A non-writable or conflicting path can block file creation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Choose to upload the generated project to HubSpot.",
+      "details": [
+        "The upload initializes the first build and deploy."
+      ],
+      "input": "Generated local boilerplate and selected HubSpot account.",
+      "output": "Project upload request.",
+      "success_signal": "The CLI begins the HubSpot build.",
+      "failure_or_wait": "Network, permission, account, or project validation errors can reject upload.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "other",
+      "action": "Build and deploy the uploaded quickstart project.",
+      "details": [
+        "HubSpot processes the first cloud build before installation can begin."
+      ],
+      "input": "Uploaded boilerplate project.",
+      "output": "Deployed quickstart app.",
+      "success_signal": "The CLI reports deployment and prompts to install the app.",
+      "failure_or_wait": "This is an external build wait. The Quickstart does not state duration or detailed build-error recovery.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Press Enter to confirm installation in the account.",
+      "details": [
+        "The command opens a browser to the app installation page."
+      ],
+      "input": "Deployed app and CLI prompt.",
+      "output": "Browser app-installation page.",
+      "success_signal": "HubSpot's install page opens.",
+      "failure_or_wait": "Browser launch failure requires opening the relevant HubSpot page manually, but the quickstart does not specify the fallback URL.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Review the expected unverified-app warning.",
+      "details": [
+        "The warning appears because the new app has not been reviewed through HubSpot's marketplace verification process.",
+        "The Quickstart says it is safe to proceed for the app the developer just built."
+      ],
+      "input": "App installation page.",
+      "output": "Acknowledged development-app warning.",
+      "success_signal": "The confirmation checkbox and Connect App are available.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the checkbox confirming installation.",
+      "details": [],
+      "input": "Unverified app installation page.",
+      "output": "Installation consent selected.",
+      "success_signal": "Connect App can be used.",
+      "failure_or_wait": "Without confirmation, installation cannot proceed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Connect App.",
+      "details": [],
+      "input": "Selected installation consent.",
+      "output": "App installed in the HubSpot account.",
+      "success_signal": "The installation success page appears.",
+      "failure_or_wait": "Installation or permission errors are not decomposed in the Quickstart.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm the installation success page.",
+      "details": [],
+      "input": "Completed app installation.",
+      "output": "Verified installed app.",
+      "success_signal": "The page offers Continue to manage App Card view.",
+      "failure_or_wait": "If the page does not appear, installation did not complete.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Continue to manage App Card view.",
+      "details": [
+        "HubSpot redirects to app-card settings."
+      ],
+      "input": "Installation success page.",
+      "output": "App card settings page.",
+      "success_signal": "Manage locations is visible.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Manage locations.",
+      "details": [],
+      "input": "App card settings.",
+      "output": "Location sidebar.",
+      "success_signal": "Get Started App Card can be selected.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the checkbox next to Get Started App Card.",
+      "details": [
+        "This adds the card to the middle column of the default contact record view."
+      ],
+      "input": "Location sidebar.",
+      "output": "Card location selected.",
+      "success_signal": "The checkbox is selected.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Save.",
+      "details": [
+        "This saves location changes and closes the sidebar."
+      ],
+      "input": "Selected app-card location.",
+      "output": "Saved default contact-view placement.",
+      "success_signal": "The sidebar closes with the card location retained.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Complete card setup in the Get Started App Card section.",
+      "details": [
+        "This finishes HubSpot's card-setup walkthrough."
+      ],
+      "input": "Saved card location.",
+      "output": "Completed card configuration.",
+      "success_signal": "The setup walkthrough completes.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Navigate into the local project directory.",
+      "details": [
+        "Run cd your-project-name."
+      ],
+      "input": "Generated project path.",
+      "output": "Terminal working directory set to the project.",
+      "success_signal": "Project files are in the current directory.",
+      "failure_or_wait": "A wrong name or destination produces a missing-directory error.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run hs project dev.",
+      "details": [
+        "The development command checks dependencies and installs them as needed."
+      ],
+      "input": "Installed app, configured card, and local project.",
+      "output": "Account-selection prompt and local development startup.",
+      "success_signal": "The CLI prompts for the testing account.",
+      "failure_or_wait": "Dependency installation, authentication, port, or project configuration can block startup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Select the account for the testing session.",
+      "details": [
+        "Choose an already connected account for this primary path.",
+        "The CLI can instead create a new developer test or sandbox account through additional prompts."
+      ],
+      "input": "Connected HubSpot account containing the installed app and a contact.",
+      "output": "Testing account selected.",
+      "success_signal": "Local development starts against the chosen account.",
+      "failure_or_wait": "Selecting another account may require installing the app and ensuring a contact exists there.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "execute",
+      "actor": "platform",
+      "interface": "other",
+      "action": "Install any missing dependencies and start the local development session.",
+      "details": [
+        "The CLI performs dependency checking automatically.",
+        "Once started, HubSpot opens the Local Dev Panel in a browser."
+      ],
+      "input": "Selected account and local project.",
+      "output": "Running development server and browser Local Dev Panel.",
+      "success_signal": "The Local Dev Panel shows project build information and Get Started App Card.",
+      "failure_or_wait": "Dependency downloads and server startup add undocumented waits; failures remain in terminal output.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Preview next to Get Started App Card.",
+      "details": [],
+      "input": "Running Local Dev Panel.",
+      "output": "Contacts index page.",
+      "success_signal": "The contacts list opens.",
+      "failure_or_wait": "If no Preview action appears, verify app installation, card setup, selected account, and server state.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click the name of a contact.",
+      "details": [
+        "The guide assumes at least one contact is available."
+      ],
+      "input": "Contacts index with a contact record.",
+      "output": "Contact record view.",
+      "success_signal": "The selected contact opens.",
+      "failure_or_wait": "An empty account requires creating or importing a contact, which the Quickstart does not document.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In the Overview tab's middle column, scroll to and verify the app card.",
+      "details": [
+        "The Developing locally badge is visible only to the developer while the local development server is running."
+      ],
+      "input": "Contact record and active local development session.",
+      "output": "Rendered Get Started App Card.",
+      "success_signal": "Get Started App Card displays with the Developing locally badge.",
+      "failure_or_wait": "A missing card points to placement, account, install, server, or contact-view problems that the Quickstart does not diagnose in detail.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The user lacks Developer tools access.",
+      "path": "Have a super admin or partner admin grant the relevant permission or use an authorized user before generating the Personal Access Key.",
+      "effect_on_first_success": "Adds administrator coordination before CLI authentication and project upload.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The authenticated account is not set as default.",
+      "path": "Supply --account on applicable commands or select the account at prompts; hs account use can set it later.",
+      "effect_on_first_success": "Adds repeated account selection and risk of targeting the wrong account.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 26,
+      "condition": "The developer chooses a new developer test account.",
+      "path": "Select the new-test-account option, enter its requested name or configuration, let HubSpot create it, install the app there through the prompts, ensure a contact exists, then start the testing session.",
+      "effect_on_first_success": "Adds account creation, app installation, and test-data setup while isolating real HubSpot data.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 26,
+      "condition": "The developer chooses an existing developer test or sandbox account.",
+      "path": "Select it, complete any prompted app install, and use its contact data for the preview.",
+      "effect_on_first_success": "May require account access, entitlement, and installation but avoids the standard account's production data.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 30,
+      "condition": "The developer continues the Quickstart development loop.",
+      "path": "Edit the app card's React/TypeScript file and save it to observe automatic local update; for JSON configuration changes, run hs project upload or click Upload and build.",
+      "effect_on_first_success": "Demonstrates hot reload and rebuild behavior after the first card is already visible.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A standard HubSpot account is required before the Quickstart begins.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "installation",
+      "description": "Node.js 20+ and npm are needed for the HubSpot CLI.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "installation",
+      "description": "The HubSpot CLI must be installed, potentially requiring global npm write permission.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "permission",
+      "description": "The Personal Access Key's scopes are bounded by the HubSpot user's permissions; Developer tools access is needed for project upload.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "A per-user, per-account Personal Access Key authenticates the CLI and must be protected.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "wait",
+      "description": "HubSpot must build and deploy the project before installation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "verification",
+      "description": "The installation page displays an expected unverified-app warning and requires explicit confirmation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 26,
+      "type": "choice",
+      "description": "The developer must choose a connected, test, or sandbox account for the local session.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 27,
+      "type": "wait",
+      "description": "Missing dependencies may be installed and the local development server must start.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 29,
+      "type": "environment",
+      "description": "The final preview requires a contact record in the selected account.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://developers.hubspot.com/docs/getting-started/quickstart",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-07-02",
+      "sections_used": [
+        "Set up your local environment",
+        "Create and upload a project",
+        "Install the app and set up the card",
+        "Set the card location",
+        "Run the local development server",
+        "Preview your app card",
+        "Continue local development",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "Complete quickstart journey",
+        "Cloud build and install",
+        "Unverified warning",
+        "Card location",
+        "Testing-account branch",
+        "Visible card terminal signal",
+        "Post-success work"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Install the HubSpot CLI",
+      "url": "https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/install-the-cli",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-05-07",
+      "sections_used": [
+        "Install dependencies",
+        "Install the latest version of the HubSpot CLI",
+        "Authenticate your account"
+      ],
+      "evidence_supported": [
+        "Node version requirement",
+        "CLI installation",
+        "Personal Access Key handoff",
+        "Global-install failure note"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "HubSpot Account Types",
+      "url": "https://developers.hubspot.com/docs/getting-started/account-types",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Standard HubSpot accounts",
+        "Developer test accounts",
+        "Create a developer test account",
+        "Sandbox accounts"
+      ],
+      "evidence_supported": [
+        "Standard account eligibility",
+        "Testing-account alternatives",
+        "Creation and limits of developer test accounts",
+        "Sandbox entitlement distinctions"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Authenticate the CLI with personal access keys",
+      "url": "https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/personal-access-key",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-16",
+      "sections_used": [
+        "Generating and using your key",
+        "Managing personal access keys"
+      ],
+      "evidence_supported": [
+        "Key navigation",
+        "One-key-per-user/account rule",
+        "Permission and scope limits",
+        "CLI config and security behavior"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact forms and verification steps create a new standard HubSpot account?",
+      "impact": "New developers may encounter uncounted pages before CLI setup.",
+      "reason_unresolved": "The Quickstart links to account creation but does not enumerate the hosted signup flow.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "question": "What exact permission or admin flow grants Developer tools access in a given account?",
+      "impact": "A user's Personal Access Key may authenticate but still fail to upload the project.",
+      "reason_unresolved": "The key documentation explains permission inheritance but does not include the administrator grant workflow.",
+      "checked_source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "question": "What happens if the selected account has no contacts?",
+      "impact": "The documented final Preview path cannot open a contact to show the card.",
+      "reason_unresolved": "The Quickstart says to click a contact but does not create seed data or state that the account is pre-populated.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "question": "How long do the first build, deploy, dependency install, and local server startup take?",
+      "impact": "These waits contribute to real time to first visible card.",
+      "reason_unresolved": "HubSpot documents the waits but makes no duration claim.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Editing the React/TypeScript example and observing hot reload.",
+    "Uploading JSON configuration changes and rebuilding.",
+    "Adding data fetching, settings, webhooks, workflows, or other app features.",
+    "OAuth distribution, allowlists, marketplace listing, and app verification.",
+    "Production monitoring, API usage, and release management."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

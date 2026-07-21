@@ -1,0 +1,410 @@
+{
+  "platform": {
+    "name": "Stability AI",
+    "slug": "stability-ai",
+    "organization": "Stability AI Ltd."
+  },
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Stable Image Core REST v2beta through the first saved lighthouse image",
+    "selection_basis": "Under the workshop policy, Stable Image Core is primary because official docs call it the flagship and primary fast text-to-image service and publish a Python sample with a saved-image terminal. Google signup is one opaque step because it is the documented route that grants 25 free credits.",
+    "alternatives_considered": [
+      {
+        "name": "Stable Image Ultra",
+        "url": "https://platform.stability.ai/docs/api-reference",
+        "reason_not_primary": "Ultra is the highest-quality option and costs more credits, while the Stable Image overview calls Core the flagship service and the reference calls Core the primary fast service."
+      },
+      {
+        "name": "Stable Diffusion 3.5 API",
+        "url": "https://platform.stability.ai/docs/api-reference",
+        "reason_not_primary": "This requires choosing among model variants, while Core is presented as the primary service without prompt engineering."
+      },
+      {
+        "name": "Username and password account",
+        "url": "https://platform.stability.ai/docs/getting-started",
+        "reason_not_primary": "The guide documents this account option but explicitly ties 25 free credits to Google social login; credits are required for the first generation."
+      },
+      {
+        "name": "Legacy gRPC SDK",
+        "url": "https://platform.stability.ai/docs/legacy/python-grpc-sdk",
+        "reason_not_primary": "The Stable Image overview says REST v2beta is the newer API and places gRPC and REST v1 in legacy maintenance."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Stability AI Developer Platform account with free credits and an API key, then run the Stable Image Core Python sample until `lighthouse.webp` is saved.",
+    "starting_url": "https://platform.stability.ai/docs/getting-started",
+    "assumed_prior_state": [
+      "No Stability AI membership account, API key, credits, payment method, Python dependency, or generated image is assumed.",
+      "The developer has a Google account for the documented free-credit route, is at least 18 and of legal age, and is authorized to accept the platform terms.",
+      "No account, agreement, OAuth authorization, credential, credit purchase, API request, or image generation was performed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Generate an image with Stable Image Core",
+    "normalized_outcome": "The Stable Image Core sample returns HTTP 200 and saves the generated lighthouse image as `lighthouse.webp`.",
+    "observable_completion_signal": "A non-empty `lighthouse.webp` file is written locally after the API returns HTTP 200.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "On HTTP 200, write `response.content` to `./lighthouse.webp`.",
+      "source_ids": [
+        "S1",
+        "S6",
+        "S7"
+      ]
+    },
+    "why_this_is_the_boundary": "The saved image is the first durable proof that account credits, API-key authentication, generation, and response handling work end to end.",
+    "source_ids": [
+      "S1",
+      "S4",
+      "S6"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Stability AI Developer Platform account created through Google social login for the explicitly documented 25 free credits.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Be at least 18 and of legal age, be authorized to accept the Terms, and accept the required Terms and Privacy Policy checkbox in the post-login Welcome modal.",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "credential",
+      "requirement": "Generate an API key from the account API Keys view and keep it secret.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "billing",
+      "requirement": "Have at least 3 credits for a successful Stable Image Core generation; the documented new-account grant is 25 credits.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "A Python environment with the `requests` package used by the published sample.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Getting Started and select Login from the Developer Platform documentation.",
+      "details": [],
+      "input": "https://platform.stability.ai/docs/getting-started",
+      "output": "The Stability AI Developer Platform account application opens.",
+      "success_signal": "The official platform.stability.ai account surface is reached.",
+      "failure_or_wait": "No navigation failure or recovery behavior is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Complete Google signup through the official Developer Platform.",
+      "details": ["Treat signup as one opaque step; this route grants the documented 25 free credits."],
+      "input": "A Google account",
+      "output": "An authenticated Developer Platform account with free credits is available.",
+      "success_signal": "The account dashboard opens and shows credits.",
+      "failure_or_wait": "Complete Google authorization and any required legal acceptance.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S6",
+        "S7"
+      ]
+    },
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Open API Keys and generate a key with the plus control.", "details": ["Copy and store the key securely."], "input": "Authenticated account", "output": "A Stability API key is available.", "success_signal": "The new key is copied for use.", "failure_or_wait": "Create a replacement if the key display is lost.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 4, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Create a Python environment, install `requests`, and expose the API key securely.", "details": [], "input": "Python and the API key", "output": "The sample can authenticate.", "success_signal": "Python imports `requests` and reads the key.", "failure_or_wait": "Correct the environment or key variable.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the official Stable Image Core Python sample with the lighthouse prompt and WebP response.", "details": ["The request uses the v2beta Stable Image Core endpoint and bearer API key."], "input": "At least 3 credits and the API key", "output": "The API returns generated image bytes.", "success_signal": "The response status is HTTP 200.", "failure_or_wait": "Handle documented authentication, moderation, credit, rate-limit, or server errors.", "required": true, "source_ids": ["S4"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "device", "action": "Verify that the sample wrote `lighthouse.webp` and open it.", "details": [], "input": "HTTP 200 image bytes", "output": "A generated lighthouse image is visible locally.", "success_signal": "`lighthouse.webp` exists and renders as an image.", "failure_or_wait": "Inspect the response body and file-write permissions.", "required": true, "source_ids": ["S4"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Use username and password",
+      "path": "Create a Developer Platform account with a username and password instead of Google social login.",
+      "effect_on_first_success": "Avoids Google authorization, but Getting Started does not explicitly attach the 25-credit grant to this route even though the API-key help article describes new accounts as receiving it.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Free credits are depleted",
+      "path": "Purchase additional credits in Billing at $1 per 100 credits.",
+      "effect_on_first_success": "Adds a payment action before the generation request.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Use JSON response",
+      "path": "Set `accept` to `application/json` and decode the base64-encoded output instead of accepting direct image bytes.",
+      "effect_on_first_success": "Adds JSON decoding before a local image artifact exists.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Use Ultra or Stable Diffusion 3.5",
+      "path": "Select another generate endpoint and pay its documented per-success credit cost.",
+      "effect_on_first_success": "Changes service, cost, and possibly output resolution while preserving a generated-image terminal.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "access",
+      "description": "The selected Google social-login route continues through a client application whose provider consent and account-convergence sequence are not public in the official guide.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "legal",
+      "description": "After login, the public client defines a required checkbox agreeing to the Terms, acknowledging the Privacy Policy, and confirming age 18; Accept submits it, Decline prevents API use, and marketing opt-in is optional.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "credential",
+      "description": "Stability AI directs developers to store API keys in a secret manager or environment variable and never expose them in client-side code or public repositories.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "billing",
+      "description": "Stable Image Core charges 3 credits only for a successful generation; failed generations are not charged.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "policy",
+      "description": "A `403` response means the request was flagged by content moderation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "rate-limit",
+      "description": "The API is limited to 150 requests per 10 seconds; exceeding the limit returns `429`.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started",
+      "url": "https://platform.stability.ai/docs/getting-started",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create an Account",
+        "Authentication",
+        "Credits",
+        "Purchasing Credits"
+      ],
+      "evidence_supported": [
+        "Username/password and Google routes",
+        "Google free-credit grant",
+        "API-key requirement",
+        "Credit requirement and purchase rate"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Where can I find my API Key?",
+      "url": "https://kb.stability.ai/knowledge-base/where-can-i-find-my-api-key",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Where can I find my API Key?"
+      ],
+      "evidence_supported": [
+        "New-account credits",
+        "Profile and API Keys navigation",
+        "Plus-icon key creation",
+        "Ten-key limit",
+        "Secret storage"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Stable Image",
+      "url": "https://platform.stability.ai/docs/getting-started/stable-image",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Image Services",
+        "REST API",
+        "Next Steps"
+      ],
+      "evidence_supported": [
+        "Core flagship selection",
+        "REST v2beta selection",
+        "Account and free-credit prerequisite"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "StabilityAI REST API (v2beta)",
+      "url": "https://platform.stability.ai/docs/api-reference",
+      "official_domain": true,
+      "source_type": "api-reference",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Authentication",
+        "Rate limiting",
+        "Stable Image Core"
+      ],
+      "evidence_supported": [
+        "Core primary-service wording",
+        "Python lighthouse request",
+        "HTTP 200 file write",
+        "Required prompt and headers",
+        "Output resolution",
+        "Credit charge",
+        "Error states"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Pricing",
+      "url": "https://platform.stability.ai/pricing",
+      "official_domain": true,
+      "source_type": "pricing",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How does pricing work?",
+        "Buying Credits",
+        "Generate"
+      ],
+      "evidence_supported": [
+        "Credit value",
+        "25 free credits",
+        "Core cost",
+        "Peer generate-service costs"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Stability AI - Developer Platform",
+      "url": "https://platform.stability.ai/account/keys",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public application response",
+        "Welcome to Stability AI API legal modal"
+      ],
+      "evidence_supported": [
+        "Client-rendered account and API-key application without a public static provider contract",
+        "Required Terms, Privacy Policy, and age-18 checkbox",
+        "Accept, Decline, and optional marketing controls"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "STABILITY AI API Terms of Service",
+      "url": "https://platform.stability.ai/legal/terms-of-service",
+      "official_domain": true,
+      "source_type": "policy",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Agreement",
+        "Your Information",
+        "Notices"
+      ],
+      "evidence_supported": [
+        "Stability AI Ltd. identity",
+        "Legal-age and authority requirements",
+        "Membership account and registered email"
+      ]
+    }
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "No complete first-success boundary is claimed while Google account authorization and convergence remain incompletely documented.",
+    "Other generate services, upscaling, editing, controls, audio, 3D, paid credit purchases, multiple keys, integrations, and production operation are outside the blocked selected path."
+  ]
+}

@@ -1,0 +1,1222 @@
+{
+  "platform": {
+    "name": "OVHcloud",
+    "slug": "ovhcloud",
+    "organization": "OVH Groupe SA"
+  },
+  "category": "Cloud and application runtimes",
+  "surface": {
+    "name": "Create a public hourly Linux instance in the OVHcloud Control Panel and complete first SSH login",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create a public hourly Linux instance in the OVHcloud Control Panel and complete first SSH login. The current getting-started guide presents this as its complete browser-first procedure and provides exact required SSH-key, wizard, status, username, address, and login steps. Prior surface before policy commit: Create an OVHcloud Public Cloud project, launch a Linux instance, and log in over SSH.",
+    "alternatives_considered": [
+      {
+        "name": "OVHcloud API instance creation",
+        "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+        "reason_not_primary": "The API is a peer tab but requires OVHcloud API access plus separate flavor, image, region, and SSH-key identifiers before the create call."
+      },
+      {
+        "name": "OVHcloud CLI instance creation",
+        "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+        "reason_not_primary": "The CLI is a peer tab that adds local installation, account credential configuration, project ID, region, and command parameters."
+      },
+      {
+        "name": "OpenStack CLI or Horizon",
+        "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+        "reason_not_primary": "These interfaces add OpenStack environment or Horizon access. Horizon can create an instance without a key, but the official docs warn that connection then requires rescue mode."
+      },
+      {
+        "name": "Terraform",
+        "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+        "reason_not_primary": "Terraform adds provider credentials and configuration, and the first Public Cloud project must still be created manually to accept terms and validate payment."
+      },
+      {
+        "name": "Windows instance and RDP",
+        "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+        "reason_not_primary": "Windows is a fully documented branch but adds VNC-based first-boot locale and Administrator password setup before RDP. The Linux SSH path is the general key-based first connection."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create an OVHcloud account and active Public Cloud project, launch a first public Linux instance, and obtain an authenticated remote shell.",
+    "starting_url": "https://docs.ovhcloud.com/en/guides/account-and-service-management/account-information/ovhcloud-account-creation",
+    "assumed_prior_state": [
+      "The developer has a valid and accessible email address.",
+      "The developer can provide accurate individual, company, or non-profit account details and accept the Public Cloud contract terms.",
+      "The developer can register and validate a payment method supported by the applicable OVHcloud regional entity.",
+      "The local device has a current OpenSSH client and can securely retain a private SSH key and optional passphrase.",
+      "The developer is authorized to start hourly or monthly billable compute and any default backup or networking resources included in the order summary."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "First login on an instance with a GNU/Linux OS installed",
+    "normalized_outcome": "OVHcloud reports the first Linux Public Cloud instance Enabled, and the developer has logged in through SSH as the image's preconfigured sudo user.",
+    "observable_completion_signal": "The instance table shows `Enabled`, and `ssh username@IPv4_instance` opens the remote command line using the private key corresponding to the public key selected at creation.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "First login on an instance with a GNU/Linux OS installed",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "The official guide names the connection section `First login`, states that the instance is accessible immediately after creation, and moves password setup, user management, and additional SSH keys into Step 6 after the login. Application installation is also outside the getting-started boundary.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "A valid accessible email address, country of tax residence, currency, management language, unique strong password, and accurate account-type details.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Acceptance of the Public Cloud contract terms during first-project creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "billing",
+      "requirement": "A valid registered and validated payment method is required to activate a discovery-mode project and create resources.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "configuration",
+      "requirement": "An active Public Cloud project in the OVHcloud account. Discovery mode permits browsing but not instance creation.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "credential",
+      "requirement": "An RSA, ECDSA, or Ed25519 SSH key pair, with the public key available for instance creation and the private key retained locally.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "software",
+      "requirement": "A local OpenSSH-compatible client for the primary GNU/Linux connection route.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Creating an OVHcloud account, follow its account-creation link, and select Create an account.",
+      "details": [],
+      "input": "https://docs.ovhcloud.com/en/guides/account-and-service-management/account-information/ovhcloud-account-creation",
+      "output": "The official regional account setup opens.",
+      "success_signal": "Country of tax residence, currency, and management-language fields are visible.",
+      "failure_or_wait": "An existing OVHcloud account holder can log in and skip to first-project creation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Select country of tax residence, currency, and management language, then confirm.",
+      "details": [],
+      "input": "The legal and billing locale for the account.",
+      "output": "The account is associated with an OVHcloud regional context and currency.",
+      "success_signal": "Email and password fields become available.",
+      "failure_or_wait": "The guide requires these three selections before it presents the email and password fields; it does not document a bypass.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter a valid accessible email address and create a unique, sufficiently complex password, then submit the form.",
+      "details": [],
+      "input": "Email address and new OVHcloud account password.",
+      "output": "A one-time email validation code is sent.",
+      "success_signal": "The interface displays boxes for the code.",
+      "failure_or_wait": "An invalid or inaccessible email prevents validation. OVHcloud advises against using an address on a domain that this same account will manage.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Retrieve the one-time email code and enter it in the account form.",
+      "details": [],
+      "input": "The code from the OVHcloud validation email.",
+      "output": "The email address is validated.",
+      "success_signal": "The account-type selection appears.",
+      "failure_or_wait": "If the message is missing, check spam, request another code, or change the email address.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Choose Non-profit, Company, or Private individual and complete the requested account details.",
+      "details": [],
+      "input": "Accurate identity or organization information for the selected account type.",
+      "output": "The OVHcloud account is created and receives a unique NIC handle.",
+      "success_signal": "The developer is automatically logged in to the account dashboard.",
+      "failure_or_wait": "OVHcloud defines who should use each account type and tells the user to make sure the entered details are correct.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Public Cloud, read the Public Cloud contracts, tick the acceptance box, and select Discover the Public Cloud universe.",
+      "details": [],
+      "input": "An authenticated OVHcloud account and contract acceptance.",
+      "output": "The first Public Cloud project-creation process begins.",
+      "success_signal": "The project is created in discovery mode when no payment method is registered, or project naming and payment selection appear when one already exists.",
+      "failure_or_wait": "Failure to accept the contracts prevents the first project.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "For the new-account path without a registered payment method, allow the first project to be created in discovery mode and open its homepage.",
+      "details": [],
+      "input": "The accepted first-project request.",
+      "output": "A browsable but non-deployable Public Cloud project exists.",
+      "success_signal": "The project is visible in the Public Cloud selector and presents Activate project.",
+      "failure_or_wait": "Discovery mode cannot create resources such as instances, so project presence alone is not deployable success.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create an Ed25519 SSH key pair, or use the documented RSA alternative, and protect the private key with a passphrase when practical.",
+      "details": [],
+      "input": "For example `ssh-keygen -t ed25519 -a 100`, an optional custom filename, and an optional recommended passphrase.",
+      "output": "A public key file and matching private key exist in the local `.ssh` directory.",
+      "success_signal": "The key generator prints the saved file paths and fingerprint.",
+      "failure_or_wait": "Losing or exposing the private key prevents or compromises future access. Existing key holders can skip generation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Display and copy the public-key string.",
+      "details": [],
+      "input": "For example `cat ~/.ssh/id_ed25519.pub` or the `.pub` path chosen in step 9.",
+      "output": "The shareable public key is on the clipboard or otherwise ready to paste.",
+      "success_signal": "The displayed line begins with a supported key type and includes the public-key material.",
+      "failure_or_wait": "Only the `.pub` content should be copied. The private key must not be uploaded or shared.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the active project's Home page and select Create an instance.",
+      "details": [],
+      "input": "An active project with validated payment and an available SSH public key.",
+      "output": "The instance creation wizard opens.",
+      "success_signal": "Name, location, model, image, SSH key, backup, network, billing, and advanced-setting controls are visible.",
+      "failure_or_wait": "Discovery mode cannot create resources, and the broader Public Cloud guide says regional quotas can limit the resources a project can start.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the default automated backup and choose its 7- or 14-day rotation, or change the backup selection deliberately.",
+      "details": [],
+      "input": "The default-enabled backup configuration and a 7- or 14-day rotation.",
+      "output": "Backup behavior is included in the instance order.",
+      "success_signal": "The selected backup state and rotation appear in the summary.",
+      "failure_or_wait": "Because automated backups are enabled by default, overlooking this section can preserve a backup and rotation choice the developer did not intend.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Use Public Mode for the direct first SSH route, leave private-network selection empty, enable public connectivity, and choose Basic Public IP.",
+      "details": [],
+      "input": "No private network, public-connectivity toggle enabled, and the free Basic Public IP tied to the instance lifetime.",
+      "output": "The instance will be directly reachable over public IPv4 or IPv6.",
+      "success_signal": "Basic Public IP is present in the network summary without a gateway dependency.",
+      "failure_or_wait": "Private Mode requires a gateway or Load Balancer plus Floating IP. A reusable Floating IP is a separate configuration branch.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose hourly billing for a flexible first evaluation and leave advanced settings unchanged unless a flexible instance or post-installation script is required.",
+      "details": [],
+      "input": "Hourly rather than monthly billing, one instance, and default advanced settings.",
+      "output": "The instance can later convert to monthly billing and will accrue hourly charges until deletion.",
+      "success_signal": "Hourly billing and the quantity are visible in the order summary.",
+      "failure_or_wait": "Monthly billing is lower-cost but non-reversible. Advanced settings can switch to a flexible instance with one 50 GB disk or add a post-installation script.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the full order summary and select Launch my instance.",
+      "details": [],
+      "input": "Name, location, model, Linux image, SSH key, backup, public network, billing mode, quantity, and any advanced settings.",
+      "output": "OVHcloud begins delivering the instance.",
+      "success_signal": "The instance appears in the Instances table with a provisioning status.",
+      "failure_or_wait": "Regional quota limits can prevent the requested resources from starting. The current instance guide says delivery may take a few minutes.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Provision and boot the instance until the Instances table reports `Enabled`.",
+      "details": [],
+      "input": "The accepted instance configuration.",
+      "output": "A running Linux instance with public IP and the selected public key installed.",
+      "success_signal": "Status is `Enabled`; if another status remains after recent creation, the developer can select Refresh.",
+      "failure_or_wait": "Delivery may take a few minutes. A separate 2024 overview uses billing-specific status terminology: billing starts at `ACTIVE`, displayed as `Activated`, rather than during `BUILD`; the current readiness guide uses `Enabled` as the connection-ready status.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the instance Dashboard, verify the image-derived preconfigured username in Networks, and retrieve the public IP address shown for the instance or through the documented OVHcloud CLI list command.",
+      "details": [],
+      "input": "The Enabled instance's Dashboard fields.",
+      "output": "The exact login username and network address are available.",
+      "success_signal": "The Dashboard shows the image-specific user, such as `ubuntu`, `debian`, or `fedora`, and the instance's public IP is available for the SSH command.",
+      "failure_or_wait": "Assuming `root` or another username can cause authentication failure; the guide directs the user to verify the Dashboard value.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `ssh username@IPv4_instance`, specifying the private-key path when needed and entering its passphrase if configured.",
+      "details": [],
+      "input": "The Dashboard username, public IPv4, matching local private key, and optional key passphrase.",
+      "output": "An authenticated command-line session on the first OVHcloud instance.",
+      "success_signal": "The remote shell prompt opens, completing the guide's First login milestone.",
+      "failure_or_wait": "For key errors, verify the local private key and selected public key. A lost or omitted key requires the documented rescue-mode key-replacement route. VNC on a new Linux instance also requires first setting a password after SSH login.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Creating an OVHcloud account, follow its account-creation link, and select Create an account.",
+      "details": [],
+      "input": "https://docs.ovhcloud.com/en/guides/account-and-service-management/account-information/ovhcloud-account-creation",
+      "output": "The official regional account setup opens.",
+      "success_signal": "Country of tax residence, currency, and management-language fields are visible.",
+      "failure_or_wait": "An existing OVHcloud account holder can log in and skip to first-project creation.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Select country of tax residence, currency, and management language, then confirm.",
+      "details": [],
+      "input": "The legal and billing locale for the account.",
+      "output": "The account is associated with an OVHcloud regional context and currency.",
+      "success_signal": "Email and password fields become available.",
+      "failure_or_wait": "The guide requires these three selections before it presents the email and password fields; it does not document a bypass.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter a valid accessible email address and create a unique, sufficiently complex password, then submit the form.",
+      "details": [],
+      "input": "Email address and new OVHcloud account password.",
+      "output": "A one-time email validation code is sent.",
+      "success_signal": "The interface displays boxes for the code.",
+      "failure_or_wait": "An invalid or inaccessible email prevents validation. OVHcloud advises against using an address on a domain that this same account will manage.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Retrieve the one-time email code and enter it in the account form.",
+      "details": [],
+      "input": "The code from the OVHcloud validation email.",
+      "output": "The email address is validated.",
+      "success_signal": "The account-type selection appears.",
+      "failure_or_wait": "If the message is missing, check spam, request another code, or change the email address.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Choose Non-profit, Company, or Private individual and complete the requested account details.",
+      "details": [],
+      "input": "Accurate identity or organization information for the selected account type.",
+      "output": "The OVHcloud account is created and receives a unique NIC handle.",
+      "success_signal": "The developer is automatically logged in to the account dashboard.",
+      "failure_or_wait": "OVHcloud defines who should use each account type and tells the user to make sure the entered details are correct.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Public Cloud, read the Public Cloud contracts, tick the acceptance box, and select Discover the Public Cloud universe.",
+      "details": [],
+      "input": "An authenticated OVHcloud account and contract acceptance.",
+      "output": "The first Public Cloud project-creation process begins.",
+      "success_signal": "The project is created in discovery mode when no payment method is registered, or project naming and payment selection appear when one already exists.",
+      "failure_or_wait": "Failure to accept the contracts prevents the first project.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "For the new-account path without a registered payment method, allow the first project to be created in discovery mode and open its homepage.",
+      "details": [],
+      "input": "The accepted first-project request.",
+      "output": "A browsable but non-deployable Public Cloud project exists.",
+      "success_signal": "The project is visible in the Public Cloud selector and presents Activate project.",
+      "failure_or_wait": "Discovery mode cannot create resources such as instances, so project presence alone is not deployable success.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "other",
+      "action": "Select Activate project, register a payment method, and name the project if prompted.",
+      "details": [],
+      "input": "Project name and a payment method, plus any billing, contact, terms, privacy, and payment confirmation fields shown for the applicable regional order path.",
+      "output": "The Public Cloud project is active and can create resources.",
+      "success_signal": "The project exits discovery mode and the product creation controls are enabled.",
+      "failure_or_wait": "Without a registered payment method, the project remains in discovery mode and cannot create resources. OVHcloud's US guide separately documents a $0.99 first-project anti-fraud charge credited to the first bill.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Create an Ed25519 SSH key pair, or use the documented RSA alternative, and protect the private key with a passphrase when practical.",
+      "details": [],
+      "input": "For example `ssh-keygen -t ed25519 -a 100`, an optional custom filename, and an optional recommended passphrase.",
+      "output": "A public key file and matching private key exist in the local `.ssh` directory.",
+      "success_signal": "The key generator prints the saved file paths and fingerprint.",
+      "failure_or_wait": "Losing or exposing the private key prevents or compromises future access. Existing key holders can skip generation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Display and copy the public-key string.",
+      "details": [],
+      "input": "For example `cat ~/.ssh/id_ed25519.pub` or the `.pub` path chosen in step 9.",
+      "output": "The shareable public key is on the clipboard or otherwise ready to paste.",
+      "success_signal": "The displayed line begins with a supported key type and includes the public-key material.",
+      "failure_or_wait": "Only the `.pub` content should be copied. The private key must not be uploaded or shared.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Within the active Public Cloud project, open SSH Keys under Settings, select Add an SSH key, name it, paste the public-key string, and select Add.",
+      "details": [],
+      "input": "A key name and RSA, ECDSA, or Ed25519 public key.",
+      "output": "The SSH public key is stored for all Public Cloud regions and selectable during instance creation.",
+      "success_signal": "The key appears in the project's SSH Keys list.",
+      "failure_or_wait": "Import is optional because a key can be pasted in the instance wizard, but a public key is mandatory for Control Panel Linux instance creation.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the active project's Home page and select Create an instance.",
+      "details": [],
+      "input": "An active project with validated payment and an available SSH public key.",
+      "output": "The instance creation wizard opens.",
+      "success_signal": "Name, location, model, image, SSH key, backup, network, billing, and advanced-setting controls are visible.",
+      "failure_or_wait": "Discovery mode cannot create resources, and the broader Public Cloud guide says regional quotas can limit the resources a project can start.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Enter the instance name and select a location close to the intended users.",
+      "details": [],
+      "input": "A full instance name and an available 3-AZ, 1-AZ, or Local Zone location.",
+      "output": "The resource identity and deployment locality are set.",
+      "success_signal": "The wizard displays the location-compatible models and images.",
+      "failure_or_wait": "For Local Zones, private connectivity is limited to instances in the same Local Zone and is incompatible with vRack.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 31,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select an Instance Model suited to the first evaluation.",
+      "details": [],
+      "input": "A displayed Best Sellers, General Purpose, Compute Optimized, Memory Optimized, GPU, Discovery, Storage Optimized, or Metal flavor.",
+      "output": "Processor, memory, storage, and model capabilities are assigned.",
+      "success_signal": "The selected model appears in the order summary.",
+      "failure_or_wait": "Initial project quotas can limit model availability. Regular instances can be upgraded but not downgraded; a flexible instance is the documented resize exception.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 32,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select a GNU/Linux Distribution Type and Image Version, then select the stored SSH key.",
+      "details": [],
+      "input": "A location- and model-compatible Linux image plus the public key imported in step 11.",
+      "output": "OVHcloud will install the image and its preconfigured sudo user with the selected public key.",
+      "success_signal": "The image and SSH key appear in the summary.",
+      "failure_or_wait": "The preconfigured username depends on the image, such as `ubuntu`, `debian`, or `fedora`. Omitting the key is not permitted in the Control Panel Linux path.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 33,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the default automated backup and choose its 7- or 14-day rotation, or change the backup selection deliberately.",
+      "details": [],
+      "input": "The default-enabled backup configuration and a 7- or 14-day rotation.",
+      "output": "Backup behavior is included in the instance order.",
+      "success_signal": "The selected backup state and rotation appear in the summary.",
+      "failure_or_wait": "Because automated backups are enabled by default, overlooking this section can preserve a backup and rotation choice the developer did not intend.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 34,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Use Public Mode for the direct first SSH route, leave private-network selection empty, enable public connectivity, and choose Basic Public IP.",
+      "details": [],
+      "input": "No private network, public-connectivity toggle enabled, and the free Basic Public IP tied to the instance lifetime.",
+      "output": "The instance will be directly reachable over public IPv4 or IPv6.",
+      "success_signal": "Basic Public IP is present in the network summary without a gateway dependency.",
+      "failure_or_wait": "Private Mode requires a gateway or Load Balancer plus Floating IP. A reusable Floating IP is a separate configuration branch.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 35,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose hourly billing for a flexible first evaluation and leave advanced settings unchanged unless a flexible instance or post-installation script is required.",
+      "details": [],
+      "input": "Hourly rather than monthly billing, one instance, and default advanced settings.",
+      "output": "The instance can later convert to monthly billing and will accrue hourly charges until deletion.",
+      "success_signal": "Hourly billing and the quantity are visible in the order summary.",
+      "failure_or_wait": "Monthly billing is lower-cost but non-reversible. Advanced settings can switch to a flexible instance with one 50 GB disk or add a post-installation script.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 36,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the full order summary and select Launch my instance.",
+      "details": [],
+      "input": "Name, location, model, Linux image, SSH key, backup, public network, billing mode, quantity, and any advanced settings.",
+      "output": "OVHcloud begins delivering the instance.",
+      "success_signal": "The instance appears in the Instances table with a provisioning status.",
+      "failure_or_wait": "Regional quota limits can prevent the requested resources from starting. The current instance guide says delivery may take a few minutes.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 37,
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-console",
+      "action": "Provision and boot the instance until the Instances table reports `Enabled`.",
+      "details": [],
+      "input": "The accepted instance configuration.",
+      "output": "A running Linux instance with public IP and the selected public key installed.",
+      "success_signal": "Status is `Enabled`; if another status remains after recent creation, the developer can select Refresh.",
+      "failure_or_wait": "Delivery may take a few minutes. A separate 2024 overview uses billing-specific status terminology: billing starts at `ACTIVE`, displayed as `Activated`, rather than during `BUILD`; the current readiness guide uses `Enabled` as the connection-ready status.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 38,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the instance Dashboard, verify the image-derived preconfigured username in Networks, and retrieve the public IP address shown for the instance or through the documented OVHcloud CLI list command.",
+      "details": [],
+      "input": "The Enabled instance's Dashboard fields.",
+      "output": "The exact login username and network address are available.",
+      "success_signal": "The Dashboard shows the image-specific user, such as `ubuntu`, `debian`, or `fedora`, and the instance's public IP is available for the SSH command.",
+      "failure_or_wait": "Assuming `root` or another username can cause authentication failure; the guide directs the user to verify the Dashboard value.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 39,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `ssh username@IPv4_instance`, specifying the private-key path when needed and entering its passphrase if configured.",
+      "details": [],
+      "input": "The Dashboard username, public IPv4, matching local private key, and optional key passphrase.",
+      "output": "An authenticated command-line session on the first OVHcloud instance.",
+      "success_signal": "The remote shell prompt opens, completing the guide's First login milestone.",
+      "failure_or_wait": "For key errors, verify the local private key and selected public key. A lost or omitted key requires the documented rescue-mode key-replacement route. VNC on a new Linux instance also requires first setting a password after SSH login.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Regional account",
+      "path": "Choose the country of tax residence, currency, and management language before entering account credentials.",
+      "effect_on_first_success": "These selections are mandatory account fields. The global and US project guides document different regional order and promotional terms.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "Legal account type",
+      "path": "Choose Non-profit, Company, or Private individual and provide its requested details.",
+      "effect_on_first_success": "All types can reach the dashboard, but required identity and organization fields differ.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Payment method already registered",
+      "path": "Name the Public Cloud project and select the existing payment method during project creation instead of entering discovery mode and activating later.",
+      "effect_on_first_success": "Removes the discovery-mode page and separate Activate project action while preserving contract acceptance and validated billing.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "First-project regional promotion",
+      "path": "Receive the applicable free-trial credit only if the account, region, and prior-project history satisfy the published conditions.",
+      "effect_on_first_success": "Reduces effective cost but does not remove payment registration or ongoing billing. The global English page advertises \u00a3175 for one month, while the US page advertises $200 for 90 days after a $0.99 purchase.",
+      "source_ids": [
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "Key storage preference",
+      "path": "Skip stored-key import and select Create a new SSH key inside the instance wizard to paste the public key directly.",
+      "effect_on_first_success": "Removes a navigation step but still requires local key generation and public-key input.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "Deployment mode",
+      "path": "Choose a 3-AZ, 1-AZ, or Local Zone location.",
+      "effect_on_first_success": "Changes resilience, available models, network behavior, vRack compatibility, and price.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "Resource profile",
+      "path": "Choose Best Sellers, General Purpose, Compute Optimized, Memory Optimized, GPU, Discovery, Storage Optimized, or Metal.",
+      "effect_on_first_success": "All are instance-model choices, but allocated resources, guarantees, intended workloads, regional availability, and quota fit differ. Discovery is specifically shared for testing and development.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 15,
+      "condition": "Operating system",
+      "path": "Choose Windows instead of GNU/Linux, finish locale and Administrator-password setup in VNC, then connect through RDP.",
+      "effect_on_first_success": "Removes SSH-key login but adds first-boot GUI configuration and RDP client steps; the success boundary becomes an authenticated Windows desktop.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 17,
+      "condition": "Networking mode",
+      "path": "Use Private Mode with a private network, gateway or Load Balancer, and Floating IP, or use a reusable Floating IP in a public configuration.",
+      "effect_on_first_success": "Adds network resource creation and address-routing dependencies before remote access.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 18,
+      "condition": "Billing commitment",
+      "path": "Choose lower-cost monthly billing instead of hourly.",
+      "effect_on_first_success": "The deployment steps remain the same, but the billing choice cannot be reversed to hourly.",
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "Provisioning interface",
+      "path": "Use OVHcloud API, OVHcloud CLI, OpenStack CLI, Horizon, or Terraform instead of the Control Panel.",
+      "effect_on_first_success": "Adds credentials and tooling and changes which network, power, and key requirements must be expressed explicitly before converging on Enabled status and remote access.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 22,
+      "condition": "SSH cannot connect",
+      "path": "Use rescue mode to replace a lost or missing key; VNC becomes usable for Linux only after a password has first been set on the preconfigured user.",
+      "effect_on_first_success": "Recovery adds reboot, key-replacement, or post-login password work and therefore does not shorten the primary path.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "other",
+      "description": "Country of tax residence, currency, and language selection precede credentials. The global and US project guides show that regional order and promotion details differ.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "verification",
+      "description": "Email ownership is verified with a one-time code before account type and identity details.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "legal",
+      "description": "Public Cloud contracts must be reviewed and accepted before the first project is created.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "other",
+      "description": "A first project without payment is placed in discovery mode, which looks browsable but cannot create an instance until activation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "billing",
+      "description": "A payment method is required to activate the project. The US order path additionally documents billing and contact confirmation, terms and privacy acceptance, a Pay action, and a $0.99 anti-fraud charge.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "other",
+      "description": "Key-only Linux access adds local key generation, private-key protection, an optional passphrase, and later key matching.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 14,
+      "type": "choice",
+      "description": "The model picker exposes eight families with different resources and use cases, while quotas and resize constraints can narrow the choice.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "billing",
+      "description": "Automated backups are enabled by default and require a 7- or 14-day rotation decision before launch.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "other",
+      "description": "Public, Private, and Local Private modes have different IP, gateway, Floating IP, and vRack requirements. The primary path requires an explicit public-connectivity choice.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 20,
+      "type": "wait",
+      "description": "Delivery can take a few minutes before the status becomes Enabled; the user may need to refresh the table.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 21,
+      "type": "credential",
+      "description": "The preconfigured sudo username varies by image and must be retrieved from the Dashboard rather than assumed.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 22,
+      "type": "other",
+      "description": "A lost, wrong, or omitted SSH key requires verification or rescue-mode replacement. Linux VNC is not a zero-setup fallback because a password must first be configured.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The instance guide says delivery may take a few minutes. The broader Public Cloud introduction says deployment takes a few seconds, but neither page publishes a universal account-to-shell total, and project activation through the applicable regional payment path can add unquantified time.",
+    "source_ids": [
+      "S3",
+      "S5"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Creating an OVHcloud account",
+      "url": "https://docs.ovhcloud.com/en/guides/account-and-service-management/account-information/ovhcloud-account-creation",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "February 26, 2026",
+      "sections_used": [
+        "How do I create my OVHcloud account?",
+        "What is my NIC handle?"
+      ],
+      "evidence_supported": [
+        "Email prerequisite",
+        "Country, currency, and language",
+        "Email and password",
+        "One-time email code",
+        "Account-type selection",
+        "Requested details",
+        "Automatic dashboard login",
+        "NIC handle"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Creating your first OVHcloud Public Cloud project",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/cross-functional/create-a-public-cloud-project",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "May 28, 2026",
+      "sections_used": [
+        "Project creation",
+        "Discovery Mode",
+        "Project activation and free trial"
+      ],
+      "evidence_supported": [
+        "Contract acceptance",
+        "First-project creation",
+        "Existing-payment branch",
+        "Discovery-mode constraint",
+        "Activate project",
+        "Payment registration",
+        "Conditional UK-denominated free-trial terms"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "How to create a Public Cloud instance and connect to it",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "May 27, 2026",
+      "sections_used": [
+        "Step 1: Create an SSH key set",
+        "Step 2: Import SSH keys",
+        "Step 3: Prepare the network configuration",
+        "Step 4: Create the instance",
+        "Step 5: Connect to the instance",
+        "Step 6: First steps on a new instance"
+      ],
+      "evidence_supported": [
+        "Primary complete path",
+        "Mandatory Linux public key",
+        "Key import",
+        "Network-mode branches",
+        "All wizard fields",
+        "Default backup",
+        "Hourly versus monthly billing",
+        "Launch and wait",
+        "Enabled status",
+        "Dashboard username and IP",
+        "SSH command",
+        "Windows branch",
+        "VNC and rescue limits",
+        "Post-success cut line"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How to create and use authentication keys for SSH connections to Public Cloud instances",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/creating-ssh-keys",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "December 9, 2024",
+      "sections_used": [
+        "Creating key pairs for OpenSSH connections",
+        "How to configure key pairs from a GNU/Linux distribution or macOS",
+        "Managing multiple authentication keys"
+      ],
+      "evidence_supported": [
+        "SSH-key default",
+        "Ed25519 and RSA commands",
+        "Filename and passphrase prompts",
+        "Private-key protection",
+        "Public-key export",
+        "Private-key path and connection configuration"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "All you need to know to get started with Public Cloud",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/cross-functional/compute-essential-information",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "April 19, 2024",
+      "sections_used": [
+        "An ecosystem of on-demand resources",
+        "Starting: handling",
+        "The project",
+        "Billing",
+        "Quota management"
+      ],
+      "evidence_supported": [
+        "Starter sequence",
+        "Payment-method requirement",
+        "Hourly and monthly resource use",
+        "ACTIVE versus BUILD billing start",
+        "Quota factors",
+        "Seconds-level general deployment claim"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Legal notice",
+      "url": "https://blog.ovhcloud.com/legal-notice/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "OVH SAS",
+        "OVH Groupe S.A. relationship"
+      ],
+      "evidence_supported": [
+        "OVH SAS legal publisher",
+        "OVH Groupe S.A. parent relationship"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Creating your first OVHcloud Public Cloud project, United States",
+      "url": "https://support.us.ovhcloud.com/hc/en-us/articles/360002245784-Creating-your-first-OVHcloud-Public-Cloud-project",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "March 10, 2026",
+      "sections_used": [
+        "Initiate project creation",
+        "Complete your order",
+        "Free-trial terms"
+      ],
+      "evidence_supported": [
+        "US project naming",
+        "$0.99 first-project anti-fraud charge credited to first bill",
+        "Billing and contact confirmation",
+        "Terms and privacy acceptance",
+        "Payment method and Pay action",
+        "US $200 over 90 days conditional promotion",
+        "Default resource limits"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which payment instruments, authorization amount, and anti-fraud checks apply to each regional OVHcloud account?",
+      "impact": "The number of billing steps and time before project activation can vary materially.",
+      "reason_unresolved": "The global project guide requires payment registration but does not enumerate universal methods or challenges, while the US guide documents a region-specific $0.99 transaction.",
+      "checked_source_ids": [
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "question": "Which model, Linux image, and location should be treated as the universal tutorial default?",
+      "impact": "The exact cost, username, performance, quota, and availability differ across otherwise valid first paths.",
+      "reason_unresolved": "The getting-started guide intentionally asks the user to choose and provides category guidance without naming one universal combination.",
+      "checked_source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "question": "What live price, if any, is shown for the default automated backup in each region and model combination?",
+      "impact": "The total first-success order cost cannot be calculated from the getting-started guide alone.",
+      "reason_unresolved": "The guide documents that automated backup is enabled by default and requires a 7- or 14-day rotation, but it does not publish a universal backup price in the cited section.",
+      "checked_source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "question": "What exact shell prompt or command output should be captured after successful SSH authentication?",
+      "impact": "The connection boundary is observable as an opened remote command line but lacks one vendor-specified verification command such as `whoami`.",
+      "reason_unresolved": "The guide ends the first-login action with the SSH command and then moves to post-login user management, without prescribing a terminal verification command.",
+      "checked_source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Setting a password for the preconfigured Linux user or enabling password-based remote SSH.",
+    "Creating additional users or SSH keys after the first login.",
+    "Installing an application, preconfigured application image, web server, or workload.",
+    "Creating private networks, gateways, Load Balancers, Floating IPs, vRack connections, security groups, or Additional IPs beyond first public access.",
+    "Configuring production backups, snapshots, monitoring, DNS, TLS, storage, or quota increases.",
+    "Automating future resources through API, OVHcloud CLI, OpenStack, Horizon, or Terraform.",
+    "Deleting the test instance to stop hourly billing after the workshop measurement."
+  ]
+}

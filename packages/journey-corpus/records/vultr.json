@@ -1,0 +1,979 @@
+{
+  "platform": {
+    "name": "Vultr",
+    "slug": "vultr",
+    "organization": "The Constant Company, LLC"
+  },
+  "category": "Cloud and application runtimes",
+  "surface": {
+    "name": "Deploy a Linux Cloud Compute instance in the Vultr Console and verify it over OpenSSH",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Deploy a Linux Cloud Compute instance in the Vultr Console and verify it over OpenSSH. The account guide directs a new user to a first server, the current provisioning guide supplies the general Console workflow, and the OpenSSH guide supplies exact default-credential and `whoami` verification steps. Prior surface before policy commit: Create a Vultr account, deploy a Cloud Compute instance, and connect with OpenSSH.",
+    "alternatives_considered": [
+      {
+        "name": "Sign up with GitHub or Google",
+        "url": "https://docs.vultr.com/create-a-new-vultr-account-with-github-or-google",
+        "reason_not_primary": "This is a valid shorter identity branch, but it still converges on profile completion and billing before the first deployment."
+      },
+      {
+        "name": "Deploy through the Vultr API",
+        "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/provisioning",
+        "reason_not_primary": "The provisioning guide documents API as a peer interface, but it adds API-key handling and request construction before a first instance."
+      },
+      {
+        "name": "Deploy through Vultr CLI",
+        "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/provisioning",
+        "reason_not_primary": "The CLI is a peer deployment interface and requires local CLI installation and API credentials, while the Console path is fully documented after signup."
+      },
+      {
+        "name": "Deploy through Terraform",
+        "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/provisioning",
+        "reason_not_primary": "Terraform is appropriate for infrastructure as code but adds provider, credential, and configuration work before the first instance."
+      },
+      {
+        "name": "Vultr Console connection",
+        "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/connection/vultr-console",
+        "reason_not_primary": "The built-in noVNC console is a documented alternative and recovery route. OpenSSH is the primary remote-access procedure in the connection documentation and ends with an explicit `whoami` verification command."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Vultr account, provision a first general-purpose Linux Cloud Compute instance, and verify interactive shell access.",
+    "starting_url": "https://docs.vultr.com/platform/create-an-account",
+    "assumed_prior_state": [
+      "The developer has a working email address, or a GitHub or Google account for the documented OAuth signup branch.",
+      "The developer can provide an accepted payment method and accept Vultr's Terms of Service and Privacy Policy.",
+      "The local machine has a terminal and OpenSSH client for the primary connection path.",
+      "The developer is authorized to create a billable Cloud Compute resource or use an applicable promotional credit."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Verify the active SSH identity with `whoami`",
+    "normalized_outcome": "Vultr has provisioned the developer's first Cloud Compute instance, and the developer can open its Linux shell and verify the logged-in user.",
+    "observable_completion_signal": "The SSH session accepts the instance credentials and `whoami` prints the current remote username.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Verify the active SSH identity with `whoami`",
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4"
+      ]
+    },
+    "why_this_is_the_boundary": "The account guide says the user can deploy a first server after billing setup, the provisioning guide ends with Deploy, and the OpenSSH guide ends its default-credentials procedure by running `whoami`. Installing an application or configuring a production workload occurs after this first usable compute success.",
+    "source_ids": [
+      "S1",
+      "S3",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "A deliverable email address and a strong password, or a GitHub or Google identity for the documented provider-signup branch.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Acceptance of the Terms of Service and Privacy Policy during registration and the applicable terms presented during billing setup.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "billing",
+      "requirement": "An accepted payment method for account verification. The credit-card route can link a card with a $0.00 deposit, while other documented methods require a small deposit.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "A terminal with OpenSSH installed for the primary remote connection path.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "credential",
+      "requirement": "The username and password shown on the instance Overview page, or a private key matching a public key selected during deployment.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open How to Create a Vultr Account and follow its registration path.",
+      "details": [],
+      "input": "https://docs.vultr.com/platform/create-an-account",
+      "output": "The official account creation and billing sequence is visible.",
+      "success_signal": "The page lists registration, email verification, billing, and the transition to deploying a first server.",
+      "failure_or_wait": "An existing account holder can sign in and skip to the compute deployment step.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter an email address and strong password, review the Terms of Service and Privacy Policy, and select Create free account.",
+      "details": [],
+      "input": "Email, password, and acceptance of the linked legal terms.",
+      "output": "A pending Vultr account registration exists and a verification message is sent.",
+      "success_signal": "The interface instructs the developer to verify the supplied email address.",
+      "failure_or_wait": "Invalid credentials, unmet password requirements, unavailable email, or failure to accept the terms prevents progression. GitHub or Google signup is a separate branch.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the Vultr verification message and select Verify Your E-mail.",
+      "details": [],
+      "input": "Access to the mailbox used for registration.",
+      "output": "The email address is verified and the flow opens Billing.",
+      "success_signal": "The developer lands on the Billing page.",
+      "failure_or_wait": "The guide does not document delivery time or recovery behavior when the verification message is missing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Optionally enter a valid promotional coupon, review the billing terms, and submit the payment-linking or deposit action.",
+      "details": [],
+      "input": "Optional coupon, required agreement acknowledgement, and the selected payment action.",
+      "output": "Billing setup and account verification complete.",
+      "success_signal": "The account can access Vultr services and deploy a first server.",
+      "failure_or_wait": "An invalid or ineligible coupon does not establish universal credit. Billing verification must still complete.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Products, choose Compute, and select Deploy.",
+      "details": [],
+      "input": "An active Vultr account with completed billing verification.",
+      "output": "The compute deployment workflow opens.",
+      "success_signal": "The Shared CPU product option and instance configuration controls are visible.",
+      "failure_or_wait": "The account guide does not advance to service use until payment details have been added.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose Shared CPU for the general first Cloud Compute instance.",
+      "details": [],
+      "input": "Shared CPU from the available compute products.",
+      "output": "The deployment form is scoped to shared virtual CPU plans.",
+      "success_signal": "Location, plan, and software configuration become selectable.",
+      "failure_or_wait": "The provisioning guide selects Shared CPU for this Console path; it does not name a universal first workload or plan.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Leave the optional SSH Keys, Startup Script, and Firewall Group settings unselected for the default-credentials route used by this primary path.",
+      "details": [],
+      "input": "No optional SSH key, startup script, or firewall group for this primary path.",
+      "output": "The instance remains on the default-credentials branch documented by the OpenSSH guide.",
+      "success_signal": "No SSH key, startup script, or firewall group is selected before continuing.",
+      "failure_or_wait": "If the SSH-key branch is chosen instead, the key must be added during deployment. The OpenSSH guide warns that adding one through the Console after deployment wipes the instance to install it.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Set the server hostname and label.",
+      "details": [],
+      "input": "A hostname and an account-facing server label.",
+      "output": "The instance has its system and Console identities.",
+      "success_signal": "Both required fields contain the entered values.",
+      "failure_or_wait": "The provisioning guide does not document hostname or label validation rules.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review additional options and retain a public IP for the primary direct-SSH path.",
+      "details": [],
+      "input": "Instance(s) with Public IP with the default Public IPv4 setting, plus any deliberately selected optional VPC, backup, DDoS Protection, Limited User Login, or Cloud-Init settings.",
+      "output": "Networking and optional service behavior are set for the instance.",
+      "success_signal": "Instance(s) with Public IP is selected and Public IPv4 remains enabled.",
+      "failure_or_wait": "A private-only instance requires a different network path. Limited User Login changes the documented login user to `linuxuser`.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the configuration and select Deploy.",
+      "details": [],
+      "input": "Location, plan, image, authentication, hostname, label, network, and any optional settings.",
+      "output": "Vultr begins provisioning the billable Cloud Compute instance.",
+      "success_signal": "Once the instance is available, its management page exposes the Overview information and default credentials used by the connection guide.",
+      "failure_or_wait": "The general provisioning and connection guides do not publish a universal provisioning duration or named readiness status. The FAQ confirms that a created instance remains billable even when stopped.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the instance management page and copy the username, server IP address, and password shown in Overview.",
+      "details": [],
+      "input": "The provisioned instance's Overview credentials.",
+      "output": "The exact default login values for this operating system are available locally.",
+      "success_signal": "The developer has the username, IP address, and password required by the OpenSSH guide.",
+      "failure_or_wait": "The username can vary by image and Limited User Login selection, so it should be copied rather than assumed. An SSH-key deployment uses the matching private key instead.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `ssh username@SERVER-IP` in a terminal and accept the host key by entering `yes` when first prompted.",
+      "details": [],
+      "input": "The copied username and server IP, plus the host-key confirmation.",
+      "output": "OpenSSH attempts an encrypted connection to the instance.",
+      "success_signal": "The remote host presents the documented authentication prompt.",
+      "failure_or_wait": "The connection guide does not enumerate OpenSSH failure causes or a readiness wait. The built-in Vultr Console is the documented alternate access route.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Enter the copied password, then run `whoami` in the remote shell.",
+      "details": [],
+      "input": "The Overview password and the `whoami` command.",
+      "output": "An authenticated interactive shell on the first instance.",
+      "success_signal": "`whoami` prints the active remote username, completing the documented first-use boundary.",
+      "failure_or_wait": "If this instance was deployed with an SSH key instead, use the documented `ssh -i /path/to/private/key username@SERVER-IP` branch. The built-in Vultr Console is the other documented access route.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open How to Create a Vultr Account and follow its registration path.",
+      "details": [],
+      "input": "https://docs.vultr.com/platform/create-an-account",
+      "output": "The official account creation and billing sequence is visible.",
+      "success_signal": "The page lists registration, email verification, billing, and the transition to deploying a first server.",
+      "failure_or_wait": "An existing account holder can sign in and skip to the compute deployment step.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter an email address and strong password, review the Terms of Service and Privacy Policy, and select Create free account.",
+      "details": [],
+      "input": "Email, password, and acceptance of the linked legal terms.",
+      "output": "A pending Vultr account registration exists and a verification message is sent.",
+      "success_signal": "The interface instructs the developer to verify the supplied email address.",
+      "failure_or_wait": "Invalid credentials, unmet password requirements, unavailable email, or failure to accept the terms prevents progression. GitHub or Google signup is a separate branch.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the Vultr verification message and select Verify Your E-mail.",
+      "details": [],
+      "input": "Access to the mailbox used for registration.",
+      "output": "The email address is verified and the flow opens Billing.",
+      "success_signal": "The developer lands on the Billing page.",
+      "failure_or_wait": "The guide does not document delivery time or recovery behavior when the verification message is missing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Choose a payment method and enter its required payment and billing details.",
+      "details": [],
+      "input": "For a credit card, card and billing details with the option `I just want to link my credit card - $0.00 deposit`; for other documented methods, the required small deposit.",
+      "output": "Payment information is ready for verification and future service charges.",
+      "success_signal": "The billing form shows the selected method and amount before submission.",
+      "failure_or_wait": "The card provider may place a temporary authorization hold. A rejected method or failed deposit blocks account use.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Optionally enter a valid promotional coupon, review the billing terms, and submit the payment-linking or deposit action.",
+      "details": [],
+      "input": "Optional coupon, required agreement acknowledgement, and the selected payment action.",
+      "output": "Billing setup and account verification complete.",
+      "success_signal": "The account can access Vultr services and deploy a first server.",
+      "failure_or_wait": "An invalid or ineligible coupon does not establish universal credit. Billing verification must still complete.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Products, choose Compute, and select Deploy.",
+      "details": [],
+      "input": "An active Vultr account with completed billing verification.",
+      "output": "The compute deployment workflow opens.",
+      "success_signal": "The Shared CPU product option and instance configuration controls are visible.",
+      "failure_or_wait": "The account guide does not advance to service use until payment details have been added.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Choose Shared CPU for the general first Cloud Compute instance.",
+      "details": [],
+      "input": "Shared CPU from the available compute products.",
+      "output": "The deployment form is scoped to shared virtual CPU plans.",
+      "success_signal": "Location, plan, and software configuration become selectable.",
+      "failure_or_wait": "The provisioning guide selects Shared CPU for this Console path; it does not name a universal first workload or plan.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select a deployment location.",
+      "details": [],
+      "input": "A location appropriate for the intended users, latency, and available plan.",
+      "output": "The desired Vultr location is selected for the instance.",
+      "success_signal": "A location is selected before the plan step.",
+      "failure_or_wait": "The guide requires a location choice but does not name a universal default location.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Select a plan category and instance plan.",
+      "details": [],
+      "input": "Cloud Compute, High Frequency, or High Performance, then a displayed plan based on vCPU, memory, storage, and bandwidth requirements. Cloud Compute is the documented balance-of-price-and-performance branch.",
+      "output": "The instance plan is selected for the required vCPU, memory, storage, and bandwidth.",
+      "success_signal": "A plan is selected before Configure Software.",
+      "failure_or_wait": "The guide requires a plan choice but does not name one universal first plan.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Configure Software and choose Operating System as the image source, then select a supported Linux image.",
+      "details": [],
+      "input": "Operating System and a Linux distribution/version available in the chosen location and plan.",
+      "output": "The instance is configured to boot a standard Linux image.",
+      "success_signal": "A cloud image is selected before Server Settings.",
+      "failure_or_wait": "Marketplace, ISO or iPXE, ISO Library, Backup, and Snapshot are documented alternative image sources with their own prerequisites.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Leave the optional SSH Keys, Startup Script, and Firewall Group settings unselected for the default-credentials route used by this primary path.",
+      "details": [],
+      "input": "No optional SSH key, startup script, or firewall group for this primary path.",
+      "output": "The instance remains on the default-credentials branch documented by the OpenSSH guide.",
+      "success_signal": "No SSH key, startup script, or firewall group is selected before continuing.",
+      "failure_or_wait": "If the SSH-key branch is chosen instead, the key must be added during deployment. The OpenSSH guide warns that adding one through the Console after deployment wipes the instance to install it.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Set the server hostname and label.",
+      "details": [],
+      "input": "A hostname and an account-facing server label.",
+      "output": "The instance has its system and Console identities.",
+      "success_signal": "Both required fields contain the entered values.",
+      "failure_or_wait": "The provisioning guide does not document hostname or label validation rules.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review additional options and retain a public IP for the primary direct-SSH path.",
+      "details": [],
+      "input": "Instance(s) with Public IP with the default Public IPv4 setting, plus any deliberately selected optional VPC, backup, DDoS Protection, Limited User Login, or Cloud-Init settings.",
+      "output": "Networking and optional service behavior are set for the instance.",
+      "success_signal": "Instance(s) with Public IP is selected and Public IPv4 remains enabled.",
+      "failure_or_wait": "A private-only instance requires a different network path. Limited User Login changes the documented login user to `linuxuser`.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Review the configuration and select Deploy.",
+      "details": [],
+      "input": "Location, plan, image, authentication, hostname, label, network, and any optional settings.",
+      "output": "Vultr begins provisioning the billable Cloud Compute instance.",
+      "success_signal": "Once the instance is available, its management page exposes the Overview information and default credentials used by the connection guide.",
+      "failure_or_wait": "The general provisioning and connection guides do not publish a universal provisioning duration or named readiness status. The FAQ confirms that a created instance remains billable even when stopped.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 28,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open the instance management page and copy the username, server IP address, and password shown in Overview.",
+      "details": [],
+      "input": "The provisioned instance's Overview credentials.",
+      "output": "The exact default login values for this operating system are available locally.",
+      "success_signal": "The developer has the username, IP address, and password required by the OpenSSH guide.",
+      "failure_or_wait": "The username can vary by image and Limited User Login selection, so it should be copied rather than assumed. An SSH-key deployment uses the matching private key instead.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 29,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `ssh username@SERVER-IP` in a terminal and accept the host key by entering `yes` when first prompted.",
+      "details": [],
+      "input": "The copied username and server IP, plus the host-key confirmation.",
+      "output": "OpenSSH attempts an encrypted connection to the instance.",
+      "success_signal": "The remote host presents the documented authentication prompt.",
+      "failure_or_wait": "The connection guide does not enumerate OpenSSH failure causes or a readiness wait. The built-in Vultr Console is the documented alternate access route.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 30,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Enter the copied password, then run `whoami` in the remote shell.",
+      "details": [],
+      "input": "The Overview password and the `whoami` command.",
+      "output": "An authenticated interactive shell on the first instance.",
+      "success_signal": "`whoami` prints the active remote username, completing the documented first-use boundary.",
+      "failure_or_wait": "If this instance was deployed with an SSH key instead, use the documented `ssh -i /path/to/private/key username@SERVER-IP` branch. The built-in Vultr Console is the other documented access route.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Signup identity",
+      "path": "Select Sign Up with GitHub or Sign Up with Google, authenticate with the provider, and complete the requested user profile instead of creating email-password credentials directly.",
+      "effect_on_first_success": "The identity step changes, but the path still converges on Billing before resource creation.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "Payment method",
+      "path": "Link a credit card with a $0.00 deposit, or use another available payment method that requires a small deposit.",
+      "effect_on_first_success": "The verification charge or deposit differs, but billing setup remains a required pre-deployment gate.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "Workload characteristics",
+      "path": "Choose Cloud Compute, High Frequency, or High Performance and then a suitable displayed plan.",
+      "effect_on_first_success": "The documented categories differ in CPU and storage characteristics. Cloud Compute is the primary balance-of-price-and-performance selection.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 10,
+      "condition": "Image source",
+      "path": "Use Marketplace, ISO or iPXE, ISO Library, Backup, or Snapshot instead of a standard Operating System image.",
+      "effect_on_first_success": "Adds artifact-specific prerequisites and can change credentials, boot behavior, and the meaning of first success.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "Authentication preference",
+      "path": "Select a stored SSH public key during deployment and later connect with `ssh -i /path/to/private/key username@SERVER-IP` instead of the generated password.",
+      "effect_on_first_success": "Removes password entry after key setup, but adds prior key generation and upload. Adding the key after deployment through Console is destructive to the instance.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "Login privilege",
+      "path": "Enable Limited User Login and use `linuxuser` instead of the image's default privileged username.",
+      "effect_on_first_success": "Changes the connection username while preserving the same SSH success signal.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "Network exposure",
+      "path": "Deploy without a public IP behind private NAT and connect through an appropriate private-network access route.",
+      "effect_on_first_success": "Direct internet SSH no longer works and the path requires additional networking that the primary quick path excludes.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "Automation interface",
+      "path": "Provision the equivalent instance through the Vultr API, Vultr CLI, or Terraform using the guide's documented alternatives.",
+      "effect_on_first_success": "Replaces Console configuration with credentials, local tooling, or request/configuration code, then converges on instance connection.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 16,
+      "condition": "OpenSSH is unavailable or fails",
+      "path": "Enable browser popups, open View Console on the instance management page, enter the Overview username, paste the password using Send Clipboard, and press Enter.",
+      "effect_on_first_success": "Reaches the instance through the built-in noVNC terminal instead of its public SSH service.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 3,
+      "type": "verification",
+      "description": "Email verification is mandatory for the direct registration path before billing setup opens.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "billing",
+      "description": "A payment method is required before the account can deploy services. The card route can use a $0.00 deposit but can trigger a temporary authorization hold; other methods require a small deposit.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "other",
+      "description": "Promotional credit is conditional. Coupon eligibility and value cannot be treated as universal account behavior.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "choice",
+      "description": "The first compute order requires location, plan-category, and plan decisions before the user has workload measurements.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 10,
+      "type": "choice",
+      "description": "Multiple image sources and operating-system versions add choice, although the standard Operating System branch is sufficient for first shell access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "other",
+      "description": "SSH key, startup script, and firewall group are optional deployment choices. The docs warn that adding an SSH key in Console after deployment wipes the instance and its data to install the key.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 16,
+      "type": "other",
+      "description": "The built-in Vultr Console provides documented browser terminal access without SSH.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "billing",
+      "description": "Stopping an instance does not stop normal charges. The FAQ says charges stop when the instance is destroyed.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "How to Create a Vultr Account",
+      "url": "https://docs.vultr.com/platform/create-an-account",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "November 18, 2025",
+      "sections_used": [
+        "Create a Vultr account",
+        "Verify your email",
+        "Add a payment method",
+        "Deploy your first server"
+      ],
+      "evidence_supported": [
+        "Direct registration fields",
+        "Legal acceptance",
+        "Email verification",
+        "Billing redirect",
+        "$0.00 card-link option",
+        "Other-method deposit",
+        "Temporary authorization hold",
+        "Optional coupon",
+        "Credit duration warning",
+        "First-server transition"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create a New Vultr Account with GitHub or Google",
+      "url": "https://docs.vultr.com/create-a-new-vultr-account-with-github-or-google",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "April 15, 2026",
+      "sections_used": [
+        "Sign up with GitHub or Google",
+        "Complete your user profile",
+        "Billing"
+      ],
+      "evidence_supported": [
+        "Provider-signup branch",
+        "Profile completion",
+        "Billing convergence",
+        "$250 credit over 30 days offer"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "How to Provision Vultr Cloud Compute Instances",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/provisioning",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 23, 2026",
+      "sections_used": [
+        "Vultr Console",
+        "Select a location",
+        "Select a plan",
+        "Configure software",
+        "Server settings",
+        "Additional features",
+        "Deploy",
+        "API",
+        "CLI",
+        "Terraform"
+      ],
+      "evidence_supported": [
+        "Complete Console deployment sequence",
+        "Shared CPU selection",
+        "Location",
+        "Plan categories",
+        "Image-source branches",
+        "SSH key and firewall options",
+        "Hostname and label",
+        "Networking and optional features",
+        "Deploy action",
+        "Automation alternatives"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How to Connect to Vultr Cloud Compute with OpenSSH",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/connection/openssh",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "May 26, 2026",
+      "sections_used": [
+        "Connect with default credentials",
+        "Connect with an SSH key",
+        "Verify the connection"
+      ],
+      "evidence_supported": [
+        "Overview credentials",
+        "SSH command",
+        "Host-key acceptance",
+        "Password entry",
+        "`whoami` success signal",
+        "Private-key command",
+        "Post-deployment key wipe warning"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "How to Connect to Vultr Cloud Compute with Vultr Console",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/connection/vultr-console",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "May 26, 2026",
+      "sections_used": [
+        "Connect with Vultr Console"
+      ],
+      "evidence_supported": [
+        "Built-in noVNC fallback",
+        "Popup prerequisite",
+        "View Console navigation",
+        "Username and Send Clipboard password procedure"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Vultr Cloud Compute FAQ",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/faq",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "June 23, 2026",
+      "sections_used": [
+        "How do I access my Cloud Compute instance?",
+        "Will I be charged for a stopped instance?",
+        "Can I downgrade my instance?"
+      ],
+      "evidence_supported": [
+        "SSH and Vultr Console access routes",
+        "Stopped-instance billing",
+        "Destroyed-instance billing stop",
+        "Upgrade-only resize constraint"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Vultr Docs Products",
+      "url": "https://docs.vultr.com/support/products",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Site footer"
+      ],
+      "evidence_supported": [
+        "VULTR trademark ownership by The Constant Company, LLC"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "How long does a generic Cloud Compute instance take to become ready for its first connection?",
+      "impact": "The wait between Deploy and usable Overview credentials cannot be included in a verified total time-to-success estimate.",
+      "reason_unresolved": "The current general provisioning and connection guides document the actions and readiness-dependent connection, but do not publish a universal duration or generic status transition.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "question": "Which promotional credit, if any, applies to every signup entry point and account eligibility profile?",
+      "impact": "The effective first-use cost and cleanup urgency vary between users.",
+      "reason_unresolved": "The generic account guide describes optional coupons and credits for up to 30 days, while the GitHub or Google guide presents a specific $250 over 30 days offer without establishing universal eligibility.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "question": "Which plan, Linux image, and location should be treated as the universal tutorial default?",
+      "impact": "The exact choices, price, capacity, username, and provisioning behavior differ across valid first instances.",
+      "reason_unresolved": "The provisioning guide requires the developer to choose among current regional options and does not name one canonical combination.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Installing or deploying an application on the Cloud Compute instance.",
+    "Creating production users, hardening SSH, or rotating the generated credentials.",
+    "Configuring DNS, domains, TLS, load balancing, object storage, block storage, backups, monitoring, or private networking.",
+    "Benchmarking and resizing the instance.",
+    "Automating future deployments with API, CLI, Terraform, startup scripts, or Cloud-Init.",
+    "Destroying the evaluation instance to stop billing after the workshop measurement."
+  ]
+}

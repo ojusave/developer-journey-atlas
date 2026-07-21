@@ -1,0 +1,752 @@
+{
+  "platform": {
+    "name": "WorkOS",
+    "slug": "workos",
+    "organization": "WorkOS"
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "AuthKit AI Installer on a supported existing project",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: AuthKit AI Installer on a supported existing project. The AuthKit AI Installer is prominently offered on the WorkOS docs home and documents a complete automated path from framework detection through build validation and the AuthKit is ready terminal. It avoids the manual Node.js guide's unresolved CSRF_SECRET generation gap, but remains a representative AuthKit route rather than a platform-wide default over eleven peer products. Prior surface before policy commit: WorkOS product documentation and AuthKit route selector.",
+    "alternatives_considered": [
+      {
+        "name": "AuthKit AI Installer",
+        "url": "https://workos.com/docs/authkit/cli-installer",
+        "reason_not_primary": "It is a one-command AuthKit route and claims about two minutes, but requires an existing supported project and is not the default for non-AuthKit products."
+      },
+      {
+        "name": "AuthKit manual Node.js",
+        "url": "https://workos.com/docs/authkit/vanilla/nodejs",
+        "reason_not_primary": "It is a complete hosted-authentication journey with explicit validation, but WorkOS also offers five other manual start guides and fifteen installer-supported frameworks."
+      },
+      {
+        "name": "Single Sign-On",
+        "url": "https://workos.com/docs/sso",
+        "reason_not_primary": "It integrates an existing authentication stack and ends at an enterprise SSO flow, not a new AuthKit user."
+      },
+      {
+        "name": "Directory Sync",
+        "url": "https://workos.com/docs/directory-sync",
+        "reason_not_primary": "It has a directory, webhook, and user-provisioning outcome rather than interactive sign-in."
+      },
+      {
+        "name": "Additional WorkOS products",
+        "url": "https://workos.com/docs",
+        "reason_not_primary": "Admin Portal, Audit Logs, RBAC, FGA, Vault, Pipes, Feature Flags, Widgets, and Domain Verification each expose separate setup and success boundaries."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Reach the first documented WorkOS success after selecting WorkOS as the platform.",
+    "starting_url": "https://workos.com/docs",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected WorkOS.",
+      "The developer has not chosen a WorkOS product or first-success outcome.",
+      "The developer has not chosen the AuthKit AI Installer, a manual framework guide, or an additional-product quickstart."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.",
+    "normalized_outcome": "The developer chooses a WorkOS product and route, configures the staging environment and credentials required by that route, executes its first workflow, and verifies the product-specific result.",
+    "observable_completion_signal": "For the fully inspected AuthKit Node.js route, the local app redirects through hosted AuthKit, creates and authenticates a user, returns to the app with a sealed session and welcome email, and lists that user in the Dashboard Users section.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "Selecting a product changes the required resources, credentials, external systems, API calls, waits, and terminal verification. AuthKit is visually prominent, but treating it as the universal WorkOS journey would omit eleven peer products.",
+    "source_ids": [
+      "S1",
+      "S4",
+      "S5",
+      "S6"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A WorkOS Dashboard account and team workspace are required; each account belongs to exactly one team, and each team starts with one project.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "access",
+      "requirement": "The developer needs a Dashboard role allowed to configure staging resources and API keys. Admin and Developer have full access; Sandbox Developer can manage staging but is read-only in production.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "knowledge",
+      "requirement": "The desired product outcome must be chosen before a canonical path exists: authentication, SSO, provisioning, admin self-service, logs, authorization, secrets, third-party connection, feature rollout, widget, or domain verification.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "Most server and API routes require the environment-scoped WorkOS API key; AuthKit also requires the application Client ID. Staging supplies a pre-generated, repeatedly viewable API key.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "Runtime and SDK depend on the selected route. AuthKit's AI Installer requires Node.js 20+ and a supported project; the manual Node.js route requires an Express-capable Node project and npm.",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "billing",
+      "requirement": "The staging environment is free and permits localhost HTTP. Production requires billing information, but production is outside the first staging success.",
+      "required": false,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 7,
+      "type": "credential",
+      "requirement": "The manual Node.js AuthKit logout example reads a CSRF_SECRET environment variable through csrf-csrf. The official guide requires that configuration in code but does not prescribe its value, length, or generation procedure.",
+      "required": false,
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the WorkOS documentation landing page and inspect the product-level routes.",
+      "details": [
+        "AuthKit is foregrounded with a Quick Start and npx command.",
+        "The same page separately lists SSO, Directory Sync, Admin Portal, Audit Logs, RBAC, FGA, Vault, Pipes, Feature Flags, Widgets, and Domain Verification."
+      ],
+      "input": "Intent to begin with WorkOS",
+      "output": "Twelve incompatible product-level paths",
+      "success_signal": "The product inventory and separate outcomes are visible.",
+      "failure_or_wait": "No runtime wait occurs at documentation arrival.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose the WorkOS product and its documented starting route.",
+      "details": [
+        "For AuthKit, choose the AI Installer and CLI or a manual Next.js, Remix, Node.js, Ruby, Python, or React guide.",
+        "The installer itself supports Next.js, React, React Router, TanStack Start, SvelteKit, Node.js/Express, Vanilla JS, Python/Django, Ruby/Rails, Go, PHP, Laravel, .NET/ASP.NET Core, Kotlin, and Elixir/Phoenix."
+      ],
+      "input": "Product outcome, existing stack, framework, and preference for automatic or manual integration",
+      "output": "A human-selected first-success route",
+      "success_signal": "One product, implementation route, and terminal outcome are selected.",
+      "failure_or_wait": "WorkOS does not identify one platform-wide default, so the canonical journey cannot proceed without this human decision.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Open an existing project supported by the AuthKit installer and verify Node.js 20 or later.",
+      "details": [
+        "Supported integrations include Next.js, React, React Router, TanStack Start, SvelteKit, Node.js/Express, Vanilla JS, Python/Django, Ruby/Rails, Go, PHP, Laravel, .NET/ASP.NET Core, Kotlin, and Elixir/Phoenix."
+      ],
+      "input": "Existing supported application project",
+      "output": "Eligible installer target",
+      "success_signal": "The shell is in the project and Node.js 20+ is available.",
+      "failure_or_wait": "If framework detection is unsupported or ambiguous, use a manual guide or rerun the installer with --integration and an explicit supported integration.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run npx workos@latest install from the project root.",
+      "details": [],
+      "input": "Eligible project",
+      "output": "AuthKit installer session",
+      "success_signal": "The CLI begins framework detection and opens or requests WorkOS authentication.",
+      "failure_or_wait": "Package download, Node version, network, or filesystem errors must be corrected and the command rerun; use --debug for more detail.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Complete the browser handoff to create or sign in to the WorkOS account and authorize the CLI for the intended staging project.",
+      "details": [
+        "Staging is free and supports localhost HTTP; production billing is outside this candidate."
+      ],
+      "input": "WorkOS identity and team access",
+      "output": "Authenticated installer linked to staging",
+      "success_signal": "The browser returns control to the CLI and it can read the WorkOS project configuration.",
+      "failure_or_wait": "Account, team-role, browser callback, or connectivity problems must be resolved before installation can continue; workos doctor is the documented diagnostic route.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Allow the installer to detect the project's framework and integration shape.",
+      "details": [],
+      "input": "Supported project files",
+      "output": "Detected AuthKit integration",
+      "success_signal": "The CLI identifies a supported framework and presents the planned setup.",
+      "failure_or_wait": "If detection fails or chooses incorrectly, stop and rerun with --integration to select the correct route explicitly.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Review and confirm the installer prompts for redirect URI, CORS, and homepage URL for the local application.",
+      "details": [],
+      "input": "Actual local application origin and callback path",
+      "output": "WorkOS application URL configuration",
+      "success_signal": "The chosen URLs match the application's local runtime.",
+      "failure_or_wait": "Incorrect callback, CORS, or homepage values cause login return, browser-origin, or post-login navigation failure and must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "install",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Allow the installer to install the matching WorkOS SDK.",
+      "details": [],
+      "input": "Detected framework and package manager",
+      "output": "Framework-appropriate WorkOS dependency",
+      "success_signal": "The dependency is added to the project's package or dependency manifest.",
+      "failure_or_wait": "Package-manager, lockfile, network, or compatibility errors stop installation and must be corrected.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Allow the installer to analyze the project and create or update the callback routes, authentication middleware or provider wrappers, and environment configuration appropriate to the framework.",
+      "details": [],
+      "input": "Project structure and WorkOS staging application",
+      "output": "Generated AuthKit integration code and secrets configuration",
+      "success_signal": "The CLI reports the expected files and configuration changes.",
+      "failure_or_wait": "Unsupported project patterns, conflicting existing auth code, or unwritable files require manual review, correction, or a framework-specific guide.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Let the installer run its build validation.",
+      "details": [],
+      "input": "Modified project",
+      "output": "Build validation result",
+      "success_signal": "The project passes the installer's build validation.",
+      "failure_or_wait": "Fix pre-existing or integration-related build errors, rerun with --debug if needed, and repeat until validation passes.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Confirm the CLI displays AuthKit is ready and Run npm run dev to get started, then inspect git diff before accepting the generated integration.",
+      "details": [
+        "The documented terminal establishes installer completion, not successful signup or sign-in."
+      ],
+      "input": "Build-valid generated changes",
+      "output": "Reviewed AuthKit integration at the documented installer terminal",
+      "success_signal": "The AuthKit is ready message and npm run dev instruction appear, and the developer understands the files, routes, middleware, and environment changes.",
+      "failure_or_wait": "Unexpected or unsafe changes must be corrected or reverted before running the app; the installer result alone does not prove user authentication.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "AuthKit manual Node.js is selected.",
+      "path": "Create or sign in to the WorkOS account and use the staging environment; retrieve the staging API key and application Client ID; prepare an Express Node project; install @workos-inc/node, csrf-csrf, and cookie-parser; in Dashboard Redirects set http://localhost:3000/callback as the default redirect URI, configure a sign-out redirect, and register the application's /login sign-in endpoint; store WORKOS_API_KEY and WORKOS_CLIENT_ID as managed environment secrets; create index.html with sign-in and POST sign-out controls plus CSRF token fetching; create the Express server and WorkOS client; add /login to generate an AuthKit authorization URL with provider authkit, callback, and client ID, then redirect to hosted sign-in; add /callback to reject a missing code and exchange the returned code, which is valid for 10 minutes, for a User; generate a 32-character cookie password with openssl rand -base64 32 or another secure generator and store WORKOS_COOKIE_PASSWORD; update callback authentication to seal the session and set an HTTP-only, secure, sameSite lax wos-session cookie, retrying /login on failure; load and authenticate the sealed session on / and render Welcome plus the user email; add protected-route middleware that redirects a missing session to login, refreshes an invalid session, updates the cookie and retries the original URL, or clears the cookie and returns to login on refresh failure; configure CSRF_SECRET because the documented doubleCsrf setup reads process.env.CSRF_SECRET, while preserving the unresolved fact that the guide supplies no value, length, or generation instruction for it; add /csrf-token and implement POST /logout with double-CSRF protection; clear the cookie and redirect through WorkOS logout, noting missing sign-out redirect causes an error; run node server.js; open localhost:3000; sign up; sign in; verify the welcome state and the new user in Dashboard Users.",
+      "effect_on_first_success": "Produces the inspected hosted-authentication success and includes every guide heading through validation.",
+      "source_ids": [
+        "S3",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "AuthKit AI Installer is selected.",
+      "path": "Use an existing supported project with Node.js 20+; run npx workos@latest install; let the CLI detect the framework, open a browser for WorkOS authentication, configure redirect URI, CORS, and homepage URL, install the matching SDK, analyze the project, create callback routes and auth middleware or provider wrappers, write environment configuration, and run a build validation; review the displayed AuthKit is ready state and inspect git diff. If detection fails, rerun with --integration; if build validation fails, fix pre-existing build errors and use --debug; use workos doctor for unresolved configuration or connectivity problems.",
+      "effect_on_first_success": "Automates dashboard and code changes and claims about two minutes to the documented AuthKit is ready installer terminal. Running the application and proving user authentication remain unverified after that terminal.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "AuthKit manual Next.js, Remix, Ruby, Python, or React is selected.",
+      "path": "Follow that framework-specific guide's account, staging key and Client ID, package installation, redirect, sign-in endpoint, secret configuration, authorization URL, callback exchange, session, protected route, sign-out, local execution, signup, sign-in, and Dashboard user-verification actions. Framework file structure, SDK, session mechanism, and development command differ from Node.js.",
+      "effect_on_first_success": "Retains the AuthKit user outcome while replacing every implementation-specific action.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Single Sign-On is selected.",
+      "path": "Use the staging environment and Test Organization, install and initialize the chosen WorkOS SDK with API key and Client ID, create an SSO authorization endpoint and callback that exchanges the code for a normalized profile, configure the callback in the application's Redirects tab, then use Dashboard Test SSO to exercise the flow end-to-end and verify the returned user profile. The exact SAML or OIDC customer connection and Admin Portal onboarding are later production work.",
+      "effect_on_first_success": "Integrates an existing authentication stack and ends at a test enterprise SSO profile rather than an AuthKit-created user.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Directory Sync is selected.",
+      "path": "Choose Directory Sync, use staging and its test directory or provider setup, create or select an organization and directory, configure an event or webhook receiver, connect the directory, ingest directory user and group events, and verify synced records in the Dashboard or API. Provider admin setup and propagation can introduce external approval and wait gates.",
+      "effect_on_first_success": "Ends at provisioned directory data, not login.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Admin Portal is selected.",
+      "path": "Create or select a WorkOS organization in staging, configure portal intent and return behavior, generate an Admin Portal link with the server API or SDK, open the link as the organization's IT administrator, complete the chosen self-service setup, and verify the resulting resource in the WorkOS Dashboard.",
+      "effect_on_first_success": "Adds an organization and customer-admin browser journey before a connection exists.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Audit Logs is selected.",
+      "path": "Choose Audit Logs, create an organization, initialize the server SDK with the staging key, construct and send the first audit event with actor, action, targets, context, and occurred-at data, then verify it through the WorkOS Dashboard or events API before configuring exports or streams.",
+      "effect_on_first_success": "Ends at an ingested audit event rather than authentication.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "RBAC or Fine-Grained Authorization is selected.",
+      "path": "Choose the authorization model, define the first permission and role or FGA resource and relationship, assign it to a test subject, call the relevant authorization check from the application with staging credentials, and verify the documented allow result plus a denied control case. Modeling choices precede code and materially change the journey.",
+      "effect_on_first_success": "Ends at an authorization decision and requires policy modeling rather than user authentication.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Vault is selected.",
+      "path": "Choose Vault, obtain staging credentials, create the first secret with its access context through the Dashboard, SDK, or API, retrieve it through an authorized server-side call, and verify that unauthorized access is rejected before adding rotation or production policy.",
+      "effect_on_first_success": "Ends at encrypted secret storage and retrieval.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Pipes is selected.",
+      "path": "Choose Pipes, create the required organization and provider connection configuration, generate or open the customer authorization experience, authorize a third-party account, handle WorkOS events or returned connection data, and verify the connected account can be used by the application.",
+      "effect_on_first_success": "Adds an external provider OAuth journey and ends at a connected third-party account.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Feature Flags is selected.",
+      "path": "Choose Feature Flags, create the first flag in the project, define its initial targeting or rollout, initialize the documented client or server evaluation path, evaluate for a test context, and verify the expected enabled or disabled value before production rollout.",
+      "effect_on_first_success": "Ends at a deterministic flag evaluation rather than an identity event.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Widgets is selected.",
+      "path": "Choose the relevant enterprise workflow widget, create the prerequisite user, organization, roles, or API-key configuration, generate a short-lived client token server-side, embed the widget with that token, and verify its first rendered and completed workflow.",
+      "effect_on_first_success": "Adds server token issuance and a client UI component tied to an existing WorkOS resource model.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Domain Verification is selected.",
+      "path": "Choose Domain Verification, create or select an organization and domain, generate the verification challenge, publish the required DNS record at the external DNS provider, trigger or wait for verification, and confirm the domain becomes verified. Incorrect DNS records or propagation add retry and wait paths.",
+      "effect_on_first_success": "Ends at a verified customer-domain claim and requires external DNS control.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "A raw WorkOS API or Postman route is selected.",
+      "path": "Use the pre-generated staging API key and Client ID, keep the sk_ key server-side, choose an endpoint with all required resource IDs, send it over HTTPS with Bearer authentication, and verify its JSON response. Missing or incorrect authentication returns 401, insufficient permissions return 403, and plain HTTP fails. For Postman, fork or import the official collection and environment, populate api_key, client_id, base_url, and request-specific IDs, select the environment, and send the request.",
+      "effect_on_first_success": "Bypasses a product UI quickstart but still requires a product-specific resource and endpoint outcome.",
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Twelve top-level products define different first-success outcomes, and AuthKit adds automatic versus manual and framework choices.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "A WorkOS account belongs to exactly one team and is required to access the staging project, Dashboard, and personalized credentials.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "permission",
+      "description": "Dashboard role controls whether the developer can manage keys and environment resources; Sandbox Developer is intentionally staging-only.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "credential",
+      "description": "The staging API key is environment-scoped and powerful; AuthKit also needs a Client ID, while the manual session path adds cookie and CSRF secrets.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "Auth and SSO routes require exact redirect, sign-in, sign-out, CORS, and homepage values; missing sign-out redirect is a documented logout error.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "Every SDK path requires the selected framework runtime, package manager, and code changes; the AI Installer additionally analyzes and writes the existing project.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "billing",
+      "description": "Staging is free, but production remains locked until billing information is added and is excluded from first staging success.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "AuthKit's manual Node.js guide says less than ten minutes; the AI Installer says about two minutes from zero auth to a build-valid AuthKit integration. WorkOS makes no platform-wide claim across all products.",
+    "source_ids": [
+      "S4",
+      "S5"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "WorkOS Docs",
+      "url": "https://workos.com/docs",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "AuthKit",
+        "Additional Products",
+        "Events and webhooks",
+        "Resources and tools"
+      ],
+      "evidence_supported": [
+        "Twelve product families",
+        "Product outcome ambiguity",
+        "AuthKit quickstart prominence",
+        "Resource and tool alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Dashboard",
+      "url": "https://workos.com/docs/dashboard",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Overview",
+        "How teams work",
+        "Set up your workspace"
+      ],
+      "evidence_supported": [
+        "Account-team constraint",
+        "Default project",
+        "Environment-scoped resources",
+        "Dashboard roles and production billing sequence"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Staging vs. production environments",
+      "url": "https://workos.com/docs/authkit/environments",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "When to use staging",
+        "When to use production",
+        "Key differences",
+        "Going live"
+      ],
+      "evidence_supported": [
+        "Free staging boundary",
+        "Localhost support",
+        "Production billing gate",
+        "Environment isolation",
+        "Staging test resources"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "AI Installer & CLI",
+      "url": "https://workos.com/docs/authkit/cli-installer",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "AI Installer",
+        "What the installer handles",
+        "Supported frameworks",
+        "How the installer works",
+        "Install options",
+        "Prerequisites",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "Complete installer journey",
+        "Fifteen supported frameworks",
+        "About-two-minute claim",
+        "Failure and diagnostic branches"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "AuthKit for Node.js",
+      "url": "https://workos.com/docs/authkit/vanilla/nodejs",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before getting started",
+        "Configure your project",
+        "Add AuthKit to your app",
+        "Handle the user session",
+        "Ending the session",
+        "Validate the authentication flow"
+      ],
+      "evidence_supported": [
+        "Complete manual hosted-auth path",
+        "Redirect and secret configuration",
+        "Session and CSRF handling",
+        "All failure and refresh paths",
+        "User and Dashboard validation",
+        "Less-than-ten-minute claim"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "API authentication",
+      "url": "https://workos.com/docs/reference/api-authentication",
+      "official_domain": true,
+      "source_type": "api-reference",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Using an API key",
+        "Secure your API Keys",
+        "In Staging",
+        "In Production"
+      ],
+      "evidence_supported": [
+        "API key requirements",
+        "401 and 403 failures",
+        "HTTPS requirement",
+        "Staging pre-generated key",
+        "Production one-time key"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "WorkOS Postman collection",
+      "url": "https://workos.com/docs/postman",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Configuring Postman",
+        "Environment variables",
+        "Sending requests to the WorkOS API",
+        "Debugging requests"
+      ],
+      "evidence_supported": [
+        "Postman fork and import branches",
+        "Required environment values",
+        "Send and debug path"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which WorkOS product defines the canonical workshop journey?",
+      "impact": "The choice changes the success outcome itself, from authentication to provisioning, logs, policy, secrets, connection, rollout, widget, or DNS verification.",
+      "reason_unresolved": "The official docs expose twelve product families without one platform-wide default.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "If AuthKit is chosen, should the workshop use the AI Installer or a manual framework guide?",
+      "impact": "The installer analyzes and edits the project and configures Dashboard settings automatically; manual guides expose each action and friction point for participant scoring.",
+      "reason_unresolved": "WorkOS offers both as co-equal starting paths and supports many frameworks.",
+      "checked_source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "question": "What exact signup and initial team-creation screens appear for a new WorkOS account?",
+      "impact": "They may add identity fields, email verification, workspace naming, invitations, or anti-abuse checks before staging access.",
+      "reason_unresolved": "Official docs require an account and describe the resulting team and project model but do not enumerate the dynamic signup screens.",
+      "checked_source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "question": "What value and generation procedure should the manual Node.js AuthKit path use for CSRF_SECRET?",
+      "impact": "The documented logout implementation reads this environment value, so omitting it can break CSRF-token generation or logout protection.",
+      "reason_unresolved": "The official Node.js guide references process.env.CSRF_SECRET in doubleCsrf configuration but does not state a value, required length, or generation command. The separate documented openssl command applies only to WORKOS_COOKIE_PASSWORD and must not be reused by inference.",
+      "checked_source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Selecting a canonical WorkOS product without workshop-owner direction",
+    "Running the generated application, completing signup or sign-in, and confirming a user in Dashboard Users after the documented AuthKit is ready installer terminal",
+    "Production unlock, billing, HTTPS domains, one-time production keys, and live customer traffic",
+    "AuthKit branding, MFA, passkeys, social login, magic auth, organizations, invitations, roles, and production session hardening after first login",
+    "SSO customer connection onboarding and production launch after Test SSO",
+    "Directory provider-specific production onboarding and full lifecycle handling after first synced record",
+    "Advanced authorization modeling, secret rotation, audit exports, connection refresh, rollout analytics, and widget customization",
+    "Additional projects, environments, workspace security, team invitations, and enterprise contracting"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

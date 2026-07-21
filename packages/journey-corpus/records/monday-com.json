@@ -1,0 +1,421 @@
+{
+  "platform": {
+    "name": "monday.com",
+    "slug": "monday-com",
+    "organization": "monday.com Ltd."
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "monday platform API first GraphQL request with a personal token",
+    "selection_basis": "Under the workshop policy, monday.com’s official “Making your first request” guide is primary. No local or OSS equivalent exists; the guide lists trial signup first and then documents personal-token authentication plus a direct GraphQL request. Signup is one opaque official step, and the public post-login instructions define the remaining route.",
+    "alternatives_considered": [
+      {
+        "name": "API playground",
+        "url": "https://monday.com/developers/v2/try-it-yourself",
+        "reason_not_primary": "The first-request guide lists the playground as an exploration option after authentication; its published language examples are the direct first request."
+      },
+      {
+        "name": "OAuth app token",
+        "url": "https://developer.monday.com/apps/docs/oauth",
+        "reason_not_primary": "The authentication guide uses a personal V2 token for a user's own account, while app tokens add OAuth and scope configuration."
+      },
+      {
+        "name": "Platform MCP",
+        "url": "https://developer.monday.com/api-reference/docs/mondaycom-mcp-server",
+        "reason_not_primary": "This is a separate tool surface; the API guide explicitly defines the first GraphQL request route."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a monday.com trial or developer account, enable Developer mode, copy a personal V2 API token, and make the official first GraphQL API request.",
+    "starting_url": "https://developer.monday.com/api-reference/docs/getting-started",
+    "assumed_prior_state": [
+      "No monday.com account, product, workspace, board, confirmed email, eligible user role, Developer mode setting, Developer Center access, personal token, or prior API request is assumed.",
+      "A browser and a terminal or supported language runtime are available.",
+      "No signup, trial, account activation, token access, or API request was performed during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Making your first request to the monday platform API.",
+    "normalized_outcome": "The intended terminal is a token-authenticated POST to `https://api.monday.com/v2` containing one of the guide's board queries.",
+    "observable_completion_signal": "The guide demonstrates a JSON response whose `data.boards` array contains a board ID and name, plus an `account_id`; a transport response or empty data alone should not be treated as the demonstrated board result.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The GraphQL endpoint returns a JSON `data.boards` array with a board ID and name, plus `account_id`.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "Create a monday.com trial account or a developer account that is strictly for developing apps.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "verification",
+      "requirement": "Have a confirmed and enabled user account; unconfirmed, deactivated, disabled, viewer, and student users cannot access the API.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "Use an admin or member role for direct access to a personal API token; guests require OAuth or a short-lived token instead.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "configuration",
+      "requirement": "Optionally enable Developer mode through profile picture, monday.labs, Developer mode, and Activate to expose IDs used by many API methods; the guide does not state that this is required to obtain a personal token or send its limit-one board query.",
+      "required": false,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "credential",
+      "requirement": "Open the Developer Center, show the API token, and copy the personal V2 token.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "access",
+      "requirement": "Have a board accessible to the user for the guide's board-query example.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Making your first request.",
+      "details": [],
+      "input": "https://developer.monday.com/api-reference/docs/getting-started",
+      "output": "The trial, token, endpoint, and examples are visible.",
+      "success_signal": "The guide identifies trial signup as the first step.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create the trial account as one opaque signup step.",
+      "details": [],
+      "input": "https://auth.monday.com/users/sign_up_new?origin=hp_fullbg_page_header&source=web_main",
+      "output": "An authenticated monday.com account with an accessible board is available.",
+      "success_signal": "The monday.com workspace opens.",
+      "failure_or_wait": "Complete any signup, verification, legal, workspace, and initial-board setup requested by monday.com; individual fields are outside this record.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Optionally enable Developer mode from profile picture > monday.labs > Developer mode > Activate.",
+      "details": [],
+      "input": "Authenticated account",
+      "output": "Developer identifiers are exposed in the UI.",
+      "success_signal": "The page refreshes with Developer mode active.",
+      "failure_or_wait": "This is useful but not required for the guide’s limit-one board query.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Developers > API token, select Show, and copy the personal V2 token.",
+      "details": [],
+      "input": "Eligible confirmed admin or member account",
+      "output": "A personal API token is available.",
+      "success_signal": "The token is copied.",
+      "failure_or_wait": "Guests and ineligible users require another authentication route.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "POST the guide’s `boards(limit:1){id name}` GraphQL query to `https://api.monday.com/v2` with Authorization, Content-Type, and API-Version headers.",
+      "details": [],
+      "input": "Personal token and published query",
+      "output": "The API executes the board query.",
+      "success_signal": "A JSON GraphQL response is returned.",
+      "failure_or_wait": "Invalid credentials or query syntax return errors.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Inspect the GraphQL data response.",
+      "details": [],
+      "input": "API response",
+      "output": "The first monday.com API request is complete.",
+      "success_signal": "`data.boards` contains a board ID and name and the response includes `account_id`.",
+      "failure_or_wait": "A GraphQL error or unauthorized response is not success.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Create a trial account",
+      "path": "Use the guide's general monday.com trial signup entry.",
+      "effect_on_first_success": "May provide a normal product workspace and board, but the public signup and onboarding sequence is hidden.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "Create a developer account",
+      "path": "Use the guide's developer=true signup entry, which the guide describes as strictly for developing apps.",
+      "effect_on_first_success": "Changes account purpose and possibly initial resources, while the public signup and onboarding sequence remains hidden.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The account and eligible admin or member already exist",
+      "path": "Optionally enable Developer mode to expose IDs, copy the token from the Developer Center, select a guide example, substitute an accessible board where required, and send the request.",
+      "effect_on_first_success": "Reaches the documented API sequence after bypassing the blocked first-user account transition.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The user is a guest",
+      "path": "Use OAuth or a short-lived token rather than a personal API token.",
+      "effect_on_first_success": "Leaves the selected personal-token route and adds app authentication work.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The first-request guide presents trial and developer accounts without selecting one for a new developer.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "Both signup destinations hide the current account and onboarding sequence in a client-rendered application.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "permission",
+      "description": "Only eligible confirmed users can access the API, and personal-token availability depends on user type.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "configuration",
+      "description": "The guide includes Developer mode because it exposes IDs used by many API methods, but does not state that activation is required to obtain a personal token or send its limit-one board query.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "credential",
+      "description": "Requests require the personal token in the Authorization header.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Making your first request",
+      "url": "https://developer.monday.com/api-reference/docs/getting-started",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Updated 9 months ago",
+      "sections_used": [
+        "Setting up a monday.com account",
+        "Enable Developer mode",
+        "Authenticating with the API",
+        "Using the API",
+        "Examples"
+      ],
+      "evidence_supported": [
+        "Trial and developer account entries",
+        "Developer mode sequence",
+        "GraphQL endpoint and headers",
+        "Language examples",
+        "Sample board response"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Authentication",
+      "url": "https://developer.monday.com/api-reference/docs/authentication",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Updated 9 months ago",
+      "sections_used": [
+        "Token permissions",
+        "Accessing your token",
+        "Making requests with your token"
+      ],
+      "evidence_supported": [
+        "Personal V2 token behavior",
+        "Developer Center token steps",
+        "Admin alternative",
+        "Authorization header",
+        "Minimal `me` query"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "The basics",
+      "url": "https://developer.monday.com/api-reference/docs/basics",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Updated 3 months ago",
+      "sections_used": [
+        "Who can use the API?",
+        "What monday products does the API support?"
+      ],
+      "evidence_supported": [
+        "Eligible and ineligible user types",
+        "Guest authentication alternatives",
+        "Supported products"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "monday.com: Your team's growth made easy | Sign Up",
+      "url": "https://auth.monday.com/users/sign_up_new?origin=hp_fullbg_page_header&source=web_main",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public response"
+      ],
+      "evidence_supported": [
+        "Official trial signup destination",
+        "No public rendered account sequence"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "monday.com: Your team's growth made easy | Sign Up",
+      "url": "https://auth.monday.com/users/sign_up_new?developer=true&utm_source=dev_documentation",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Public response"
+      ],
+      "evidence_supported": [
+        "Official developer-account signup destination",
+        "No public rendered account sequence"
+      ]
+    }
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Board-item queries, mutations, application packaging, OAuth, webhooks, API analytics, pagination, complexity limits, production token rotation, and Platform MCP use occur after the first GraphQL response."
+  ]
+}

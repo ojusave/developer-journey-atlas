@@ -1,0 +1,360 @@
+{
+  "platform": {
+    "name": "Ory",
+    "slug": "ory",
+    "organization": "Ory Corp"
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Ory Kratos local Docker quickstart through a verified first user",
+    "selection_basis": "Under the workshop policy, the official Ory Kratos Docker quickstart is primary: it is a local, no-account, OSS route and the guide says Git, Docker, and Docker Compose are the only dependencies. The guide chooses Node.js because it is broadly understood and documents the full registration, local email verification, welcome page, and active-session terminal.",
+    "alternatives_considered": [
+      {
+        "name": "Ory Network",
+        "url": "https://www.ory.com/docs/network/getting-started",
+        "reason_not_primary": "The portal presents Network, Enterprise License, and Open Source as deployment choices rather than a universal default."
+      },
+      {
+        "name": "Next.js App Router Quickstart",
+        "url": "https://www.ory.com/docs/getting-started/integrate-auth/nextjs-app-router-quickstart",
+        "reason_not_primary": "Next.js is one of several framework peers and its final registration screen actions are not enumerated in the public guide."
+      },
+      {
+        "name": "Express.js Quickstart",
+        "url": "https://www.ory.com/docs/getting-started/integrate-auth/expressjs",
+        "reason_not_primary": "This route requires an Ory Network account and project and is not selected over the other framework routes."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Run the official Ory Kratos Docker quickstart locally, register a user, verify the address through MailSlurper, and inspect the active session.",
+    "starting_url": "https://www.ory.com/docs/kratos/quickstart",
+    "assumed_prior_state": [
+      "No Ory account or cloud project is assumed.",
+      "Git, Docker, Docker Compose, a browser, and the documented local ports are available."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Perform registration and verify the first local Ory Kratos user.",
+    "normalized_outcome": "A local Ory Kratos identity is registered, its email is verified through MailSlurper, and an active browser session reaches the welcome dashboard.",
+    "observable_completion_signal": "`/welcome` opens after verification and `/sessions` reports an active identity with `verified: true` and a `verified_at` timestamp.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "After local registration and MailSlurper verification, `/welcome` opens and `/sessions` shows an active identity with the email address marked verified.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "software",
+      "requirement": "Git, Docker, and Docker Compose installed.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "network",
+      "requirement": "Local ports 4455, 4433, 4434, and 4436 are free.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "hardware",
+      "requirement": "Docker has sufficient disk space for the quickstart images and volumes.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the official Ory Kratos quickstart.",
+      "details": [],
+      "input": "https://www.ory.com/docs/kratos/quickstart",
+      "output": "The local Docker Compose registration route is visible.",
+      "success_signal": "Clone and Docker commands are shown.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install or confirm Git, Docker, and Docker Compose, and ensure ports 4455, 4433, 4434, and 4436 are free.",
+      "details": [],
+      "input": "Local machine",
+      "output": "The quickstart prerequisites are ready.",
+      "success_signal": "Docker Compose is available and required ports are free.",
+      "failure_or_wait": "Insufficient Docker disk space or occupied ports block startup.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Clone `https://github.com/ory/kratos.git`, enter the repository, and check out the desired documented version.",
+      "details": [],
+      "input": "Git and network access",
+      "output": "The Ory Kratos source and quickstart files are local.",
+      "success_signal": "`quickstart.yml` and `quickstart-standalone.yml` are present.",
+      "failure_or_wait": "Use a valid released version.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "run",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `docker compose -f quickstart.yml -f quickstart-standalone.yml up --force-recreate`.",
+      "details": [],
+      "input": "Docker quickstart files",
+      "output": "Kratos, the Node.js self-service UI, and MailSlurper start.",
+      "success_signal": "Logs show admin HTTP on 4434 and public HTTP on 4433.",
+      "failure_or_wait": "Wait one or two minutes; resolve network or disk errors if health logs do not appear.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open `http://127.0.0.1:4455/welcome`, choose Sign In, then Register new account.",
+      "details": [],
+      "input": "Healthy local stack",
+      "output": "The Ory-backed registration form opens.",
+      "success_signal": "A registration flow ID appears in the URL.",
+      "failure_or_wait": "Use 127.0.0.1, not localhost, so cookies work.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Complete the generated registration form with an email, name, and policy-compliant password, then submit.",
+      "details": [],
+      "input": "Local registration form",
+      "output": "Ory creates the identity and sends a verification message to MailSlurper.",
+      "success_signal": "The browser asks for email verification.",
+      "failure_or_wait": "A weak password is rejected by the configured policy.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open `http://127.0.0.1:4436`, open the verification message, and follow its link.",
+      "details": [],
+      "input": "MailSlurper verification message",
+      "output": "The address is verified and the browser redirects to `/welcome`.",
+      "success_signal": "The welcome dashboard opens.",
+      "failure_or_wait": "Refresh MailSlurper if the message is not initially visible.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open `http://127.0.0.1:4455/sessions` and inspect the session.",
+      "details": [],
+      "input": "Verified local identity",
+      "output": "The first Ory user and authenticated session are confirmed.",
+      "success_signal": "The session is active and the address has `verified: true` and a `verified_at` value.",
+      "failure_or_wait": "An inactive or unverified session is not success.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer wants managed SaaS.",
+      "path": "Choose Ory Network, then choose GitHub, Google, or work email on the public account form before creating a free developer project.",
+      "effect_on_first_success": "Adds an unresolved account-method and project transition before a Network-backed integration.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer chooses Next.js App Router.",
+      "path": "Choose a package manager, create a Next.js app, install `@ory/elements-react` and `@ory/nextjs`, add configuration, middleware, and self-service pages, run the app, and open `/auth/registration`.",
+      "effect_on_first_success": "Reaches the public registration page, but the guide does not document the final form-to-user transition.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Deployment, product, framework, and package-manager choices change the required journey and are not globally defaulted.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "form",
+      "description": "The intended Next.js first-user terminal requires an undocumented generated registration-form transition.",
+      "documented_requirement": false,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The Network route presents GitHub, Google, and work-email account methods, whose post-selection convergence is not documented on the public form.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The quickstart says container startup may take a minute or two; it does not claim a total registration time.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Ory Documentation | Ory",
+      "url": "https://www.ory.com/docs/welcome",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How to use the Ory Developer Portal",
+        "How to design your Ory solution",
+        "Select your framework or language"
+      ],
+      "evidence_supported": [
+        "portal entry",
+        "registered-user framing",
+        "deployment and framework choices"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Introduction to Ory Network | Ory",
+      "url": "https://www.ory.com/docs/network/getting-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Last updated on Jul 2, 2026 by unatasha8",
+      "sections_used": [
+        "Introduction to Ory Network",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "managed Network option",
+        "free developer project continuation",
+        "deployment-model distinction"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Ory Kratos Quickstart",
+      "url": "https://www.ory.com/docs/kratos/quickstart",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": "Last updated on Jun 2, 2026 by Wassim Bougarfa",
+      "sections_used": [
+        "Clone Ory Kratos and run it in Docker",
+        "Perform registration, login, and logout",
+        "Session details"
+      ],
+      "evidence_supported": [
+        "Git, Docker, and Docker Compose prerequisites",
+        "Docker Compose commands",
+        "Healthy service logs",
+        "Local ports",
+        "Registration form",
+        "MailSlurper verification",
+        "Welcome redirect",
+        "Active verified session terminal"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create Your Ory Account: Sign Up & Get Started",
+      "url": "https://console.ory.com/registration",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create your account"
+      ],
+      "evidence_supported": [
+        "GitHub, Google, and work-email account choices",
+        "email fields and terms checkbox"
+      ]
+    }
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Login after the verified registration session, recovery, profile settings, social login, production deployment, external databases, and Ory Network occur after the first verified local user."
+  ]
+}

@@ -1,0 +1,458 @@
+{
+  "platform": {
+    "name": "HashiCorp Vault",
+    "slug": "hashicorp-vault",
+    "organization": "HashiCorp, Inc."
+  },
+  "category": "Identity, security, and networking",
+  "surface": {
+    "name": "Developer quick start, Docker and Go path",
+    "selection_basis": "HashiCorp labels this page Developer quick start and explicitly defines its goal as using a Vault client library in application code to store and retrieve a first secret. Docker is the first server-start option and Go is the first client-library tab, so this record uses those documented defaults while preserving the local-binary and other-language variants as branches.",
+    "alternatives_considered": [
+      {
+        "name": "Developer quick start with local Vault binary",
+        "url": "https://developer.hashicorp.com/vault/docs/get-started/developer-qs",
+        "reason_not_primary": "It is the second server-start option and adds platform-specific Vault installation."
+      },
+      {
+        "name": "Vault CLI foundations",
+        "url": "https://developer.hashicorp.com/vault/tutorials/get-started/learn-cli",
+        "reason_not_primary": "It teaches CLI and server administration actions rather than the application-code milestone named by the developer quick start."
+      },
+      {
+        "name": "HCP Vault Dedicated",
+        "url": "https://developer.hashicorp.com/vault/tutorials/get-started/setup",
+        "reason_not_primary": "It is a managed-cluster setup path with account, billing or trial, cluster, networking, and namespace gates."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-18",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Use Vault from application code to store and retrieve a first secret value.",
+    "starting_url": "https://developer.hashicorp.com/vault/docs/get-started/developer-qs",
+    "assumed_prior_state": [
+      "The developer has not started a Vault server or configured a Vault client.",
+      "The Docker and Go variants are used because they are the first documented options in the selected quick start."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Write and retrieve your first Vault secret.",
+    "normalized_outcome": "A local Go program stores the password value in Vault's version 2 key-value engine, retrieves it, confirms the value, and prints Access granted!.",
+    "observable_completion_signal": "The final program run prints Access granted! after the retrieved password equals Hashi123.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "That's it! You've just written and retrieved your first Vault secret!",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The guide states this as its completed first-secret outcome immediately after the retrieval check. The following Additional examples section introduces stronger authentication, runnable demos, dynamic database credentials, and Vault Agent.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "software",
+      "requirement": "A current Docker installation, used here instead of a local Vault binary.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "A Go development environment and a Go source file or module in which to add the quickstart code.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "access",
+      "requirement": "Local TCP port 8200 must be available for the Docker container's published Vault listener.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Vault Developer quick start and select the documented Docker and Go variants.",
+      "details": [
+        "The guide offers Docker or a local Vault binary for the server and Go, Ruby, C#, Python, Java, Bash/curl, and beta OpenAPI variants for the client.",
+        "This record follows Docker and the first code tab, Go."
+      ],
+      "input": "Intent to use Vault in application code.",
+      "output": "A concrete local-server and language path.",
+      "success_signal": "Docker and Go instructions are visible.",
+      "failure_or_wait": "Choosing another variant changes installation, code, and some terminal output.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install or confirm current Docker and a working Go development environment.",
+      "details": [
+        "The quick start accepts Docker or a local Vault installation and requires a development environment for one supported language.",
+        "The Docker note warns that older versions may not work."
+      ],
+      "input": "Supported workstation with package-install permissions.",
+      "output": "Working docker and go commands.",
+      "success_signal": "Docker and Go can execute locally.",
+      "failure_or_wait": "Installation is operating-system specific and is linked rather than decomposed in the quick start.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Start an insecure, in-memory Vault development server in Docker.",
+      "details": [
+        "Run docker run -p 8200:8200 -e 'VAULT_DEV_ROOT_TOKEN_ID=dev-only-token' hashicorp/vault.",
+        "The token grants full root access and is only for this local development exercise.",
+        "The server listens over HTTP on local port 8200."
+      ],
+      "input": "Docker and available local port 8200.",
+      "output": "Running Vault dev server with root token dev-only-token.",
+      "success_signal": "The container starts and Vault listens on port 8200.",
+      "failure_or_wait": "If the image is not local, Docker must download it. A port conflict or failed container prevents the next steps.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the official Go Vault API client.",
+      "details": [
+        "Run go get github.com/hashicorp/vault/api in the Go project."
+      ],
+      "input": "Go module and network access to the module registry.",
+      "output": "Vault Go API dependency added to the project.",
+      "success_signal": "The dependency installation completes without error.",
+      "failure_or_wait": "Module, network, or dependency-resolution errors must be corrected before compiling.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Import the Vault Go API package.",
+      "details": [
+        "Add import vault \"github.com/hashicorp/vault/api\" to the source file.",
+        "The complete sample also needs standard-library context, fmt, and log imports for later steps."
+      ],
+      "input": "Editable Go source file.",
+      "output": "Source file can reference the Vault client library.",
+      "success_signal": "The import resolves in the Go project.",
+      "failure_or_wait": "A missing module or malformed import causes compilation failure.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Create a Vault client for the local address and set the development root token.",
+      "details": [
+        "Create the default config and set its Address to http://127.0.0.1:8200.",
+        "Create the client and fail if initialization returns an error.",
+        "Call client.SetToken(\"dev-only-token\").",
+        "The guide notes that production should use a more secure authentication method."
+      ],
+      "input": "Local Vault address and dev-only root token.",
+      "output": "Authenticated Go client object.",
+      "success_signal": "Client initialization completes and carries the token for requests.",
+      "failure_or_wait": "An incorrect address or token causes the later write request to fail.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add code that stores the first key-value secret.",
+      "details": [
+        "Create a map whose password key has value Hashi123.",
+        "Call client.KVv2(\"secret\").Put with path my-secret-password and the map.",
+        "Handle the returned error and print Secret written successfully."
+      ],
+      "input": "Authenticated Vault client, secret mount secret, path my-secret-password, and password value.",
+      "output": "Go program containing the KV v2 write request.",
+      "success_signal": "The program compiles with the write action.",
+      "failure_or_wait": "Incorrect code, mount, address, or token surfaces as a compile or request error.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the program and verify that the secret write succeeds.",
+      "details": [
+        "The guide instructs the developer to run the code after adding the write.",
+        "If it succeeds, the program prints Secret written successfully."
+      ],
+      "input": "Running Vault dev server and completed write code.",
+      "output": "Secret stored at secret/my-secret-password.",
+      "success_signal": "Secret written successfully appears.",
+      "failure_or_wait": "The guide says to check the root token and Vault server address if the message does not appear.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add code that reads the secret and extracts its password value.",
+      "details": [
+        "Call client.KVv2(\"secret\").Get for my-secret-password.",
+        "Fail on a read error.",
+        "Extract secret.Data[\"password\"] as a string and fail if the type assertion is not valid."
+      ],
+      "input": "Stored secret path and authenticated client.",
+      "output": "Retrieved password value in the application.",
+      "success_signal": "The read and type assertion can complete without error.",
+      "failure_or_wait": "A wrong path, failed request, or unexpected data type terminates the sample.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Compare the retrieved value with the expected password and add the completion message.",
+      "details": [
+        "Fail if the value is not Hashi123.",
+        "Print Access granted! when the value matches."
+      ],
+      "input": "Password value returned by Vault.",
+      "output": "Explicit value check and first-success signal.",
+      "success_signal": "The source contains the equality check and completion message.",
+      "failure_or_wait": "An unexpected retrieved value terminates with an error.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the completed program and observe the first-success result.",
+      "details": [
+        "The same run writes the secret, reads it back, checks its value, and prints the final message."
+      ],
+      "input": "Completed Go program and running local Vault dev server.",
+      "output": "Verified first secret round trip through Vault.",
+      "success_signal": "Access granted! appears in terminal output.",
+      "failure_or_wait": "If retrieval fails, the guide says to check that the secret path is correct; earlier address and token checks also still apply.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer uses a local Vault binary instead of Docker.",
+      "path": "Install Vault for the operating system, then run vault server -dev -dev-root-token-id=\"dev-only-token\".",
+      "effect_on_first_success": "Removes the Docker image and port-publication action but adds platform-specific Vault installation.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "The developer selects Ruby, C#, Python, Java Spring, Bash/curl, or a beta OpenAPI client.",
+      "path": "Use the corresponding dependency, imports, client initialization, write, read, and verification tab throughout the guide.",
+      "effect_on_first_success": "The Vault server, token, secret path, value, and write/read milestone stay the same, while commands, code, and some output change.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer needs production-suitable application authentication.",
+      "path": "Choose and configure an appropriate auth method such as a Kubernetes or cloud-provider method rather than the development root token.",
+      "effect_on_first_success": "Adds auth-method configuration, identity, policy, and credential steps that the quick start defers to additional examples.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "Docker or the Vault binary plus one supported language environment must be installed.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The developer must choose Docker versus local Vault and a supported implementation language.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "environment",
+      "description": "Local port 8200 must be available and the Docker daemon must be able to run the Vault image.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "The sample uses a full-access development root token that is explicitly unsafe for production.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "configuration",
+      "description": "The client address, token, KV mount, and secret path must match the running development server.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developer quick start",
+      "url": "https://developer.hashicorp.com/vault/docs/get-started/developer-qs",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Step 1: start Vault",
+        "Step 2: install a client library",
+        "Step 3: authenticate to Vault",
+        "Step 4: store a secret",
+        "Step 5: retrieve a secret",
+        "Additional examples"
+      ],
+      "evidence_supported": [
+        "Canonical developer entry path",
+        "Docker and language alternatives",
+        "Full Go setup, authentication, write, read, and verification journey",
+        "Explicit first-secret terminal boundary",
+        "Troubleshooting checks and production warnings"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Install Vault",
+      "url": "https://developer.hashicorp.com/vault/install",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "macOS",
+        "Windows",
+        "Linux",
+        "FreeBSD"
+      ],
+      "evidence_supported": [
+        "Local-binary installation branch",
+        "Operating-system-specific installation gate"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "How many screens or package-manager prompts occur while installing Docker or a local Vault binary on a new workstation?",
+      "impact": "The prerequisite installation can contain uncounted platform-specific actions before the documented application journey starts.",
+      "reason_unresolved": "The quick start links to external Docker installation or OS-specific Vault installation and does not define one workstation state.",
+      "checked_source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "question": "Does Docker need to download the Vault image on the first run?",
+      "impact": "An image download adds a network wait before the server starts.",
+      "reason_unresolved": "It depends on local Docker image state and the guide provides no deterministic wait.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Production server configuration and hardening.",
+    "Production-suitable authentication methods and least-privilege policies.",
+    "Runnable hello-vault demo applications.",
+    "Dynamic database credentials and connection keepalive.",
+    "Vault Agent integration.",
+    "Cleanup of the local development server."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

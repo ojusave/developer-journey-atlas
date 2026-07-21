@@ -1,0 +1,328 @@
+{
+  "platform": {
+    "name": "SUSE",
+    "slug": "suse",
+    "organization": "SUSE"
+  },
+  "category": "API infrastructure and developer tooling",
+  "surface": {
+    "name": "K3s OSS Quick Start through a functional single-node cluster",
+    "selection_basis": "Under the workshop policy, the official K3s OSS Quick Start is primary because it is a public, no-account, one-command local Linux route. It is faster and less gated than Rancher Prime or SLES and explicitly states that the result is a fully functional single-node Kubernetes cluster.",
+    "alternatives_considered": [
+      {
+        "name": "SUSE Linux Enterprise Server",
+        "url": "https://documentation.suse.com/sles/",
+        "reason_not_primary": "It is a peer operating-system product with installation and administration journeys rather than the declared company-wide developer default."
+      },
+      {
+        "name": "K3s",
+        "url": "https://documentation.suse.com/cloudnative/k3s/latest/en/",
+        "reason_not_primary": "It is a peer cloud-native product and is also used as an implementation prerequisite inside the selected Rancher candidate."
+      },
+      {
+        "name": "Deploy Rancher on Amazon EKS",
+        "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/deploy-rancher/deploy-rancher.html",
+        "reason_not_primary": "The Rancher deployment index presents EKS, Equinix Metal, manual Helm, and AWS SaaS as alternative routes without a universal provider choice."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Choose a SUSE developer product and reach the first terminal state that its official quick-start documentation names.",
+    "starting_url": "https://documentation.suse.com/",
+    "assumed_prior_state": [
+      "No SUSE product choice, Rancher installation, Kubernetes cluster, kubeconfig, Helm repository, cert-manager installation, domain, or Rancher administrator password is assumed."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Launch a fully functional single-node K3s cluster",
+    "normalized_outcome": "The K3s install script starts a single-node Kubernetes cluster and installs a configured `kubectl`.",
+    "observable_completion_signal": "`sudo k3s kubectl get nodes` shows the local node in Ready state.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "A single-node server installation is a fully-functional Kubernetes cluster.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    "why_this_is_the_boundary": "A Ready node is the first observable proof that the K3s service, control plane, datastore, kubelet, and container runtime are running.",
+    "source_ids": [
+      "S5"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "hardware",
+      "requirement": "Provide a Linux virtual machine reachable from the workstation; the guide says not to install on localhost and requires saving the machine's IP address.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Select a supported Kubernetes version and have kubectl and Helm installed on the local workstation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "account",
+      "requirement": "An authenticated SUSE Customer Center session is required to open the Prime-only documentation and retrieve the Rancher Prime Helm chart repository URL; the public guide does not enumerate account creation, access approval, or the hidden URL.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "permission",
+      "requirement": "Have root or equivalent sudo access on the Linux virtual machine and permission to copy its K3s kubeconfig to the workstation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "network",
+      "requirement": "Allow the workstation and browser to reach the Linux node on the Kubernetes API and web-service ports used by the guide.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "domain",
+      "requirement": "Choose either the guide's IP-based sslip.io hostname or a real domain that points to the Linux node.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the official K3s Quick Start.",
+      "details": [
+        "The route requires no account or Prime entitlement."
+      ],
+      "input": "https://docs.k3s.io/quick-start",
+      "output": "The one-command install route is visible.",
+      "success_signal": "The Install Script section loads.",
+      "failure_or_wait": "",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "On a requirements-compatible Linux host, run `curl -sfL https://get.k3s.io | sh -`.",
+      "details": [
+        "The script installs K3s as a service, adds kubectl and related utilities, and writes `/etc/rancher/k3s/k3s.yaml`."
+      ],
+      "input": "Linux host with root privileges and network access",
+      "output": "The K3s service and single-node cluster start.",
+      "success_signal": "The install command exits successfully.",
+      "failure_or_wait": "Check system requirements, privileges, service status, and installer output.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `sudo k3s kubectl get nodes` and verify the local node is Ready.",
+      "details": [],
+      "input": "The running K3s service",
+      "output": "The cluster node table is displayed.",
+      "success_signal": "The single node reports Ready.",
+      "failure_or_wait": "Inspect the K3s service and logs if the node is not Ready.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "A different SUSE product is intended",
+      "path": "Use that product family's own setup or quick-start documentation.",
+      "effect_on_first_success": "Changes the complete journey and terminal success rather than merely changing one step.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "A managed or provider-specific Rancher route is preferred",
+      "path": "Choose Amazon EKS, Equinix Metal, or Rancher for AWS SaaS instead of the Helm CLI route.",
+      "effect_on_first_success": "Adds provider-specific accounts, infrastructure, access, and commands.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "SUSE exposes many peer product families without a company-wide default developer path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "Rancher itself offers multiple deployment quick starts with different provider and account requirements.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "access",
+      "description": "The required Rancher Prime chart repository URL is available only through Prime-only documentation that redirects to SUSE identity authentication.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "SUSE Documentation",
+      "url": "https://documentation.suse.com/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Product families"
+      ],
+      "evidence_supported": [
+        "Broad SUSE developer surface",
+        "Peer product families",
+        "Absence of one company-wide starting route"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "SUSE Rancher Prime Deployment Quick Start Guides",
+      "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/quick-start.html",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "SUSE Rancher Prime Deployment Quick Start Guides",
+        "Deploying Rancher Server"
+      ],
+      "evidence_supported": [
+        "Sandbox and evaluation scope",
+        "Proof-of-concept purpose",
+        "Deployment-guide grouping"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Deploying SUSE Rancher Prime Server",
+      "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/deploy-rancher/deploy-rancher.html",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Deploying SUSE Rancher Prime Server"
+      ],
+      "evidence_supported": [
+        "Amazon EKS route",
+        "Equinix Metal route",
+        "Manual install route",
+        "Rancher for AWS SaaS route"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Helm CLI Quick Start",
+      "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/deploy-rancher/helm-cli.html",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Install Kubernetes",
+        "Save Your Linux Node IP Address",
+        "Copy the kubeconfig",
+        "Install cert-manager",
+        "Install Rancher",
+        "Navigate to the Rancher UI"
+      ],
+      "evidence_supported": [
+        "Proof-of-concept boundary",
+        "VM and tool prerequisites",
+        "K3s command",
+        "Remote kubeconfig sequence",
+        "SCC chart access",
+        "cert-manager commands",
+        "Hostname options",
+        "Rancher Helm command",
+        "Browser-visible terminal"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Quick-Start Guide | K3s",
+      "url": "https://docs.k3s.io/quick-start",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-19",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install Script"
+      ],
+      "evidence_supported": [
+        "no-account OSS route",
+        "one-command installation",
+        "installed utilities and kubeconfig",
+        "fully functional single-node cluster terminal"
+      ]
+    }
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Logging in, changing the bootstrap password, importing downstream clusters, deploying workloads, production certificates, backups, high availability, monitoring, and production hardening occur after the Rancher UI first appears."
+  ]
+}

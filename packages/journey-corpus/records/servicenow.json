@@ -1,0 +1,844 @@
+{
+  "platform": {
+    "name": "ServiceNow",
+    "slug": "servicenow",
+    "organization": "ServiceNow"
+  },
+  "category": "B2B SaaS and enterprise ecosystems",
+  "surface": {
+    "name": "Australia REST API Explorer tutorial, create and read an incident",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Committed to already-reconstructed surface `Australia REST API Explorer tutorial, create and read an incident`. Prior basis: ServiceNow's official REST API Explorer tutorial explicitly says the learner will test ServiceNow REST APIs, then orders Access, Create an incident record, Read the incident, retrieve, update, and delete. Creating and reading the first incident is the earliest complete create-and-verify success. ServiceNow has many other app, workflow, UI, integration, and product surfaces, so this is not organization-wide canonical.",
+    "alternatives_considered": [
+      {
+        "name": "Direct Table API from an external client",
+        "url": "https://www.servicenow.com/docs/r/api-reference/table-api/table-api.html",
+        "reason_not_primary": "It adds external authentication and client configuration, while REST API Explorer is the official in-instance tutorial route."
+      },
+      {
+        "name": "Retrieve, update, and delete the tutorial incident",
+        "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/use-REST-API-Explorer.html",
+        "reason_not_primary": "These are later CRUD exercises after the inserted record has already been created and read."
+      },
+      {
+        "name": "App Engine and Studio application development",
+        "url": "https://developer.servicenow.com/",
+        "reason_not_primary": "Creating an application has a different project, table, UI, and runtime success boundary."
+      },
+      {
+        "name": "ServiceNow product-specific APIs",
+        "url": "https://www.servicenow.com/docs/r/api-reference/api-reference.html",
+        "reason_not_primary": "The API Explorer exposes many namespaces and APIs; the tutorial specifically chooses Table API v1 and Incident."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Use an authorized ServiceNow instance's REST API Explorer to create a test incident through Table API v1 and retrieve that same incident by sys_id.",
+    "starting_url": "https://developer.servicenow.com/print_page.do?category=now-platform&identifier=DAG_UserRole&module=guide&release=yokohama",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected ServiceNow's REST API Explorer tutorial.",
+      "The developer has no ServiceNow Developer Site account or instance.",
+      "The primary path uses ServiceNow's free Developer Program and a Personal Developer Instance with the Admin user role; an existing enterprise instance remains a branch."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Read the inserted incident",
+    "normalized_outcome": "The developer opens REST API Explorer, sends a Table API v1 POST that creates an incident, captures the Location header's sys_id, sends the documented GET for that sys_id, and receives the inserted record.",
+    "observable_completion_signal": "The POST response shows a status code, execution time, and Location header; the following GET response body contains a text representation of the same incident record and also shows its status code and execution time.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The tutorial lists Create an incident record followed by Read the inserted incident, whose result says the response body contains a text representation of the record.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    "why_this_is_the_boundary": "It proves instance access, the required role, Explorer navigation, API and method selection, request-body construction, a successful insert, sys_id handoff, and a successful read. Retrieve-list, update, delete, and export exercises are later.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A free ServiceNow Developer Site account with a verified email address is required to request a Personal Developer Instance.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "permission",
+      "requirement": "The Developer Site user role must be Admin for unrestricted PDI access; the REST tutorial accepts admin, web_service_admin, or rest_api_explorer.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "plan",
+      "requirement": "A requested and assigned Personal Developer Instance, its URL, and its admin credentials are required for the primary path.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "permission",
+      "requirement": "The user also needs effective permission to insert and read Incident table records in the selected instance; the PDI admin role supplies unrestricted access.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "billing",
+      "requirement": "ServiceNow describes the Developer Site account and Personal Developer Instance as free; the documented signup and PDI request path has no credit-card step.",
+      "required": false,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the ServiceNow Developer Site, select Sign In, and on the ServiceNow ID screen select Get a ServiceNow ID.",
+      "details": [
+        "The Developer Site account provides free access to Developer Program benefits, including requesting a Personal Developer Instance."
+      ],
+      "input": "Browser and accessible email account",
+      "output": "ServiceNow ID signup form",
+      "success_signal": "The Sign up for a ServiceNow ID form is visible.",
+      "failure_or_wait": "A developer who already has a ServiceNow ID can sign in and skip account creation, email verification, and the corresponding first-account screens.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Complete the ServiceNow ID signup form with First Name, Last Name, Email, Country, Password, Confirm Password, CAPTCHA, and the Terms of Use agreement, then select Sign Up.",
+      "details": [
+        "All eight fields or controls are shown in ServiceNow's official account guide."
+      ],
+      "input": "Identity, country, email, password and confirmation, CAPTCHA, and terms acceptance",
+      "output": "Submitted ServiceNow ID registration",
+      "success_signal": "A Thank You! message appears.",
+      "failure_or_wait": "Invalid or mismatched password, existing email, missing field, failed CAPTCHA, or unaccepted terms blocks submission until corrected.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "access",
+      "actor": "system",
+      "interface": "email",
+      "action": "Wait for the Welcome to ServiceNow from Developer Program! email, open it, and select Verify Email.",
+      "details": [],
+      "input": "Signup email inbox",
+      "output": "Verified ServiceNow ID email address",
+      "success_signal": "The verification link opens the Thank You! screen.",
+      "failure_or_wait": "Email delivery delay, spam filtering, wrong address, or an expired verification link requires locating or requesting a valid message before continuing.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On the Thank You! screen, select Login and sign in to the Developer Site with the verified ServiceNow ID.",
+      "details": [],
+      "input": "Verified email and ServiceNow ID password",
+      "output": "First Developer Site session",
+      "success_signal": "The first-sign-in role questions appear.",
+      "failure_or_wait": "Invalid credentials or incomplete email verification blocks the first session and requires account recovery or verification.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "On the Help us tune your experience screen, answer Do you code? by selecting Yes (Admin), then select Next.",
+      "details": [
+        "Yes sets the Admin role with unrestricted PDI access; No sets App Engine Studio Creator with restricted access."
+      ],
+      "input": "Developer Site role choice",
+      "output": "Admin user-role selection",
+      "success_signal": "The job-responsibility and Developer Site terms screen appears.",
+      "failure_or_wait": "Selecting No creates a restricted PDI role; change the user role to Admin from the Account menu before the REST tutorial if necessary.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the option that best describes job responsibilities, add an explanation if Other is selected, open and read the Developer Site Terms of Use, close them, select the agreement checkbox, and select Finish Setup.",
+      "details": [],
+      "input": "Job-responsibility choice and Developer Site terms acceptance",
+      "output": "Completed Developer Site profile with Admin role",
+      "success_signal": "Developer Site setup finishes and the signed-in site header is available.",
+      "failure_or_wait": "Missing responsibility selection, missing Other explanation, or unaccepted terms prevents Finish Setup.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Request Instance in the Developer Site header.",
+      "details": [],
+      "input": "Completed Developer Site account",
+      "output": "Personal Developer Instance request screen",
+      "success_signal": "Available ServiceNow releases are displayed.",
+      "failure_or_wait": "An incomplete profile, existing PDI, program restriction, or unavailable capacity can prevent the request screen or change the available action.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select the available release intended for the Personal Developer Instance and submit the request.",
+      "details": [
+        "The selected official guide specifically documents selecting the offered Early Availability release; it also says a developer can request another available release when Early Availability is unavailable."
+      ],
+      "input": "Release choice",
+      "output": "Submitted PDI request",
+      "success_signal": "The Developer Site indicates that instance assignment is in progress.",
+      "failure_or_wait": "A release may be unavailable; select an available release or wait for capacity according to the choices shown.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "configure",
+      "actor": "system",
+      "interface": "console",
+      "action": "Wait while ServiceNow assigns and provisions the Personal Developer Instance.",
+      "details": [
+        "No fixed assignment time is stated in the selected official guide."
+      ],
+      "input": "Submitted PDI request",
+      "output": "Assigned PDI",
+      "success_signal": "My Instance or the ready dialog shows the instance URL and admin credentials.",
+      "failure_or_wait": "Capacity or provisioning delay extends this wait; the path cannot continue until assignment completes.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Retrieve the assigned instance URL and admin credentials from My Instance or the Your instance is ready! dialog, and copy the current admin password to a safe location.",
+      "details": [
+        "ServiceNow says to preserve the current password for integrations or mobile access."
+      ],
+      "input": "Completed PDI assignment",
+      "output": "PDI URL, admin username, and current password",
+      "success_signal": "The developer has the URL and admin login details.",
+      "failure_or_wait": "If the credentials are not yet displayed, assignment is not complete; wait or use the Developer Site's instance support path.",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Open Instance or the instance link, sign in with the supplied admin credentials if prompted, and verify the Personal Developer Instance opens with the admin role.",
+      "details": [
+        "Admin is accepted by all REST API Explorer child procedures."
+      ],
+      "input": "PDI URL and admin credentials",
+      "output": "Authorized PDI session",
+      "success_signal": "The All navigation is available in the assigned instance.",
+      "failure_or_wait": "An inactive, hibernating, unavailable, or credential-rejected PDI requires waking, password recovery, or Developer Site instance support before continuing.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open All, then navigate to System Web Services, REST, REST API Explorer or search for REST API Explorer, select the module, and click Explore.",
+      "details": [],
+      "input": "Authorized instance session",
+      "output": "REST API Explorer page",
+      "success_signal": "Namespace, API Name, and Version filters are visible.",
+      "failure_or_wait": "A missing module indicates role, plugin, navigation, or release differences and requires administrator review.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In REST API Explorer, select Table API and version v1, then choose Create a record (POST).",
+      "details": [
+        "The documented endpoint is POST /api/now/v1/table/incident."
+      ],
+      "input": "REST API Explorer",
+      "output": "Table API v1 POST request builder",
+      "success_signal": "Path Parameters and Request Body sections for Create a record are visible.",
+      "failure_or_wait": "Wrong namespace, API, version, or method constructs a different request.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Set the Path Parameter table to Incident (incident).",
+      "details": [],
+      "input": "Table API POST builder",
+      "output": "Incident table request path",
+      "success_signal": "The request URL ends with /table/incident.",
+      "failure_or_wait": "Selecting another table changes the record type and does not satisfy the incident tutorial.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "In Request Body, select Add a field, choose a field and value, and optionally add more fields with the plus control.",
+      "details": [
+        "The tutorial example sets short_description to Test incident creation through REST and comments to These are my comments.",
+        "The request body updates automatically."
+      ],
+      "input": "Incident field values",
+      "output": "Generated incident JSON request body",
+      "success_signal": "The body contains the intended field-value pairs.",
+      "failure_or_wait": "Invalid or unauthorized fields, missing required data, or malformed values can make the insert fail.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Send to create the incident.",
+      "details": [],
+      "input": "Constructed POST request",
+      "output": "Table API create response",
+      "success_signal": "The response shows a successful status, execution time, and Location header for the created incident.",
+      "failure_or_wait": "Authentication, role, ACL, business-rule, validation, or table errors must be corrected before resending.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Record the Location header and extract the 32-character sys_id at its end.",
+      "details": [
+        "The tutorial explicitly says to save this header for the next part."
+      ],
+      "input": "POST response Location header",
+      "output": "Created incident sys_id",
+      "success_signal": "A 32-character sys_id is available for retrieval.",
+      "failure_or_wait": "A missing Location header or unsuccessful POST means no created record can be verified.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Retrieve a record (GET), keep Incident as the table, and enter the created sys_id.",
+      "details": [
+        "The documented endpoint is GET /api/now/v1/table/incident/{sys_id}."
+      ],
+      "input": "Incident sys_id",
+      "output": "Single-record GET request",
+      "success_signal": "The request path includes incident and the exact sys_id.",
+      "failure_or_wait": "Wrong table or sys_id returns another record or a not-found error.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Click Send to retrieve the inserted incident.",
+      "details": [
+        "Response Format can select JSON or XML."
+      ],
+      "input": "Configured GET request",
+      "output": "Inserted incident response",
+      "success_signal": "The response body contains a text representation of the created incident and shows status code and execution time.",
+      "failure_or_wait": "A failed insert, wrong sys_id, ACL, deletion, or table mismatch prevents retrieval and requires correcting the request or recreating the incident.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer already has a verified ServiceNow ID and completed Developer Site profile.",
+      "path": "Select Sign In, authenticate, verify the Developer Site user role is Admin, and continue at Request Instance.",
+      "effect_on_first_success": "Skips ServiceNow ID creation, welcome-email verification, and first-sign-in profile setup.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The developer already has access to an enterprise or sandbox ServiceNow instance.",
+      "path": "Skip Developer Site account and PDI acquisition; sign in to the authorized target instance; verify admin, web_service_admin, or rest_api_explorer plus Incident insert and read access; then continue at REST API Explorer navigation.",
+      "effect_on_first_success": "Removes the free PDI signup and provisioning segment but can add enterprise invitation, SSO, MFA, administrator approval, role propagation, and instance policy.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The developer selected No and received App Engine Studio Creator rather than Admin.",
+      "path": "Open the Account menu, select Change User Role, choose Admin, submit the change, wait for the success message, close the dialog, and verify USER ROLE shows Admin before requesting or opening the PDI.",
+      "effect_on_first_success": "Adds a role-correction loop before unrestricted REST API Explorer access.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The intended release is unavailable.",
+      "path": "Select another available release and submit the PDI request, or wait until the intended release becomes available; an Early Availability participant selects the offered Early Availability release.",
+      "effect_on_first_success": "Changes release choice or adds an availability wait before assignment.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 11,
+      "condition": "The developer uses an existing instance account but lacks an accepted REST role.",
+      "path": "Ask an authorized instance administrator to assign rest_api_explorer, web_service_admin, or admin according to least privilege, sign out and back in if needed, then reopen All and REST API Explorer.",
+      "effect_on_first_success": "Adds administrator approval and a permission-propagation wait before the tool is available.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "Navigation by module path is difficult.",
+      "path": "Enter REST API Explorer in the All filter search, select the matching module, and click Explore.",
+      "effect_on_first_success": "Changes navigation only.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 15,
+      "condition": "Only one field is needed.",
+      "path": "Add the required field and value, skip the optional plus control, and send the generated body.",
+      "effect_on_first_success": "Reduces request-body configuration while still creating an incident.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 16,
+      "condition": "The POST fails.",
+      "path": "Inspect status and response error; verify role, Incident ACL, Table API v1 selection, incident path, required field values, and business rules; correct the request and click Send again; record the new Location header.",
+      "effect_on_first_success": "Adds diagnosis and another insert attempt.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "XML is preferred.",
+      "path": "Set Response Format to XML before sending the GET and verify the returned XML represents the created incident.",
+      "effect_on_first_success": "Changes serialization but not the record or verification boundary.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 19,
+      "condition": "The developer continues the official CRUD tutorial.",
+      "path": "Retrieve existing incidents, update the created incident with PUT or PATCH, delete it with DELETE, optionally explore a table directly, and export an OpenAPI specification.",
+      "effect_on_first_success": "Adds later list, update, cleanup, and tooling exercises after the first create-and-read success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 13,
+      "condition": "An external REST client is required.",
+      "path": "Use the instance Table API endpoint, configure an allowed authentication method and headers in the external client, send the equivalent POST, capture Location and sys_id, then send the equivalent GET and verify the incident.",
+      "effect_on_first_success": "Adds external client installation, authentication, network, and secret-handling steps that Explorer avoids.",
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "ServiceNow ID signup requires first name, last name, email, country, password, password confirmation, CAPTCHA, and Terms of Use acceptance.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "wait",
+      "description": "The developer must receive the Welcome to ServiceNow from Developer Program! email and verify the email address before first login.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "choice",
+      "description": "The first-sign-in Do you code? choice determines unrestricted Admin versus restricted App Engine Studio Creator PDI access.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "terms",
+      "description": "Job responsibility and Developer Site Terms of Use acceptance are required to finish profile setup.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "choice",
+      "description": "A currently available ServiceNow release must be selected for the PDI request.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "wait",
+      "description": "The PDI request must wait for ServiceNow assignment before URL and admin credentials appear.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "credential",
+      "description": "The assigned instance URL and admin credentials must be retrieved and the current password preserved.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "permission",
+      "description": "rest_api_explorer, web_service_admin, or admin is required; the selected PDI Admin role satisfies this gate.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "choice",
+      "description": "Namespace, Table API, version v1, method, and Incident table must all be selected in the Explorer.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "configuration",
+      "description": "Incident field choices and values can be constrained by required fields, ACLs, and instance business rules.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 17,
+      "type": "other",
+      "description": "The POST-to-GET handoff depends on preserving the Location header and extracting its 32-character sys_id.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Use the REST API Explorer",
+      "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/use-REST-API-Explorer.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-12",
+      "sections_used": [
+        "Overview",
+        "Prerequisite role",
+        "Tutorial child procedures"
+      ],
+      "evidence_supported": [
+        "Australia tutorial scope",
+        "rest_api_explorer requirement",
+        "Complete CRUD order",
+        "Create and read boundary"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Access the REST API Explorer",
+      "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/t_GetStartedAccessExplorer.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-12",
+      "sections_used": [
+        "Before you begin",
+        "About this task",
+        "Procedure",
+        "Result"
+      ],
+      "evidence_supported": [
+        "Australia accepted roles",
+        "All navigation and search routes",
+        "Explore action",
+        "Namespace and API filters"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create an incident record",
+      "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/t_GetStartedCreateInt.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-12",
+      "sections_used": [
+        "Before you begin",
+        "About this task",
+        "Procedure",
+        "Response"
+      ],
+      "evidence_supported": [
+        "Australia Table API v1 POST path",
+        "Incident selection",
+        "Body field actions",
+        "Send",
+        "Location header, status, and execution time"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Read the incident",
+      "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/t_GetStartedReadInt.html",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "2026-03-12",
+      "sections_used": [
+        "Before you begin",
+        "About this task",
+        "Procedure",
+        "Response"
+      ],
+      "evidence_supported": [
+        "Australia GET path",
+        "Location-to-sys_id handoff",
+        "Response format branch",
+        "Inserted-record response boundary"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Developer Site Account Guide",
+      "url": "https://developer.servicenow.com/print_page.do?category=now-platform&identifier=DAG_UserRole&module=guide&release=yokohama",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Developer Site Account Guide Introduction",
+        "Creating a Developer Site Account",
+        "Set Your User Role - First Time Signing In"
+      ],
+      "evidence_supported": [
+        "Free Developer Program access",
+        "Signup fields",
+        "Thank You state",
+        "Welcome email verification",
+        "Login",
+        "Admin or App Engine Studio Creator role",
+        "Job responsibility",
+        "Developer Site terms",
+        "Finish Setup"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Personal Developer Instances",
+      "url": "https://developer.servicenow.com/dev.do?_escaped_fragment_=%2Fguides%2Fxanadu%2Fdeveloper-program%2Fea-guide%2Fpersonal-developer-instances-pdis",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Request a Personal Developer Instance"
+      ],
+      "evidence_supported": [
+        "Request Instance",
+        "Release selection",
+        "Assignment wait",
+        "Instance URL and admin credentials",
+        "Open instance"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which PDI releases and capacity will be available to a workshop participant at request time?",
+      "impact": "Availability changes the release choice and can add an assignment wait before the URL and admin credentials appear.",
+      "reason_unresolved": "The Developer Program guide documents selecting an offered release and waiting for assignment, but live inventory and provisioning time are not established in static documentation.",
+      "checked_source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "question": "Which ServiceNow development surface should represent the organization-wide workshop journey?",
+      "impact": "REST Explorer, external APIs, App Engine, Studio, UI Builder, Flow Designer, and product APIs have different first successes.",
+      "reason_unresolved": "The REST tutorial is canonical for Explorer but not for all ServiceNow development.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Will the target instance's Incident ACLs and business rules allow the documented minimal fields?",
+      "impact": "Instance customizations can require additional fields, roles, or approvals before the POST succeeds.",
+      "reason_unresolved": "The generic tutorial cannot establish configuration in a participant's particular instance.",
+      "checked_source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "PDI administration after initial assignment and first login, including release upgrades, resets, hibernation management, and release",
+    "Retrieving lists of incidents after the inserted-record GET",
+    "Updating and deleting the tutorial incident",
+    "Exporting OpenAPI specifications",
+    "External-client authentication and secret management",
+    "App Engine, Studio, UI Builder, Flow Designer, scoped applications, and product-specific API journeys",
+    "Production integration design, ACL changes, business-rule customization, retries, and monitoring"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

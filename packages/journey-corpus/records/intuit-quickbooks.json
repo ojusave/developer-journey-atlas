@@ -1,0 +1,684 @@
+{
+  "platform": {
+    "name": "Intuit QuickBooks",
+    "slug": "intuit-quickbooks",
+    "organization": "Intuit"
+  },
+  "category": "Payments, fintech, and commerce",
+  "surface": {
+    "name": "QuickBooks Online Accounting API CompanyInfo call through the OAuth 2.0 Playground",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Committed to already-reconstructed surface `QuickBooks Online Accounting API CompanyInfo call through the OAuth 2.0 Playground`. Prior basis: The QuickBooks Online Accounting API getting-started guide contains a highlighted quick-sample path that says full application authentication is not needed for testing, directs the developer through the OAuth 2.0 Playground, and supplies a complete CompanyInfo cURL request and sample server response. A separate Build a demo app guide also calls the CompanyInfo route the generic jump-right-in API call. QuickBooks Desktop and QuickBooks Payments have separate first miles, so the organization-level selection still needs human judgment.",
+    "alternatives_considered": [
+      {
+        "name": "QuickBooks Online API Explorer",
+        "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/build-your-first-app",
+        "reason_not_primary": "It is a co-equal no-code testing option: choose a sandbox company, entity, and operation, then select Try it, but it does not demonstrate the access token and realm ID that the cURL path exposes."
+      },
+      {
+        "name": "QuickBooks Online demo application",
+        "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/build-your-first-app",
+        "reason_not_primary": "It is the more robust app-development route, with .NET, Java, and PHP variants, repository setup, redirect URI configuration, browser authorization, and an automatic CompanyInfo call."
+      },
+      {
+        "name": "Full OAuth 2.0 implementation",
+        "url": "https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization",
+        "reason_not_primary": "It is required for a real application, but the official getting-started guide explicitly provides the Playground for a quick first sample call before the complete authorization implementation."
+      },
+      {
+        "name": "QuickBooks Payments API",
+        "url": "https://developer.intuit.com/app/developer/qbpayments/docs/workflows/process-a-payment",
+        "reason_not_primary": "It uses the payments scope and a charge or payment-processing outcome rather than the Accounting API CompanyInfo result."
+      },
+      {
+        "name": "QuickBooks Desktop SDK",
+        "url": "https://developer.intuit.com/app/developer/qbdesktop/docs/get-started",
+        "reason_not_primary": "It is a separate desktop integration surface with a different SDK, local QuickBooks environment, and connection model."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create the minimum QuickBooks Online developer setup, obtain a temporary sandbox access token in the OAuth 2.0 Playground, call the Accounting API CompanyInfo entity, and inspect the sample-shaped response.",
+    "starting_url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/start-developing-your-app",
+    "assumed_prior_state": [
+      "Discovery is complete and the developer has selected the QuickBooks Online Accounting API rather than QuickBooks Payments or QuickBooks Desktop.",
+      "The developer does not yet have an Intuit Developer account, workspace, app, sandbox company, development credentials, OAuth token, or realm ID.",
+      "The developer can use a browser and a CLI or API client capable of sending cURL-equivalent HTTPS requests.",
+      "The first success uses Intuit's sandbox and sample data, not a live QuickBooks Online company."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Want to make a quick sample API call?",
+    "normalized_outcome": "The developer creates the required QuickBooks Online developer resources, uses the OAuth 2.0 Playground to obtain a temporary access token and sandbox realm ID, sends the documented GET CompanyInfo request, and receives a CompanyInfo object for the sandbox company.",
+    "observable_completion_signal": "The sandbox endpoint returns a JSON response with a top-level CompanyInfo object, sandbox company fields such as CompanyName and Id, and a response time value that matches the documented sample response shape.",
+    "boundary_evidence": {
+      "type": "explicitly-named",
+      "official_label_or_terminal_state": "The Create and start developing your app guide labels the inset Want to make a quick sample API call?, provides the GET CompanyInfo command, and says the response should match the sample server response.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "It is Intuit's explicitly documented first request, proving developer access, app and scope setup, sandbox availability, temporary OAuth authorization, bearer-token use, realm selection, and a successful Accounting API response. SDK integration, durable OAuth handling, writes, webhooks, publication, and production access come later.",
+    "source_ids": [
+      "S1",
+      "S4"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "An Intuit Developer account and developer profile are required; account setup asks for basic company information and a workspace name.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "access",
+      "requirement": "A QuickBooks Online sandbox company is required. Intuit automatically gives a new developer profile one sandbox company with sample data.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "permission",
+      "requirement": "A developer app with the accounting scope is required to authorize access to the CompanyInfo entity.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "The developer app has separate Development Client ID and Client Secret credentials for sandbox use; the Playground uses the app to produce a temporary access token and realm ID.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "A web browser plus cURL or another API client is required for the documented quick sample route.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "billing",
+      "requirement": "The selected first success uses the automatically provided sandbox company and sample data; the official route does not document a payment-card or QuickBooks subscription purchase gate.",
+      "required": false,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 7,
+      "type": "knowledge",
+      "requirement": "The optional introductory learning step points to API-platform, REST, bookkeeping, and QuickBooks Online basics, but the guide explicitly lets already-familiar developers skip it.",
+      "required": false,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Create and start developing your app and select the QuickBooks Online Accounting API path.",
+      "details": [
+        "The guide separately links API Explorer, use-case workflows, QuickBooks Desktop, and QuickBooks Payments.",
+        "If unfamiliar, review the linked API-platform, REST, bookkeeping, and QuickBooks Online basics before continuing; the guide says familiar developers can skip this learning step."
+      ],
+      "input": "Intent to make a first QuickBooks Online Accounting API request",
+      "output": "QuickBooks Online Accounting setup path and quick CompanyInfo call target",
+      "success_signal": "Steps 2 through 6 and the highlighted quick-sample-call section are visible.",
+      "failure_or_wait": "Choosing QuickBooks Desktop, QuickBooks Payments, or a specific workflow changes the first-mile outcome and documentation sequence.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create the Intuit Developer account and profile, entering the requested basic company information and a workspace name.",
+      "details": [
+        "The developer profile is the home for apps, credentials, and sandbox companies."
+      ],
+      "input": "Intuit identity, basic company information, and workspace name",
+      "output": "Authenticated developer profile and default workspace",
+      "success_signal": "My Hub, App dashboard, and sandbox resources are accessible.",
+      "failure_or_wait": "The official guide does not enumerate the exact current identity-provider, email-verification, company-information, consent, or workspace-validation screens.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a developer app and grant it the accounting scope.",
+      "details": [
+        "Sign in, select My Hub, App dashboard, and the plus app card.",
+        "Follow the on-screen app-creation steps.",
+        "Choose accounting scope for Accounting API data; add payments scope only if the app also needs payment data."
+      ],
+      "input": "Developer workspace, app name and current on-screen app details, accounting-scope decision",
+      "output": "QuickBooks Online developer app with accounting permission",
+      "success_signal": "The app opens in App dashboard and exposes Keys and credentials plus Settings.",
+      "failure_or_wait": "The guide does not document every current app-creation field; omitting the accounting scope prevents the CompanyInfo authorization and call.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "platform",
+      "interface": "console",
+      "action": "Use the sandbox QuickBooks Online company that Intuit automatically creates with the developer profile.",
+      "details": [
+        "The sandbox is a region-specific QuickBooks Online company with sample data and behaves like a normal QuickBooks Online experience.",
+        "Additional sandboxes are optional; the documented first company is automatically provided.",
+        "Sandbox content is for non-commercial development and testing."
+      ],
+      "input": "Completed developer profile",
+      "output": "Default sandbox company with sample data",
+      "success_signal": "The sandbox appears under My Hub, Sandboxes and can be selected by the Playground.",
+      "failure_or_wait": "If the default sandbox is absent or inaccessible, the public guide does not document a recovery wait; an additional sandbox can be created manually as a fallback.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm the app's Development Client ID and Client Secret in Keys and credentials.",
+      "details": [
+        "Open My Hub, App dashboard, select the app, choose Keys and credentials, choose Development, turn on Show credentials, and copy Client ID and Client Secret.",
+        "Development credentials work with sandbox companies; Production has a separate credential set and questionnaire approval."
+      ],
+      "input": "Developer app and dashboard access",
+      "output": "Development Client ID and Client Secret associated with the sandbox app",
+      "success_signal": "Both development credential values are visible and can be copied securely.",
+      "failure_or_wait": "Selecting Production introduces a questionnaire and approval gate and yields credentials that are not for the sandbox route.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open the OAuth 2.0 Playground, select the sandbox app or company, select the accounting scope, obtain an authorization code, and exchange it for tokens.",
+      "details": [
+        "Choose the relevant sandbox selection in the Select app dropdown.",
+        "Select com.intuit.quickBooks.accounting or the displayed Accounting scope.",
+        "Select Get authorization code and, if prompted, select Connect.",
+        "Review the generated authorization code and Realm ID, then select Get tokens and review the sample token request and response."
+      ],
+      "input": "Developer app, sandbox, and accounting scope",
+      "output": "Temporary access token and sandbox realm ID",
+      "success_signal": "The Playground response contains accessToken and the UI exposes the Realm ID.",
+      "failure_or_wait": "A missing app, unavailable sandbox, omitted scope, denied Connect prompt, or failed code exchange prevents the access token from appearing and requires correcting that selection before retrying.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Copy the documented GET CompanyInfo cURL command and replace both sandbox-company placeholders with the Realm ID and the bearer placeholder with the access token.",
+      "details": [
+        "The sandbox URL is https://sandbox-quickbooks.api.intuit.com/v3/company/{realmId}/companyinfo/{realmId}.",
+        "Set accept and content-type to application/json.",
+        "Set authorization to Bearer followed by the temporary access token.",
+        "Keep the access token out of source control and command history where possible."
+      ],
+      "input": "Access token, realm ID, and official CompanyInfo command",
+      "output": "Complete authenticated sandbox request",
+      "success_signal": "No REPLACE_WITH placeholders remain and the realm ID is identical in both URL positions.",
+      "failure_or_wait": "A malformed Authorization header, wrong realm ID, expired token, missing scope, or production-versus-sandbox mismatch prevents a successful response.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Send the GET CompanyInfo request to the sandbox QuickBooks Online Accounting API.",
+      "details": [
+        "The request reads the CompanyInfo entity for the sandbox company selected in the Playground."
+      ],
+      "input": "Authenticated CompanyInfo request",
+      "output": "HTTP response from the sandbox Accounting API",
+      "success_signal": "The server returns JSON rather than an OAuth, scope, realm, or endpoint error.",
+      "failure_or_wait": "If the access token is older than its documented 60-minute lifetime, return to the Playground to refresh it or generate a new authorization and token before retrying.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Compare the response shape with Intuit's sample server response.",
+      "details": [
+        "Verify the top-level CompanyInfo object.",
+        "Verify sandbox company fields such as CompanyName, CompanyAddr, Country, Id, SyncToken, and MetaData are present as applicable.",
+        "Verify the response includes the server time value."
+      ],
+      "input": "CompanyInfo JSON response",
+      "output": "Verified first QuickBooks Online Accounting API response",
+      "success_signal": "The response matches the sample's CompanyInfo response structure for the selected sandbox.",
+      "failure_or_wait": "An error payload or response for another entity, company, or environment does not satisfy the documented first-call boundary.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "The developer chooses the API Explorer route.",
+      "path": "Sign in to the developer account, open API Explorer, choose the sandbox company, find an Accounting API entity and operation, select Try it, and inspect the generated request and response in the browser.",
+      "effect_on_first_success": "Avoids cURL and manual bearer-header construction but changes the terminal experience to an in-browser tool and permits an entity other than CompanyInfo.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "The developer wants a runnable demo application rather than a raw first API request.",
+      "path": "Use Build a demo app and choose .NET, Java, or PHP; meet the language-specific prerequisites; clone the matching official Hello World repository; create or use the demo app with accounting scope; get Development credentials; add the repository's localhost redirect URI in app Settings; place credentials, redirect URI, and sandbox environment in the sample configuration; run the app; select Connect to QuickBooks; sign in, select a sandbox, authorize; follow the callback; and verify that the sample automatically calls CompanyInfo.",
+      "effect_on_first_success": "Adds local tooling, repository, SDK, configuration file, redirect URI, browser consent, callback, and language-specific failure modes before the same CompanyInfo outcome.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "QuickBooks Payments is the intended product.",
+      "path": "Use the QuickBooks Payments workflow, create an app with the payments scope, use the Payments sandbox and test card data, obtain a scoped OAuth token, submit the documented charge or payment request, and verify the Payments API response.",
+      "effect_on_first_success": "Changes scope, endpoint, test data, billing semantics, and terminal result from company metadata to a payment-processing object.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "QuickBooks Desktop is the intended product.",
+      "path": "Leave the QuickBooks Online docs and use the QuickBooks Desktop SDK getting-started route, install the required desktop SDK and local QuickBooks environment, create and authorize the desktop connection, run its sample request, and verify the local company-data response.",
+      "effect_on_first_success": "Replaces the cloud sandbox and OAuth 2.0 model with a local desktop integration and separate SDK.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "The app also needs QuickBooks payment data.",
+      "path": "Add the payments scope in addition to accounting, obtain a token authorized for both intended scopes, and use only the endpoints corresponding to granted permissions.",
+      "effect_on_first_success": "Adds user-consent scope and product surface but is unnecessary for CompanyInfo.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "The automatic sandbox is unavailable or a different SKU or region is needed.",
+      "path": "Open My Hub, Sandboxes, select Add, choose QuickBooks Online Plus or Advanced; for Plus choose the country and note that it cannot later be changed; select Create; then use the new sandbox in the Playground. Up to 10 sandboxes can be created and they remain active for two years.",
+      "effect_on_first_success": "Adds SKU and irreversible region choices plus explicit sandbox creation before authorization.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The Playground's Example API calls workflow is preferred over the copied command in the getting-started page.",
+      "path": "After obtaining tokens, go to Example API calls, select Get Company Info from Call APIs for, select Get Curl, copy the generated command into a CLI or API client, execute it, and compare its request and response with the Playground sample.",
+      "effect_on_first_success": "Lets the Playground populate the accessToken authorization value and command rather than manually replacing placeholders.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The temporary access token has expired.",
+      "path": "Return to the first Playground server response, obtain refreshToken, open Refresh Access Token, confirm the refresh token is populated, select Refresh Access Token, copy the new accessToken, replace the bearer value in the CompanyInfo command, and retry. Alternatively repeat authorization and Get tokens.",
+      "effect_on_first_success": "Adds a token-refresh or reauthorization cycle after the documented 60-minute access-token lifetime.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The request fails because accounting scope was not authorized.",
+      "path": "Return to the Playground, select the accounting scope, obtain a new authorization code, approve Connect, exchange for a new token, update the bearer token, and resend the request.",
+      "effect_on_first_success": "Repeats OAuth authorization because scopes determine which API request types the token can make.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "condition": "The realm ID or environment is wrong.",
+      "path": "Copy the Realm ID associated with the selected sandbox from the Playground, use the sandbox base URL, replace both URL placeholders with the same ID, and resend the request. Do not use Production credentials or a live-company URL for the selected test route.",
+      "effect_on_first_success": "Corrects company and environment routing before the response can match the sandbox sample.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "QuickBooks Online Accounting, QuickBooks Payments, QuickBooks Desktop, API Explorer, generic cURL, and language-specific demo routes have different first-mile paths.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The developer account requires basic company information and a workspace name; the current form sequence is not documented field-by-field.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "configuration",
+      "description": "A developer app and accounting scope must exist before the Playground can issue a CompanyInfo-capable token.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "environment",
+      "description": "The first request depends on a selectable sandbox company and its immutable region if a new sandbox must be created.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "credential",
+      "description": "Development and Production credentials are separate; Production credentials introduce a questionnaire and approval and do not belong in the sandbox path.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "verification",
+      "description": "The Playground requires app and sandbox selection, accounting scope, a Connect authorization prompt when shown, code generation, and token exchange.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "configuration",
+      "description": "The bearer token, sandbox realm ID in two URL positions, sandbox hostname, and JSON headers must all be correct in the raw cURL request.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "wait",
+      "description": "Playground access tokens are temporary and valid for 60 minutes; expiry requires refresh or reauthorization before retrying.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Create and start developing your app",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/start-developing-your-app",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Step 1: Get to know the QuickBooks Online Accounting API platform",
+        "Step 2: Set up your developer account",
+        "Step 3: Create an app on the Intuit Developer Portal",
+        "Step 4: Create a sandbox QuickBooks Online company",
+        "Step 5: Learn how to get your app's credentials",
+        "Step 6: Authorize your app",
+        "Want to make a quick sample API call?",
+        "Step 7: Test your code"
+      ],
+      "evidence_supported": [
+        "Full getting-started order",
+        "Company and workspace account fields",
+        "App and scope setup",
+        "Automatic sandbox",
+        "OAuth Playground shortcut",
+        "Complete CompanyInfo request and sample response boundary",
+        "QuickBooks Payments and Desktop alternatives"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get the Client ID and Client Secret for your app",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/get-client-id-and-client-secret",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get your app's credentials",
+        "Development credentials",
+        "Production credentials note"
+      ],
+      "evidence_supported": [
+        "Exact dashboard navigation",
+        "Two credential sets",
+        "Development-versus-Production boundary",
+        "Production questionnaire approval"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create and test with a sandbox company",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/develop/sandboxes/manage-your-sandboxes",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create a sandbox company",
+        "Test code with a sandbox company",
+        "Get a sandbox's credentials",
+        "Get the sandbox base URL"
+      ],
+      "evidence_supported": [
+        "Automatic sandbox",
+        "Sample-data purpose",
+        "Additional sandbox action order",
+        "SKU and region choice",
+        "Count and lifetime",
+        "Sandbox hostname"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Practice authorization in the OAuth Playground",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0-playground",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Step 1: Set up your app on the Intuit Developer Portal",
+        "Step 2: Practice getting access tokens",
+        "Step 3: Make practice API calls",
+        "See sample API requests for each scope",
+        "Step 4: Practice refreshing access tokens"
+      ],
+      "evidence_supported": [
+        "App prerequisite",
+        "Sandbox and scope selections",
+        "Connect branch",
+        "Authorization code and token exchange",
+        "Get Company Info example",
+        "60-minute token lifetime",
+        "Refresh path"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Build a demo app",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/build-your-first-app",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Make a generic API call",
+        "Call a specific API using your sandbox company",
+        ".NET",
+        "Java",
+        "PHP",
+        "Create a demo app",
+        "Get credentials",
+        "Add redirect URI",
+        "Configure authorization",
+        "Simulate authorization",
+        "Make your first API call"
+      ],
+      "evidence_supported": [
+        "Generic and API Explorer quick routes",
+        "Three-language demo alternatives",
+        "Repository and runtime prerequisites",
+        "Redirect URI and consent sequence",
+        "Automatic CompanyInfo terminal call"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which QuickBooks product and first-success surface should define the workshop's canonical Intuit QuickBooks journey?",
+      "impact": "Accounting API, Payments API, Desktop SDK, API Explorer, cURL, and demo-app choices change account resources, credentials, tools, scopes, code, and success signals.",
+      "reason_unresolved": "The official getting-started page links these as separate valid routes and does not designate one organization-wide canonical path.",
+      "checked_source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "question": "What exact Intuit Developer signup and current app-creation screens appear before the workspace and app are ready?",
+      "impact": "Additional identity verification, agreements, company fields, use-case questions, or validation can add pages and waiting before the documented dashboard steps.",
+      "reason_unresolved": "The official guide names basic company information, workspace name, and on-screen app steps but does not enumerate the live forms.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "question": "Does the current OAuth Playground label the first selector as an app, sandbox company, or both in the user's account?",
+      "impact": "The exact user action and displayed object affect the page count and comprehension of app-to-company authorization.",
+      "reason_unresolved": "One official guide says select a sandbox company from Select app, while the Playground guide says select one of your sandbox companies from the same dropdown and also requires the app to exist.",
+      "checked_source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "question": "Can the automatically created default sandbox be absent, delayed, or region-dependent for some new developer profiles?",
+      "impact": "If so, the path gains manual SKU and country selection before authorization.",
+      "reason_unresolved": "The docs state that a sandbox is created automatically and document manual additional creation, but do not describe exceptions or provisioning time.",
+      "checked_source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Building the full application OAuth 2.0 authorization-code flow, persistent token storage, refresh scheduling, revocation, and multi-user company connections",
+    "Cloning and configuring the .NET, Java, or PHP Hello World demo unless that alternative surface is selected",
+    "SDK installation, entity modeling, create and update operations, queries, batch requests, CDC, webhooks, and production error handling",
+    "QuickBooks Payments charges, payment method handling, PCI concerns, and settlements",
+    "QuickBooks Desktop SDK setup and local company-file integration",
+    "Production-key questionnaire, approval, live QuickBooks company access, app assessment, App Store listing, publication, pricing, and billing",
+    "Additional sandbox creation unless the default is absent or a different SKU or country is needed",
+    "Testing entities beyond the first CompanyInfo response"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

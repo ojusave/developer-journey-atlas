@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: first-mile-atlas
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm ci --include=dev && npm run build:data && npm run build:app
+    startCommand: node dist/server.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Phase 2 live research. Secrets are set in the dashboard, not committed.
+      - key: RESEARCH_ENABLED
+        value: "true"
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: YDC_API_KEY
+        sync: false
+      # Optional: enables auto-opening draft PRs for newly researched records.
+      - key: GITHUB_TOKEN
+        sync: false
+      # Optional: override the default OpenRouter model.
+      # - key: OPENROUTER_MODEL
+      #   value: openai/gpt-4o
+# Phase 2 research runs inline in the web service and streams progress over SSE,
+# so no extra Render services are required.

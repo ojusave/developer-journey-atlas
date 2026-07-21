@@ -1,0 +1,76 @@
+{
+  "platform": {"name": "Rollbar", "slug": "rollbar", "organization": "Rollbar Inc."},
+  "category": "Observability, testing, and release engineering",
+  "surface": {
+    "name": "Rollbar SDK selection and first captured occurrence",
+    "selection_basis": "Under the workshop policy, the fastest commonly used documented route is selected instead of requiring a universal SDK choice. The official Browser JavaScript Quick Start is a copy-paste route with an explicit test command and dashboard-visible terminal, so it is primary; account signup is treated as one opaque step at the official signup URL.",
+    "alternatives_considered": [
+      {"name": "Browser JavaScript quick start", "url": "https://docs.rollbar.com/docs/browser-js", "reason_not_primary": "This provides a fully described browser-specific example but the general overview lists it alongside other language SDKs, and even the page recommends module imports for most modern web applications."},
+      {"name": "Node.js SDK", "url": "https://docs.rollbar.com/docs/nodejs", "reason_not_primary": "This is a server-side JavaScript route requiring a different project token and code integration."},
+      {"name": "Rollbar REST API", "url": "https://explorer.docs.rollbar.com/", "reason_not_primary": "The general overview identifies SDK instrumentation as the first step rather than selecting a direct API route."}
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Start without a Rollbar account or project, choose the SDK matching an application, instrument it with the correct project access token, send a documented test occurrence, and verify that the occurrence appears in Rollbar.",
+    "starting_url": "https://docs.rollbar.com/docs/getting-started",
+    "assumed_prior_state": [
+      "No Rollbar account, project, SDK choice, access token, instrumented application, captured occurrence, or dashboard item is assumed.",
+      "A browser, working identity, application codebase, development environment, and network connection are available.",
+      "No signup method was authorized or submitted, account or project was created, token was viewed or generated, code was changed, or occurrence was sent during research."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "Test your installation",
+    "normalized_outcome": "The selected Rollbar SDK sends a test error or message from the instrumented application and the resulting item becomes visible in the Rollbar dashboard.",
+    "observable_completion_signal": "The simulated uncaught error appears in the project's Rollbar dashboard within a few seconds.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "This simulates an uncaught error. It should appear in your project's dashboard within a few seconds.", "source_ids": ["S3"]},
+    "why_this_is_the_boundary": "The dashboard-visible occurrence is the first proof that the browser SDK, project token, transport, and Rollbar ingestion path work end to end.",
+    "source_ids": ["S1", "S2", "S3"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "identity", "requirement": "Create a Rollbar account using GitHub, Google, or email signup.", "required": true, "source_ids": ["S2"]},
+    {"order": 2, "type": "account", "requirement": "Create or select a Rollbar project for the application being instrumented.", "required": true, "source_ids": ["S1", "S3", "S4"]},
+    {"order": 3, "type": "knowledge", "requirement": "Choose the SDK and integration route matching the application's language and framework.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "credential", "requirement": "Use the project access token with the scope required by the selected client-side or server-side SDK.", "required": true, "source_ids": ["S3", "S4"]},
+    {"order": 5, "type": "environment", "requirement": "Have an application codebase and the ability to install or embed the selected SDK and run the application.", "required": true, "source_ids": ["S1", "S3"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Browser JavaScript Quick Start.", "details": ["This is the shortest official SDK route with a published test and terminal."], "input": "https://docs.rollbar.com/docs/browser-js", "output": "The copy-paste snippet and test instructions are visible.", "success_signal": "The Quick Start and Test your installation sections load.", "failure_or_wait": "", "required": true, "source_ids": ["S3"]},
+    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for a Rollbar account using the official signup URL.", "details": ["Treat signup as one opaque step; do not infer provider-specific form fields."], "input": "https://app.rollbar.com/signup", "output": "An authenticated Rollbar account is available.", "success_signal": "The developer can access Rollbar and create a project.", "failure_or_wait": "Complete any account verification requested by Rollbar.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Create or select a project and open Settings > Project Access Tokens.", "details": ["Use a token with the `post_client_item` scope."], "input": "An authenticated Rollbar account", "output": "A project and browser-capable project access token are available.", "success_signal": "The token can be copied into the browser snippet.", "failure_or_wait": "New tokens must be copied when created because they are not shown later.", "required": true, "source_ids": ["S1", "S3", "S4"]},
+    {"step_number": 4, "phase": "build", "actor": "developer", "interface": "code", "action": "Paste the Quick Start snippet high in the page head before other scripts and replace `POST_CLIENT_ITEM_ACCESS_TOKEN`.", "details": ["Change the environment value if the page is not production."], "input": "The project token and an HTML page", "output": "The page loads Rollbar.js with uncaught-error capture enabled.", "success_signal": "The instrumented page loads in a browser.", "failure_or_wait": "Check snippet placement and token scope if the SDK does not initialize.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "browser", "action": "Run the documented `window.onerror` test in the browser console.", "details": ["On Firefox, use the documented `setTimeout(function() {notThere();}, 1000);` alternative in page code."], "input": "The loaded instrumented page", "output": "A simulated uncaught error is sent to Rollbar.", "success_signal": "The command runs and Rollbar receives the occurrence.", "failure_or_wait": "Use the Firefox-specific trigger when `window.onerror` is unavailable.", "required": true, "source_ids": ["S3"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Open the project dashboard and wait a few seconds.", "details": [], "input": "The simulated uncaught error", "output": "A Rollbar item for the test error is displayed.", "success_signal": "The test occurrence appears in the project dashboard.", "failure_or_wait": "Recheck token, snippet placement, environment, and browser network errors.", "required": true, "source_ids": ["S3"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "The developer chooses an identity route", "path": "Continue with GitHub, Google, or email registration.", "effect_on_first_success": "Changes the external authentication and verification sequence before project setup.", "source_ids": ["S2"]},
+    {"at_step": 2, "condition": "The application uses a listed language or framework", "path": "Follow the corresponding JavaScript, Python, PHP, Ruby, Go, Apple, .NET, or framework SDK guide.", "effect_on_first_success": "Changes installation, configuration, token scope, test action, and observable output.", "source_ids": ["S1"]},
+    {"at_step": 2, "condition": "The selected route is Browser JavaScript", "path": "Use a post_client_item token, place the snippet high in the page head, load the page, and trigger the documented browser test error.", "effect_on_first_success": "Provides a concrete dashboard-visible error terminal but is not universal.", "source_ids": ["S3"]},
+    {"at_step": 2, "condition": "The browser is Firefox", "path": "Use the published setTimeout undefined-function test instead of calling window.onerror directly.", "effect_on_first_success": "Changes only the test-error trigger for the Browser JavaScript candidate.", "source_ids": ["S3"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "account", "description": "A Rollbar account and project are required before obtaining a project token and seeing captured occurrences.", "documented_requirement": true, "source_ids": ["S1", "S2", "S3"]},
+    {"at_step": 2, "type": "form", "description": "The public signup page does not expose the exact post-submission account and project states.", "documented_requirement": false, "source_ids": ["S2"]},
+    {"at_step": 2, "type": "choice", "description": "The developer must choose an SDK and often a framework-specific integration.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "credential", "description": "The integration requires a project token with an appropriate client or server scope.", "documented_requirement": true, "source_ids": ["S3", "S4"]},
+    {"at_step": 2, "type": "policy", "description": "Newly created access tokens are shown only at creation and cannot be retrieved from the UI or API afterward, so they must be copied and stored securely.", "documented_requirement": true, "source_ids": ["S4"]},
+    {"at_step": 2, "type": "installation", "description": "The SDK must be embedded or installed and configured in application code.", "documented_requirement": true, "source_ids": ["S1", "S3"]},
+    {"at_step": 2, "type": "wait", "description": "The Browser JavaScript quick start says the simulated error should appear in the dashboard in a few seconds.", "documented_requirement": true, "source_ids": ["S3"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Overview", "url": "https://docs.rollbar.com/docs/getting-started", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": "Updated over 2 years ago", "sections_used": ["Installation", "Setting up your Rollbar account"], "evidence_supported": ["Account prerequisite", "SDK instrumentation as first step", "Peer language choices", "Rollbar Inc. organization name"]},
+    {"id": "S2", "title": "Rollbar Signup", "url": "https://app.rollbar.com/signup", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Get started with Rollbar for free", "GitHub signup", "Google signup", "Email signup", "Trial details"], "evidence_supported": ["Signup identity choices", "Free allowance", "Trial claim", "Public live-account boundary"]},
+    {"id": "S3", "title": "Browser JS", "url": "https://docs.rollbar.com/docs/browser-js", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": "Updated 4 months ago", "sections_used": ["Quick Start", "Test your integration"], "evidence_supported": ["Browser-specific candidate", "Snippet placement", "post_client_item token", "Project Settings token location", "Environment configuration", "Test-error commands", "Firefox alternative", "Dashboard appearance signal", "Few-seconds wait"]},
+    {"id": "S4", "title": "Access Tokens", "url": "https://docs.rollbar.com/docs/access-tokens", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": "Updated about 1 year ago", "sections_used": ["What is changing?", "Project access tokens", "Token scopes"], "evidence_supported": ["Project-token requirement", "Client and server scopes", "One-time display for newly created tokens", "Secure storage requirement", "April 2025 token changes"]}
+  ],
+  "uncertainties": [],
+  "excluded_after_success": [
+    "Source maps, deploy tracking, person tracking, notifications, issue integrations, telemetry enrichment, additional environments, and production-quality error handling occur after the first captured occurrence is visible."
+  ]
+}

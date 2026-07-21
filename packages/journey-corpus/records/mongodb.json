@@ -1,0 +1,438 @@
+{
+  "platform": {
+    "name": "MongoDB",
+    "slug": "mongodb",
+    "organization": "MongoDB, Inc."
+  },
+  "category": "Data, databases, and search",
+  "surface": {
+    "name": "Create and configure an Atlas cluster with Atlas CLI",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Create and configure an Atlas cluster with Atlas CLI. The MongoDB product and interface router has no default, but the official Atlas CLI quickstart supplies an ordered cluster path and explicitly congratulates the developer when the cluster can host data. Prior surface before policy commit: MongoDB product and interface not selected.",
+    "alternatives_considered": [
+      {
+        "name": "Atlas CLI create and configure cluster",
+        "url": "https://www.mongodb.com/docs/atlas/cli/current/atlas-cli-quickstart/",
+        "reason_not_primary": "This official path creates an Atlas M0 cluster and connection string, but requires the Atlas product and CLI surface to be selected."
+      },
+      {
+        "name": "Atlas UI free cluster",
+        "url": "https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/",
+        "reason_not_primary": "This is a coequal UI route with different account, project, provider, region, user, and IP-access steps."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Reach a first MongoDB data-platform result without a preselected deployment product or interface.",
+    "starting_url": "https://www.mongodb.com/docs/",
+    "assumed_prior_state": [
+      "The developer has arrived after discovery.",
+      "The developer has not selected Atlas versus another MongoDB deployment, or UI versus CLI versus a driver."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "The selected Atlas CLI route demonstrates first success when the CLI prints the connection command and the documented cluster-created message.",
+    "normalized_outcome": "The CLI prints the connection command and the documented cluster-created terminal signal.",
+    "observable_completion_signal": "The CLI prints the connection command and the documented cluster-created terminal signal.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The CLI prints the connection command and the documented cluster-created terminal signal.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    "why_this_is_the_boundary": "Selected under workshop fastest/most-used policy; terminal taken from the committed official candidate route.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "other",
+      "requirement": "A MongoDB deployment product and interaction interface must be selected.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "account",
+      "requirement": "The Atlas candidates require an Atlas user account plus organization and project context. Registration can use email, GitHub, or Google, with federation and identity-provider differences documented.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "The Atlas CLI candidate requires the Atlas CLI; connecting at the demonstrated next command also requires MongoDB Shell (`mongosh`).",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or sign in to the Atlas account, then open or create the organization and project that will contain the first cluster.",
+      "details": [
+        "Atlas registration supports email and password, GitHub, or Google, and only one login method is used for an account.",
+        "Company federated authentication requires the company email and delegates password and 2FA behavior to the identity provider.",
+        "Atlas automatically creates an organization and project for a new account, while the developer can also create them manually."
+      ],
+      "input": "Email identity or supported identity-provider account, terms acceptance, and organization/project context.",
+      "output": "Authenticated Atlas account with an organization and project.",
+      "success_signal": "The organization and project open and can host the cluster.",
+      "failure_or_wait": "GitHub registration fails without a public GitHub email; the developer must expose or select a public email and retry. Federated users follow their company's identity provider instead of Atlas password and 2FA controls.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Register an Atlas account with email, GitHub, or Google and complete the selected identity flow.",
+      "details": [
+        "The email route collects email, first and last name, an Atlas-compliant password, optional company, terms acceptance, and robot check.",
+        "GitHub requires a public email; Google and company federation delegate password and 2FA to the identity provider."
+      ],
+      "input": "Supported identity and required registration details.",
+      "output": "Authenticated Atlas user.",
+      "success_signal": "The Atlas console opens for the new user.",
+      "failure_or_wait": "A GitHub account without a public email must expose or select one and retry; federated users must complete their company identity-provider flow.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Use the automatically created Atlas organization and project, or create the organization and project manually.",
+      "details": [
+        "The candidate cluster is created inside this project context."
+      ],
+      "input": "Authenticated Atlas account.",
+      "output": "Atlas organization and project.",
+      "success_signal": "The project opens and can contain a cluster.",
+      "failure_or_wait": "Missing organization or project permission prevents cluster setup.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install Atlas CLI and MongoDB Shell (`mongosh`), then connect Atlas CLI to the account and project.",
+      "details": [
+        "The quickstart requires an Atlas organization, installed CLI, and connected CLI before `atlas setup`."
+      ],
+      "input": "Supported local machine, Atlas account, and project.",
+      "output": "Connected Atlas CLI and local shell tools.",
+      "success_signal": "Atlas CLI can address the selected organization and project.",
+      "failure_or_wait": "Installation, authentication, organization, or project-selection errors block setup.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `atlas setup --force` to accept the quickstart defaults, or run `atlas setup` and answer the interactive prompts.",
+      "details": [
+        "The quickstart's forced route creates the documented default free cluster path."
+      ],
+      "input": "Connected Atlas CLI and target project.",
+      "output": "Atlas cluster setup operation.",
+      "success_signal": "Atlas accepts the setup request and begins cluster creation.",
+      "failure_or_wait": "Invalid project context, quota, permissions, or interactive input stops creation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Capture and store the generated database user credentials and emitted connection string.",
+      "details": [
+        "The credentials are needed for the printed connection command and later database access."
+      ],
+      "input": "Running Atlas setup command.",
+      "output": "Database credentials and cluster connection string.",
+      "success_signal": "The credential values and connection string are available to the developer.",
+      "failure_or_wait": "Losing generated credentials requires credential recovery or replacement before connection.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "cli",
+      "action": "Wait for Atlas to create the cluster, configure access, and load the quickstart sample data.",
+      "details": [
+        "Provisioning and sample-data loading are platform waits in the official CLI output."
+      ],
+      "input": "Accepted Atlas setup operation.",
+      "output": "Created Atlas cluster with access configuration and sample data.",
+      "success_signal": "Output reports `Cluster created` and finishes loading sample data.",
+      "failure_or_wait": "Provisioning or sample-data failure requires inspecting the CLI error and retrying the setup or load operation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Inspect the printed `mongosh` connection command and the quickstart completion message.",
+      "details": [
+        "The page congratulates the developer for creating a cluster that can host data."
+      ],
+      "input": "Completed cluster setup and connection string.",
+      "output": "Runnable `mongosh` command for the created cluster.",
+      "success_signal": "The CLI prints the connection command and the documented cluster-created terminal signal.",
+      "failure_or_wait": "A missing connection command or incomplete cluster state means the setup has not reached the documented boundary.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "The developer registers with an email address.",
+      "path": "Provide email, first and last name, an Atlas-compliant password, optional company name, accept the Terms and Privacy Policy, complete the robot check, and select Sign up. Then use the automatically created organization and project or create them manually.",
+      "effect_on_first_success": "Atlas manages the account password and any Atlas authentication settings.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer registers with GitHub.",
+      "path": "Select GitHub and complete GitHub sign-in and terms steps. If Atlas reports that no public GitHub email exists, open GitHub Settings, make an email public or disable email privacy as documented, save the profile, and retry.",
+      "effect_on_first_success": "GitHub manages user details, email, password, and 2FA; Atlas does not prompt for separate Atlas 2FA.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer registers with Google or a company uses federated authentication.",
+      "path": "For Google, select Google, enter the email, and follow Google's login prompts. For company federation, use the company email and complete the organization's identity-provider flow.",
+      "effect_on_first_success": "Password and 2FA behavior is controlled by the selected identity provider rather than the Atlas password path.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Atlas CLI is selected.",
+      "path": "Create an Atlas organization, install and connect the Atlas CLI, run `atlas setup --force` or accept interactive defaults, wait for cluster creation, store generated database credentials, receive the connection string, and wait while sample data loads. The output then provides the `mongosh` connection command and the page congratulates cluster creation.",
+      "effect_on_first_success": "Success is a created Atlas M0 cluster that can host data, with credentials, access-list entry, sample data, and a connection command.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Atlas UI is selected.",
+      "path": "Log in, go to Project Overview, choose Create, select M0, choose provider and region, name and create the cluster, create a database user in Security Quickstart, add the current IP address, finish, and return to Overview.",
+      "effect_on_first_success": "Success is a provisioned free Atlas cluster with database user and IP access configured; the page claims three minutes and less than 15 seconds for cluster readiness after deployment.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "Atlas requires one of the email, GitHub, Google, or federated login paths plus organization and project context.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "verification",
+      "description": "GitHub signup requires a public email; identity-provider accounts move password and 2FA behavior outside Atlas.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "The developer must choose deployment product and interaction surface before a single MongoDB first-mile path exists.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "account",
+      "description": "Atlas paths require account, organization, and project context.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "Atlas creates or requires a database user and password, an IP access-list entry, and a connection string before client connection.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "MongoDB Documentation",
+      "url": "https://www.mongodb.com/docs/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Docs home",
+        "Products and tools"
+      ],
+      "evidence_supported": [
+        "Cross-product entry point",
+        "Need to select a MongoDB product and tool"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create and Configure an Atlas Cluster",
+      "url": "https://www.mongodb.com/docs/atlas/cli/current/atlas-cli-quickstart/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prerequisites",
+        "Configure an Atlas Cluster",
+        "Take the Next Steps"
+      ],
+      "evidence_supported": [
+        "Atlas organization and CLI prerequisites",
+        "Default and interactive setup modes",
+        "Cluster, credential, sample-data, access-list, connection-string, and congratulations signals"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Deploy a Free Cluster",
+      "url": "https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Procedure",
+        "Atlas UI",
+        "Next Steps"
+      ],
+      "evidence_supported": [
+        "Coequal CLI, API, and UI routes",
+        "Complete first-cluster UI sequence",
+        "Three-minute and readiness claims specific to that branch"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create an Atlas Account",
+      "url": "https://www.mongodb.com/docs/atlas/tutorial/create-atlas-account/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Considerations",
+        "GitHub Accounts Require a Public Email Address",
+        "Register a new Atlas Account",
+        "Create an Atlas Organization and Project"
+      ],
+      "evidence_supported": [
+        "Email, GitHub, and Google registration routes",
+        "Company federation branch",
+        "GitHub public-email failure and repair",
+        "Identity-provider password and 2FA differences",
+        "Automatic and manual organization and project creation"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should MongoDB be represented by Atlas CLI, Atlas UI, a local server, or a driver-specific application path?",
+      "impact": "Each option changes prerequisites, account and network gates, atomic steps, terminal state, and vendor time claims.",
+      "reason_unresolved": "The official cross-product entry point does not select one universal surface; Atlas itself documents CLI, Administration API, and UI routes.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "No common after-success scope is selected while product and surface remain unresolved.",
+    "Atlas production sizing, paid tiers, backups, scaling, monitoring, security hardening, and application-driver integration are excluded."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}

@@ -1,0 +1,879 @@
+{
+  "platform": {
+    "name": "Honeycomb",
+    "slug": "honeycomb",
+    "organization": "Honeycomb.io Inc."
+  },
+  "category": "Observability, testing, and release engineering",
+  "surface": {
+    "name": "Ruby OpenTelemetry traces to a first Honeycomb trace view",
+    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Committed to reconstructed surface `Unresolved Honeycomb start path and application language, with Ruby OpenTelemetry traces as the representative candidate`. Prior: Honeycomb's Get Started page asks the developer to choose Applications, Kubernetes, Sandbox, or an example app. Applications then branches among unstructured logs, structured logs, traces, web, Android, iOS, and React Native. The Traces and Wide Events guide further branches by application language. The full Ruby tab is preserved because it is one supported language path, but the docs do not make it canonical.",
+    "alternatives_considered": [
+      {
+        "name": "JavaScript or Node.js OpenTelemetry",
+        "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+        "reason_not_primary": "A peer tab with npm dependencies, a declarative config file, and a Node preload command."
+      },
+      {
+        "name": "Python OpenTelemetry",
+        "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+        "reason_not_primary": "A peer tab with pip, bootstrap-discovered instrumentation, declarative configuration, and opentelemetry-instrument."
+      },
+      {
+        "name": "Java OpenTelemetry",
+        "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+        "reason_not_primary": "A peer tab using the OpenTelemetry Java agent JAR and declarative configuration."
+      },
+      {
+        "name": ".NET OpenTelemetry",
+        "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+        "reason_not_primary": "A peer ASP.NET Core tab with .NET packages, TracerProvider initialization, environment variables, and dotnet run."
+      },
+      {
+        "name": "Go OpenTelemetry",
+        "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+        "reason_not_primary": "A peer tab with Go-specific SDK initialization and run command."
+      },
+      {
+        "name": "Kubernetes",
+        "url": "https://docs.honeycomb.io/get-started/start-building/kubernetes",
+        "reason_not_primary": "A different first path for cluster telemetry, metrics, logs, events, and Kubernetes attributes."
+      },
+      {
+        "name": "Honeycomb Sandbox",
+        "url": "https://play.honeycomb.io/",
+        "reason_not_primary": "An interactive no-setup demo that explores vendor data rather than sending the developer's telemetry."
+      },
+      {
+        "name": "Example Applications",
+        "url": "https://docs.honeycomb.io/get-started/start-building/example-applications/",
+        "reason_not_primary": "Pre-instrumented apps reduce source-code work and use separate repository instructions."
+      }
+    ]
+  },
+  "research_status": "complete",
+  "researched_at": "2026-07-19",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Choose one Honeycomb start path and get to an observable trace; the representative route instruments a runnable Ruby service with OpenTelemetry and opens a trace waterfall.",
+    "starting_url": "https://docs.honeycomb.io/get-started",
+    "assumed_prior_state": [
+      "The developer has no Honeycomb account, team, region, environment, or ingest API key.",
+      "For the representative route, the developer has a Ruby application but has not added OpenTelemetry instrumentation."
+    ]
+  },
+  "documented_first_success": {
+    "official_milestone": "In the selected Ruby OpenTelemetry route, first success is demonstrated when Honeycomb opens a trace view showing the request's spans, their durations, and any errors.",
+    "normalized_outcome": "Choose US or EU, create a Honeycomb account and team, copy an ingest API key, instrument and run a Ruby service with OpenTelemetry, generate request traffic, query HEATMAP(duration_ms), and open one trace.",
+    "observable_completion_signal": "Honeycomb opens a trace view that shows the spans within the request, how long each span took, and which spans contain errors.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The trace displays its span hierarchy, durations, and error state.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    "why_this_is_the_boundary": "Committed under workshop fastest/most-used policy; terminal taken from the reconstructed official path.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3"
+    ]
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "type": "region",
+      "requirement": "Choose whether Honeycomb stores the team's data in the US or EU.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "account",
+      "requirement": "A free Honeycomb account and named team in the selected region.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "access",
+      "requirement": "A Honeycomb ingest API key that can send events and create the service-named dataset when needed.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "For the representative route, a working Ruby 2.5 or newer environment with Bundler.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "access",
+      "requirement": "Source access to a Ruby service, permission to modify it, and ability to run and request it in a development environment.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "order": 6,
+      "type": "access",
+      "requirement": "Network access from the service to the selected Honeycomb OTLP endpoint and from the browser to the corresponding Honeycomb UI.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Honeycomb Get Started and choose a start path.",
+      "details": [
+        "Choices include Honeycomb for Applications, Honeycomb for Kubernetes, Sandbox, and Example Apps."
+      ],
+      "input": "Intent to evaluate or instrument Honeycomb.",
+      "output": "Selected product path or unresolved choice.",
+      "success_signal": "The developer names the telemetry source and desired success.",
+      "failure_or_wait": "The roster provides no path.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose Honeycomb for Applications, then Get Started with Traces.",
+      "details": [
+        "Applications also offers unstructured logs, structured logs, web, Android, iOS, and React Native."
+      ],
+      "input": "Application observability intent.",
+      "output": "Traces and Wide Events guide.",
+      "success_signal": "The guide's Before You Begin and Send Telemetry sections are selected.",
+      "failure_or_wait": "Another telemetry type changes all later steps.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Choose US-based or EU-based data storage.",
+      "details": [
+        "The account and ingest endpoints differ by region.",
+        "The guide requires this decision before account creation."
+      ],
+      "input": "Data residency, latency, and policy requirements.",
+      "output": "US or EU Honeycomb instance.",
+      "success_signal": "One region is selected.",
+      "failure_or_wait": "A wrong selection can conflict with organizational residency requirements or later endpoints.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a free Honeycomb account in the selected region.",
+      "details": [
+        "Use the region-specific account link.",
+        "The public guide does not enumerate current signup form fields or identity-provider steps."
+      ],
+      "input": "Eligible user identity.",
+      "output": "Authenticated Honeycomb account.",
+      "success_signal": "Account creation reaches team setup.",
+      "failure_or_wait": "Form, verification, existing-account, or provider errors are not documented.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create the Honeycomb team.",
+      "details": [
+        "Enter a team name to finish account creation.",
+        "Honeycomb recommends the company or organization name.",
+        "Teams organize users, access to data, and shared work history."
+      ],
+      "input": "Authenticated account and team name.",
+      "output": "Honeycomb team.",
+      "success_signal": "The team is created and environment setup becomes available.",
+      "failure_or_wait": "Naming, account, or organization-policy errors are not enumerated.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "View or create the Honeycomb ingest API key and copy it to secure storage.",
+      "details": [
+        "The guide says the key is available after team creation and can also be managed in Environment Settings.",
+        "Make note of the secret because it will be needed later.",
+        "The Ruby-specific guide recommends a getting-started key that can create datasets and be rotated for production."
+      ],
+      "input": "Created team and key permission choice.",
+      "output": "Stored ingest API key.",
+      "success_signal": "The key secret is copied and available for OTLP headers.",
+      "failure_or_wait": "Losing the secret requires creating or retrieving an appropriate replacement rather than guessing it.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Choose one application or service and a language tab.",
+      "details": [
+        "The developer must be able to modify source and run the service locally.",
+        "An official example app is available if there is no suitable application.",
+        "For the representative path, choose an existing Ruby service."
+      ],
+      "input": "Runnable application and language.",
+      "output": "Ruby automatic-instrumentation route.",
+      "success_signal": "The service, entry process, and expected request are known.",
+      "failure_or_wait": "The roster supplies no application or language.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Add the OpenTelemetry Ruby dependencies to Gemfile.",
+      "details": [
+        "Add opentelemetry-sdk.",
+        "Add opentelemetry-exporter-otlp.",
+        "Add opentelemetry-instrumentation-all."
+      ],
+      "input": "Ruby service repository.",
+      "output": "Updated Gemfile.",
+      "success_signal": "All three gems are declared.",
+      "failure_or_wait": "Ruby, Gemfile, or version conflicts can block resolution.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install the Ruby dependencies.",
+      "details": [
+        "Run bundle install."
+      ],
+      "input": "Updated Gemfile and working Ruby/Bundler environment.",
+      "output": "Installed OpenTelemetry gems and lockfile changes.",
+      "success_signal": "Bundler completes successfully.",
+      "failure_or_wait": "Dependency resolution, native extension, network, or permission errors can fail installation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Create or update the early OpenTelemetry initialization file.",
+      "details": [
+        "For Rails, use an initializer such as config/initializers/opentelemetry.rb.",
+        "For another Ruby service, initialize as early as possible in startup."
+      ],
+      "input": "Instrumented Ruby project structure.",
+      "output": "Early-loaded OpenTelemetry initialization location.",
+      "success_signal": "The application will load instrumentation before serving requests.",
+      "failure_or_wait": "Loading too late can miss request spans.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Require the OpenTelemetry libraries.",
+      "details": [
+        "Require opentelemetry/sdk, opentelemetry/exporter/otlp, and opentelemetry/instrumentation/all."
+      ],
+      "input": "Initialization file.",
+      "output": "Loaded SDK, exporter, and instrumentation packages.",
+      "success_signal": "Application startup can resolve all three requires.",
+      "failure_or_wait": "Missing gems or wrong load path fails startup.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "ide",
+      "action": "Enable all available automatic instrumentation.",
+      "details": [
+        "Configure OpenTelemetry::SDK and call c.use_all().",
+        "The meta package supports Rails, Sinatra, HTTP libraries, and other integrations."
+      ],
+      "input": "Loaded OpenTelemetry packages.",
+      "output": "SDK configured for automatic spans.",
+      "success_signal": "The initializer completes during application startup.",
+      "failure_or_wait": "Unsupported library or configuration errors can prevent instrumentation.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set the OTLP endpoint for the selected Honeycomb region.",
+      "details": [
+        "For US, export OTEL_EXPORTER_OTLP_ENDPOINT=https://api.honeycomb.io.",
+        "For EU, use https://api.eu1.honeycomb.io."
+      ],
+      "input": "Selected region.",
+      "output": "Correct exporter endpoint environment variable.",
+      "success_signal": "The process environment targets the same region as the account.",
+      "failure_or_wait": "A US/EU mismatch prevents the expected data from appearing.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set the Honeycomb API key header.",
+      "details": [
+        "Export OTEL_EXPORTER_OTLP_HEADERS with x-honeycomb-team=<ingest-api-key>.",
+        "Honeycomb Classic additionally needs x-honeycomb-dataset."
+      ],
+      "input": "Stored ingest API key.",
+      "output": "Authorized exporter header.",
+      "success_signal": "The service process inherits the key header.",
+      "failure_or_wait": "Invalid, missing, revoked, or under-permissioned keys reject telemetry.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Set OTEL_SERVICE_NAME.",
+      "details": [
+        "Choose a service name and export it.",
+        "Honeycomb uses the service name as the dataset name when data is sent."
+      ],
+      "input": "Declared service identity.",
+      "output": "Service-name environment variable.",
+      "success_signal": "The running service will emit a stable service.name.",
+      "failure_or_wait": "An empty or inconsistent name fragments data or changes dataset identity.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the Ruby application with the configured environment.",
+      "details": [
+        "Use the service's normal development start command.",
+        "The guide expects incoming requests and outgoing HTTP calls to generate traces."
+      ],
+      "input": "Instrumented service, dependencies, endpoint, key, and service name.",
+      "output": "Running automatically instrumented Ruby service.",
+      "success_signal": "The application starts without instrumentation errors.",
+      "failure_or_wait": "Application, dependency, environment, or exporter errors can stop startup or export.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 17,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "device",
+      "action": "Make a few requests to the running service.",
+      "details": [
+        "Interact with the development application through its normal client or endpoint.",
+        "Each request should generate automatic spans and send them to Honeycomb."
+      ],
+      "input": "Running service and accessible request route.",
+      "output": "Several trace events sent to Honeycomb.",
+      "success_signal": "Requests complete and telemetry export occurs.",
+      "failure_or_wait": "If several requests produce no data after several minutes, the guide directs the developer to community help.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 18,
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "api",
+      "action": "Ingest the trace data into the team environment.",
+      "details": [
+        "The guide says generated telemetry should appear in Honeycomb within seconds.",
+        "The service name creates or selects the dataset."
+      ],
+      "input": "OTLP spans, correct endpoint, valid key, and dataset permission.",
+      "output": "Queryable Honeycomb trace events.",
+      "success_signal": "The events become available to Query.",
+      "failure_or_wait": "Endpoint, authorization, dataset, network, or schema problems can reject or delay data.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 19,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Log in to the Honeycomb UI for the same region.",
+      "details": [
+        "Use Honeycomb US or Honeycomb EU according to the account created earlier."
+      ],
+      "input": "Honeycomb account and selected region.",
+      "output": "Authenticated team UI.",
+      "success_signal": "The intended team and data are visible.",
+      "failure_or_wait": "Logging into the other regional UI shows a different account or no data.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 20,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Query from the left sidebar.",
+      "details": [
+        "This begins the guide's View an Example Trace verification."
+      ],
+      "input": "Authenticated team with ingested spans.",
+      "output": "Query Builder.",
+      "success_signal": "The SELECT clause is available.",
+      "failure_or_wait": "Wrong environment or dataset can hide the generated events.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 21,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Add HEATMAP(duration_ms) to SELECT.",
+      "details": [
+        "The example is designed to show trace latency distribution."
+      ],
+      "input": "Query Builder and trace data.",
+      "output": "Heatmap query definition.",
+      "success_signal": "HEATMAP(duration_ms) is present.",
+      "failure_or_wait": "A missing duration_ms field prevents the intended visualization.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 22,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select Run Query.",
+      "details": [
+        "Honeycomb executes the query over the generated data."
+      ],
+      "input": "Heatmap query.",
+      "output": "Heatmap result with points representing traces.",
+      "success_signal": "The result contains at least one dot.",
+      "failure_or_wait": "No points indicate missing data, time-range, environment, query, or field issues.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 23,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Select a dot in the heatmap.",
+      "details": [
+        "Each dot can open a representative trace."
+      ],
+      "input": "Heatmap with data points.",
+      "output": "Trace detail view.",
+      "success_signal": "A trace waterfall opens.",
+      "failure_or_wait": "If the selected result cannot resolve to a trace, verify trace fields and data mapping.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Inspect the opened trace.",
+      "details": [
+        "Verify the spans in the trace.",
+        "Verify how long each span took.",
+        "Verify which spans contain errors."
+      ],
+      "input": "Trace detail view.",
+      "output": "Confirmed first Honeycomb trace exploration.",
+      "success_signal": "The trace displays its span hierarchy, durations, and error state.",
+      "failure_or_wait": "Missing spans or visualization can indicate incomplete instrumentation or field mapping.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "The team chooses EU data storage.",
+      "path": "Create and log in through the EU Honeycomb UI, use api.eu1.honeycomb.io as the OTLP endpoint, and keep every account, key, service, and query action in that region.",
+      "effect_on_first_success": "Changes account and endpoint hostnames but keeps the trace-view result.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The application uses JavaScript, Python, Java, .NET, Go, Kubernetes, or another supported platform.",
+      "path": "Use the matching tab's dependencies, initialization or agent, declarative or environment configuration, launch command, and traffic-generation steps, then run the same heatmap and open a trace.",
+      "effect_on_first_success": "Changes package manager, code changes, configuration format, runtime command, and possible collector requirements.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 7,
+      "condition": "The developer has no modifiable application.",
+      "path": "Choose an official pre-instrumented example app, follow its repository instructions, insert the Honeycomb API key, run it, generate traffic, and open the resulting trace.",
+      "effect_on_first_success": "Replaces source instrumentation with clone/setup work and example-specific dependencies.",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "at_step": 14,
+      "condition": "The account is Honeycomb Classic.",
+      "path": "Add x-honeycomb-dataset=<dataset-name> alongside x-honeycomb-team in OTEL_EXPORTER_OTLP_HEADERS.",
+      "effect_on_first_success": "Adds an explicit dataset credential/configuration requirement.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "Honeycomb offers application, Kubernetes, sandbox, and example-app starting routes.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "The developer must choose US or EU data storage before account creation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "account",
+      "description": "Sending and viewing the developer's own data requires a Honeycomb account and team.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "credential",
+      "description": "Telemetry export requires an ingest API key with suitable send and dataset permissions.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 7,
+      "type": "choice",
+      "description": "Instrumentation branches by application, telemetry type, and programming language.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "permission",
+      "description": "The developer must be able to modify and run the selected service.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 9,
+      "type": "installation",
+      "description": "The representative route installs three OpenTelemetry Ruby packages and their dependencies.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 13,
+      "type": "configuration",
+      "description": "Account region, OTLP endpoint, key header, and service name must agree.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 18,
+      "type": "wait",
+      "description": "The guide says data should appear within seconds, but directs the developer to seek help if several requests still show nothing after several minutes.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "Total time not documented; after requests, telemetry should appear in the Honeycomb UI within seconds, with several minutes used as the no-data troubleshooting threshold",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started",
+      "url": "https://docs.honeycomb.io/get-started",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Start Building",
+        "Learn the Basics",
+        "Plan & Design"
+      ],
+      "evidence_supported": [
+        "Platform route choices and lack of one universal path"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get Started with Traces and Wide Events",
+      "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before You Begin",
+        "Create a Honeycomb Account",
+        "Create a Honeycomb Team",
+        "Get Your Honeycomb API Key",
+        "Choose Your Application",
+        "Add Automatic Instrumentation to Your Code",
+        "Ruby",
+        "Generate Automated Data",
+        "View an Example Trace",
+        "What's Next?"
+      ],
+      "evidence_supported": [
+        "Complete selected quick start, language alternatives, timing claim, query, and terminal trace view"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Send Data with the OpenTelemetry Ruby SDK",
+      "url": "https://docs.honeycomb.io/send-data/ruby/opentelemetry-sdk/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Before You Begin",
+        "Prepare Your Development Environment",
+        "Get Your Honeycomb API Key",
+        "Add Automatic Instrumentation",
+        "Acquire Dependencies",
+        "Initialize",
+        "Configure the OpenTelemetry SDK",
+        "Run"
+      ],
+      "evidence_supported": [
+        "Ruby version and service prerequisites, key permission, packages, initialization, configuration, and run result"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Send Data with OpenTelemetry",
+      "url": "https://docs.honeycomb.io/send-data/opentelemetry",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Instrumenting with OpenTelemetry",
+        "Using the Honeycomb OpenTelemetry Endpoint"
+      ],
+      "evidence_supported": [
+        "Language breadth, OTLP methods, region endpoints, key headers, and service name"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Example Applications",
+      "url": "https://docs.honeycomb.io/get-started/start-building/example-applications/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Honeycomb Academy Example Applications"
+      ],
+      "evidence_supported": [
+        "Pre-instrumented fallback and API-key/run requirements"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Honeycomb path, telemetry type, application, and language should represent the platform?",
+      "impact": "Account-free sandbox, example apps, application traces, logs, frontend, mobile, and Kubernetes have different actions and outcomes.",
+      "reason_unresolved": "The official Get Started page explicitly says Choose your path, and the roster provides no application context.",
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "question": "Should the comparison choose US or EU storage?",
+      "impact": "The account, UI, and OTLP endpoint hostnames differ and residency policy can make one route invalid.",
+      "reason_unresolved": "The trace guide requires the developer to decide before signup; no region is supplied.",
+      "checked_source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "question": "What are the exact current account-signup form and verification steps?",
+      "impact": "Unmapped identity or verification pages may add fields, retries, or waits before team creation.",
+      "reason_unresolved": "The public guide links to the region-specific account form but only documents the region choice and free signup.",
+      "checked_source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "question": "What command starts and requests the selected Ruby service?",
+      "impact": "The runtime and traffic-generation steps determine whether automatic instrumentation produces a trace.",
+      "reason_unresolved": "The guide intentionally uses the developer's application and says to run and interact with it without inventing its commands.",
+      "checked_source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Adding custom spans and attributes around business logic.",
+    "Deploying instrumentation to production and using real traffic.",
+    "Further Query Builder analysis, BubbleUp, service maps, boards, triggers, SLOs, markers, and team workflows.",
+    "Collector architecture, sampling, Refinery, data transformation, cost management, API-key rotation, and production governance."
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
+}
