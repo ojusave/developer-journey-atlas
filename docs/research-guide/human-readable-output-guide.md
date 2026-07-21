@@ -10,6 +10,8 @@ Use this order:
 4. What remains unknown.
 5. One next check.
 
+Use “supported hypothesis” only when both gates in the [diagnosis evidence contract](diagnosis-evidence-contract.md) pass. Keep the attempt scope, evidence attribution, and limitations visible.
+
 Use one idea per sentence, concrete verbs, short paragraphs, and descriptive headings. Define technical terms. Do not blame the developer or platform.
 
 Preferred language:
@@ -18,6 +20,7 @@ Preferred language:
 - “This is a possible blocker, not a confirmed cause.”
 - “The available evidence cannot distinguish these explanations.”
 - “The next useful check is whether the developer reached this step.”
+- “This hypothesis is supported for this attempt, but it is not a confirmed cause or broader pattern.”
 
 Prohibited without appropriate evidence:
 
@@ -25,5 +28,6 @@ Prohibited without appropriate evidence:
 - “This is the most common reason.”
 - “Similar platforms usually do this.”
 - “The platform has a conversion problem.”
+- “This is the confirmed cause.”
 
 The generated `packages/generated-views/atlas.md` presents the full corpus. A future UI may progressively disclose sources and alternatives, but it must preserve the same evidence boundaries.

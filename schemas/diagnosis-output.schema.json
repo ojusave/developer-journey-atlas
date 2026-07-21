@@ -20,7 +20,7 @@
     "limitations"
   ],
   "properties": {
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "2.0.0"},
     "platform_id": {"type": "string", "pattern": "^platform:[a-z0-9-]+$"},
     "journey_id": {"type": ["string", "null"]},
     "analysis_mode": {"enum": ["documented-journey", "specific-attempt"]},
@@ -35,13 +35,36 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["statement", "blocker_ids", "evidence_state", "source_ids"],
+        "required": ["statement", "blocker_ids", "evidence_state", "source_ids", "evidence_event_ids", "evidence_kinds", "limitations"],
         "properties": {
           "statement": {"type": "string", "minLength": 1},
           "blocker_ids": {"type": "array", "items": {"type": "string", "pattern": "^blocker:[UP][0-9]{2}(?:\\.[0-9]{2,3})?$"}, "uniqueItems": true},
           "evidence_state": {"enum": ["participant-reported", "inferred", "unresolved", "contradicted", "supported"]},
-          "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
-        }
+          "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "evidence_event_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "evidence_kinds": {"type": "array", "items": {"$ref": "#/$defs/evidence_kind"}, "uniqueItems": true},
+          "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"evidence_state": {"const": "supported"}}, "required": ["evidence_state"]},
+            "then": {
+              "properties": {
+                "blocker_ids": {"type": "array", "minItems": 1},
+                "evidence_event_ids": {"type": "array", "minItems": 1},
+                "evidence_kinds": {
+                  "type": "array",
+                  "contains": {"enum": ["direct_observation", "product_data", "support_case", "developer_interview"]},
+                  "minContains": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {"properties": {"evidence_state": {"const": "participant-reported"}}, "required": ["evidence_state"]},
+            "then": {"properties": {"evidence_kinds": {"type": "array", "contains": {"const": "participant_report"}, "minContains": 1}}}
+          }
+        ]
       }
     },
     "what_we_do_not_know": {"type": "array", "items": {"type": "string", "minLength": 1}},
@@ -49,18 +72,59 @@
     "comparison": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["summary", "comparison_record_ids", "limitations", "minimum_comparison_count_met"],
+      "required": ["summary", "comparison_record_ids", "limitations", "analysis_eligible", "minimum_comparison_count_met", "pattern_claim_eligible", "safe_to_anonymize", "withheld_reasons"],
       "properties": {
         "summary": {"type": ["string", "null"]},
         "comparison_record_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "limitations": {"type": "array", "items": {"type": "string"}},
-        "minimum_comparison_count_met": {"type": "boolean"}
-      }
+        "analysis_eligible": {"type": "boolean"},
+        "minimum_comparison_count_met": {"type": "boolean"},
+        "pattern_claim_eligible": {"type": "boolean"},
+        "safe_to_anonymize": {"type": "boolean"},
+        "withheld_reasons": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"analysis_eligible": {"const": false}}, "required": ["analysis_eligible"]},
+          "then": {"properties": {"summary": {"type": "null"}, "withheld_reasons": {"type": "array", "minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"safe_to_anonymize": {"const": false}}, "required": ["safe_to_anonymize"]},
+          "then": {"properties": {"summary": {"type": "null"}, "withheld_reasons": {"type": "array", "minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"minimum_comparison_count_met": {"const": false}}, "required": ["minimum_comparison_count_met"]},
+          "then": {"properties": {"pattern_claim_eligible": {"const": false}}}
+        }
+      ]
     },
     "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}}
   },
+  "allOf": [
+    {
+      "if": {"properties": {"analysis_mode": {"const": "documented-journey"}}, "required": ["analysis_mode"]},
+      "then": {
+        "properties": {
+          "analysis_status": {"not": {"const": "supported-hypothesis"}},
+          "what_may_be_happening": {"type": "array", "not": {"type": "array", "contains": {"type": "object", "properties": {"evidence_state": {"const": "supported"}}, "required": ["evidence_state"]}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"analysis_status": {"const": "supported-hypothesis"}}, "required": ["analysis_status"]},
+      "then": {
+        "properties": {
+          "analysis_mode": {"const": "specific-attempt"},
+          "what_may_be_happening": {"type": "array", "contains": {"type": "object", "properties": {"evidence_state": {"const": "supported"}}, "required": ["evidence_state"]}, "minContains": 1}
+        }
+      }
+    }
+  ],
   "$defs": {
+    "evidence_kind": {
+      "enum": ["participant_report", "direct_observation", "product_data", "support_case", "developer_interview", "team_anecdote", "assumption", "none"]
+    },
     "claim": {
       "type": "object",
       "additionalProperties": false,

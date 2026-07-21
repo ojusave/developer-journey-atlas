@@ -12,7 +12,7 @@ This public repository is the canonical open-source home for the combined projec
 - A documented friction gate is not a confirmed drop-off point.
 - A blocker hypothesis is not a diagnosis without evidence from a specific attempt.
 
-Run `npm run atlas:verify` after changing either canonical dataset. See `docs/research-guide/` for the data model, evidence method, retrieval contract, intake workflow, and anonymized-comparison rules.
+Run `npm run atlas:verify` after changing either canonical dataset. Start with the [research method](docs/research-guide/research-method.md), [diagnosis evidence contract](docs/research-guide/diagnosis-evidence-contract.md), and [comparison and anonymization contract](docs/research-guide/comparison-and-anonymization.md). The rest of `docs/research-guide/` covers the data model, LLM retrieval, intake, and human-readable output.
 
 ## Existing scanner application
 

@@ -51,7 +51,7 @@ The final local verification passed on 2026-07-21:
 | Browser end-to-end and accessibility smoke test | passed |
 | In-memory API load smoke test | 100 completed, 0 failed |
 
-The Atlas integrity checks compile all three strict JSON Schemas, verify imported Git blobs and source hashes, verify all 79 unchanged scanner blobs, review four license metadata changes, verify generated-view hashes, parse all 1,040 JSONL records independently, confirm that all 790 blocker hypotheses remain `not_diagnosis_eligible`, classify all 375 original files, and prove that every mapped destination path is unique.
+The Atlas integrity checks compile the strict JSON Schemas, verify imported Git blobs and source hashes, verify the 77 Scanner files that remain unchanged, track two reviewed post-migration evidence-validation changes, review four license metadata changes, verify generated-view hashes, parse all 1,040 JSONL records independently, confirm that all 790 blocker hypotheses remain `not_diagnosis_eligible`, classify all 375 original files, and prove that every mapped destination path is unique.
 
 The browser smoke test covered the supported diagnostic flow, insufficient-evidence handling, a corrected journey, legitimate completion with no drop-off, exports, persistence, deletion, accessibility, offline behavior, and layouts from 320 px through 1280 px. The API load smoke test completed 100 concurrent in-memory sessions with no failures.
 

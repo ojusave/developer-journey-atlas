@@ -13,23 +13,66 @@
     "differing_dimensions",
     "source_ids",
     "limitations",
+    "research_snapshots",
     "analysis_eligible",
+    "minimum_comparison_count_met",
+    "pattern_claim_eligible",
     "safe_to_anonymize",
-    "participant_summary"
+    "participant_summary",
+    "withheld_reasons"
   ],
   "properties": {
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "2.0.0"},
     "comparison_id": {"type": "string", "pattern": "^comparison:[a-z0-9:-]+$"},
     "subject_journey_id": {"type": "string", "pattern": "^journey:[a-z0-9-]+:[a-z0-9-]+$"},
-    "peer_journey_ids": {"type": "array", "items": {"type": "string", "pattern": "^journey:[a-z0-9-]+:[a-z0-9-]+$"}, "uniqueItems": true},
-    "matching_dimensions": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/dimension"}},
+    "peer_journey_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^journey:[a-z0-9-]+:[a-z0-9-]+$"}, "uniqueItems": true},
+    "matching_dimensions": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/dimension"}},
     "differing_dimensions": {"type": "array", "items": {"$ref": "#/$defs/dimension"}},
-    "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "source_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "research_snapshots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["journey_id", "researched_at"],
+        "properties": {
+          "journey_id": {"type": "string", "pattern": "^journey:[a-z0-9-]+:[a-z0-9-]+$"},
+          "researched_at": {"type": "string", "format": "date"}
+        }
+      }
+    },
     "analysis_eligible": {"type": "boolean"},
+    "minimum_comparison_count_met": {"type": "boolean"},
+    "pattern_claim_eligible": {"type": "boolean"},
     "safe_to_anonymize": {"type": "boolean"},
-    "participant_summary": {"type": ["string", "null"]}
+    "participant_summary": {"type": ["string", "null"], "minLength": 1},
+    "withheld_reasons": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
   },
+  "allOf": [
+    {
+      "if": {"properties": {"analysis_eligible": {"const": false}}, "required": ["analysis_eligible"]},
+      "then": {"properties": {"participant_summary": {"type": "null"}, "withheld_reasons": {"type": "array", "minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"safe_to_anonymize": {"const": false}}, "required": ["safe_to_anonymize"]},
+      "then": {"properties": {"participant_summary": {"type": "null"}, "withheld_reasons": {"type": "array", "minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"minimum_comparison_count_met": {"const": false}}, "required": ["minimum_comparison_count_met"]},
+      "then": {"properties": {"pattern_claim_eligible": {"const": false}}}
+    },
+    {
+      "if": {"properties": {"pattern_claim_eligible": {"const": true}}, "required": ["pattern_claim_eligible"]},
+      "then": {
+        "properties": {
+          "analysis_eligible": {"const": true},
+          "minimum_comparison_count_met": {"const": true}
+        }
+      }
+    }
+  ],
   "$defs": {
     "dimension": {
       "type": "object",
@@ -37,11 +80,11 @@
       "required": ["name", "subject_value", "peer_values", "source_ids"],
       "properties": {
         "name": {
-          "enum": ["platform-archetype", "developer-goal", "authentication-model", "credential-model", "setup-surface", "execution-model", "first-operation", "success-verification", "account-gate", "entitlement-gate", "branch-complexity"]
+          "enum": ["platform-archetype", "developer-goal", "finish-line", "authentication-model", "credential-model", "setup-surface", "execution-model", "first-operation", "success-verification", "account-gate", "entitlement-gate", "branch-complexity"]
         },
-        "subject_value": {"type": "string"},
-        "peer_values": {"type": "array", "items": {"type": "string"}},
-        "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        "subject_value": {"type": "string", "minLength": 1},
+        "peer_values": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "source_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
       }
     }
   }

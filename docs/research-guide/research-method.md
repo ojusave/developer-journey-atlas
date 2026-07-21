@@ -6,6 +6,8 @@ For a named platform and one documented developer goal, reconstruct the official
 
 This is documentation research. It is not telemetry, usability testing, conversion analysis, or proof of abandonment.
 
+Specific-attempt analysis follows the separate [diagnosis evidence contract](diagnosis-evidence-contract.md). Documentation evidence cannot satisfy its attempt-level support gate.
+
 ## Evidence order
 
 1. Current official documentation and API references.
@@ -23,6 +25,7 @@ Search results and model memory can locate sources but cannot support a recorded
 - Stop at the selected first-success boundary.
 - Do not turn a documented requirement into a confirmed drop-off.
 - Do not turn a blocker hypothesis into a cause without evidence from a real attempt.
+- Do not call an attempt-level hypothesis supported unless both eligibility gates pass.
 
 The imported corpus retains its original detailed method in `packages/journey-corpus/agent-instructions.md`, `SELECTION-POLICY.md`, and `MEASUREMENT-CONTRACT.md`.
 
