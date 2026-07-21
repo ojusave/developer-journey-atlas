@@ -47,7 +47,7 @@ Every original path and transformation is listed in `migration-map.json`. All 37
 
 ## Privacy findings
 
-Gitleaks 8.30.1 scanned all 32 commits and approximately 15.89 MB of Git patches. It reported two UUID-shaped `idempotencyKey` fixtures in `workflows/README.md` and `workflows/test/diagnostic-turn.test.ts`; manual inspection confirmed both are non-secret test values. Tracked `.env.example` files contain placeholders or blank values. No raw user answers were added, and no actual credential was found.
+Gitleaks 8.30.1 scanned the entire reachable migration history. It initially reported two UUID-shaped `idempotencyKey` fixtures in `workflows/README.md` and `workflows/test/diagnostic-turn.test.ts`; manual inspection confirmed both are non-secret test values. Their exact fingerprints are documented in `.gitleaksignore`, and the final full-history scan passes with no findings. Tracked `.env.example` files contain placeholders or blank values. No raw user answers were added, and no actual credential was found.
 
 ## Validation
 

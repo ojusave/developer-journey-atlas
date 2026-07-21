@@ -49,7 +49,7 @@ The path-level classification for all 375 original files is in `migration-map.js
 
 - No private-key, GitHub-token, AWS-key, OpenAI-key, or Render-key signatures were found in tracked history using the local pattern audit.
 - Both tracked `.env.example` files contain placeholders or blank secret fields, not credentials.
-- Gitleaks 8.30.1 scanned all 32 commits and approximately 15.89 MB of Git patches. Its two alerts were manually verified UUID fixtures, not credentials.
+- Gitleaks 8.30.1 scanned the entire reachable migration history. Two initial alerts were manually verified UUID fixtures, not credentials; the exact fingerprints are documented and the final scan passes with no findings.
 - The data repository was imported with full history using an unsquashed Git subtree.
 - Source Git bundles and tracked-file archives are stored outside this repository under the dated migration backup directory.
 

@@ -53,7 +53,7 @@ Generated outputs are derived views. They must be regenerated from the canonical
 
 ## Security and privacy preflight
 
-Gitleaks 8.30.1 scanned all 32 commits and approximately 15.89 MB of Git patches. Its two alerts were manually verified UUID fixtures, not credentials. The earlier pattern scan also found no private-key, GitHub-token, AWS-key, OpenAI-key, or Render-key signatures. Tracked environment examples contain blank or placeholder credentials.
+Gitleaks 8.30.1 scanned the entire reachable migration history. Its two initial alerts were manually verified UUID fixtures, not credentials; the exact fingerprints are documented and the final scan passes with no findings. The earlier pattern scan also found no private-key, GitHub-token, AWS-key, OpenAI-key, or Render-key signatures. Tracked environment examples contain blank or placeholder credentials.
 
 ## Environment and limitations
 
