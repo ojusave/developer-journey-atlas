@@ -254,14 +254,15 @@ const approvalBasisCounts = Object.fromEntries(
 );
 if (
   migrationMap.mappings.every((entry) => entry.approved === true && entry.approval?.status === "approved") &&
-    approvalBasisCounts.byte_identical_history_import === 285 &&
+    approvalBasisCounts.byte_identical_history_import === 284 &&
     approvalBasisCounts.reviewed_license_metadata_change === 4 &&
+    approvalBasisCounts.reviewed_non_data_omission === 1 &&
     approvalBasisCounts.unchanged_blob_verified === 76 &&
     approvalBasisCounts.path_only_hash_verified === 1 &&
     approvalBasisCounts.reviewed_compatibility_change === 6 &&
     approvalBasisCounts.reviewed_post_migration_change === 3
   ) {
-  pass("migration-approval", "285 byte-identical imports, 4 license metadata changes, 76 unchanged, 1 path-only, 6 compatibility, and 3 post-migration mappings approved by evidence class");
+  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 76 unchanged, 1 path-only, 6 compatibility, and 3 post-migration mappings approved by evidence class");
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
@@ -296,6 +297,18 @@ if (new Set(mappedDestinations).size === mappedDestinations.length) {
   pass("migration-destinations", "all mapped destination paths are unique");
 } else {
   fail("migration-destinations", "two or more original files map to the same destination path");
+}
+const omittedTooling = migrationMap.mappings.filter(
+  ({ approval }) => approval?.basis === "reviewed_non_data_omission",
+);
+if (
+  omittedTooling.length === 1 &&
+  omittedTooling[0].originalPath === ".cursor/rules/readme-and-docs.mdc" &&
+  omittedTooling[0].newPath === null
+) {
+  pass("migration-tooling-omission", "one editor-specific documentation rule is omitted with its original Git blob retained");
+} else {
+  fail("migration-tooling-omission", JSON.stringify(omittedTooling));
 }
 if (
   repositoryComparison.counts.samePathDifferentContent === 7 &&
