@@ -16,7 +16,7 @@ Evidence archives need PR review and SHA checks. Postgres is for queryable joins
 
 ## Seed / migrate on Render
 
-- `preDeployCommand`: `npm run db:setup` (`prisma migrate deploy` + `node dist/db/seed.js`)
+- Build ends with `npm run db:setup` (`prisma migrate deploy` + `node dist/db/seed.js`) so free web services seed without a pre-deploy step
 - Seed is idempotent (upsert by slug / catalog id)
 - `blocker-catalog.json` is copied into the package during `build:data`
 
