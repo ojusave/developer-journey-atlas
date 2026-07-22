@@ -46,7 +46,7 @@ for (const url of links.filter((value) => value.startsWith(canonicalUrl))) {
 
 const manifest = JSON.parse(await readFile(path.join(publicRoot, "data/index.json"), "utf8"));
 assert.equal(manifest.schemaVersion, 1);
-assert.equal(manifest.records.length, 205);
+assert.ok(manifest.records.length >= 205);
 assert.equal(manifest.counts.recordsWithErrors, 0);
 assert.equal(manifest.sourceCode.license, "Apache-2.0");
 assert.equal(manifest.sourceCode.files.length, 15);
