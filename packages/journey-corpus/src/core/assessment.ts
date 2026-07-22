@@ -113,15 +113,32 @@ export function buildAssessment(
       completionSignal: audit?.first_success.observable_signal ?? fs?.observable_completion_signal ?? null,
       boundaryType: fs?.boundary_evidence?.type ?? null,
     },
-    prerequisites: audit
-      ? audit.prerequisites.map((p) => ({ type: "required", requirement: p.description, required: true }))
-      : [],
-    frictionGates: audit
-      ? [
+    prerequisites: (() => {
+      const fromRecord = (record?.prerequisites ?? []).map((p) => ({
+        type: p.type,
+        requirement: p.requirement,
+        required: Boolean(p.required),
+      }));
+      if (fromRecord.length) return fromRecord;
+      return (audit?.prerequisites ?? []).map((p) => ({
+        type: "other",
+        requirement: p.description,
+        required: true,
+      }));
+    })(),
+    frictionGates: (() => {
+      if (audit) {
+        return [
           ...audit.external_gates.map((gate) => ({ atStep: null, type: "external gate", description: gate.description })),
           ...audit.unavoidable_waits.map((wait) => ({ atStep: null, type: "wait", description: wait.description })),
-        ]
-      : [],
+        ];
+      }
+      return (record?.friction_gates ?? []).map((g) => ({
+        atStep: g.at_step ?? null,
+        type: g.type ?? "gate",
+        description: g.description ?? g.requirement ?? "",
+      }));
+    })(),
     steps,
     timeToFirstSuccess:
       ttfs && ttfs.value
