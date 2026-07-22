@@ -1,11 +1,20 @@
 import type { Request, Response } from "express";
-import { config, researchConfigStatus } from "../config.js";
-import { sendError } from "./http.js";
-import { runResearch, type ResearchDeps } from "../core/researchPipeline.js";
+import { researchAvailability } from "../config.js";
+import { sendData, sendError } from "./http.js";
+import type { DataStore } from "../core/ports.js";
+import type { WorkflowRunner } from "../workflows/contract.js";
+import { buildResearchInput, InvalidResearchInput } from "../workflows/input.js";
 
 const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
 const RESEARCH_LIMIT = 3;
 const attemptsByIp = new Map<string, number[]>();
+
+// Per-platform duplicate-submission guard: a recently started run for the same
+// normalized slug is reused instead of starting a new one. Bounded in-memory,
+// which is enough because the Workflow itself is durable and the GitHub
+// contribution is idempotent even across web-service restarts.
+const DEDUPE_TTL_MS = 10 * 60 * 1_000;
+const recentRuns = new Map<string, { runId: string; at: number }>();
 
 function takeResearchSlot(ip: string, now = Date.now()): boolean {
   const cutoff = now - RESEARCH_WINDOW_MS;
@@ -19,63 +28,88 @@ function takeResearchSlot(ip: string, now = Date.now()): boolean {
   return true;
 }
 
+function recentRunFor(slug: string, now = Date.now()): string | null {
+  const hit = recentRuns.get(slug);
+  if (hit && now - hit.at < DEDUPE_TTL_MS) return hit.runId;
+  if (hit) recentRuns.delete(slug);
+  return null;
+}
+
 /**
- * Phase 2 endpoint: research a platform that is not in the dataset and stream
- * progress over Server-Sent Events. Gated by RESEARCH_ENABLED and by whether the
- * search/LLM providers are configured. Each pipeline event is one SSE message.
+ * Start research for a platform that is not in the Atlas. Validates and
+ * rate-limits, short-circuits known platforms, then starts a durable Workflow
+ * run and returns 202 with a run id immediately. The research continues even if
+ * the browser disconnects or this request ends.
  */
-export function startResearch(deps: ResearchDeps | null) {
+export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
   return async (req: Request, res: Response): Promise<void> => {
-    if (!config.researchEnabled) {
-      const status = researchConfigStatus();
-      sendError(res, 503, "research_disabled", `Live research is not configured on this deployment. Set ${status.missing.join(", ")}.`);
+    if (!runner) {
+      const status = researchAvailability();
+      sendError(res, 503, "research_unconfigured", `Live research is not configured on this deployment. Set ${status.missing.join(", ")}.`);
       return;
     }
-    if (!deps) {
-      const status = researchConfigStatus();
-      sendError(res, 503, "research_unconfigured", `Live research is enabled but missing ${status.missing.join(", ")}.`);
+
+    let input;
+    try {
+      input = buildResearchInput(req.body?.platform);
+    } catch (err) {
+      const message = err instanceof InvalidResearchInput ? err.message : "Provide a platform name.";
+      sendError(res, 400, "bad_request", message);
       return;
     }
-    const platform = typeof req.body?.platform === "string" ? req.body.platform.trim() : "";
-    if (!platform) {
-      sendError(res, 400, "bad_request", "Provide a platform name.");
+
+    // Known platforms never hit the Workflow: return the existing record directly.
+    if (store.getRow(input.slug)) {
+      sendData(res, { known: true, slug: input.slug }, { status: 200 });
       return;
     }
-    if (platform.length > 100 || !/^[\p{L}\p{N} .&+'()_/:\-]+$/u.test(platform)) {
-      sendError(res, 400, "bad_request", "Use a platform name of 100 characters or fewer.");
+
+    const existingRunId = recentRunFor(input.slug);
+    if (existingRunId) {
+      res.status(202);
+      sendData(res, { runId: existingRunId, phase: "running", slug: input.slug, deduplicated: true });
       return;
     }
+
     if (!takeResearchSlot(req.ip ?? "unknown")) {
       sendError(res, 429, "rate_limited", "This connection has started three research jobs in the last hour. Try again later.");
       return;
     }
 
-    res.status(200);
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache, no-transform");
-    res.setHeader("X-Accel-Buffering", "no");
-    res.flushHeaders();
-
-    // Detect a real client disconnect via the response socket closing before we
-    // finished writing. (req "close" is unreliable: it fires once the request
-    // body has been consumed, not when the client goes away.)
-    let aborted = false;
-    res.on("close", () => {
-      if (!res.writableEnded) aborted = true;
-    });
-    const send = (event: string, data: unknown): void => {
-      if (!aborted && !res.writableEnded) {
-        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-      }
-    };
-
     try {
-      await runResearch(platform, deps, (ev) => send(ev.type, ev));
+      const { runId } = await runner.start(input);
+      recentRuns.set(input.slug, { runId, at: Date.now() });
+      res.status(202);
+      sendData(res, { runId, phase: "queued", slug: input.slug });
     } catch (err) {
-      console.error("Research stream error:", err);
-      send("error", { type: "error", code: "internal", message: "Research failed unexpectedly." });
-    } finally {
-      if (!res.writableEnded) res.end();
+      console.error("Failed to start research run:", err);
+      sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
+    }
+  };
+}
+
+/**
+ * Read the server-side status of a Workflow run and return a browser-safe
+ * projection. Never returns Render or provider credentials, raw upstream errors,
+ * or the run's raw task input. The browser can reload and resume with the run id.
+ */
+export function getResearchStatus(runner: WorkflowRunner | null) {
+  return async (req: Request, res: Response): Promise<void> => {
+    if (!runner) {
+      sendError(res, 503, "research_unconfigured", "Live research is not configured on this deployment.");
+      return;
+    }
+    const runId = typeof req.params.runId === "string" ? req.params.runId.trim() : "";
+    if (!runId || !/^[A-Za-z0-9._-]{1,128}$/.test(runId)) {
+      sendError(res, 400, "bad_request", "Provide a valid run id.");
+      return;
+    }
+    try {
+      const projection = await runner.status(runId);
+      sendData(res, projection);
+    } catch (err) {
+      console.error("Failed to read research run:", err);
+      sendError(res, 404, "run_not_found", "That research run could not be found.");
     }
   };
 }

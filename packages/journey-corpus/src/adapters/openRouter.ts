@@ -5,6 +5,18 @@ const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const TIMEOUT_MS = 90_000;
 const MAX_ATTEMPTS = 2;
 
+/**
+ * Deterministic terminal failure: the model could not produce a schema-valid
+ * record within the bounded repair policy. This is NOT transient, so callers
+ * must treat it as a final outcome rather than retrying it.
+ */
+export class SchemaRepairError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SchemaRepairError";
+  }
+}
+
 interface ChatChoice {
   message?: { content?: string };
 }
@@ -32,7 +44,7 @@ function docsBlock(docs: DocHit[]): string {
 }
 
 /**
- * Reconstructs a schema-valid source-evidence record from official-docs search hits
+ * Reconstructs a schema-valid first-mile record from official-docs search hits
  * using an OpenRouter-hosted model. Grounds strictly on the supplied documents,
  * validates against record.schema.json, and does one repair pass on validation
  * errors. Throws if a valid record cannot be produced.
@@ -40,7 +52,8 @@ function docsBlock(docs: DocHit[]): string {
 export class OpenRouterProvider implements LLMProvider {
   constructor(
     private readonly apiKey: string,
-    private readonly model: string | undefined,
+    /** Optional. When empty, no model is sent and OpenRouter uses the account default. */
+    private readonly model: string,
     private readonly validate: RecordValidator,
     private readonly schemaText: string,
     private readonly categories: string[] = [],
@@ -83,7 +96,9 @@ export class OpenRouterProvider implements LLMProvider {
       }
     }
 
-    throw new Error(`Model could not produce a schema-valid record: ${lastErrors.slice(0, 5).join("; ")}`);
+    throw new SchemaRepairError(
+      `Model could not produce a schema-valid record: ${lastErrors.slice(0, 5).join("; ")}`,
+    );
   }
 
   private async call(messages: Array<{ role: string; content: string }>): Promise<string> {
@@ -99,6 +114,8 @@ export class OpenRouterProvider implements LLMProvider {
           "X-Title": "Developer Journey Atlas",
         },
         body: JSON.stringify({
+          // Omit `model` entirely when unset so OpenRouter falls back to the
+          // account/payer default instead of a pinned, possibly stale model.
           ...(this.model ? { model: this.model } : {}),
           messages,
           temperature: 0.2,
@@ -120,18 +137,12 @@ export class OpenRouterProvider implements LLMProvider {
 
   private systemPrompt(): string {
     return [
-      "You reconstruct a source-evidence record for a developer platform onboarding journey,",
+      "You reconstruct the documented first-mile onboarding journey of a developer platform,",
       "strictly from official documentation. You output a single JSON object that conforms",
       "exactly to the provided JSON Schema (additionalProperties are forbidden).",
       "",
       "Hard rules:",
       "- Use ONLY the supplied official-docs sources. Never invent steps, URLs, or claims.",
-      "- Cover the route from account creation through the earliest meaningful, observable developer success.",
-      "- Account creation belongs inside the route. Include each required signup, verification, agreement, permission, implementation, and execution action supported by the sources.",
-      "- Do not treat reading documentation, optional customization, passive waiting, or automatic platform behavior as a required developer action.",
-      "- The legacy record schema has no dedicated required_fields property. Preserve every documented required field in the containing step's details array without inventing hidden authenticated fields.",
-      "- One submitted form is one developer action. List its required fields separately in details rather than splitting the form into one action per field.",
-      "- This output is source evidence only. It is not a verified shortest-path audit and must not claim comparative difficulty, drop-off, or a public score.",
       "- official_docs_only must be true. Every `sources[].url` must be an official domain and official_domain must be true.",
       "- Give each source an id S1, S2, ... and reference those ids in the *_source_ids arrays.",
       "- If the docs do not establish a single first-success milestone, set research_status to",

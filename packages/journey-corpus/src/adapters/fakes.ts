@@ -2,6 +2,9 @@ import type {
   DataStore, DatasetMeta, DocHit, LLMProvider, MetricRow, PlatformRecord, QualityRow, ShortestPathAudit,
   RepoWriter, SearchProvider,
 } from "../core/ports.js";
+import type {
+  ResearchOutcome, ResearchTaskInput, RunStatusProjection, WorkflowRunner,
+} from "../workflows/contract.js";
 
 /** In-memory DataStore for tests: no filesystem, fully deterministic. */
 export class InMemoryDataStore implements DataStore {
@@ -66,10 +69,51 @@ export class FakeLLMProvider implements LLMProvider {
 /** Fake RepoWriter: records the call and returns a canned PR URL or throws. */
 export class FakeRepoWriter implements RepoWriter {
   public calls = 0;
-  constructor(private readonly result: { url: string } | Error = { url: "https://github.com/x/y/pull/1" }) {}
-  async openDraftRecordPR(): Promise<{ url: string }> {
+  constructor(private readonly result: { url: string; reused?: boolean } | Error = { url: "https://github.com/x/y/pull/1" }) {}
+  async openDraftRecordPR(): Promise<{ url: string; reused: boolean }> {
     this.calls += 1;
     if (this.result instanceof Error) throw this.result;
-    return this.result;
+    return { url: this.result.url, reused: this.result.reused ?? false };
   }
+}
+
+/**
+ * Fake WorkflowRunner: starts return a canned run id and status returns canned
+ * projections in sequence (last one repeats). Lets the API layer be tested
+ * without the Render SDK or network.
+ */
+export class FakeWorkflowRunner implements WorkflowRunner {
+  public started: ResearchTaskInput[] = [];
+  private index = 0;
+  constructor(
+    private readonly runId = "run-fake-1",
+    private readonly projections: RunStatusProjection[] = [],
+    private readonly startError?: Error,
+  ) {}
+
+  async start(input: ResearchTaskInput): Promise<{ runId: string }> {
+    if (this.startError) throw this.startError;
+    this.started.push(input);
+    return { runId: this.runId };
+  }
+
+  async status(runId: string): Promise<RunStatusProjection> {
+    if (this.projections.length === 0) {
+      return { runId, phase: "queued", result: null, message: null };
+    }
+    const projection = this.projections[Math.min(this.index, this.projections.length - 1)];
+    this.index += 1;
+    return { ...projection, runId };
+  }
+}
+
+/** Small helper to build a completed ResearchOutcome for tests. */
+export function completedOutcome(record: PlatformRecord, assessment: unknown): ResearchOutcome {
+  return {
+    outcome: "completed",
+    slug: record.platform.slug,
+    record,
+    assessment: assessment as never,
+    contribution: { status: "opened", url: "https://github.com/x/y/pull/1", reused: false },
+  };
 }

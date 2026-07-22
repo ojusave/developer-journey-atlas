@@ -1,10 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { runResearch } from "../../dist/core/researchPipeline.js";
+import { runResearchPipeline, stepsFromAdapters, slugify } from "../../dist/core/researchPipeline.js";
 import {
   InMemoryDataStore, FakeSearchProvider, FakeLLMProvider, FakeRepoWriter,
 } from "../../dist/adapters/fakes.js";
+import { SchemaRepairError } from "../../dist/adapters/openRouter.js";
 import { selectedPathRow } from "../../lib/measure.mjs";
 
 function draftRecord(overrides = {}) {
@@ -32,99 +33,104 @@ function store() {
   ]);
 }
 
-async function collect(platform, deps) {
-  const events = [];
-  await runResearch(platform, deps, (ev) => events.push(ev));
-  return events;
+function ctx() {
+  return { store: store(), buildRow: selectedPathRow };
+}
+
+function inputFor(platform) {
+  return { platform, slug: slugify(platform) };
+}
+
+async function run(platform, deps, context = ctx()) {
+  return runResearchPipeline(inputFor(platform), stepsFromAdapters(deps), context);
 }
 
 const hits = [{ title: "Acme Docs", url: "https://acme.com/docs", content: "Getting started" }];
 
-test("happy path yields a draft result and opens a PR", async () => {
+test("happy path yields a completed outcome and opens a contribution", async () => {
   const repo = new FakeRepoWriter({ url: "https://github.com/x/y/pull/9" });
-  const deps = {
+  const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
     llm: new FakeLLMProvider(draftRecord()),
     repo,
-    store: store(),
-    buildRow: selectedPathRow,
-  };
-  const events = await collect("Acme", deps);
-  const types = events.map((e) => e.type);
-  assert.ok(types.includes("result"));
-  assert.ok(types.includes("pr"));
+  });
+  assert.equal(outcome.outcome, "completed");
+  assert.equal(outcome.assessment.name, "Acme");
+  assert.equal(outcome.contribution.status, "opened");
+  assert.equal(outcome.contribution.url, "https://github.com/x/y/pull/9");
   assert.equal(repo.calls, 1);
-  const result = events.find((e) => e.type === "result");
-  assert.equal(result.draft, true);
-  assert.equal(result.assessment.name, "Acme");
 });
 
-test("search failure yields a typed error and no result", async () => {
-  const deps = {
+test("transient search failure yields search_failed and no result", async () => {
+  const outcome = await run("Acme", {
     search: new FakeSearchProvider(new Error("upstream 500")),
     llm: new FakeLLMProvider(draftRecord()),
-    store: store(),
-    buildRow: selectedPathRow,
-  };
-  const events = await collect("Acme", deps);
-  const err = events.find((e) => e.type === "error");
-  assert.equal(err.code, "search_failed");
-  assert.ok(!events.some((e) => e.type === "result"));
+  });
+  assert.equal(outcome.outcome, "search_failed");
 });
 
-test("no repo configured shows result but skips the PR", async () => {
-  const deps = {
+test("no docs yields a no_docs terminal", async () => {
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider([]),
+    llm: new FakeLLMProvider(draftRecord()),
+  });
+  assert.equal(outcome.outcome, "no_docs");
+});
+
+test("transient model failure yields model_failed (retryable class, not terminal input error)", async () => {
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider(hits),
+    llm: new FakeLLMProvider(new Error("openrouter 502")),
+  });
+  assert.equal(outcome.outcome, "model_failed");
+});
+
+test("schema-repair exhaustion yields invalid_output (deterministic, not retried)", async () => {
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider(hits),
+    llm: new FakeLLMProvider(new SchemaRepairError("missing required field")),
+  });
+  assert.equal(outcome.outcome, "invalid_output");
+});
+
+test("no repo configured completes with a skipped contribution", async () => {
+  const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
     llm: new FakeLLMProvider(draftRecord()),
-    store: store(),
-    buildRow: selectedPathRow,
-  };
-  const events = await collect("Acme", deps);
-  assert.ok(events.some((e) => e.type === "result"));
-  const skip = events.find((e) => e.type === "pr_skipped");
-  assert.match(skip.reason, /GITHUB_TOKEN/);
+  });
+  assert.equal(outcome.outcome, "completed");
+  assert.equal(outcome.contribution.status, "skipped");
+  assert.match(outcome.contribution.reason, /GITHUB_TOKEN/);
 });
 
-test("non-complete record is not auto-PR'd", async () => {
+test("non-complete record is not contributed", async () => {
   const repo = new FakeRepoWriter();
-  const deps = {
+  const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
     llm: new FakeLLMProvider(draftRecord({ research_status: "needs-human-judgment" })),
     repo,
-    store: store(),
-    buildRow: selectedPathRow,
-  };
-  const events = await collect("Acme", deps);
+  });
+  assert.equal(outcome.outcome, "completed");
   assert.equal(repo.calls, 0);
-  assert.ok(events.some((e) => e.type === "pr_skipped"));
+  assert.equal(outcome.contribution.status, "skipped");
 });
 
 test("known platform short-circuits to the existing record", async () => {
-  const deps = {
+  const outcome = await run("Peer", {
     search: new FakeSearchProvider(hits),
     llm: new FakeLLMProvider(draftRecord()),
-    store: store(),
-    buildRow: selectedPathRow,
-  };
-  const events = await collect("Peer", deps);
-  assert.equal(events[0].type, "known");
-  assert.equal(events[0].slug, "peer");
+  });
+  assert.equal(outcome.outcome, "known");
+  assert.equal(outcome.slug, "peer");
 });
 
 test("drafts cannot cite URLs that were not returned by the docs search", async () => {
   const repo = new FakeRepoWriter();
-  const ungrounded = draftRecord({
-    sources: [{ id: "S1", title: "Invented", url: "https://invented.example/docs" }],
-  });
-  const deps = {
+  const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
-    llm: new FakeLLMProvider(ungrounded),
+    llm: new FakeLLMProvider(draftRecord({ sources: [{ id: "S1", title: "Invented", url: "https://invented.example/docs" }] })),
     repo,
-    store: store(),
-    buildRow: selectedPathRow,
-  };
-  const events = await collect("Acme", deps);
-  assert.ok(events.some((event) => event.type === "error" && event.code === "source_grounding_failed"));
-  assert.ok(!events.some((event) => event.type === "result"));
+  });
+  assert.equal(outcome.outcome, "source_grounding_failed");
   assert.equal(repo.calls, 0);
 });

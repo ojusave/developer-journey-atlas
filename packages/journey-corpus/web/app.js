@@ -99,49 +99,43 @@ const runSearch = debounce(async (q) => {
   }
 }, 160);
 
-/* ---------- Platform result ---------- */
+/* ---------- Rendering one platform's documented route ---------- */
 
-function auditBanner(a) {
-  const status = a.auditStatus || "pending";
-  let text = "Pending re-audit: preserved evidence is not treated as a verified shortest path.";
-  if (status === "verified") {
-    text = "Verified shortest required path: account creation → first success, required fields only.";
-  } else if (status === "needs-human-judgment") {
-    text = "Not verified: a route or field choice is still unresolved. Counts and peer comparison withheld.";
-  } else if (status === "blocked") {
-    text = "Audit blocked: a required step or field is hidden from available evidence. Counts withheld.";
-  }
-  return `<div class="status-banner" data-status="${esc(status)}">${text}</div>`;
+// A short, honest "how to read this" strip shown with every result. It frames
+// the content as documented steps, not a measurement, score, or ranking.
+function readStrip() {
+  return `
+    <p class="read-strip">
+      <strong>What this means:</strong> this is the route described by official docs. It is not observed
+      developer behavior, a conversion rate, or a product ranking.
+    </p>`;
 }
 
 function renderLoad(load) {
   if (!load || !load.available) {
     return `
       <section class="load-card load-unavailable" aria-labelledby="load-title">
-        <p class="section-kicker">Peer comparison</p>
-        <h3 id="load-title">${esc(load?.label || "Unavailable")}</h3>
-        <p>${esc(load?.summary || "Not enough qualified evidence for a peer comparison.")}</p>
+        <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
+        <h3 id="load-title">${esc(load?.label || "Comparison unavailable")}</h3>
+        <p>${esc(load?.summary || "There is not enough qualified evidence for a peer comparison.")}</p>
+        <p class="microcopy">${esc(load?.note || "No drop-off score is inferred from documentation.")}</p>
       </section>`;
   }
 
-  const components = load.components
-    .map(
-      (component) => `
+  const components = load.components.map((component) => `
     <li class="signal-row">
       <span><strong>${num(component.value)}</strong> ${esc(component.label)}</span>
-      <span class="position position-${esc(component.position)}">${esc(component.position)} median (${num(component.peerMedian)})</span>
-    </li>`,
-    )
-    .join("");
+      <span class="position position-${esc(component.position)}">${esc(component.position)} peer median (${num(component.peerMedian)})</span>
+    </li>`).join("");
 
   return `
     <section class="load-card" aria-labelledby="load-title">
       <div class="load-head">
         <div>
-          <p class="section-kicker">Peer comparison</p>
+          <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
           <h3 id="load-title">${esc(load.label)}</h3>
         </div>
-        <span class="load-score" aria-label="${num(load.signalsAboveMedian)} of ${num(load.signalCount)} above median">
+        <span class="load-score" aria-label="${num(load.signalsAboveMedian)} of ${num(load.signalCount)} signals above peer median">
           ${num(load.signalsAboveMedian)}<small>/${num(load.signalCount)}</small>
         </span>
       </div>
@@ -163,22 +157,10 @@ function stepItem(s) {
     ? `<p class="step-signal"><strong>Success signal:</strong> ${esc(s.successSignal)}</p>`
     : "";
   const optional = s.required ? "" : '<span class="step-optional">optional</span>';
-  const fields =
-    s.requiredFields && s.requiredFields.length
-      ? `<div class="step-fields"><strong>Required fields</strong><ul class="step-details">${s.requiredFields
-          .map(
-            (field) =>
-              `<li>${esc(field.label)} <span class="step-tag">${esc(field.type)}</span>${
-                field.notes ? `<br><span class="microcopy">${esc(field.notes)}</span>` : ""
-              }</li>`,
-          )
-          .join("")}</ul></div>`
-      : "";
   return `
     <li class="step">
       <div class="step-head"><span class="step-num">${num(s.stepNumber)}</span>${meta}${optional}</div>
       <p class="step-action">${esc(s.action)}</p>
-      ${fields}
       ${details}
       ${signal}
     </li>`;
@@ -189,18 +171,13 @@ function renderAssessment(a) {
     ? `<div class="chips">${a.prerequisites
         .map((p) => `<span class="chip ${p.required ? "req" : ""}">${esc(p.type)}${p.required ? " (required)" : ""}</span>`)
         .join("")}</div>`
-    : '<p class="lede">None documented.</p>';
+    : '<p class="lede">No prerequisites documented for this route.</p>';
 
   const gates = a.frictionGates.length
     ? `<ul class="gate-list">${a.frictionGates
-        .map(
-          (g) =>
-            `<li><span class="chip">${esc(g.type)}</span> ${esc(g.description)}${
-              g.atStep ? ` <span class="gate-step">(step ${num(g.atStep)})</span>` : ""
-            }</li>`,
-        )
+        .map((g) => `<li><span class="chip">${esc(g.type)}</span> ${esc(g.description)}${g.atStep ? ` <span class="gate-step">(at step ${num(g.atStep)})</span>` : ""}</li>`)
         .join("")}</ul>`
-    : '<p class="lede">None documented.</p>';
+    : '<p class="lede">No friction gates documented on this route.</p>';
 
   const time = a.timeToFirstSuccess
     ? `${esc(a.timeToFirstSuccess.value)} ${a.timeToFirstSuccess.vendorClaim ? "(vendor claim)" : ""}`
@@ -215,7 +192,7 @@ function renderAssessment(a) {
 
   const steps = a.steps.length
     ? `<ol class="steps-list">${a.steps.map(stepItem).join("")}</ol>`
-    : '<p class="lede">No shortest required path until re-audit passes.</p>';
+    : '<p class="lede">Open the full record for the documented steps.</p>';
 
   const asOf = a.researchedAt
     ? ` Documented from official docs as of ${esc(a.researchedAt)}. Docs change.`
@@ -223,20 +200,7 @@ function renderAssessment(a) {
 
   const prompts = a.investigationPrompts?.length
     ? `<ul class="prompt-list">${a.investigationPrompts.map((prompt) => `<li>${esc(prompt)}</li>`).join("")}</ul>`
-    : '<p class="lede">None derived for this route.</p>';
-
-  const signals = a.routeSignals
-    ? `<div class="signal-counters" aria-label="Verified shortest-path signals">
-          <div><strong>${num(a.routeSignals.requiredActions)}</strong><span>required actions</span></div>
-          <div><strong>${num(a.routeSignals.requiredFields)}</strong><span>required fields</span></div>
-          <div><strong>${num(a.routeSignals.waits)}</strong><span>unavoidable waits</span></div>
-          <div><strong>${num(a.routeSignals.gates)}</strong><span>external gates</span></div>
-        </div>`
-    : '<div class="signal-counters"><div><strong>Withheld</strong><span>until audit passes</span></div></div>';
-
-  const comparison = a.auditStatus === "verified" ? renderLoad(a.onboardingLoad) : "";
-  const pathLabel = a.auditStatus === "verified" ? "Verified path" : "Audit evidence";
-  const pathCount = a.pathStepCount == null ? "not verified" : `${num(a.pathStepCount)} actions`;
+    : '<p class="lede">No specific investigation prompts were derived from the documented route.</p>';
 
   return `
     <div class="card">
@@ -245,44 +209,48 @@ function renderAssessment(a) {
         <span class="pill pill-cat">${esc(a.category)}</span>
       </div>
       <p class="lede">${esc(a.outcome)}</p>
-      <p class="read-strip">Official docs route only: not observed behavior, conversion, or a ranking.</p>
-      ${auditBanner(a)}
+      ${readStrip()}
 
       <div class="summary-grid">
         <div class="summary-block">
-          <p class="section-kicker">First success</p>
+          <p class="section-kicker">DOCUMENTED FIRST SUCCESS</p>
           <p class="summary-answer">${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</p>
-          <p class="microcopy">Route: ${esc(a.selectedSurface)}</p>
+          <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
         </div>
-        ${signals}
+        <div class="signal-counters" aria-label="Documented route signals">
+          <div><strong>${num(a.routeSignals.requiredActions)}</strong><span>required actions</span></div>
+          <div><strong>${num(a.routeSignals.waits)}</strong><span>waits</span></div>
+          <div><strong>${num(a.routeSignals.decisions)}</strong><span>decisions</span></div>
+          <div><strong>${num(a.routeSignals.gates)}</strong><span>gates</span></div>
+        </div>
       </div>
 
-      ${comparison}
+      ${renderLoad(a.onboardingLoad)}
+
+      <section class="prompt-card" aria-labelledby="prompt-title">
+        <p class="section-kicker">WHERE TO INVESTIGATE</p>
+        <h3 id="prompt-title">Possible attention points</h3>
+        <p class="microcopy">These prompts come from documented gates and prerequisites. They are not recorded causes of drop-off.</p>
+        ${prompts}
+      </section>
 
       <details class="detail-panel">
-        <summary>${pathLabel} <span>${pathCount}</span></summary>
+        <summary>Open the full documented route <span>${num(a.pathStepCount)} steps</span></summary>
         <dl class="kv">
           <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
           <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
-          <div><dt>Friction gates</dt><dd>${gates}</dd></div>
+          <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
         </dl>
-        <h3 class="steps-heading">Steps <span class="steps-count">${pathCount}</span></h3>
+        <h3 class="steps-heading">Documented steps <span class="steps-count">${num(a.pathStepCount)} steps</span></h3>
         ${steps}
       </details>
 
-      <details class="detail-panel">
-        <summary>Investigation prompts <span>${num(a.investigationPrompts?.length || 0)}</span></summary>
-        <p class="microcopy">From documented gates and prerequisites, not recorded drop-off causes.</p>
-        ${prompts}
-      </details>
-
       <details class="detail-panel sources-block">
-        <summary>Sources <span>${num(a.sourceCount)} official</span></summary>
+        <summary>Check the evidence <span>${num(a.sourceCount)} official sources</span></summary>
         ${sources}
       </details>
 
-      <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Full evidence record (JSON)</a></p>
-      ${a.auditUrl ? `<p class="dist-line"><a href="${esc(a.auditUrl)}" rel="noreferrer">Shortest-path audit (JSON)</a></p>` : ""}
+      <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Open the full evidence record (JSON)</a></p>
       <p class="dist-line note-line">${esc(a.note)}${asOf}</p>
     </div>`;
 }
@@ -290,7 +258,7 @@ function renderAssessment(a) {
 async function showPlatform(slug) {
   hideSuggestions();
   el.result.hidden = false;
-  el.result.innerHTML = '<div class="state-message">Loading…</div>';
+  el.result.innerHTML = '<div class="state-message">Loading the documented route…</div>';
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
   try {
     const assessment = await api(`/api/platforms/${encodeURIComponent(slug)}`);
@@ -300,29 +268,57 @@ async function showPlatform(slug) {
   }
 }
 
+// A monotonically increasing token so a new submission (or reload) cancels any
+// in-flight polling loop from a previous one.
+let activePoll = 0;
+const POLL_INTERVAL_MS = 2500;
+const MAX_POLLS = 160; // ~6.5 minutes, then we stop polling but research continues.
+
+const PHASE_TEXT = {
+  queued: "Queued. Research will start shortly…",
+  running: "Researching official documentation…",
+  retrying: "A step hit a transient error and is being retried…",
+};
+
+const OUTCOME_MESSAGE = {
+  no_docs: "No official documentation was found for that platform, so nothing could be drafted.",
+  search_failed: "The documentation search provider was unavailable. Nothing was submitted. Try again shortly.",
+  model_failed: "The model provider was unavailable while reconstructing the record. Nothing was submitted. Try again shortly.",
+  invalid_output: "The model could not produce a schema-valid record from the official docs, so nothing was submitted.",
+  source_grounding_failed: "The draft cited sources that were not returned by the official-docs search, so it was rejected. Nothing was submitted.",
+};
+
+function setUrlState(query, runId) {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (runId) params.set("research", runId);
+  const suffix = params.toString();
+  history.replaceState(null, "", suffix ? `?${suffix}` : location.pathname);
+}
+
+function setStatus(text) {
+  const statusEl = document.querySelector("#research-status");
+  if (statusEl) statusEl.textContent = text;
+}
+
 function renderUnknown(query) {
   el.result.hidden = false;
   el.result.innerHTML = `
     <div class="card unknown-panel">
       <p class="section-kicker">New platform</p>
       <h2>${esc(query)} is not in the Atlas yet</h2>
-      <p class="lede">Researching official docs and drafting a contribution for review.</p>
+      <p class="lede">Researching official docs on a durable Workflow, then drafting a contribution for review.</p>
+      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
       <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
-      <ol class="research-log" id="research-log" hidden></ol>
     </div>`;
-  document.querySelector("#research-btn").addEventListener("click", () => researchPlatform(query));
+  wireRetry(query);
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
   researchPlatform(query);
 }
 
-function logStep(text, cls) {
-  const logEl = document.querySelector("#research-log");
-  if (!logEl) return;
-  logEl.hidden = false;
-  const li = document.createElement("li");
-  if (cls) li.className = cls;
-  li.textContent = text;
-  logEl.appendChild(li);
+function wireRetry(query) {
+  const btn = document.querySelector("#research-btn");
+  if (btn) btn.addEventListener("click", () => researchPlatform(query));
 }
 
 function draftBanner(record) {
@@ -335,77 +331,117 @@ function draftBanner(record) {
     </div>`;
 }
 
-async function* readSse(res) {
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const chunks = buffer.split("\n\n");
-    buffer = chunks.pop() ?? "";
-    for (const chunk of chunks) {
-      const dataLine = chunk.split("\n").find((l) => l.startsWith("data:"));
-      if (dataLine) {
-        try {
-          yield JSON.parse(dataLine.slice(5).trim());
-        } catch {
-          /* ignore malformed frame */
-        }
-      }
-    }
+function renderContribution(contribution) {
+  if (!contribution) return "";
+  if (contribution.status === "opened") {
+    const reused = contribution.reused ? " An existing open contribution was reused." : "";
+    return `<div class="card"><p class="dist-line"><strong>Draft contribution opened for human review:</strong> <a href="${esc(contribution.url)}" rel="noreferrer">${esc(contribution.url)}</a>${reused}</p></div>`;
   }
+  return `<div class="card"><p class="dist-line">${esc(contribution.reason)}</p></div>`;
 }
 
+// Render a terminal error outcome with a keyboard-accessible retry control.
+function renderResearchError(message, query) {
+  el.result.hidden = false;
+  el.result.innerHTML = `
+    <div class="card unknown-panel">
+      <p class="section-kicker">RESEARCH</p>
+      <h2>"${esc(query)}"</h2>
+      <p class="lede">${esc(message)}</p>
+      <button class="btn btn-secondary" id="research-btn" type="button">Try research again</button>
+    </div>`;
+  wireRetry(query);
+}
+
+function renderResult(result, query) {
+  if (result.outcome === "known") return showPlatform(result.slug);
+  if (result.outcome === "completed") {
+    el.result.innerHTML =
+      draftBanner(result.record) + renderAssessment(result.assessment) + renderContribution(result.contribution);
+    return;
+  }
+  renderResearchError(OUTCOME_MESSAGE[result.outcome] || "Research could not be completed.", query);
+}
+
+// Start research and poll for its result. Safe to call on retry or on reload.
 async function researchPlatform(query) {
   const btn = document.querySelector("#research-btn");
   if (btn) btn.disabled = true;
-  logStep("Starting…");
+  setStatus("Starting…");
   try {
     const res = await fetch("/api/research", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ platform: query }),
     });
-    if (!res.ok || !res.body) {
-      const body = await res.json().catch(() => ({}));
-      logStep(body.error ? body.error.message : `Research unavailable (${res.status}).`, "err");
-      if (btn) btn.disabled = false;
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      renderResearchError(body.error ? body.error.message : `Research is unavailable right now (${res.status}).`, query);
       return;
     }
-
-    let resultHtml = "";
-    for await (const ev of readSse(res)) {
-      if (ev.type === "status") logStep(ev.message);
-      else if (ev.type === "known") return showPlatform(ev.slug);
-      else if (ev.type === "result") {
-        resultHtml = draftBanner(ev.record) + renderAssessment(ev.assessment);
-        el.result.innerHTML = resultHtml;
-      } else if (ev.type === "pr") {
-        el.result.innerHTML =
-          resultHtml +
-          `<div class="card"><p class="dist-line"><strong>Draft PR:</strong> <a href="${esc(ev.url)}" rel="noreferrer">${esc(ev.url)}</a></p></div>`;
-      } else if (ev.type === "pr_skipped") {
-        el.result.innerHTML =
-          resultHtml + `<div class="card"><p class="dist-line">${esc(ev.reason)}</p></div>`;
-      } else if (ev.type === "error") {
-        if (resultHtml) {
-          el.result.innerHTML =
-            resultHtml + `<div class="card"><p class="dist-line err">${esc(ev.message)}</p></div>`;
-        } else logStep(ev.message, "err");
-      }
+    if (body.data && body.data.known) return showPlatform(body.data.slug);
+    const runId = body.data && body.data.runId;
+    if (!runId) {
+      renderResearchError("Research could not be started right now. Try again shortly.", query);
+      return;
     }
+    setUrlState(query, runId);
+    setStatus(PHASE_TEXT[body.data.phase] || PHASE_TEXT.queued);
+    pollRunStatus(runId, query);
   } catch {
-    logStep("Lost connection to the research service.", "err");
-  } finally {
-    if (btn) btn.disabled = false;
+    renderResearchError("Could not reach the research service. Check your connection and try again.", query);
   }
+}
+
+// Poll server-side run status. A dropped connection never cancels the research;
+// the run continues on Render and the browser resumes on the next poll.
+async function pollRunStatus(runId, query) {
+  const token = ++activePoll;
+  let networkErrors = 0;
+  for (let i = 0; i < MAX_POLLS; i += 1) {
+    if (token !== activePoll) return; // superseded by a newer run
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    if (token !== activePoll) return;
+    let body;
+    try {
+      const res = await fetch(`/api/research/${encodeURIComponent(runId)}`);
+      body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 404 && i < 3) continue; // run may not be visible yet
+        renderResearchError(body.error ? body.error.message : "Lost track of this research run.", query);
+        return;
+      }
+      networkErrors = 0;
+    } catch {
+      networkErrors += 1;
+      setStatus("Reconnecting to the research service… (your research is still running)");
+      if (networkErrors > 8) {
+        renderResearchError("Could not reach the research service. Your research may still be running: reload to resume.", query);
+        return;
+      }
+      continue;
+    }
+
+    const projection = body.data;
+    if (!projection) continue;
+    if (projection.phase === "completed" && projection.result) {
+      setUrlState(query, null);
+      renderResult(projection.result, query);
+      return;
+    }
+    if (projection.phase === "failed") {
+      renderResearchError(projection.message || "Research could not be completed. Try again shortly.", query);
+      return;
+    }
+    setStatus(PHASE_TEXT[projection.phase] || PHASE_TEXT.running);
+  }
+  setStatus("Research is taking longer than expected. It is still running: reload this page to resume.");
 }
 
 async function submitQuery(q) {
   const query = q.trim();
   if (!query) return;
+  activePoll += 1; // cancel any previous polling loop
   try {
     const { data } = await api(`/api/search?q=${encodeURIComponent(query)}`);
     const exact = data.find((r) => r.name.toLowerCase() === query.toLowerCase());
@@ -417,6 +453,30 @@ async function submitQuery(q) {
     el.result.innerHTML = `<div class="state-message">${esc(err.message)}</div>`;
   }
 }
+
+// Resume an in-flight research run after a page reload using the URL state.
+function resumeFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const runId = params.get("research");
+  const query = params.get("q");
+  if (!runId || !query) return false;
+  el.input.value = query;
+  el.result.hidden = false;
+  el.result.innerHTML = `
+    <div class="card unknown-panel">
+      <p class="section-kicker">New platform</p>
+      <h2>${esc(query)} is not in the Atlas yet</h2>
+      <p class="lede">Resuming research…</p>
+      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
+    </div>`;
+  wireRetry(query);
+  setStatus("Resuming…");
+  pollRunStatus(runId, query);
+  return true;
+}
+
+/* ---------- Events ---------- */
 
 el.input.addEventListener("input", (e) => runSearch(e.target.value));
 el.input.addEventListener("blur", () => setTimeout(hideSuggestions, 150));
@@ -454,6 +514,7 @@ async function init() {
   } catch {
     /* leave the static fallback count */
   }
+  resumeFromUrl();
 }
 
 init();

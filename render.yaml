@@ -1,3 +1,7 @@
+# Blueprints do not yet create or manage Workflow services, so the
+# developer-journey-atlas-workflows service is created with the Render CLI or
+# Dashboard (see docs/migration/atlas-research-workflows.md). This Blueprint
+# manages only the public web service, which starts and reads Workflow runs.
 services:
   - type: web
     name: developer-journey-atlas
@@ -14,10 +18,10 @@ services:
         value: production
       - key: NODE_VERSION
         value: 22.22.0
-      # Live-research secrets are set in Render, never committed.
-      - key: YDC_API_KEY
+      # Server-side Render API key used by @renderinc/sdk to start and read
+      # Workflow runs. Secret, never exposed to the browser. Set in Render.
+      - key: RENDER_API_KEY
         sync: false
-      - key: OPENROUTER_API_KEY
-        sync: false
-      - key: GITHUB_TOKEN
-        sync: false
+      # Registered task slug for the parent research task. Non-secret.
+      - key: RENDER_WORKFLOW_TASK_SLUG
+        value: developer-journey-atlas-workflows/researchPlatform

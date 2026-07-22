@@ -1,29 +1,17 @@
 import type {
-  DataStore, LLMProvider, MetricRow, PlatformRecord, RepoWriter, SearchProvider,
+  DataStore, DocHit, LLMProvider, MetricRow, PlatformRecord, RepoWriter, SearchProvider,
 } from "./ports.js";
-import { buildAssessment, type Assessment } from "./assessment.js";
+import { buildAssessment } from "./assessment.js";
 import { buildDocumentedOnboardingLoad } from "./onboardingLoad.js";
+import type { ContributionResult, ResearchOutcome, ResearchSteps, ResearchTaskInput } from "../workflows/contract.js";
+import { draftWithClassification, reconstructWithClassification } from "../workflows/classify.js";
 
-export interface ResearchDeps {
-  search: SearchProvider;
-  llm: LLMProvider;
-  repo?: RepoWriter;
+/** Read-only context the orchestration needs beyond the injectable steps. */
+export interface ResearchContext {
   store: DataStore;
   /** Bridge to the shared measurement contract (selectedPathRow). */
   buildRow: (record: PlatformRecord) => MetricRow;
 }
-
-export type ResearchEvent =
-  | { type: "status"; step: string; message: string }
-  | { type: "known"; slug: string }
-  | { type: "result"; assessment: Assessment; record: PlatformRecord; draft: true }
-  | { type: "pr"; url: string }
-  | { type: "pr_skipped"; reason: string }
-  | { type: "error"; code: string; message: string }
-  | { type: "done" };
-
-/** Sink for pipeline events. The API layer maps these to SSE frames. */
-export type Emit = (event: ResearchEvent) => void;
 
 export function slugify(input: string): string {
   return input
@@ -33,7 +21,7 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-function msg(err: unknown): string {
+function safeMessage(err: unknown): string {
   return err instanceof Error ? err.message : "Unexpected error.";
 }
 
@@ -48,7 +36,8 @@ function normalizedUrl(value: string): string {
   }
 }
 
-function validateSourceGrounding(record: PlatformRecord, docs: Array<{ url: string }>): string | null {
+/** Every cited source URL must have been returned by the official-docs search. */
+export function validateSourceGrounding(record: PlatformRecord, docs: Array<{ url: string }>): string | null {
   const searchedUrls = new Set(docs.map((doc) => normalizedUrl(doc.url)));
   const unsupported = (record.sources ?? []).filter((source) => !searchedUrls.has(normalizedUrl(source.url)));
   if (unsupported.length > 0) {
@@ -58,83 +47,90 @@ function validateSourceGrounding(record: PlatformRecord, docs: Array<{ url: stri
 }
 
 /**
- * Orchestrate live research for an unknown platform: search official docs,
- * reconstruct a schema-valid source-evidence record, show it without audited
- * counts or comparison, then optionally open a draft PR. A separate shortest-
- * path audit is required before publication. Every external step is isolated: a failure emits a typed
- * error/skip event and never throws out of the function. Push-based so the SSE
- * layer can flush each event as it happens.
+ * Orchestrate live research for an unknown platform, returning one bounded,
+ * terminal outcome. Transient failures inside a step throw and are handled by
+ * that step's retry policy at the task boundary; when a step's retries are
+ * exhausted the orchestration catches it and returns a user-safe terminal
+ * reason rather than crashing the run. Deterministic outcomes (known platform,
+ * no docs, invalid model output, source-grounding failure) are returned
+ * directly and are never retried.
+ *
+ * The same function runs durably on Render (steps are chained subtasks) and
+ * inline in tests (steps are fakes): there is one orchestration, not two.
  */
-export async function runResearch(platform: string, deps: ResearchDeps, emit: Emit): Promise<void> {
-  const slug = slugify(platform);
-  if (slug && deps.store.getRow(slug)) {
-    emit({ type: "known", slug });
-    return;
+export async function runResearchPipeline(
+  input: ResearchTaskInput,
+  steps: ResearchSteps,
+  ctx: ResearchContext,
+): Promise<ResearchOutcome> {
+  const { slug, platform } = input;
+
+  if (slug && ctx.store.getRow(slug)) {
+    return { outcome: "known", slug };
   }
 
-  let docs;
+  let docs: DocHit[];
   try {
-    emit({ type: "status", step: "search", message: `Searching official documentation for ${platform}…` });
-    docs = await deps.search.findOfficialDocs(platform);
+    docs = await steps.searchDocs({ platform });
   } catch (err) {
-    emit({ type: "error", code: "search_failed", message: msg(err) });
-    return;
+    return { outcome: "search_failed", message: safeMessage(err) };
   }
   if (docs.length === 0) {
-    emit({ type: "error", code: "no_docs", message: "No official documentation found for that platform." });
-    return;
+    return { outcome: "no_docs" };
   }
 
-  let record: PlatformRecord;
+  let reconstruct;
   try {
-    emit({ type: "status", step: "reconstruct", message: "Reconstructing a source-evidence draft from account creation to first success…" });
-    record = await deps.llm.reconstructRecord(platform, docs);
+    reconstruct = await steps.reconstructRecord({ platform, docs });
   } catch (err) {
-    emit({ type: "error", code: "llm_failed", message: msg(err) });
-    return;
+    return { outcome: "model_failed", message: safeMessage(err) };
   }
+  if (reconstruct.status === "invalid_output") {
+    return { outcome: "invalid_output", message: reconstruct.message };
+  }
+  const record = reconstruct.record;
 
   const groundingError = validateSourceGrounding(record, docs);
   if (groundingError) {
-    emit({ type: "error", code: "source_grounding_failed", message: groundingError });
-    return;
+    return { outcome: "source_grounding_failed", message: groundingError };
   }
 
-  let assessment: Assessment;
-  try {
-    emit({ type: "status", step: "assemble", message: "Assembling the unaudited source draft with counts withheld…" });
-    const row = deps.buildRow(record);
-    assessment = buildAssessment(row, record, buildDocumentedOnboardingLoad(row, deps.store));
-  } catch (err) {
-    emit({ type: "error", code: "assemble_failed", message: msg(err) });
-    return;
-  }
+  const row = ctx.buildRow(record);
+  const assessment = buildAssessment(row, record, buildDocumentedOnboardingLoad(row, ctx.store));
 
-  emit({ type: "result", assessment, record, draft: true });
-
-  if (!deps.repo) {
-    emit({
-      type: "pr_skipped",
-      reason: "Auto-PR is off (no GITHUB_TOKEN set). The drafted record is shown below for manual submission.",
-    });
-    emit({ type: "done" });
-    return;
-  }
+  let contribution: ContributionResult;
   if (record.research_status !== "complete") {
-    emit({
-      type: "pr_skipped",
-      reason: `Record marked "${record.research_status}", so no automatic PR was opened. Resolve its evidence gaps before creating a shortest-path audit.`,
-    });
-    emit({ type: "done" });
-    return;
+    contribution = {
+      status: "skipped",
+      reason: `Record marked "${record.research_status}", so no automatic contribution was opened. Review it before submitting.`,
+    };
+  } else {
+    try {
+      contribution = await steps.draftContribution({ record });
+    } catch {
+      contribution = {
+        status: "skipped",
+        reason: "The contribution service was unavailable. The drafted record is shown below for manual submission.",
+      };
+    }
   }
 
-  try {
-    emit({ type: "status", step: "pr", message: "Opening a draft pull request in Developer Journey Atlas…" });
-    const { url } = await deps.repo.openDraftRecordPR(record);
-    emit({ type: "pr", url });
-  } catch (err) {
-    emit({ type: "pr_skipped", reason: `Could not open a PR automatically: ${msg(err)}` });
-  }
-  emit({ type: "done" });
+  return { outcome: "completed", slug: record.platform.slug, record, assessment, contribution };
+}
+
+/**
+ * Wrap concrete adapters into the injectable step shape. Used by the direct
+ * (non-Workflow) path and by tests. The Workflow entry provides its own steps
+ * that run each adapter inside a chained subtask.
+ */
+export function stepsFromAdapters(deps: {
+  search: SearchProvider;
+  llm: LLMProvider;
+  repo?: RepoWriter;
+}): ResearchSteps {
+  return {
+    searchDocs: ({ platform }) => deps.search.findOfficialDocs(platform),
+    reconstructRecord: ({ platform, docs }) => reconstructWithClassification(deps.llm, platform, docs),
+    draftContribution: ({ record }) => draftWithClassification(deps.repo, record),
+  };
 }
