@@ -1,0 +1,514 @@
+{
+  "branches": [
+    {
+      "at_step": 1,
+      "condition": "Developer chooses to self-host instead of using Appwrite Cloud",
+      "effect_on_first_success": "Adds initial installation and server startup steps before project creation",
+      "path": "self-hosted-setup",
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "self-hosted-setup",
+      "name": "Self-hosted Appwrite server setup",
+      "relationship_to_primary_path": "Alternative initial setup before using the console and SDKs.",
+      "selection_basis": "Alternative to using Appwrite Cloud; involves installing and running Appwrite locally via Docker.",
+      "source_ids": [
+        "S6"
+      ],
+      "steps": [
+        {
+          "action": "Install Docker and run Appwrite Docker container",
+          "actor": "developer",
+          "details": [
+            "Run docker command to install Appwrite server"
+          ],
+          "failure_or_wait": "Docker errors or server startup delays",
+          "input": "Docker installed",
+          "interface": "cli",
+          "output": "Appwrite server running locally",
+          "phase": "install",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 1,
+          "success_signal": "Access Appwrite console at http://localhost"
+        },
+        {
+          "action": "Access Appwrite console at localhost",
+          "actor": "developer",
+          "details": [
+            "Open browser to http://localhost"
+          ],
+          "failure_or_wait": "Server not started or network issues",
+          "input": "None",
+          "interface": "browser",
+          "output": "Appwrite console UI loads",
+          "phase": "arrive",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 2,
+          "success_signal": "Console UI visible"
+        },
+        {
+          "action": "Create account and project in console",
+          "actor": "developer",
+          "details": [
+            "Create user account",
+            "Create new project"
+          ],
+          "failure_or_wait": "Input errors",
+          "input": "Account info, project name",
+          "interface": "web-ui",
+          "output": "Project created",
+          "phase": "account",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 3,
+          "success_signal": "Project visible in console"
+        }
+      ]
+    }
+  ],
+  "category": "API infrastructure and developer tooling",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Project created with database and collection in Appwrite console",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Developer has a backend project with a database collection ready to be used by their app",
+    "observable_completion_signal": "New project and database collection appear in the Appwrite console UI",
+    "official_milestone": "Create a new project in the Appwrite console and configure a database with a collection",
+    "source_ids": [
+      "S1",
+      "S4",
+      "S5"
+    ],
+    "why_this_is_the_boundary": "This milestone represents the minimal backend setup enabling the developer to start integrating Appwrite services into their app, as shown in quickstart tutorials."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has Docker installed if self-hosting",
+      "Developer has basic knowledge of web or mobile app development"
+    ],
+    "developer_intent": "Create an Appwrite account and project to build a backend for a web or mobile application.",
+    "starting_url": "https://appwrite.io/docs/quick-starts"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Creating an Appwrite account is required to access the cloud console and create projects.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 1,
+      "description": "Docker installation is required for self-hosting Appwrite locally.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "other"
+    },
+    {
+      "at_step": 8,
+      "description": "SDK initialization requires correct endpoint URL and project ID configuration.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "configuration"
+    },
+    {
+      "at_step": 9,
+      "description": "API calls require valid credentials or API keys depending on client type (client or admin).",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "credential"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Appwrite",
+    "organization": "Appwrite",
+    "slug": "appwrite"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create an Appwrite account via the Appwrite Cloud or self-host an Appwrite server",
+      "source_ids": [
+        "S3",
+        "S5"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": false,
+      "requirement": "Have Docker installed if self-hosting Appwrite locally",
+      "source_ids": [
+        "S6"
+      ],
+      "type": "software"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Basic familiarity with web or mobile app development and SDK integration",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "knowledge"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Sign up for an Appwrite account or log in",
+      "actor": "developer",
+      "details": [
+        "Visit appwrite.io",
+        "Create an account or log in"
+      ],
+      "failure_or_wait": "Error messages on invalid input or network issues",
+      "input": "Email, password, organization name",
+      "interface": "web-ui",
+      "output": "Authenticated user session",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ],
+      "step_number": 1,
+      "success_signal": "Access to Appwrite console dashboard"
+    },
+    {
+      "action": "Create a new project in the Appwrite console",
+      "actor": "developer",
+      "details": [
+        "Click 'Create New Project'",
+        "Enter project name and select hosting region"
+      ],
+      "failure_or_wait": "Validation errors or network delays",
+      "input": "Project name, region",
+      "interface": "web-ui",
+      "output": "New project created and visible in console",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ],
+      "step_number": 2,
+      "success_signal": "Project dashboard loads with project details"
+    },
+    {
+      "action": "Create a new database within the project",
+      "actor": "developer",
+      "details": [
+        "Navigate to Databases section",
+        "Click 'Create Database'",
+        "Provide database name and ID"
+      ],
+      "failure_or_wait": "Input validation errors",
+      "input": "Database name and optional ID",
+      "interface": "web-ui",
+      "output": "Database created and listed in project",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ],
+      "step_number": 3,
+      "success_signal": "Database visible in console UI"
+    },
+    {
+      "action": "Create a collection (table) in the database",
+      "actor": "developer",
+      "details": [
+        "Select the created database",
+        "Click 'Create Collection'",
+        "Enter collection name and ID"
+      ],
+      "failure_or_wait": "Validation errors or UI delays",
+      "input": "Collection name and optional ID",
+      "interface": "web-ui",
+      "output": "Collection created and visible in database",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S4",
+        "S5"
+      ],
+      "step_number": 4,
+      "success_signal": "Collection listed in database UI"
+    },
+    {
+      "action": "Add attributes (fields) to the collection",
+      "actor": "developer",
+      "details": [
+        "Navigate to Attributes tab in collection",
+        "Click 'Create Attribute'",
+        "Define attribute type and properties"
+      ],
+      "failure_or_wait": "Input errors or conflicts",
+      "input": "Attribute name, type, and constraints",
+      "interface": "web-ui",
+      "output": "Attributes added to collection schema",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ],
+      "step_number": 5,
+      "success_signal": "Attributes visible in collection schema"
+    },
+    {
+      "action": "Create a document in the collection",
+      "actor": "developer",
+      "details": [
+        "Navigate to the collection",
+        "Click 'Create Document'",
+        "Fill in attribute values"
+      ],
+      "failure_or_wait": "Validation errors or permission issues",
+      "input": "Document field values",
+      "interface": "web-ui",
+      "output": "Document stored in collection",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ],
+      "step_number": 6,
+      "success_signal": "Document visible in collection list"
+    },
+    {
+      "action": "Add a platform for the app (web, mobile, native)",
+      "actor": "developer",
+      "details": [
+        "In project settings, click 'Add a platform'",
+        "Specify platform type and details"
+      ],
+      "failure_or_wait": "Input errors",
+      "input": "Platform type and identifier (domain, package ID)",
+      "interface": "web-ui",
+      "output": "Platform added to project",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ],
+      "step_number": 7,
+      "success_signal": "Platform listed in project settings"
+    },
+    {
+      "action": "Initialize Appwrite SDK in app code with endpoint and project ID",
+      "actor": "developer",
+      "details": [
+        "Install appropriate SDK for platform",
+        "Configure SDK with endpoint URL and project ID"
+      ],
+      "failure_or_wait": "Errors on invalid configuration",
+      "input": "Endpoint URL, project ID",
+      "interface": "code",
+      "output": "SDK client instance ready for API calls",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S1"
+      ],
+      "step_number": 8,
+      "success_signal": "No errors on SDK initialization"
+    },
+    {
+      "action": "Make first API call to fetch or create data using SDK",
+      "actor": "developer",
+      "details": [
+        "Use SDK methods to interact with database or authentication"
+      ],
+      "failure_or_wait": "API errors or permission denied",
+      "input": "API call parameters",
+      "interface": "code",
+      "output": "API response with data or confirmation",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "step_number": 9,
+      "success_signal": "Successful API response"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path steps 8 and 9"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Quick start Web app",
+        "Client SDK integration"
+      ],
+      "source_type": "quickstart",
+      "title": "Quick starts - Docs - Appwrite",
+      "url": "https://appwrite.io/docs/quick-starts"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path step 9"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "React tutorial",
+        "Overview of Appwrite features"
+      ],
+      "source_type": "documentation",
+      "title": "Docs - Appwrite",
+      "url": "https://appwrite.io/docs"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path steps 7 and 8",
+        "friction_gates steps 8 and 9"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Client and Server SDK setup",
+        "API key scopes",
+        "Platform addition"
+      ],
+      "source_type": "quickstart",
+      "title": "Quick start",
+      "url": "https://appwrite.io/docs/references/quick-start"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path steps 2 to 6"
+      ],
+      "id": "S4",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Creating account and project",
+        "Creating database, collections, attributes, documents",
+        "Authentication and settings overview"
+      ],
+      "source_type": "quickstart",
+      "title": "Elestio",
+      "url": "https://elest.io/open-source/appwrite/resources/quickstart"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path steps 1 to 6",
+        "time_to_first_success"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Account creation",
+        "Project creation",
+        "Database and collection creation",
+        "SDK initialization",
+        "Time to first success estimate"
+      ],
+      "source_type": "tutorial",
+      "title": "Appwrite quickstart tutorial - YouTube",
+      "url": "https://www.youtube.com/watch?v=aM_dyQsZWwk"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "candidate_paths self-hosted-setup",
+        "friction_gates step 1"
+      ],
+      "id": "S6",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Self-hosting installation",
+        "Docker setup",
+        "Admin client and API keys"
+      ],
+      "source_type": "official-repository",
+      "title": "GitHub - appwrite/appwrite: The developers' cloud",
+      "url": "https://github.com/appwrite/appwrite"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Self-hosted CLI or direct API calls",
+        "reason_not_primary": "While possible, the primary documented onboarding flow uses the web console and SDKs rather than CLI or raw API calls.",
+        "url": "https://appwrite.io/docs/references/quick-start"
+      }
+    ],
+    "name": "Web Console and SDKs",
+    "selection_basis": "The official documentation and quickstarts emphasize the use of the Appwrite web console for project and backend setup, and SDKs for client and server integration."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ],
+      "impact": "The boundary of first success is inferred from multiple steps rather than a single explicit milestone, which may affect precision.",
+      "question": "Is there an officially documented single 'first success' milestone explicitly named by Appwrite?",
+      "reason_unresolved": "No explicit single milestone labeled as 'first success' was found in the official docs; the milestone was synthesized from quickstart and tutorial steps."
+    },
+    {
+      "checked_source_ids": [
+        "S5"
+      ],
+      "impact": "Time estimate is approximate based on tutorial narrative and may vary.",
+      "question": "Exact time to first success is not explicitly stated by Appwrite.",
+      "reason_unresolved": "No explicit timing claim found in official docs; estimate derived from tutorial video narration."
+    }
+  ]
+}

@@ -1,0 +1,400 @@
+{
+  "branches": [
+    {
+      "at_step": 6,
+      "condition": "If the /api/novu Bridge Endpoint is not publicly accessible after deployment",
+      "effect_on_first_success": "Blocks notification delivery from Novu Cloud to local workflow, delaying first success",
+      "path": "Deployment fails or requires additional network configuration",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "python-sdk",
+      "name": "Python SDK Quickstart",
+      "relationship_to_primary_path": "Alternative SDK-based integration path using Python instead of Express.js framework.",
+      "selection_basis": "Official Python SDK documentation provides code snippets to trigger notifications using Novu API.",
+      "source_ids": [
+        "S3"
+      ],
+      "steps": [
+        {
+          "action": "Create Novu account and obtain API key from dashboard settings",
+          "actor": "developer",
+          "details": [
+            "Access https://web.novu.co/settings to get API key"
+          ],
+          "failure_or_wait": "No access or missing permissions",
+          "input": "Novu dashboard",
+          "interface": "web-ui",
+          "output": "API key obtained",
+          "phase": "account",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 1,
+          "success_signal": "API key visible in settings"
+        },
+        {
+          "action": "Install the Novu Python package via pip or poetry",
+          "actor": "developer",
+          "details": [
+            "Run pip install novu or poetry add novu"
+          ],
+          "failure_or_wait": "Installation errors",
+          "input": "Command line",
+          "interface": "cli",
+          "output": "Novu Python SDK installed",
+          "phase": "install",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 2,
+          "success_signal": "Package installed without errors"
+        },
+        {
+          "action": "Write Python code to trigger a notification event using Novu SDK",
+          "actor": "developer",
+          "details": [
+            "Use EventApi.trigger with workflow ID and subscriber ID"
+          ],
+          "failure_or_wait": "Code errors or API failures",
+          "input": "Python code editor",
+          "interface": "code",
+          "output": "Code ready to trigger notification",
+          "phase": "configure",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 3,
+          "success_signal": "Code runs without errors"
+        },
+        {
+          "action": "Run the Python script to trigger the notification event",
+          "actor": "developer",
+          "details": [
+            "Execute script and observe notification delivery"
+          ],
+          "failure_or_wait": "No notification or errors",
+          "input": "Python runtime environment",
+          "interface": "cli",
+          "output": "Notification sent to subscriber",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 4,
+          "success_signal": "Notification received"
+        }
+      ]
+    }
+  ],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Test your endpoint",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Notification workflow triggered and notification sent to subscriber",
+    "observable_completion_signal": "Test workflow notification is received by the subscriber as triggered from the Express.js application",
+    "official_milestone": "Successfully send a test workflow notification through the Novu Bridge Endpoint in the Express.js app",
+    "source_ids": [
+      "S1"
+    ],
+    "why_this_is_the_boundary": "The documentation explicitly marks 'Test your endpoint' as the step confirming the workflow is running and notifications are sent, marking first successful integration."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has an existing Express.js application",
+      "Developer has basic knowledge of Node.js and Express",
+      "Developer has access to Novu dashboard to create workflows and obtain API keys"
+    ],
+    "developer_intent": "Integrate Novu notification workflows into an existing Express.js application to send notifications.",
+    "starting_url": "https://docs.novu.co/framework/quickstart/express"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Developer must create a Novu account to access dashboard and API keys.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 2,
+      "description": "Developer must obtain API key from Novu dashboard settings to authenticate API calls.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "credential"
+    },
+    {
+      "at_step": 4,
+      "description": "Developer must configure the Novu Bridge Endpoint correctly in the Express.js app and run npx novu dev with correct port.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "configuration"
+    },
+    {
+      "at_step": 6,
+      "description": "The /api/novu endpoint must be accessible from the internet for Novu Cloud to communicate with the local workflow.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "environment"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Novu",
+    "organization": "Novu",
+    "slug": "novu"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a Novu account and access the Novu dashboard",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Obtain an API key from the Novu dashboard settings",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "credential"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Have an existing Express.js application and Node.js environment set up",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "software"
+    },
+    {
+      "order": 4,
+      "required": true,
+      "requirement": "Create a Novu workflow definition in the application code under novu/workflows.ts",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "configuration"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Read the Express.js Quickstart guide to understand integration steps",
+      "actor": "developer",
+      "details": [
+        "Understand the need for a Bridge Endpoint",
+        "Learn workflow definition location"
+      ],
+      "failure_or_wait": "Confusion or lack of clarity on steps",
+      "input": "Novu Express.js Quickstart documentation",
+      "interface": "documentation",
+      "output": "Plan for integration and workflow creation",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 1,
+      "success_signal": "Developer understands integration requirements"
+    },
+    {
+      "action": "Install Novu packages in the Express.js application",
+      "actor": "developer",
+      "details": [
+        "Run npm install commands as per guide"
+      ],
+      "failure_or_wait": "Installation errors or missing dependencies",
+      "input": "Command line with npm or yarn",
+      "interface": "cli",
+      "output": "Novu packages installed in project",
+      "phase": "install",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 2,
+      "success_signal": "Packages installed without errors"
+    },
+    {
+      "action": "Create workflow definition file novu/workflows.ts with desired notification workflows",
+      "actor": "developer",
+      "details": [
+        "Define workflows in code as per guide"
+      ],
+      "failure_or_wait": "Syntax or definition errors",
+      "input": "Code editor with access to project files",
+      "interface": "code",
+      "output": "Workflow definitions created",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 3,
+      "success_signal": "Workflow file exists and compiles"
+    },
+    {
+      "action": "Start the Express.js application with Novu Bridge Endpoint configured",
+      "actor": "developer",
+      "details": [
+        "Run Express server on default or specified port",
+        "Run npx novu dev with correct port if needed"
+      ],
+      "failure_or_wait": "Server or Novu dev command errors",
+      "input": "Terminal commands to start server and Novu dev",
+      "interface": "cli",
+      "output": "Express server running with Novu Bridge Endpoint",
+      "phase": "run",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 4,
+      "success_signal": "Server starts without errors and Bridge Endpoint is active"
+    },
+    {
+      "action": "Test the Novu Bridge Endpoint by triggering a test workflow notification",
+      "actor": "developer",
+      "details": [
+        "Send test event to Novu endpoint",
+        "Verify notification delivery to subscriber"
+      ],
+      "failure_or_wait": "No notification received or errors in logs",
+      "input": "Test trigger command or HTTP request",
+      "interface": "browser",
+      "output": "Notification received by subscriber",
+      "phase": "verify",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 5,
+      "success_signal": "Notification successfully delivered and observable"
+    },
+    {
+      "action": "Deploy the Express.js application with the Novu Bridge Endpoint exposed to the internet",
+      "actor": "developer",
+      "details": [
+        "Use preferred hosting provider",
+        "Ensure /api/novu endpoint is publicly accessible"
+      ],
+      "failure_or_wait": "Endpoint inaccessible or deployment errors",
+      "input": "Deployment platform and configuration",
+      "interface": "web-ui",
+      "output": "Application deployed and accessible",
+      "phase": "access",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 6,
+      "success_signal": "Public access to Bridge Endpoint confirmed"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path steps",
+        "documented_first_success",
+        "friction_gates",
+        "branches"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Set up your local environment",
+        "Install packages",
+        "Create your workflow definition",
+        "Start your application",
+        "Test your endpoint",
+        "Deploy your application"
+      ],
+      "source_type": "quickstart",
+      "title": "Express.js Framework Quickstart Guide",
+      "url": "https://docs.novu.co/framework/quickstart/express"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "candidate_paths",
+        "prerequisites",
+        "friction_gates"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Quick start",
+        "Code Snippet Examples",
+        "Events",
+        "Subscribers"
+      ],
+      "source_type": "documentation",
+      "title": "Python Novu SDK — Novu SDK 1.11.0 documentation",
+      "url": "https://novu-python.readthedocs.io/"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Novu Python SDK Quickstart",
+        "reason_not_primary": "The Python SDK documentation provides code snippets but lacks a full end-to-end onboarding flow including deployment and endpoint exposure.",
+        "url": "https://novu-python.readthedocs.io/"
+      },
+      {
+        "name": "Novu Platform Overview",
+        "reason_not_primary": "Platform overview explains concepts but does not provide a stepwise onboarding path.",
+        "url": "https://docs.novu.co/platform"
+      }
+    ],
+    "name": "Novu Framework Express.js Quickstart",
+    "selection_basis": "The Express.js Quickstart guide provides a concrete, documented first-mile onboarding path with code and deployment instructions for developers integrating Novu workflows."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S1"
+      ],
+      "impact": "Without a vendor-claimed time, it is unclear how quickly developers can expect to complete onboarding.",
+      "question": "What is the typical time to first success claimed by Novu for the Express.js integration?",
+      "reason_unresolved": "No explicit time-to-first-success or duration claim is stated in the official documentation."
+    }
+  ]
+}
