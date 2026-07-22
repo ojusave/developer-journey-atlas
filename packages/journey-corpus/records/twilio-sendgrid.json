@@ -1,0 +1,434 @@
+{
+  "branches": [
+    {
+      "at_step": 4,
+      "condition": "Developer chooses to skip Domain Authentication and use Single Sender Verification for testing.",
+      "effect_on_first_success": "Allows sending test emails without full domain authentication but not recommended for production.",
+      "path": "Testing path with Single Sender Verification",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Send your first email",
+      "source_ids": [
+        "S3",
+        "S5",
+        "S4"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Developer sends a valid email message through the SendGrid API and receives a successful response.",
+    "observable_completion_signal": "HTTP 202 Accepted response status code from the API indicating the email was accepted for delivery.",
+    "official_milestone": "Successfully send the first email using the SendGrid Mail Send API.",
+    "source_ids": [
+      "S3",
+      "S5",
+      "S4"
+    ],
+    "why_this_is_the_boundary": "The official documentation explicitly defines sending the first email via the API as the initial success milestone and provides sample code and curl commands to achieve this."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has a SendGrid account",
+      "Developer has access to an API key or can create one",
+      "Developer has basic knowledge of HTTP requests or programming language SDK usage"
+    ],
+    "developer_intent": "Send an email programmatically using the SendGrid API.",
+    "starting_url": "https://www.twilio.com/docs/sendgrid/for-developers/sending-email/api-getting-started"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Must create a SendGrid account to access API and dashboard.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 2,
+      "description": "Two-factor authentication (2FA) is required to secure the account.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "verification"
+    },
+    {
+      "at_step": 3,
+      "description": "API key with Mail Send permissions must be created and stored securely.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6",
+        "S5"
+      ],
+      "type": "credential"
+    },
+    {
+      "at_step": 4,
+      "description": "Domain Authentication is required to verify sender identity for production use.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "domain"
+    },
+    {
+      "at_step": 6,
+      "description": "Developer must have programming environment and optionally install SendGrid SDK.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6",
+        "S5"
+      ],
+      "type": "other"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Twilio SendGrid",
+    "organization": "Twilio",
+    "slug": "twilio-sendgrid"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a SendGrid account to access the API and dashboard.",
+      "source_ids": [
+        "S6"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Enable Two-factor authentication (2FA) on the SendGrid account.",
+      "source_ids": [
+        "S6"
+      ],
+      "type": "verification"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Create and store a SendGrid API Key with Mail Send > Full Access permissions.",
+      "source_ids": [
+        "S6",
+        "S5"
+      ],
+      "type": "credential"
+    },
+    {
+      "order": 4,
+      "required": true,
+      "requirement": "Complete Domain Authentication to verify sender identity for production use.",
+      "source_ids": [
+        "S6"
+      ],
+      "type": "domain"
+    },
+    {
+      "order": 5,
+      "required": true,
+      "requirement": "Install required programming language SDK or have tools to make HTTP requests (e.g., curl).",
+      "source_ids": [
+        "S6",
+        "S5"
+      ],
+      "type": "software"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Sign up for a SendGrid account.",
+      "actor": "developer",
+      "details": [
+        "Visit the SendGrid website and create a new account.",
+        "Complete any required registration steps."
+      ],
+      "failure_or_wait": "Registration errors or email verification pending.",
+      "input": "User registration information.",
+      "interface": "web-ui",
+      "output": "Active SendGrid account.",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ],
+      "step_number": 1,
+      "success_signal": "Account creation confirmation."
+    },
+    {
+      "action": "Enable Two-factor authentication (2FA) on the account.",
+      "actor": "developer",
+      "details": [
+        "Choose 2FA method: SMS or Authy app.",
+        "Complete 2FA setup as per instructions."
+      ],
+      "failure_or_wait": "Setup errors or verification delays.",
+      "input": "Phone number or Authy app setup.",
+      "interface": "web-ui",
+      "output": "2FA enabled on account.",
+      "phase": "verify",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ],
+      "step_number": 2,
+      "success_signal": "2FA confirmation message."
+    },
+    {
+      "action": "Create an API key with Mail Send > Full Access permissions.",
+      "actor": "developer",
+      "details": [
+        "Navigate to API key creation page.",
+        "Assign appropriate permissions.",
+        "Save the API key securely."
+      ],
+      "failure_or_wait": "Permission errors or key creation failure.",
+      "input": "API key name and permissions.",
+      "interface": "web-ui",
+      "output": "API key string.",
+      "phase": "credential",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S5"
+      ],
+      "step_number": 3,
+      "success_signal": "API key creation confirmation."
+    },
+    {
+      "action": "Complete Domain Authentication to verify sender identity.",
+      "actor": "developer",
+      "details": [
+        "Add DNS records as instructed by SendGrid.",
+        "Wait for DNS propagation and verification."
+      ],
+      "failure_or_wait": "DNS propagation delay or misconfiguration errors.",
+      "input": "Domain DNS configuration.",
+      "interface": "web-ui",
+      "output": "Verified sender domain.",
+      "phase": "verify",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ],
+      "step_number": 4,
+      "success_signal": "Domain authentication success notification."
+    },
+    {
+      "action": "Set environment variable SENDGRID_API_KEY with the API key value.",
+      "actor": "developer",
+      "details": [
+        "Export the API key in the shell environment or configure in application settings."
+      ],
+      "failure_or_wait": "Environment variable not set or inaccessible.",
+      "input": "API key string.",
+      "interface": "cli",
+      "output": "Environment variable set.",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S6"
+      ],
+      "step_number": 5,
+      "success_signal": "Environment variable accessible to application."
+    },
+    {
+      "action": "Write code to send an email using the SendGrid Mail Send API or SDK.",
+      "actor": "developer",
+      "details": [
+        "Use sample code from official docs for preferred language.",
+        "Set 'to', 'from', 'subject', and 'content' fields appropriately."
+      ],
+      "failure_or_wait": "API errors or validation failures.",
+      "input": "Email message parameters and API key.",
+      "interface": "code",
+      "output": "API request to SendGrid.",
+      "phase": "build",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4",
+        "S5",
+        "S6"
+      ],
+      "step_number": 6,
+      "success_signal": "HTTP 202 Accepted response from SendGrid."
+    },
+    {
+      "action": "Run the code or curl command to send the email.",
+      "actor": "developer",
+      "details": [
+        "Execute the program or curl command in terminal or runtime environment."
+      ],
+      "failure_or_wait": "Network errors, API key issues, or spam filtering delays.",
+      "input": "Compiled or interpreted code or curl command.",
+      "interface": "cli",
+      "output": "SendGrid API response.",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S3",
+        "S4"
+      ],
+      "step_number": 7,
+      "success_signal": "Email received in recipient inbox or HTTP 202 response."
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API endpoint and usage for sending email",
+        "Requirement of API key in Authorization header"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Overview",
+        "Mail Send API"
+      ],
+      "source_type": "api-reference",
+      "title": "SendGrid v3 API reference",
+      "url": "https://www.twilio.com/docs/sendgrid/api-reference"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Documentation structure and focus on API usage"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Developer documentation overview"
+      ],
+      "source_type": "documentation",
+      "title": "Twilio SendGrid developer documentation",
+      "url": "https://www.twilio.com/docs/sendgrid/for-developers"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Code examples for sending first email",
+        "Definition of first success milestone"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Send your first email",
+        "Sample code snippets"
+      ],
+      "source_type": "documentation",
+      "title": "Twilio SendGrid",
+      "url": "https://www.twilio.com/docs/sendgrid"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Step-by-step instructions and code for sending email"
+      ],
+      "id": "S4",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Send your first email",
+        "Code examples"
+      ],
+      "source_type": "documentation",
+      "title": "Twilio SendGrid | SendGrid Docs | Twilio",
+      "url": "https://docs.sendgrid.com/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key requirement",
+        "curl command example",
+        "Expected response and success criteria"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "API usage requirements",
+        "curl example to send email"
+      ],
+      "source_type": "quickstart",
+      "title": "Getting started with the SendGrid API",
+      "url": "https://www.twilio.com/docs/sendgrid/for-developers/sending-email/api-getting-started"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and security requirements",
+        "API key creation and usage",
+        "Domain authentication importance",
+        "Code example for sending email"
+      ],
+      "id": "S6",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Prerequisites",
+        "Account setup",
+        "Two-factor authentication",
+        "API key creation",
+        "Domain authentication",
+        "SDK installation",
+        "Sample code"
+      ],
+      "source_type": "quickstart",
+      "title": "Email API Quickstart for Go",
+      "url": "https://assets2.sendgrid.com/docs/for-developers/sending-email/quickstart-go"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "SendGrid UI",
+        "reason_not_primary": "The UI is for manual email campaign management and not the primary developer onboarding surface for API integration.",
+        "url": "https://www.twilio.com/docs/sendgrid/user-interface"
+      },
+      {
+        "name": "SendGrid SDKs",
+        "reason_not_primary": "SDKs are wrappers around the Web API; the API itself is the fundamental integration surface.",
+        "url": "https://www.twilio.com/docs/sendgrid"
+      }
+    ],
+    "name": "SendGrid v3 Web API",
+    "selection_basis": "The official SendGrid documentation and API reference emphasize the v3 Web API as the primary interface for developers to send email programmatically."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S3",
+        "S5",
+        "S6"
+      ],
+      "impact": "Without a vendor-claimed or documented time estimate, it is unclear how quickly a new developer can expect to send their first email.",
+      "question": "What is the typical or average time to first success (sending first email) as claimed by SendGrid?",
+      "reason_unresolved": "The official documentation does not provide explicit timing or duration estimates for onboarding or first email send."
+    }
+  ]
+}

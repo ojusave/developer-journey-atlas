@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Mailgun",
+    "slug": "mailgun",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "4c7ba10f09b0b6626964e8f8f19895806504fb0ba63346809b6c0ceb55f09ccf",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet.",
+      "Developer has internet access",
+      "Developer has an email sending use case"
+    ]
+  },
+  "developer_goal": "Send an email using Mailgun's API",
+  "first_success": {
+    "outcome": "Email sent and accepted by Mailgun API",
+    "observable_signal": "HTTP API response indicates success and email is accepted for delivery",
+    "source_ids": [
+      "S4"
+    ]
+  },
+  "route_selection": {
+    "surface": "HTTP API",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Send email via SMTP",
+        "status": "unresolved",
+        "reason": "Present in the machine draft; not selected by an independent shortest-path audit."
+      },
+      {
+        "name": "SMTP",
+        "status": "unresolved",
+        "reason": "SMTP is supported as a legacy and flexible option but the HTTP API is preferred for programmatic scaling and ease of use."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a Mailgun account",
+      "required_fields": [
+        {
+          "label": "User registration details",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Account created and accessible",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add and verify a sending domain",
+      "required_fields": [
+        {
+          "label": "Domain name and DNS provider access",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Domain verification confirmed by Mailgun",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Retrieve API key for authentication",
+      "required_fields": [
+        {
+          "label": "Authenticated Mailgun account",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "API key available for use",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Send a test email via Mailgun HTTP API",
+      "required_fields": [
+        {
+          "label": "HTTP API request with email parameters and API key",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4",
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "HTTP 200 OK with success message and accepted email",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S4",
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Create a Mailgun account to access the platform and API keys",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "description": "Add and verify a domain you own by setting up DNS records (SPF and DKIM) or use the sandbox domain for testing",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "description": "Obtain API key or SMTP credentials to authenticate API requests",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Domain ownership verification via DNS records (SPF and DKIM) setup is required to send email from that domain.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "description": "API key or SMTP credentials are required to authenticate and authorize sending email.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Successfully send an email using the Mailgun HTTP API",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "excluded": [],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developer Documentation",
+      "url": "https://documentation.mailgun.com/docs/mailgun",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer Documentation",
+        "Send API Documentation",
+        "User Manual"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting started Sending Email",
+      "url": "https://documentation.mailgun.com/docs/mailgun/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Getting started Sending Email",
+        "SMTP vs API sending"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Developer Documentation Home",
+      "url": "https://documentation.mailgun.com/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer Documentation Home",
+        "Overview of Send API"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Quickstart: Send Your First Email",
+      "url": "https://documentation.mailgun.com/docs/mailgun/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Quickstart: Send Your First Email",
+        "Quickstart steps"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Quickstart Guide",
+      "url": "https://mailgun-docs.redoc.ly/docs/mailgun/quickstart-guide/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Quickstart Guide",
+        "Sign Up",
+        "Add and verify your domain",
+        "Choose how to send"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What is the typical or average time to first success (sending first email) claimed or expected by Mailgun?",
+      "impact": "Time to first success is unknown, limiting comparison to other platforms on onboarding speed.",
+      "evidence_needed": "No explicit time to first success or onboarding duration is stated in the official documentation or quickstart guides."
+    },
+    {
+      "question": "Has the machine-drafted Mailgun route been independently shortest-path audited?",
+      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
+      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
+    }
+  ],
+  "counts": null
+}

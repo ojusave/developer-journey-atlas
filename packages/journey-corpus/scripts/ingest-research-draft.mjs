@@ -294,7 +294,9 @@ if (args.length === 0) {
 const results = [];
 if (args[0] === "--from-dir") {
   const dir = args[1];
-  const files = (await readdir(dir)).filter((name) => name.endsWith(".json")).sort();
+  const files = (await readdir(dir))
+    .filter((name) => name.endsWith(".json") && !name.includes("summary"))
+    .sort();
   for (const name of files) {
     results.push(await ingestRecordFile(path.join(dir, name)));
   }

@@ -1,0 +1,408 @@
+{
+  "branches": [
+    {
+      "at_step": 4,
+      "condition": "Developer chooses to verify a sending domain instead of a single sender email",
+      "effect_on_first_success": "Allows sending from any email address on the domain with DKIM and SPF benefits",
+      "path": "Domain verification branch",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Developer uses SMTP integration instead of API or SDK",
+      "effect_on_first_success": "Enables sending email by switching SMTP credentials without code changes",
+      "path": "SMTP integration path",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "API response success with message_id and acceptance confirmation",
+      "source_ids": [
+        "S3",
+        "S6",
+        "S5"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Developer sends a test transactional email that is accepted by Postmark and visible in the Postmark UI or confirmed by API response",
+    "observable_completion_signal": "API response indicates success with a message ID; email appears in Postmark activity or test inbox",
+    "official_milestone": "Successfully send an email through Postmark using the API or SDK",
+    "source_ids": [
+      "S3",
+      "S6",
+      "S5"
+    ],
+    "why_this_is_the_boundary": "The official docs show that receiving a successful API response with a message ID confirms the email was accepted for delivery, marking the first successful use of the platform."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has an internet connection",
+      "Developer has an email address to use as a sender signature",
+      "Developer has access to a domain for sending email (optional for initial testing)"
+    ],
+    "developer_intent": "Send transactional email using Postmark's API or SDKs to verify successful email delivery.",
+    "starting_url": "https://postmarkapp.com/manual"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Creating and verifying a Postmark account requires email confirmation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 4,
+      "description": "Sender signature email address must be confirmed via a confirmation email before use.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ],
+      "type": "verification"
+    },
+    {
+      "at_step": 4,
+      "description": "Domain verification requires adding DKIM and SPF DNS records to the domain's DNS provider.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ],
+      "type": "dns"
+    },
+    {
+      "at_step": 6,
+      "description": "API requests require a valid Server API token in the HTTP header for authentication.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "credential"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Postmark",
+    "organization": "Wildbit",
+    "slug": "postmark"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a Postmark account by signing up at postmarkapp.com and verifying the account email.",
+      "source_ids": [
+        "S4"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Create a Postmark server (sub-account) within the account to organize sending environments.",
+      "source_ids": [
+        "S4"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Obtain a Server API token from the Postmark server's API Tokens tab for authentication.",
+      "source_ids": [
+        "S6",
+        "S3"
+      ],
+      "type": "credential"
+    },
+    {
+      "order": 4,
+      "required": true,
+      "requirement": "Add and confirm a sender signature email address to use as the 'From' address in emails.",
+      "source_ids": [
+        "S4"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 5,
+      "required": true,
+      "requirement": "Understand basic API usage or SDK usage to send an email through Postmark.",
+      "source_ids": [
+        "S3",
+        "S6"
+      ],
+      "type": "knowledge"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Sign up for a Postmark account and verify email",
+      "actor": "developer",
+      "details": [
+        "Visit postmarkapp.com",
+        "Click 'Start free trial'",
+        "Fill signup form",
+        "Check email inbox for verification link and confirm"
+      ],
+      "failure_or_wait": "Verification email not received or link expired",
+      "input": "User registration details and email confirmation",
+      "interface": "web-ui",
+      "output": "Active Postmark account",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ],
+      "step_number": 1,
+      "success_signal": "Account verified and accessible"
+    },
+    {
+      "action": "Create a Postmark server to organize sending",
+      "actor": "developer",
+      "details": [
+        "Create a new server in the Postmark dashboard",
+        "Optionally create sandbox server for testing"
+      ],
+      "failure_or_wait": "Server creation errors or UI issues",
+      "input": "Server name and configuration",
+      "interface": "web-ui",
+      "output": "Postmark server with unique API tokens",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ],
+      "step_number": 2,
+      "success_signal": "Server appears in dashboard with API tokens"
+    },
+    {
+      "action": "Retrieve Server API token from server settings",
+      "actor": "developer",
+      "details": [
+        "Navigate to API Tokens tab",
+        "Copy Server Token for use in API calls"
+      ],
+      "failure_or_wait": "Token not visible or permissions issues",
+      "input": "Access to Postmark server dashboard",
+      "interface": "web-ui",
+      "output": "Server API token string",
+      "phase": "credential",
+      "required": true,
+      "source_ids": [
+        "S6",
+        "S3"
+      ],
+      "step_number": 3,
+      "success_signal": "Token copied and ready for use"
+    },
+    {
+      "action": "Add and confirm a sender signature email address",
+      "actor": "developer",
+      "details": [
+        "Add sender signature or domain in dashboard",
+        "Confirm ownership via email confirmation link"
+      ],
+      "failure_or_wait": "Confirmation email not received or expired",
+      "input": "Email address to use as sender",
+      "interface": "web-ui",
+      "output": "Confirmed sender signature",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ],
+      "step_number": 4,
+      "success_signal": "Sender signature confirmed and usable"
+    },
+    {
+      "action": "Install official Postmark SDK or prepare API request",
+      "actor": "developer",
+      "details": [
+        "Choose official SDK for preferred language or prepare HTTP request",
+        "Install SDK via package manager if applicable"
+      ],
+      "failure_or_wait": "Installation errors or misconfiguration",
+      "input": "SDK installation command or API request setup",
+      "interface": "code",
+      "output": "SDK ready or API request prepared",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6",
+        "S5"
+      ],
+      "step_number": 5,
+      "success_signal": "SDK installed or API request ready"
+    },
+    {
+      "action": "Send a test email using the SDK or API with the Server Token and confirmed sender signature",
+      "actor": "developer",
+      "details": [
+        "Use example code from official docs",
+        "Send email to a test recipient"
+      ],
+      "failure_or_wait": "API errors such as 401 Unauthorized or 400 Bad Request",
+      "input": "Email parameters (from, to, subject, body) and Server Token",
+      "interface": "code",
+      "output": "API response with success and message ID",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S6",
+        "S5"
+      ],
+      "step_number": 6,
+      "success_signal": "API response status 200 with message_id"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "surface selection",
+        "SDK usage",
+        "general platform capabilities"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Overview of Postmark features",
+        "API and CLI usage",
+        "Official libraries"
+      ],
+      "source_type": "documentation",
+      "title": "Postmark Developer Overview",
+      "url": "https://postmarkapp.com/developer"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "entry point",
+        "alternative paths",
+        "prerequisites"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Overview of transactional vs broadcast email",
+        "SMTP integration",
+        "Getting started guidance"
+      ],
+      "source_type": "documentation",
+      "title": "Postmark Manual",
+      "url": "https://postmarkapp.com/manual"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary path steps",
+        "documented_first_success",
+        "friction gates"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "SDK installation and usage examples",
+        "Code samples for multiple languages"
+      ],
+      "source_type": "documentation",
+      "title": "Official Postmark Libraries",
+      "url": "https://postmarkapp.com/developer/integration/official-libraries"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "prerequisites",
+        "primary path",
+        "friction gates",
+        "branches"
+      ],
+      "id": "S4",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Account creation and verification",
+        "Sender signature setup",
+        "Domain verification",
+        "Sending email setup"
+      ],
+      "source_type": "tutorial",
+      "title": "Getting Started With Postmark In 5 Steps - YouTube",
+      "url": "https://www.youtube.com/watch?v=al2W96Lsa6k"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary path",
+        "documented_first_success",
+        "alternative paths"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "API usage examples",
+        "SDK usage examples",
+        "SMTP integration overview"
+      ],
+      "source_type": "documentation",
+      "title": "Postmark: Fast, Reliable Email Delivery Service",
+      "url": "https://postmarkapp.com/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "friction gates",
+        "primary path",
+        "documented_first_success"
+      ],
+      "id": "S6",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "API authentication",
+        "HTTP response codes",
+        "Error codes"
+      ],
+      "source_type": "documentation",
+      "title": "Postmark API Overview",
+      "url": "https://postmarkapp.com/developer/api/overview"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "SMTP integration",
+        "reason_not_primary": "While SMTP is supported and enabled by default for quick setup, the official docs recommend using the REST API and official SDKs for deeper integration and advanced features.",
+        "url": "https://postmarkapp.com/manual"
+      }
+    ],
+    "name": "REST API and official SDKs",
+    "selection_basis": "Postmark's official developer documentation emphasizes the REST API and provides multiple official SDKs for integration, including Python, Ruby, .NET, PHP, Java, and Node.js, as well as SMTP integration."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": []
+}

@@ -1,0 +1,345 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Postmark",
+    "slug": "postmark",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "b03d667cb142ffd14b4f26931c8718e2220ef6be04f1504b62665ed8284e4725",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet.",
+      "Developer has an internet connection",
+      "Developer has an email address to use as a sender signature"
+    ]
+  },
+  "developer_goal": "Send transactional email using Postmark's API or SDKs to verify successful email delivery.",
+  "first_success": {
+    "outcome": "Developer sends a test transactional email that is accepted by Postmark and visible in the Postmark UI or confirmed by API response",
+    "observable_signal": "API response indicates success with a message ID; email appears in Postmark activity or test inbox",
+    "source_ids": [
+      "S3",
+      "S6",
+      "S5"
+    ]
+  },
+  "route_selection": {
+    "surface": "REST API and official SDKs",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "SMTP integration",
+        "status": "unresolved",
+        "reason": "While SMTP is supported and enabled by default for quick setup, the official docs recommend using the REST API and official SDKs for deeper integration and advanced features."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a Postmark account and verify email",
+      "required_fields": [
+        {
+          "label": "User registration details and email confirmation",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Account verified and accessible",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Postmark server to organize sending",
+      "required_fields": [
+        {
+          "label": "Server name and configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Server appears in dashboard with API tokens",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Retrieve Server API token from server settings",
+      "required_fields": [
+        {
+          "label": "Access to Postmark server dashboard",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6",
+            "S3"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Token copied and ready for use",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Add and confirm a sender signature email address",
+      "required_fields": [
+        {
+          "label": "Email address to use as sender",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Sender signature confirmed and usable",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Install official Postmark SDK or prepare API request",
+      "required_fields": [
+        {
+          "label": "SDK installation command or API request setup",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3",
+            "S6",
+            "S5"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "SDK installed or API request ready",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S6",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "account",
+      "interface": "code",
+      "action": "Send a test email using the SDK or API with the Server Token and confirmed sender signature",
+      "required_fields": [
+        {
+          "label": "Email parameters (from, to, subject, body) and Server Token",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3",
+            "S6",
+            "S5"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "API response status 200 with message_id",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S6",
+        "S5"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Create a Postmark account by signing up at postmarkapp.com and verifying the account email.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Create a Postmark server (sub-account) within the account to organize sending environments.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Obtain a Server API token from the Postmark server's API Tokens tab for authentication.",
+      "source_ids": [
+        "S6",
+        "S3"
+      ]
+    },
+    {
+      "description": "Add and confirm a sender signature email address to use as the 'From' address in emails.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Understand basic API usage or SDK usage to send an email through Postmark.",
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Creating and verifying a Postmark account requires email confirmation.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Sender signature email address must be confirmed via a confirmation email before use.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Domain verification requires adding DKIM and SPF DNS records to the domain's DNS provider.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "API requests require a valid Server API token in the HTTP header for authentication.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Successfully send an email through Postmark using the API or SDK",
+      "source_ids": [
+        "S3",
+        "S6",
+        "S5"
+      ]
+    }
+  ],
+  "excluded": [],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Postmark Developer Overview",
+      "url": "https://postmarkapp.com/developer",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Postmark Developer Overview",
+        "Overview of Postmark features",
+        "API and CLI usage",
+        "Official libraries"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Postmark Manual",
+      "url": "https://postmarkapp.com/manual",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Postmark Manual",
+        "Overview of transactional vs broadcast email",
+        "SMTP integration",
+        "Getting started guidance"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Official Postmark Libraries",
+      "url": "https://postmarkapp.com/developer/integration/official-libraries",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Official Postmark Libraries",
+        "SDK installation and usage examples",
+        "Code samples for multiple languages"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Getting Started With Postmark In 5 Steps - YouTube",
+      "url": "https://www.youtube.com/watch?v=al2W96Lsa6k",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Getting Started With Postmark In 5 Steps - YouTube",
+        "Account creation and verification",
+        "Sender signature setup",
+        "Domain verification"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Postmark: Fast, Reliable Email Delivery Service",
+      "url": "https://postmarkapp.com/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Postmark: Fast, Reliable Email Delivery Service",
+        "API usage examples",
+        "SDK usage examples",
+        "SMTP integration overview"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Postmark API Overview",
+      "url": "https://postmarkapp.com/developer/api/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Postmark API Overview",
+        "API authentication",
+        "HTTP response codes",
+        "Error codes"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Has the machine-drafted Postmark route been independently shortest-path audited?",
+      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
+      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
+    }
+  ],
+  "counts": null
+}

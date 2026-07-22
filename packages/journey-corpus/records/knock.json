@@ -1,0 +1,367 @@
+{
+  "branches": [],
+  "candidate_path_gap": null,
+  "candidate_paths": [],
+  "category": "API infrastructure and developer tooling",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Trigger your workflow to notify a set of users",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Developer sends a notification through a triggered workflow that delivers a message to specified recipients.",
+    "observable_completion_signal": "API call to trigger the workflow returns success and the notification is sent to the intended recipients.",
+    "official_milestone": "Successfully trigger a workflow to send a notification to users via the Knock API.",
+    "source_ids": [
+      "S2"
+    ],
+    "why_this_is_the_boundary": "This step marks the first time a developer completes the end-to-end flow of creating a workflow and successfully sending a notification, which is the core functional milestone for Knock."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has a backend web application ready for integration",
+      "Developer has basic knowledge of API usage and environment variable management"
+    ],
+    "developer_intent": "Send a first notification using Knock by integrating with the backend and creating a workflow.",
+    "starting_url": "https://docs.knock.app/getting-started/quick-start/general"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "User must create and log into a Knock account to access the dashboard.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 3,
+      "description": "Developer must obtain and correctly configure secret API keys for authentication.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ],
+      "type": "credential"
+    },
+    {
+      "at_step": 4,
+      "description": "Workflow must have at least one channel step configured to send notifications.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ],
+      "type": "configuration"
+    },
+    {
+      "at_step": 6,
+      "description": "Trigger API call requires correct recipients and data payload to successfully send notifications.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ],
+      "type": "configuration"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Knock",
+    "organization": "Knock Labs",
+    "slug": "knock"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a Knock account and log into the Knock dashboard.",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Have a backend web application environment ready to integrate with Knock SDK or API.",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "software"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Obtain secret API keys from the Knock dashboard to authenticate API calls.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ],
+      "type": "credential"
+    },
+    {
+      "order": 4,
+      "required": true,
+      "requirement": "Set API keys as environment variables to securely use them in backend integration.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ],
+      "type": "environment"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Create a Knock account and log into the Knock dashboard.",
+      "actor": "developer",
+      "details": [
+        "Visit Knock website and sign up for an account.",
+        "Access the Knock dashboard after login."
+      ],
+      "failure_or_wait": "Account creation errors or login failure",
+      "input": "User registration details",
+      "interface": "web-ui",
+      "output": "Access to Knock dashboard",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 1,
+      "success_signal": "Dashboard loads and user is authenticated"
+    },
+    {
+      "action": "Add the Knock SDK to the backend application or prepare to use the API.",
+      "actor": "developer",
+      "details": [
+        "Choose appropriate SDK for backend language or plan to use direct API calls."
+      ],
+      "failure_or_wait": "SDK installation errors or missing dependencies",
+      "input": "Backend application environment",
+      "interface": "documentation",
+      "output": "SDK installed or API integration planned",
+      "phase": "install",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ],
+      "step_number": 2,
+      "success_signal": "SDK available in project or API client ready"
+    },
+    {
+      "action": "Retrieve secret API keys from the Knock dashboard and set them as environment variables.",
+      "actor": "developer",
+      "details": [
+        "Locate API keys under Platform section in dashboard.",
+        "Set secret key as environment variable in backend environment."
+      ],
+      "failure_or_wait": "Missing or incorrect API keys cause authentication failure",
+      "input": "Knock dashboard access",
+      "interface": "web-ui",
+      "output": "Environment variables configured with API keys",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ],
+      "step_number": 3,
+      "success_signal": "Backend can authenticate API calls to Knock"
+    },
+    {
+      "action": "Create a workflow in the Knock dashboard.",
+      "actor": "developer",
+      "details": [
+        "Click '+ Workflow' button in dashboard.",
+        "Name the workflow.",
+        "Add at least one channel step to the workflow.",
+        "Configure the message template for the channel step."
+      ],
+      "failure_or_wait": "Errors in workflow creation or invalid channel configuration",
+      "input": "Workflow name and channel selection",
+      "interface": "web-ui",
+      "output": "Workflow with configured channel step created",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 4,
+      "success_signal": "Workflow appears in dashboard and is editable"
+    },
+    {
+      "action": "Commit the workflow to the current environment to activate it.",
+      "actor": "developer",
+      "details": [
+        "Use the Commit button in the workflow canvas header.",
+        "Review changes and add commit message."
+      ],
+      "failure_or_wait": "Commit errors or uncommitted changes",
+      "input": "Workflow changes",
+      "interface": "web-ui",
+      "output": "Workflow committed and activated in environment",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 5,
+      "success_signal": "Workflow ready to be triggered"
+    },
+    {
+      "action": "Trigger the workflow via the Knock API to send a notification.",
+      "actor": "developer",
+      "details": [
+        "Use the trigger API call with required data: recipients and data payload.",
+        "Use sample payload from workflow trigger step as template."
+      ],
+      "failure_or_wait": "API errors or delivery failures",
+      "input": "API call with recipients and data",
+      "interface": "api",
+      "output": "Notification sent to recipients",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 6,
+      "success_signal": "API call returns success and notification is delivered"
+    },
+    {
+      "action": "Publish workflows to production environment when ready.",
+      "actor": "developer",
+      "details": [
+        "Ensure workflows are in production environment to send real notifications.",
+        "Optionally promote workflows from development to production."
+      ],
+      "failure_or_wait": "Misconfiguration or missing promotion",
+      "input": "Workflow in development environment",
+      "interface": "web-ui",
+      "output": "Workflow active in production environment",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 7,
+      "success_signal": "Notifications sent to real users in production"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Platform overview",
+        "Concepts of workflows and channels"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Start building",
+        "How do I send notifications?",
+        "What channels can I send notifications on?"
+      ],
+      "source_type": "documentation",
+      "title": "Documentation | Knock Docs",
+      "url": "https://docs.knock.app/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary onboarding flow",
+        "Step-by-step instructions to send first notification"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Create a Knock account",
+        "Add the Knock SDK to your backend",
+        "Set up environment variables",
+        "Create a workflow in Knock",
+        "Trigger your workflow",
+        "Publish to production"
+      ],
+      "source_type": "quickstart",
+      "title": "Get started with Knock | Knock Docs",
+      "url": "https://docs.knock.app/getting-started/quick-start/general"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SDK installation and configuration details",
+        "API key usage and environment variables"
+      ],
+      "id": "S4",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Installation",
+        "Configuration",
+        "Usage"
+      ],
+      "source_type": "documentation",
+      "title": "Knock v0.5.0 — Documentation",
+      "url": "https://hexdocs.pm/knock/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Conceptual understanding of Knock messaging infrastructure",
+        "Context for workflows and notifications"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Overview",
+        "Workflows",
+        "Broadcasts",
+        "Guides",
+        "Mapping your data into Knock",
+        "Channels",
+        "Functions",
+        "Step conditions"
+      ],
+      "source_type": "documentation",
+      "title": "What is Knock? | Knock Docs",
+      "url": "https://docs.knock.app/getting-started/what-is-knock"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Knock Elixir SDK",
+        "reason_not_primary": "While the Elixir SDK is official and documented, the primary onboarding flow documented centers on the dashboard and API usage, which is language-agnostic and more broadly applicable.",
+        "url": "https://hexdocs.pm/knock/"
+      }
+    ],
+    "name": "Knock Dashboard and API",
+    "selection_basis": "The official Knock documentation emphasizes the use of the Knock dashboard for workflow creation and the Knock API for triggering notifications as the primary developer interaction surfaces."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S4",
+        "S5"
+      ],
+      "impact": "Time to first success is useful for benchmarking developer onboarding efficiency but is not explicitly documented.",
+      "question": "What is the typical or average time to first success (sending a notification) as claimed or measured by Knock?",
+      "reason_unresolved": "No explicit vendor claim or measurement of time to first success found in the official documentation."
+    }
+  ]
+}
