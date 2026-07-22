@@ -20,14 +20,14 @@ function test(name, fn) {
   }
 }
 
-// 1. Render: raw transitions are not developer actions.
-test("render: 25 raw / 21 dev / 20 required / 1 optional / 4 platform", () => {
+// 1. Render: Dashboard Web Service first-deploy path (compacted to official tutorial sections).
+test("render: 6 raw / 6 dev / 6 required / 0 optional / 0 platform", () => {
   const t = analyzeRecord(load("render")).transitions;
-  assert.equal(t.raw_transition_count, 25);
-  assert.equal(t.developer_action_count, 21);
-  assert.equal(t.required_developer_action_count, 20);
-  assert.equal(t.optional_developer_action_count, 1);
-  assert.equal(t.platform_event_count, 4);
+  assert.equal(t.raw_transition_count, 6);
+  assert.equal(t.developer_action_count, 6);
+  assert.equal(t.required_developer_action_count, 6);
+  assert.equal(t.optional_developer_action_count, 0);
+  assert.equal(t.platform_event_count, 0);
   assert.equal(t.developer_action_count + t.platform_event_count, t.raw_transition_count);
 });
 
