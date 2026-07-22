@@ -13,12 +13,13 @@ services:
   - type: web
     name: developer-journey-atlas
     runtime: node
-    plan: free
+    # Prefer paid instance types: free spins down and skips pre-deploy.
+    plan: starter
     region: oregon
     rootDir: packages/journey-corpus
-    # Migrate + idempotent seed in build so free web services (no pre-deploy) still boot a seeded DB.
     # Git JSON remains the import source; Prisma is the runtime read model when DATA_STORE=postgres.
-    buildCommand: npm ci --include=dev && npm run build:data && npm run build:app && npm run db:setup
+    buildCommand: npm run build:render
+    preDeployCommand: npm run db:setup
     startCommand: npm start
     healthCheckPath: /healthz
     autoDeployTrigger: checksPass
