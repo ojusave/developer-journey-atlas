@@ -3,9 +3,12 @@ import { researchAvailability } from "../config.js";
 import { sendData, sendError } from "./http.js";
 import type { DataStore } from "../core/ports.js";
 import type { WorkflowRunner } from "../workflows/contract.js";
+import { ensureRow } from "./storeHelpers.js";
 
 const VERIFY_WINDOW_MS = 60 * 60 * 1_000;
 const VERIFY_LIMIT = Math.max(1, Number(process.env.VERIFY_HOURLY_LIMIT ?? 30));
+// Soft per-process guards only: verify is secondary traffic. Research uses
+// Postgres ResearchClaim for cross-instance dedupe.
 const attemptsByIp = new Map<string, number[]>();
 const DEDUPE_TTL_MS = 15 * 60 * 1_000;
 const recentRuns = new Map<string, { runId: string; at: number }>();
@@ -48,7 +51,7 @@ export function startVerify(store: DataStore, runner: WorkflowRunner | null) {
       sendError(res, 400, "bad_request", "Provide a valid platform slug.");
       return;
     }
-    if (!store.getRow(slug)) {
+    if (!(await ensureRow(store, slug))) {
       sendError(res, 404, "not_found", `No platform found for "${slug}".`);
       return;
     }

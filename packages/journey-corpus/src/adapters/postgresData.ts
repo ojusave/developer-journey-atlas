@@ -16,10 +16,18 @@ interface FamilyInfo {
   diagnosticEligibility: string | null;
 }
 
+/** Cap Prisma connections per web instance so multi-instance deploys share the DB pool. */
+function postgresUrlWithPoolLimit(): string {
+  const base = process.env.DATABASE_URL ?? "";
+  if (!base || /connection_limit=/i.test(base)) return base;
+  const limit = process.env.PRISMA_CONNECTION_LIMIT ?? "5";
+  return `${base}${base.includes("?") ? "&" : "?"}connection_limit=${limit}`;
+}
+
 /**
  * DataStore backed by Render Postgres. Corpus rows are loaded into memory at
- * construct so the existing sync DataStore port stays unchanged. Re-seed +
- * restart (or future refresh) to pick up imports.
+ * construct so the existing sync DataStore port stays unchanged. Platforms
+ * persisted by other instances are pulled in via ensurePlatformLoaded / searchRows.
  */
 export class PostgresDataStore implements DataStore {
   private readonly prisma: PrismaClient;
@@ -60,18 +68,23 @@ export class PostgresDataStore implements DataStore {
   }
 
   /** Load the full serving snapshot from Postgres. */
-  static async create(prisma = new PrismaClient()): Promise<PostgresDataStore> {
+  static async create(prisma?: PrismaClient): Promise<PostgresDataStore> {
+    const client =
+      prisma ??
+      new PrismaClient({
+        datasources: { db: { url: postgresUrlWithPoolLimit() } },
+      });
     const [metrics, qualities, platforms, audits, gates, families, reasonCount, metaRow, openrouterLinks] =
       await Promise.all([
-        prisma.metric.findMany(),
-        prisma.quality.findMany(),
-        prisma.platform.findMany(),
-        prisma.audit.findMany(),
-        prisma.frictionGate.findMany(),
-        prisma.catalogNode.findMany({ where: { kind: "universal_family" } }),
-        prisma.catalogNode.count({ where: { kind: "reason" } }),
-        prisma.datasetMeta.findUnique({ where: { id: "singleton" } }),
-        prisma.gateBlockerLink.findMany({ where: { linkSource: "openrouter" } }),
+        client.metric.findMany(),
+        client.quality.findMany(),
+        client.platform.findMany(),
+        client.audit.findMany(),
+        client.frictionGate.findMany(),
+        client.catalogNode.findMany({ where: { kind: "universal_family" } }),
+        client.catalogNode.count({ where: { kind: "reason" } }),
+        client.datasetMeta.findUnique({ where: { id: "singleton" } }),
+        client.gateBlockerLink.findMany({ where: { linkSource: "openrouter" } }),
       ]);
 
     if (metrics.length === 0) {
@@ -132,7 +145,7 @@ export class PostgresDataStore implements DataStore {
 
     const reasonIds = [...new Set(openrouterLinks.map((link) => link.blockerReasonId))];
     const reasonNodes = reasonIds.length
-      ? await prisma.catalogNode.findMany({ where: { id: { in: reasonIds } } })
+      ? await client.catalogNode.findMany({ where: { id: { in: reasonIds } } })
       : [];
     const reasonById = new Map(reasonNodes.map((node) => [node.id, node]));
 
@@ -173,7 +186,7 @@ export class PostgresDataStore implements DataStore {
     };
 
     return new PostgresDataStore({
-      prisma,
+      prisma: client,
       rows,
       qualityBySlug,
       metaValue: meta,
@@ -250,6 +263,76 @@ export class PostgresDataStore implements DataStore {
         platforms: this.rows.length,
       },
     };
+  }
+
+  /**
+   * Load one platform from Postgres into this instance's snapshot.
+   * Safe for multi-instance: another web dyno may have persisted research first.
+   */
+  async ensurePlatformLoaded(slug: string): Promise<boolean> {
+    if (this.bySlug.has(slug) && this.records.has(slug)) return true;
+    const platform = await this.prisma.platform.findUnique({
+      where: { slug },
+      include: { metric: true, audit: true, gates: true },
+    });
+    if (!platform?.metric) return false;
+    const record = platform.recordJson as unknown as PlatformRecord;
+    const row = platform.metric.metricJson as unknown as MetricRow;
+    const audit = platform.audit
+      ? (platform.audit.auditJson as unknown as ShortestPathAudit)
+      : undefined;
+    if (!audit) {
+      this.bySlug.set(slug, row);
+      this.records.set(slug, record);
+      if (!this.rows.some((item) => item.slug === slug)) this.rows.push(row);
+      return true;
+    }
+    const idMap = new Map<string, string>();
+    (record.friction_gates ?? []).forEach((gate, index) => {
+      const match = platform.gates.find(
+        (rowGate) =>
+          rowGate.type === (gate.type ?? "other") &&
+          rowGate.atStep === (gate.at_step ?? null) &&
+          rowGate.description === (gate.description ?? ""),
+      );
+      if (match) idMap.set(`${gate.at_step ?? "x"}:${gate.type ?? "other"}:${index}`, match.id);
+    });
+    this.gateIdsBySlug.set(slug, idMap);
+    this.ingestLive(record, row, audit);
+    return true;
+  }
+
+  /** DB-backed search so platforms persisted by other instances are visible. */
+  async searchRows(query: string, limit = 40): Promise<MetricRow[]> {
+    const q = query.trim();
+    if (!q) return [];
+    const platforms = await this.prisma.platform.findMany({
+      where: {
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { slug: { contains: q, mode: "insensitive" } },
+          { category: { contains: q, mode: "insensitive" } },
+        ],
+      },
+      include: { metric: true, audit: true },
+      take: limit,
+      orderBy: { name: "asc" },
+    });
+    const rows: MetricRow[] = [];
+    for (const platform of platforms) {
+      if (!platform.metric) continue;
+      const row = platform.metric.metricJson as unknown as MetricRow;
+      const record = platform.recordJson as unknown as PlatformRecord;
+      if (platform.audit) {
+        this.ingestLive(record, row, platform.audit.auditJson as unknown as ShortestPathAudit);
+      } else if (!this.bySlug.has(platform.slug)) {
+        this.bySlug.set(platform.slug, row);
+        this.records.set(platform.slug, record);
+        this.rows.push(row);
+      }
+      rows.push(row);
+    }
+    return rows;
   }
 
   /** Shared Prisma client for durable writes from the web service. */

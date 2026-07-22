@@ -64,6 +64,11 @@ The Blueprint uses a starter web plan and `preDeployCommand` for `db:setup` (mig
 | `RENDER_WORKFLOW_TASK_SLUG` | Optional | Default research task slug |
 | `RENDER_VERIFY_TASK_SLUG` | Optional | Default verify task slug |
 | `BLOCKER_LINKING_ENABLED` | Optional | `"true"` to enable linking |
+| `RESEARCH_HOURLY_LIMIT` | Optional | Per-IP research starts per hour (default `60`) |
+| `RESEARCH_GLOBAL_HOURLY_LIMIT` | Optional | Shared research starts per hour across all clients (default `300`) |
+| `PRISMA_CONNECTION_LIMIT` | Optional | Prisma pool size per web instance (default `5`) |
+
+Concurrent developers share one Workflow per platform via the `ResearchClaim` table. Search and journey endpoints load platforms from Postgres when another instance persisted them first.
 
 Health: `GET /healthz`. Logs: Render service logs for the web service and any Workflow service.
 
