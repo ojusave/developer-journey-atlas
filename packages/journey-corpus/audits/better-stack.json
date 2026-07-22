@@ -7,47 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "5c04de8d5807f57fb3029e559ae6c58e7dcd70a8303dd5f8a3cc8be82644e035",
+  "source_record_sha256": "5db4ba493014d579d506a684c955132dd3ffa343a2023d3e44be1dcc43108a15",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "No Better Stack account, team membership, monitor, alert channel, escalation policy, or prior configuration is assumed.",
-      "A browser, email address, reachable URL or IP address, and network connection are available.",
-      "No email was submitted, magic link was requested or opened, account or team was created or joined, or monitor was created during research."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Start without a Better Stack account, create the first HTTP status monitor for a URL, retain the basic single-user escalation behavior where applicable, and verify that the monitor is running and continuously checking the URL.",
+  "developer_goal": "Create a Better Stack account and monitor a public HTTP endpoint.",
   "first_success": {
-    "outcome": "A Better Stack Uptime monitor is running and continuously checking the supplied URL or IP address for an HTTP 2XX success response.",
-    "observable_signal": "After Create monitor is clicked, the official guide states that the monitor is up and running and continuously checking the URL.",
+    "outcome": "A hosted HTTP monitor checks the supplied URL and reports its current status.",
+    "observable_signal": "The monitor detail page shows a completed check and an Up status for the endpoint.",
     "source_ids": [
       "S1"
     ]
   },
   "route_selection": {
-    "surface": "Better Stack Uptime first HTTP monitor",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
-    "selected": null,
+    "surface": "Uptime dashboard: first HTTP monitor",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Uptime dashboard: first HTTP monitor",
     "candidates": [
       {
-        "name": "Better Stack Uptime first HTTP monitor",
-        "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+        "name": "Uptime dashboard: first HTTP monitor",
+        "status": "selected",
+        "reason": "The hosted dashboard path creates a working HTTP monitor without installing an agent or writing code."
       },
       {
-        "name": "Tracing",
-        "status": "unresolved",
-        "reason": "This is a separate product surface with application instrumentation and language-specific setup."
-      },
-      {
-        "name": "Log management",
-        "status": "unresolved",
-        "reason": "This requires selecting and configuring a log source rather than following the named first-monitor path."
-      },
-      {
-        "name": "Infrastructure monitoring",
-        "status": "unresolved",
-        "reason": "This requires host or cluster instrumentation and is not the selected first-monitor guide."
+        "name": "Heartbeat monitor",
+        "status": "not-selected",
+        "reason": "A heartbeat requires an external job to call Better Stack; an HTTP monitor can check an existing URL directly."
       }
     ]
   },
@@ -56,41 +45,22 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Complete Better Stack account creation or trial signup at the official entry URL.",
-      "required_fields": [
-        {
-          "label": "Signup identity and required account fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
-        }
-      ],
-      "observable_result": "A new Better Stack account or trial session exists.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to a Better Stack account and open Uptime.",
+      "required_fields": [],
+      "observable_result": "The Uptime dashboard is available.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Complete any required email or identity verification for the new account.",
-      "required_fields": [
-        {
-          "label": "Verification challenge",
-          "field_type": "challenge",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The account becomes usable for developer onboarding.",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose to create a monitor and select HTTP monitoring.",
+      "required_fields": [],
+      "observable_result": "The monitor form is open.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
@@ -99,20 +69,22 @@
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Complete the documented post-login setup for the selected Better Stack candidate through first success.",
-      "required_fields": [
-        {
-          "label": "Candidate-specific configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
-        }
-      ],
-      "observable_result": "After Create monitor is clicked, the official guide states that the monitor is up and running and continuously checking the URL.",
-      "evidence_state": "unverified",
+      "action": "Enter the endpoint URL and save the monitor.",
+      "required_fields": [],
+      "observable_result": "The monitor is listed and checks begin.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open the monitor and confirm the first completed check.",
+      "required_fields": [],
+      "observable_result": "The endpoint is reported Up.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
@@ -120,19 +92,13 @@
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'identity', 'requirement': 'Provide an email address and receive a Better Stack magic link.', 'required': True, 'source_ids': ['S2']}",
+      "description": "A Better Stack account.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'account', 'requirement': 'Join an existing team associated with the email domain or create a new account when that branch is offered.', 'required': True, 'source_ids': ['S2']}",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "{'order': 3, 'type': 'environment', 'requirement': 'Have a URL or IP address that Better Stack can check for an HTTP 2XX response.', 'required': True, 'source_ids': ['S1']}",
+      "description": "A publicly reachable HTTP or HTTPS URL to monitor.",
       "source_ids": [
         "S1"
       ]
@@ -140,35 +106,16 @@
   ],
   "external_gates": [
     {
-      "description": "The documentation home presents multiple peer product surfaces without selecting one universal first value outcome.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "A Better Stack account or existing-team membership is required before the monitor form can be used.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "Signup uses an email magic link, but its post-submit and verification states are not publicly documented.",
+      "description": "The monitored URL must be reachable from Better Stack.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "unavoidable_waits": [
-    {
-      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Create the first HTTP status monitor.",
+      "description": "A hosted HTTP monitor checks the supplied URL and reports its current status.",
       "source_ids": [
         "S1"
       ]
@@ -176,8 +123,8 @@
   ],
   "excluded": [
     {
-      "item": "Bulk importing monitors, adding advanced monitor types, configuring status pages, instrumenting traces or logs, and broader incident-management work occur after the first monitor is running.",
-      "reason": "Listed as excluded after success in the source record.",
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
       "source_ids": [
         "S1"
       ]
@@ -186,55 +133,22 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Get started with monitoring | Better Stack Documentation",
+      "title": "Get started with uptime monitoring",
       "url": "https://betterstack.com/docs/uptime/monitoring-start/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Primary documented developer route and first-success framing"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Sign up | Better Stack",
-      "url": "https://betterstack.com/users/sign-up",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Sign up | Better Stack"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Getting started | Better Stack Documentation",
-      "url": "https://betterstack.com/docs/getting-started/welcome/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Getting started | Better Stack Documentation"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Better Stack product surface should define platform-wide first success?",
-      "impact": "The prerequisites, route, and completion signal differ across Uptime, incidents and on-call, status pages, infrastructure monitoring, logs, tracing, error tracking, and AI SRE.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The official documentation home presents these as peer surfaces and does not select one universal first task."
-    },
-    {
-      "question": "What exact states follow Send me a magic link for a new user?",
-      "impact": "The mandatory signup and product-entry segment cannot be recorded atomically.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The public signup page shows the initial controls but the official docs do not enumerate delivery, verification, profile, team, and Uptime convergence states."
-    },
-    {
-      "question": "Which alert method is preselected for a new single-user account?",
-      "impact": "The exact monitor-form click path may vary.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The guide lists alerting options and a default escalation behavior but does not identify a universal alert-channel default."
-    },
-    {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does Better Stack show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "The docs do not fully expose every fresh-account signup or verification screen.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

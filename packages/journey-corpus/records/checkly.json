@@ -1,85 +1,197 @@
 {
-  "platform": {"name": "Checkly", "slug": "checkly", "organization": "Checkly Inc."},
+  "platform": {
+    "name": "Checkly",
+    "slug": "checkly",
+    "organization": "Checkly"
+  },
   "category": "Observability, testing, and release engineering",
   "surface": {
-    "name": "Checkly Monitoring as Code quickstart with deployed checks",
-    "selection_basis": "Under the workshop policy, the manual Monitoring as Code route is the fastest fully reconstructable official route: the vendor-recommended agent route is project-dependent, while the same Quickstart documents deterministic init, login, test, and deploy commands.",
+    "name": "Dashboard quickstart: first API check",
+    "selection_basis": "The dashboard API-check quickstart is hosted and avoids the Monitoring as Code CLI setup.",
     "alternatives_considered": [
-      {"name": "Manual Monitoring as Code setup", "url": "https://www.checklyhq.com/docs/quickstart/", "reason_not_primary": "This is the fully enumerated fallback on the same page, while the vendor explicitly labels the AI-agent route recommended and fastest."},
-      {"name": "Dashboard-created checks", "url": "https://www.checklyhq.com/docs/", "reason_not_primary": "The current general Quickstart selects Monitoring as Code in an existing project rather than a dashboard-only flow."},
-      {"name": "Playwright test import", "url": "https://www.checklyhq.com/docs/cli/sync-playwright/", "reason_not_primary": "This is a specialized route for projects with existing Playwright tests."}
+      {
+        "name": "Monitoring as Code CLI",
+        "url": "https://www.checklyhq.com/docs/cli/",
+        "reason_not_primary": "It adds local Node.js and CLI configuration that the hosted dashboard route does not require."
+      }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Start without a Checkly account, add Monitoring as Code to an existing project with the vendor-recommended quickstart, authenticate, test the generated checks, deploy them, and verify that the checks are live in the Checkly dashboard.",
-    "starting_url": "https://www.checklyhq.com/docs/quickstart/",
+    "developer_intent": "Create a Checkly account and run a hosted API check against an HTTP endpoint.",
+    "starting_url": "https://www.checklyhq.com/docs/quickstarts/api-check/",
     "assumed_prior_state": [
-      "No Checkly account, CLI authentication, project configuration, checks, alert channels, deployment, or dashboard resources are assumed.",
-      "An existing application project, terminal, Node.js 20.19 or newer or 22.12 or newer, npm, browser, and internet connection are available.",
-      "No package was installed, file or dependency was changed, prompt was given to an agent, browser signup was submitted, token was stored, check was run, or resource was deployed during research."
+      "The developer begins before account creation with no platform resources or credentials.",
+      "A supported browser and internet connection are available."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Deploy synthetic monitoring checks from the project's Checkly configuration.",
-    "normalized_outcome": "The project's generated or edited checks pass a Checkly cloud test, are deployed, and appear in the dashboard ready for scheduled monitoring.",
-    "observable_completion_signal": "The manual quickstart shows two passing checks after checkly test, then says the dashboard shows the deployed checks ready to start monitoring after checkly deploy; the recommended route tells the developer to open the dashboard to see monitoring live.",
-    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "After `npx checkly deploy`, the dashboard shows checks ready to start monitoring.", "source_ids": ["S1"]},
-    "why_this_is_the_boundary": "Deployed checks visible in the dashboard are the first durable monitoring result; alert channels and CI integration follow.",
-    "source_ids": ["S1", "S2", "S3"]
+    "official_milestone": "Run the first API check",
+    "normalized_outcome": "A saved API check sends its request and passes its assertions.",
+    "observable_completion_signal": "The Checkly dashboard displays a successful check result for the configured URL.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Checkly dashboard displays a successful check result for the configured URL.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the first observable end-to-end result on the selected official surface; later production configuration and expansion follow it.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "environment", "requirement": "Have an existing project directory where Monitoring as Code can be added.", "required": true, "source_ids": ["S1"]},
-    {"order": 2, "type": "software", "requirement": "Install Node.js 20.19 or newer or 22.12 or newer and npm, and have a terminal.", "required": true, "source_ids": ["S1"]},
-    {"order": 3, "type": "software", "requirement": "Have a supported AI coding agent for the recommended route; otherwise use the documented manual route.", "required": false, "source_ids": ["S1"]},
-    {"order": 4, "type": "identity", "requirement": "Create a Checkly account during checkly login or sign in to an existing account.", "required": true, "source_ids": ["S2"]},
-    {"order": 5, "type": "network", "requirement": "Have a browser and internet access for OAuth authentication and cloud test and deployment commands.", "required": true, "source_ids": ["S1", "S2"]}
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Checkly account.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "network",
+      "requirement": "An HTTP API endpoint that Checkly can reach.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Checkly Quickstart and select `Set it up yourself`.", "details": [], "input": "https://www.checklyhq.com/docs/quickstart/", "output": "The deterministic Monitoring as Code path is visible.", "success_signal": "Bootstrap, login, check, test, and deploy sections are available.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "cli", "action": "In an existing project, run `npx checkly init`; decline agent setup, allow npm install, and add demo checks.", "details": [], "input": "Node.js 20.19+ or 22.12+ and npm", "output": "`checkly.config.ts` and `__checks__` examples are created.", "success_signal": "The CLI prints `All done!`.", "failure_or_wait": "Resolve package installation errors before continuing.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 3, "phase": "authenticate", "actor": "developer", "interface": "cli", "action": "Run `npx checkly login` and open the browser authentication URL.", "details": [], "input": "Initialized project", "output": "The Checkly authentication page opens.", "success_signal": "The browser presents sign-in or signup.", "failure_or_wait": "Open the displayed URL manually if the browser does not launch.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 4, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create a free Checkly account through the official signup flow and return to the CLI.", "details": ["Treat account registration as one opaque prerequisite under the workshop policy."], "input": "https://app.checklyhq.com/signup", "output": "The CLI stores authentication for an active Checkly account.", "success_signal": "Login succeeds and `npx checkly whoami` identifies the account.", "failure_or_wait": "Registration fields are not publicly enumerated; multiple accounts can require selection.", "required": true, "source_ids": ["S2", "S3"]},
-    {"step_number": 5, "phase": "build", "actor": "developer", "interface": "code", "action": "Edit `__checks__/homepage.spec.ts` to load `https://www.checklyhq.com`, assert status below 400, assert the title matches Checkly, and save a screenshot.", "details": [], "input": "The scaffolded browser check", "output": "The first browser check matches the Quickstart.", "success_signal": "The file contains all three published assertions/actions.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `npx checkly test`.", "details": [], "input": "Authenticated CLI and checks", "output": "The checks run on Checkly infrastructure.", "success_signal": "The terminal reports `2 passed, 2 total` for homepage loads and Hello API.", "failure_or_wait": "Fix a failing assertion or target before deploying.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run `npx checkly deploy` and confirm deployment.", "details": [], "input": "Passing checks", "output": "The checks are deployed.", "success_signal": "The deploy command completes.", "failure_or_wait": "Review proposed resource changes before confirmation.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 8, "phase": "verify", "actor": "developer", "interface": "web-ui", "action": "Open the Checkly dashboard.", "details": [], "input": "Deployed project", "output": "The deployed checks are visible.", "success_signal": "The checks are ready to start monitoring.", "failure_or_wait": "Refresh after deployment if resources are not yet visible.", "required": true, "source_ids": ["S1"]}
+    {
+      "step_number": 1,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create or sign in to Checkly and open the dashboard.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The dashboard is available.",
+      "success_signal": "The dashboard is available.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Create an API check and enter its name, request method, and URL.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The API check is configured.",
+      "success_signal": "The API check is configured.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Save the API check with the quickstart assertion settings.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The check exists in the dashboard.",
+      "success_signal": "The check exists in the dashboard.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Run the check from the dashboard.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "Checkly executes the HTTP request.",
+      "success_signal": "Checkly executes the HTTP request.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Confirm the run is successful.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "A passing check result is displayed.",
+      "success_signal": "A passing check result is displayed.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "candidate_paths": [],
   "candidate_path_gap": null,
-  "branches": [
-    {"at_step": 2, "condition": "The developer follows the recommended route", "path": "Allow init to install the agent skill, select the coding agent, paste the tailored prompt, review its project-specific work, and confirm deployment.", "effect_on_first_success": "The exact checks, files, alerts, and test actions depend on the existing project and agent output.", "source_ids": ["S1"]},
-    {"at_step": 2, "condition": "The developer prefers manual setup or lacks a supported agent", "path": "Decline AI setup, generate demo checks, authenticate, edit the provided homepage check, test it in Checkly's cloud, deploy it, and inspect the dashboard.", "effect_on_first_success": "Provides a deterministic fallback with two documented passing example checks and the same deployment terminal.", "source_ids": ["S1", "S2"]},
-    {"at_step": 3, "condition": "The user has no Checkly account", "path": "Choose signup in the CLI, open the browser, click Sign up, complete registration, return automatically to the CLI, and select an account if prompted.", "effect_on_first_success": "Adds an undocumented live registration form before testing and deployment.", "source_ids": ["S2", "S3"]},
-    {"at_step": 3, "condition": "The user already has an account", "path": "Enter credentials, complete optional two-factor authentication, return to the CLI, and select among multiple accounts if needed.", "effect_on_first_success": "Avoids new registration but may add 2FA and account selection.", "source_ids": ["S2"]},
-    {"at_step": 3, "condition": "The browser does not open automatically", "path": "Decline automatic browser opening, manually open the displayed URL, complete authentication, and return to the CLI.", "effect_on_first_success": "Adds a manual URL transfer without changing the authenticated terminal.", "source_ids": ["S2"]}
-  ],
+  "branches": [],
   "friction_gates": [
-    {"at_step": 2, "type": "environment", "description": "The quickstart assumes an existing application project.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "installation", "description": "Node.js in a documented version range, npm, Checkly CLI dependencies, and project files are required.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "choice", "description": "The recommended flow requires choosing an AI coding agent, while manual setup follows a different prompt branch.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "other", "description": "Recommended agent actions vary with project structure and require developer input and deployment confirmation.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 3, "type": "account", "description": "Cloud testing and deployment require Checkly authentication and an active account selection.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
-    {"at_step": 3, "type": "form", "description": "The live client-rendered signup page does not expose its exact registration fields and transitions publicly.", "documented_requirement": false, "source_ids": ["S2", "S3"]},
-    {"at_step": 3, "type": "verification", "description": "Existing users may need two-factor authentication; the new-user verification behavior is not enumerated.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 3, "type": "permission", "description": "Deployment is a state-changing operation and the recommended agent route requires explicit confirmation before running it.", "documented_requirement": true, "source_ids": ["S1"]}
+    {
+      "at_step": 2,
+      "type": "access",
+      "description": "The target API must be reachable from Checkly's hosted locations.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": true, "value": "tests and monitors deployed in 5 minutes", "source_ids": ["S4"]},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Checkly Quickstart - Checkly Docs", "url": "https://www.checklyhq.com/docs/quickstart/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Get started with Monitoring as Code", "Prerequisites", "Let your AI agent set it up (recommended)", "Set it up yourself", "Bootstrap a Checkly project", "Authenticate with Checkly", "Create your first check", "Test your checks", "Deploy to Checkly", "Set up alert channels"], "evidence_supported": ["Existing-project scope", "Recommended agent route", "Node.js prerequisites", "Init prompts and effects", "Project-dependent agent actions", "Manual fallback", "Example check assertions", "Cloud test command", "Two-pass terminal", "Deploy action", "Dashboard terminal", "Alerting after deploy"]},
-    {"id": "S2", "title": "checkly login - Checkly Docs", "url": "https://www.checklyhq.com/docs/cli/checkly-login/", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Prerequisites", "Usage", "Examples", "Authentication Flow", "New Users", "Existing Users", "Authentication Storage", "Troubleshooting"], "evidence_supported": ["No prior account required", "Browser OAuth", "Signup choice", "Account selection", "Successful-login output", "High-level new-user route", "Existing-user credentials and 2FA", "Local token storage", "Manual URL fallback", "Multiple-account behavior"]},
-    {"id": "S3", "title": "Checkly | Active Monitoring for Dev & Ops Teams", "url": "https://app.checklyhq.com/signup", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Client-rendered signup application"], "evidence_supported": ["Official live registration endpoint", "No publicly readable form fields or transition states"]},
-    {"id": "S4", "title": "Checkly Documentation - Checkly Docs", "url": "https://www.checklyhq.com/docs/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Quick Start"], "evidence_supported": ["Vendor claim that tests and monitors can be deployed in 5 minutes", "General Quickstart selection"]},
-    {"id": "S5", "title": "Terms of use", "url": "https://www.checklyhq.com/terms/", "official_domain": true, "source_type": "policy", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Terms of use"], "evidence_supported": ["Checkly Inc. organization name"]}
+    {
+      "id": "S1",
+      "title": "Create your first API check",
+      "url": "https://www.checklyhq.com/docs/quickstarts/api-check/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [],
+      "evidence_supported": [
+        "surface selection",
+        "required path",
+        "first-success boundary"
+      ]
+    }
   ],
   "uncertainties": [
-    {"question": "What exact files, checks, alert channels, and prompts will the recommended agent route produce for a particular project?", "impact": "The official recommended path cannot be reduced to one deterministic atomic sequence.", "reason_unresolved": "The quickstart explicitly says the agent's actions depend on the project and lists possible, not universal, actions.", "checked_source_ids": ["S1"]},
-    {"question": "What fields, validation, identity alternatives, and verification steps appear during new-user registration?", "impact": "The mandatory no-account browser segment cannot be recorded atomically.", "reason_unresolved": "The CLI docs say Complete account registration and the live application is client-rendered with no readable form detail.", "checked_source_ids": ["S2", "S3"]},
-    {"question": "Does the 5-minute claim cover the recommended agent route, the manual route, or both under all prerequisites?", "impact": "The claim should not be treated as a measured duration for this reconstructed no-account journey.", "reason_unresolved": "The docs home states the claim but does not publish its conditions or measurement method.", "checked_source_ids": ["S4"]}
+    {
+      "question": "Authenticated UI labels can change independently of the documented quickstart.",
+      "impact": "The exact number or ordering of required onboarding actions may vary for a fresh account.",
+      "reason_unresolved": "Public official documentation does not fully expose every authenticated or account-dependent state.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
   ],
   "excluded_after_success": [
-    "Additional checks, alert channels, CI/CD, private locations, dashboards, status pages, incident management, root-cause features, and destroying resources occur after the first checks are deployed and visible."
+    "Production hardening, scale configuration, and ongoing operations after the first successful result."
   ]
 }

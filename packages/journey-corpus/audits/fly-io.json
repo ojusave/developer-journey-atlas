@@ -7,32 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "206941c3448b20f93bea9a9d5ba139fde8bdb9884c52b3deb8ec6fb66c04ebe2",
+  "source_record_sha256": "183867451bee8377a6c0920542418e7f64aab4723c333278230aaafdaefa29fe",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer uses macOS, Linux, or Windows.",
-      "The general Quickstart requires project source that Fly Launch can scan or a Dockerfile; the HelloFly candidate instead uses Fly.io's pre-built image.",
-      "The developer can open a browser from the CLI authentication flow; Microsoft WSL may require Fly.io's documented xdg-open symbolic link."
+      "No Fly.io account or app exists.",
+      "A machine can install flyctl."
     ]
   },
-  "developer_goal": "Get up and running on Fly.io by launching a first app.",
+  "developer_goal": "Create a Fly.io account, launch the hellofly demo image, and open the fly.dev URL.",
   "first_success": {
-    "outcome": "HelloFly demo app is deployed; fly status succeeds and fly apps open loads the fly.dev URL.",
-    "observable_signal": "After `fly status` and `fly apps open`, the HelloFly app is reachable at `https://<my-app-name>.fly.dev/`, and the guide states that the first app was successfully launched.",
+    "outcome": "hellofly demo is deployed and https://<app>.fly.dev/ loads via fly apps open.",
+    "observable_signal": "fly status shows the app; fly apps open loads the demo over HTTPS.",
     "source_ids": [
-      "S3"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "Launch the official HelloFly demo app",
-    "rule": "Prefer the official first-deploy tutorial path without duplicating steps or splitting form fields into separate required path steps.",
-    "selected": "Launch the official HelloFly demo app",
+    "surface": "Launch hellofly demo app with flyctl",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Launch hellofly demo app with flyctl",
     "candidates": [
       {
-        "name": "Launch the official HelloFly demo app",
+        "name": "Launch hellofly demo app with flyctl",
         "status": "selected",
-        "reason": "Fly.io Launch a demo app (HelloFly) is the selected first success. Removed the parallel own-app launch path that previously duplicated the journey and inflated counts."
+        "reason": "Official Launch a demo app guide is the hosted first-app path: install flyctl, fly auth signup, fly launch --image flyio/hellofly:latest, then fly apps open. Credit card is prompted for new Pay As You Go accounts."
       }
     ]
   },
@@ -40,10 +39,10 @@
     {
       "step_number": 1,
       "kind": "product-interaction",
-      "interface": "other",
-      "action": "Open the official Fly.io Getting started page.",
+      "interface": "cli",
+      "action": "Install flyctl for the local OS.",
       "required_fields": [],
-      "observable_result": "Launch hellofly demo app is visible.",
+      "observable_result": "fly version works.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -51,254 +50,82 @@
     },
     {
       "step_number": 2,
-      "kind": "implementation",
-      "interface": "other",
-      "action": "Open Launch a demo app.",
+      "kind": "account",
+      "interface": "cli",
+      "action": "Run fly auth signup (or fly auth login) and complete browser signup, including payment details when prompted.",
       "required_fields": [],
-      "observable_result": "The guide's numbered flow is visible.",
+      "observable_result": "CLI returns to a logged-in shell.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Install flyctl with the documented command for the local operating system.",
+      "action": "Run fly launch --image flyio/hellofly:latest and accept defaults to deploy.",
       "required_fields": [],
-      "observable_result": "The `fly` command is available.",
+      "observable_result": "Deploy finishes with Visit your newly deployed app URL.",
       "evidence_state": "documented",
       "source_ids": [
-        "S3",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 4,
-      "kind": "account",
-      "interface": "cli",
-      "action": "For a new account, run `fly auth signup`.",
-      "required_fields": [],
-      "observable_result": "A signup form is displayed.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S5"
-      ]
-    },
-    {
-      "step_number": 5,
-      "kind": "account",
-      "interface": "browser",
-      "action": "Create the account using email, Google, or GitHub.",
-      "required_fields": [],
-      "observable_result": "The flow returns to the command line ready to use Fly.io.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 6,
-      "kind": "product-interaction",
-      "interface": "other",
-      "action": "If prompted before deployment, provide a valid credit card.",
-      "required_fields": [],
-      "observable_result": "The account can continue launching resources.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S6",
-        "S9"
-      ]
-    },
-    {
-      "step_number": 7,
       "kind": "verification",
       "interface": "cli",
-      "action": "Run `fly launch --image flyio/hellofly:latest`.",
+      "action": "Run fly status and fly apps open to confirm the HTTPS demo.",
       "required_fields": [],
-      "observable_result": "`Do you want to tweak these settings before proceeding? (y/N)` appears.",
+      "observable_result": "Browser loads the hellofly app at *.fly.dev.",
       "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 8,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Choose whether to accept or customize the proposed launch settings.",
-      "required_fields": [],
-      "observable_result": "The launch proceeds with confirmed settings.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 9,
-      "kind": "implementation",
-      "interface": "other",
-      "action": "If customization was selected, change settings and click `Confirm Settings`.",
-      "required_fields": [],
-      "observable_result": "The web flow confirms settings and returns control to launch.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 10,
-      "kind": "verification",
-      "interface": "cli",
-      "action": "Create the app, write and validate `fly.toml`, retrieve the image, provision IPs, and launch the app Machines.",
-      "required_fields": [],
-      "observable_result": "The output ends with `Visit your newly deployed app at https://<my-app-name>.fly.dev/`.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 11,
-      "kind": "verification",
-      "interface": "cli",
-      "action": "Run `fly status`.",
-      "required_fields": [],
-      "observable_result": "The new app and its Machine status are listed.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S9"
-      ]
-    },
-    {
-      "step_number": 12,
-      "kind": "verification",
-      "interface": "cli",
-      "action": "Run `fly apps open`.",
-      "required_fields": [],
-      "observable_result": "HelloFly is reachable, and the guide explicitly declares first-app success.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S6"
-      ]
-    }
-  ],
-  "prerequisites": [
-    {
-      "description": "A local macOS, Linux, or Windows environment that can run the documented operating-system-specific flyctl installation command.",
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "description": "Browser access for the signup or login flow started by flyctl.",
-      "source_ids": [
-        "S3",
-        "S5"
-      ]
-    },
-    {
-      "description": "A Fly.io account, created during the path or an existing account used to sign in.",
-      "source_ids": [
-        "S2",
-        "S3",
-        "S5"
-      ]
-    },
-    {
-      "description": "The demo guide says a new account starts on Pay As You Go and that a credit-card prompt occurs at some point. Current trial documentation permits limited access without a payment method until 2 total VM hours or 7 days, whichever comes first, subject to resource limits.",
-      "source_ids": [
-        "S3",
-        "S6"
-      ]
-    },
-    {
-      "description": "flyctl installed and available as the `fly` command.",
-      "source_ids": [
-        "S2",
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "description": "For the general Quickstart route, an existing app source directory or Dockerfile that Fly Launch can inspect.",
-      "source_ids": [
-        "S2",
-        "S8"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "flyctl is mandatory, with operating-system-specific installation and possible PATH setup.",
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "description": "The CLI launches a browser-based signup or login flow; WSL may require a symbolic-link fix for browser launch.",
-      "source_ids": [
-        "S3",
-        "S5"
-      ]
-    },
-    {
-      "description": "GitHub signup adds an email confirmation and password-setting step for later active verification.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "The demo guide says a credit-card prompt occurs at some point, while the current free trial may defer it. Trial exhaustion stops apps and blocks new launches or deploys until billing is configured.",
-      "source_ids": [
-        "S3",
-        "S6"
-      ]
-    },
-    {
-      "description": "Fly Launch proposes project-dependent settings, and the HelloFly candidate explicitly requires accepting defaults or entering web customization.",
-      "source_ids": [
-        "S3",
-        "S8"
-      ]
-    },
-    {
-      "description": "When `fly launch` deploys the app, that deployment must complete before status and browser verification.",
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "description": "For non-obvious deployment failures, Fly.io documents `fly version update`, `fly doctor`, `fly config validate`, `fly logs`, and optional debug or SSH diagnostics.",
-      "source_ids": [
-        "S7"
-      ]
-    }
-  ],
-  "unavoidable_waits": [],
-  "platform_outcomes": [
-    {
-      "description": "HelloFly demo app is deployed; fly status succeeds and fly apps open loads the fly.dev URL.",
       "source_ids": [
         "S1"
       ]
     }
   ],
+  "prerequisites": [
+    {
+      "description": "flyctl installed.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Fly.io account via fly auth signup/login.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Credit card for new Pay As You Go accounts when prompted.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Inflated duplicate or over-split steps",
-      "reason": "Path compacted to the official first-success tutorial structure.",
+      "item": "Custom Dockerfile apps",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Scaling",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Destroying the demo",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
@@ -307,123 +134,22 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Getting started",
-      "url": "https://fly.io/docs/getting-started/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Vendor-presented route order",
-        "Quickstart, demo, framework, and deeper alternatives"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Quickstart: Launch your app",
-      "url": "https://fly.io/docs/getting-started/launch/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "General Quickstart spine",
-        "Existing source-directory prerequisite",
-        "Conditional fly deploy",
-        "Post-deploy status and open commands"
-      ]
-    },
-    {
-      "id": "S3",
       "title": "Launch a demo app",
       "url": "https://fly.io/docs/getting-started/launch-demo/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Complete HelloFly candidate",
-        "Signup choices",
-        "Billing note",
-        "Commands",
-        "Configuration choice",
-        "Deployment responses",
-        "Status verification",
-        "Explicit terminal",
-        "Post-success exclusions"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Install flyctl",
-      "url": "https://fly.io/docs/flyctl/install/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Operating-system installation commands",
-        "PATH setup",
-        "Windows pwsh recovery"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "fly auth signup",
-      "url": "https://fly.io/docs/flyctl/auth-signup/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Signup command opens a browser form"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Fly.io Free Trial",
-      "url": "https://fly.io/docs/about/free-trial/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Trial duration and resource limits",
-        "Five-minute Machine auto-stop",
-        "Payment-method conditionality",
-        "Trial exhaustion behavior"
-      ]
-    },
-    {
-      "id": "S7",
-      "title": "Troubleshoot your deployment",
-      "url": "https://fly.io/docs/getting-started/troubleshooting/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Deployment failure recovery commands and common failure classes"
-      ]
-    },
-    {
-      "id": "S8",
-      "title": "Create an app with Fly Launch",
-      "url": "https://fly.io/docs/launch/create/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Fly Launch scans source, proposes settings, may hand control to a framework scanner, and may require a later deploy"
-      ]
-    },
-    {
-      "id": "S9",
-      "title": "Autostop/autostart Machines",
-      "url": "https://fly.io/docs/launch/autostop-autostart/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
-      "evidence_supported": [
-        "Fly Launch apps default to automatic Machine stop and start behavior",
-        "Incoming requests can start existing stopped Machines"
+        "flyio/hellofly:latest",
+        "credit card",
+        "successfully launched"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "At exactly which point does a new account receive the credit-card prompt?",
-      "impact": "The number and order of billing actions before first deployment can vary by account eligibility and trial state.",
-      "evidence_needed": "The demo guide says only `at some point`, while the trial page explains when payment becomes necessary without locating the prompt in the launch flow."
-    },
-    {
-      "question": "Does the general own-app Quickstart always deploy during `fly launch`?",
-      "impact": "Some projects add a conditional `fly deploy` action before first success.",
-      "evidence_needed": "The Quickstart says `fly launch` deploys most apps and instructs the developer to run `fly deploy` if prompted; the exact branch depends on project detection."
+      "question": "Are all signup and first-success fields for Fly.io fully enumerated in public docs?",
+      "impact": "Atomic field counts inside account or billing steps may be incomplete.",
+      "evidence_needed": "Live console fields can differ from documentation screenshots."
     }
   ],
   "counts": null

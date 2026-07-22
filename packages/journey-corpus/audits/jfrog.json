@@ -7,47 +7,32 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "8289ab603c2b372d33124d77a875838e972ed0e64d1cd6d4be7a1124c6391a69",
+  "source_record_sha256": "9a531d6d86249d5ad67242ca21003c36c7a093d16d219dc6c2a77e1e45926fa6",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "No JFrog account, subscription, platform deployment, hostname, project, local repository, permission assignment, access token, artifact file, or API client configuration is assumed.",
-      "A browser, working email address or GitHub identity, network connection, and a small local file are available.",
-      "No account submission, email verification, service provisioning, login, repository creation, token generation, or artifact deployment was performed during research."
+      "No JFrog Cloud environment exists.",
+      "Docker CLI is available locally."
     ]
   },
-  "developer_goal": "Start without a JFrog account, open the official cloud trial, provision a JFrog Platform deployment, create a Generic local repository, create an access token, upload a small file with the Artifactory REST API, and receive HTTP 201 Created.",
+  "developer_goal": "Start a JFrog Platform Cloud trial, configure a Docker repository, and push hello-world.",
   "first_success": {
-    "outcome": "A developer-controlled file is stored at a chosen path in a newly created Generic local Artifactory repository.",
-    "observable_signal": "The PUT request to `/artifactory/{repoKey}/{filePath}` returns HTTP 201 Created, which the API reference defines as successful artifact deployment.",
+    "outcome": "docker push succeeds and hello-world appears in the Cloud Docker repository Artifacts tree.",
+    "observable_signal": "Artifactory Artifacts view shows the pushed hello-world image under the Docker repository.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "JFrog Artifactory Cloud first Generic local repository artifact deployment",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
-    "selected": null,
+    "surface": "JFrog Platform Cloud trial Docker hello-world push",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "JFrog Platform Cloud trial Docker hello-world push",
     "candidates": [
       {
-        "name": "JFrog Artifactory Cloud first Generic local repository artifact deployment",
-        "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
-      },
-      {
-        "name": "JFrog Platform Tour",
-        "status": "unresolved",
-        "reason": "The tour is read-only and uses sample data, so it does not prove that the developer can store an artifact in their own service."
-      },
-      {
-        "name": "Artifactory web UI deployment",
-        "status": "unresolved",
-        "reason": "The UI upload flow is documented and accessible after repository creation, but the REST deployment endpoint supplies a clearer observable success response."
-      },
-      {
-        "name": "Self-hosted Artifactory trial",
-        "status": "unresolved",
-        "reason": "Self-hosting adds software download, infrastructure, installation, and service operation before the same repository outcome."
+        "name": "JFrog Platform Cloud trial Docker hello-world push",
+        "status": "selected",
+        "reason": "JFrog Cloud trial onboarding creates a hosted Artifactory environment. Official Docker docs and Cloud testing guidance walk through repository setup, docker login to *.jfrog.io, and docker push of hello-world as the first artifact success."
       }
     ]
   },
@@ -56,63 +41,59 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Complete JFrog account creation or trial signup at the official entry URL.",
-      "required_fields": [
-        {
-          "label": "Signup identity and required account fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
-        }
-      ],
-      "observable_result": "A new JFrog account or trial session exists.",
-      "evidence_state": "unverified",
+      "action": "Sign up for the JFrog Platform Cloud trial and log in with the emailed environment URL.",
+      "required_fields": [],
+      "observable_result": "Platform UI is reachable.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1"
+        "S2"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Complete any required email or identity verification for the new account.",
-      "required_fields": [
-        {
-          "label": "Verification challenge",
-          "field_type": "challenge",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The account becomes usable for developer onboarding.",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Create a Docker repository (local or virtual with default deployment repo) in Repositories.",
+      "required_fields": [],
+      "observable_result": "Repository appears in the repository list.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Run docker login SERVER_NAME.jfrog.io with Cloud credentials.",
+      "required_fields": [],
+      "observable_result": "Login Succeeded.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Complete the documented post-login setup for the selected JFrog candidate through first success.",
-      "required_fields": [
-        {
-          "label": "Candidate-specific configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
-        }
-      ],
-      "observable_result": "The PUT request to `/artifactory/{repoKey}/{filePath}` returns HTTP 201 Created, which the API reference defines as successful artifact deployment.",
-      "evidence_state": "unverified",
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Pull/tag hello-world for SERVER_NAME.jfrog.io/REPO/hello-world:TAG and docker push.",
+      "required_fields": [],
+      "observable_result": "Push completes without error.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "other",
+      "action": "Open Artifacts and confirm hello-world under the Docker repository.",
+      "required_fields": [],
+      "observable_result": "Image metadata visible in Artifacts tree.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
@@ -120,64 +101,39 @@
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'account', 'requirement': 'Create or use a JFrog identity and obtain access to a provisioned JFrog Platform deployment through the 14-day cloud trial.', 'required': True, 'source_ids': ['S1']}",
+      "description": "JFrog Platform Cloud trial environment (URL, username, password from signup email).",
       "source_ids": [
-        "S1"
+        "S2"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'legal', 'requirement': 'Accept the trial terms and JFrog privacy processing presented by the cloud-trial form.', 'required': True, 'source_ids': ['S1']}",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "{'order': 3, 'type': 'region', 'requirement': 'Choose the cloud provider and region offered by the trial form and provide an available hostname for the deployment.', 'required': True, 'source_ids': ['S1']}",
+      "description": "Docker CLI.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "external_gates": [
-    {
-      "description": "The developer must create a JFrog identity through GitHub or email before a writable cloud deployment is available.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "The public form does not expose the complete verification and credential sequence after the initial identity submission.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "The developer must choose a deployment hostname, cloud provider, and region.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Deploy an artifact to a local Artifactory repository with the Deploy Artifact REST API.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Artifact download and verification, package-manager setup, remote and virtual repositories, build-info publication, CI integration, Xray scanning, policies, promotion, release bundles, distribution, r",
-      "reason": "Listed as excluded after success in the source record.",
+      "item": "Self-hosted reverse proxy setup",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Xray scanning",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Production HA",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
@@ -186,60 +142,32 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Start a Trial With Artifactory and Xray | JFrog",
-      "url": "https://jfrog.com/start-free/",
-      "source_type": "official-support",
+      "title": "Docker Repositories / Cloud test",
+      "url": "https://docs.jfrog.com/artifactory/docs/docker-repositories",
+      "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Primary documented developer route and first-success framing"
+        "docker login",
+        "docker push"
       ]
     },
     {
       "id": "S2",
-      "title": "Local Repositories | JFrog Artifactory",
-      "url": "https://docs.jfrog.com/artifactory/docs/local-repositories",
+      "title": "Test Docker and Artifactory Cloud",
+      "url": "https://docs.jfrog.com/artifactory/docs/additional-docker-information",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for Local Repositories | JFrog Artifactory"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Deploy Artifacts | JFrog Artifactory",
-      "url": "https://docs.jfrog.com/artifactory/docs/deploy-artifacts",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Deploy Artifacts | JFrog Artifactory"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Deploy Artifact or Create Directory",
-      "url": "https://docs.jfrog.com/artifactory/reference/deployArtifact",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Deploy Artifact or Create Directory"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Identity Tokens",
-      "url": "https://docs.jfrog.com/user-management/docs/identity-tokens",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Identity Tokens"
+        "tag hello-world",
+        "verify in repository"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does JFrog show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "Are all signup and first-success fields for JFrog fully enumerated in public docs?",
+      "impact": "Atomic field counts inside account or billing steps may be incomplete.",
+      "evidence_needed": "Live console fields can differ from documentation screenshots."
     }
   ],
   "counts": null

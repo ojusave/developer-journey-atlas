@@ -7,42 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "af7221058e1b4a9c1924fd68477194f675ac164d6d66b97062780d74e914afcb",
+  "source_record_sha256": "3e0a938631a68a15a18f2f73ebc6a419431870b05fb883f8ad59a22f29d6a542",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and an accessible email inbox.",
-      "No SAP.com identity, BTP global account, subaccount, runtime, or service instance exists yet.",
-      "The developer has not preselected trial versus enterprise free-tier, Cloud Foundry versus Kyma, or a specific BTP service."
+      "No SAP.com or BTP trial account exists.",
+      "Email inbox available for activation."
     ]
   },
-  "developer_goal": "Obtain SAP BTP access and reach the earliest meaningful first-success outcome for a chosen account model, runtime, and service or workload.",
+  "developer_goal": "Register for SAP BTP Trial, open the cockpit subaccount, and reach Service Marketplace.",
   "first_success": {
-    "outcome": "For the personal BTP Trial candidate: reach a provisioned trial subaccount where Service Marketplace service tiles and the filter bar are visible.",
-    "observable_signal": "Service Marketplace shows available service tiles and a filter bar in the trial cockpit, when trial marketplace readiness is accepted as the terminal.",
+    "outcome": "Trial subaccount cockpit is open and Service Marketplace lists available services.",
+    "observable_signal": "Services \u2192 Service Marketplace shows filterable service catalog tiles.",
     "source_ids": [
-      "S3"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "SAP BTP Trial and enterprise global-account onboarding",
-    "rule": "Reconstruct trial and enterprise candidates, then select only after account model, runtime, and first-success boundary are fixed. Equal consequential routes remain unresolved.",
-    "selected": null,
+    "surface": "SAP BTP Trial account to Service Marketplace",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "SAP BTP Trial account to Service Marketplace",
     "candidates": [
       {
-        "name": "Personal SAP BTP Trial to cockpit subaccount and Service Marketplace visibility",
-        "status": "unresolved",
-        "reason": "Documented self-service path for individuals, but trial policy forbids production or team development and is not the enterprise entitlement path."
-      },
-      {
-        "name": "Enterprise or free-tier global account via customer/partner contract",
-        "status": "unresolved",
-        "reason": "Different eligibility, admin handoffs, entitlements, and lifecycle from personal trial."
-      },
-      {
-        "name": "Trial plus Cloud Foundry sample app deploy or Business Application Studio first workload",
-        "status": "unresolved",
-        "reason": "Later getting-started outcomes that add runtime, tooling, and deployment actions beyond marketplace readiness."
+        "name": "SAP BTP Trial account to Service Marketplace",
+        "status": "selected",
+        "reason": "Official SAP tutorial Get an Account on SAP BTP Trial is the general self-service onboarding: sap.com registration, email activation, Try Now, cockpit, regional subaccount, and Service Marketplace as the terminal orientation for available services."
       }
     ]
   },
@@ -51,250 +40,122 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Register an SAP.com identity if one does not already exist, then activate it from the emailed link.",
-      "required_fields": [
-        {
-          "label": "SAP.com registration fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3"
-          ],
-          "notes": "Tutorial says fill required fields but does not enumerate them."
-        }
-      ],
-      "observable_result": "The SAP identity is activated and can sign in.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 2,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Start SAP BTP Trial with Try Now and complete the trial signup instructions.",
-      "required_fields": [
-        {
-          "label": "Trial signup prompts",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3"
-          ]
-        }
-      ],
-      "observable_result": "A trial global account is available in the BTP cockpit.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Create or open the trial subaccount in a chosen region and continue into the subaccount.",
-      "required_fields": [
-        {
-          "label": "Region",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S3"
-          ]
-        }
-      ],
-      "observable_result": "The trial subaccount tile opens with environment and space information.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 4,
-      "kind": "verification",
-      "interface": "web-ui",
-      "action": "Open Services > Service Marketplace and confirm service tiles are listed.",
+      "action": "Register on sap.com (or log on) and submit required fields.",
       "required_fields": [],
-      "observable_result": "Service tiles and the marketplace filter bar are visible.",
+      "observable_result": "Activation email sent message.",
       "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    }
-  ],
-  "prerequisites": [
-    {
-      "description": "An SAP identity is required before BTP Trial or enterprise global-account access.",
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "description": "Trial use is limited to personal, non-productive exploration.",
-      "source_ids": [
-        "S4"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "New sap.com registration requires email activation before trial login.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Enterprise or free-tier commercial accounts require customer or partner entitlement rather than personal trial eligibility.",
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "SAP must deliver the account activation email for new registrations.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Trial subaccount provisioning runs before the Continue navigation into the new account.",
-      "source_ids": [
-        "S3"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "SAP provisions a trial global account and subaccount after Try Now and region creation.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Service Marketplace lists services available to the trial environments.",
-      "source_ids": [
-        "S3"
-      ]
-    }
-  ],
-  "excluded": [
-    {
-      "item": "Reading BTP conceptual documentation beyond getting-started and the trial tutorial",
-      "reason": "Documentation reading is not a product action.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "Deploying a Cloud Foundry sample application",
-      "reason": "A later workload outcome beyond marketplace readiness on the trial candidate.",
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Activate the account via the email activation link.",
+      "required_fields": [],
+      "observable_result": "Activation success message.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S7"
+        "S1"
       ]
     },
     {
-      "item": "Business Application Studio full IDE onboarding",
-      "reason": "Alternate first-workload boundary not selected until the success terminal is fixed.",
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open SAP BTP Trial, select Try Now, and complete trial signup.",
+      "required_fields": [],
+      "observable_result": "Cockpit access granted.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S6"
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Open https://cockpit.hanatrial.ondemand.com/trial/ and create/open the regional trial subaccount.",
+      "required_fields": [],
+      "observable_result": "Subaccount overview shows CF API endpoint and spaces.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "other",
+      "action": "Open Services \u2192 Service Marketplace and confirm the service catalog.",
+      "required_fields": [],
+      "observable_result": "Marketplace service tiles visible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "sap.com registration with email activation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "SAP BTP Trial via Try Now.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
+  "excluded": [
+    {
+      "item": "Deploying a CF sample app",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "ABAP ADT setup",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Kyma cluster workloads",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "BTP Getting Started",
-      "url": "https://help.sap.com/docs/btp/sap-business-technology-platform/btp-getting-started",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Official BTP getting-started entry"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Getting a Global Account",
-      "url": "https://help.sap.com/docs/btp/sap-business-technology-platform/getting-global-account",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Global account acquisition paths"
-      ]
-    },
-    {
-      "id": "S3",
       "title": "Get an Account on SAP BTP Trial",
       "url": "https://developers.sap.com/tutorials/hcp-create-trial-account.html",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "SAP.com register and activate",
-        "Try Now trial",
-        "Subaccount region creation",
-        "Service Marketplace visibility"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Trial Accounts and Free Tier",
-      "url": "https://help.sap.com/docs/btp/sap-business-technology-platform/trial-accounts-and-free-tier",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Trial versus free-tier policy and eligibility differences"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Setting Up Your Trial Account in the Cloud Foundry Environment",
-      "url": "https://help.sap.com/docs/btp/sap-business-technology-platform/cf-env-setting-up-your-trial-account",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Cloud Foundry trial environment setup"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Getting Started with Trial Account in Business Application Studio",
-      "url": "https://help.sap.com/docs/bas/sap-business-application-studio/getting-started-with-trial-account",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Business Application Studio trial getting started"
-      ]
-    },
-    {
-      "id": "S7",
-      "title": "Cloud Foundry sample application tutorial",
-      "url": "https://developers.sap.com/tutorials/s4sdk-cloud-foundry-sample-application.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Sample deploy as a later workload outcome"
+        "email activation",
+        "cockpit.hanatrial",
+        "Service Marketplace"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which account model should define SAP BTP first success: personal trial, enterprise free-tier, or commercial global account?",
-      "impact": "Eligibility, admin approval, entitlements, and allowed use change the entire path.",
-      "evidence_needed": "A bounded audience decision for individual evaluator versus customer/partner developer, then the matching official account guide."
-    },
-    {
-      "question": "Should the first-success boundary be marketplace readiness, a provisioned runtime, a service instance, an IDE space, or a deployed workload?",
-      "impact": "These boundaries differ by many actions and handoffs, so counts cannot be verified until one terminal is chosen.",
-      "evidence_needed": "Select one official tutorial terminal and discard the peer getting-started outcomes for comparison."
-    },
-    {
-      "question": "What exact required fields appear on sap.com registration and the live BTP Trial Try Now flow?",
-      "impact": "Account-creation field counts remain unverified.",
-      "evidence_needed": "A dated cold-signup walkthrough listing every required registration and trial prompt."
+      "question": "Are all signup and first-success fields for SAP Business Technology Platform fully enumerated in public docs?",
+      "impact": "Atomic field counts inside account or billing steps may be incomplete.",
+      "evidence_needed": "Live console fields can differ from documentation screenshots."
     }
   ],
   "counts": null

@@ -7,47 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "029beb5bc6e87403bf5f7559395a448b57ffacc6ade9b8124f17b92ae72fa08f",
+  "source_record_sha256": "f846b99b6569118d5e9ec7f31c88a7bb293e3bbef4884d41b85911a5145f6708",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "No Checkly account, CLI authentication, project configuration, checks, alert channels, deployment, or dashboard resources are assumed.",
-      "An existing application project, terminal, Node.js 20.19 or newer or 22.12 or newer, npm, browser, and internet connection are available.",
-      "No package was installed, file or dependency was changed, prompt was given to an agent, browser signup was submitted, token was stored, check was run, or resource was deployed during research."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Start without a Checkly account, add Monitoring as Code to an existing project with the vendor-recommended quickstart, authenticate, test the generated checks, deploy them, and verify that the checks are live in the Checkly dashboard.",
+  "developer_goal": "Create a Checkly account and run a hosted API check against an HTTP endpoint.",
   "first_success": {
-    "outcome": "The project's generated or edited checks pass a Checkly cloud test, are deployed, and appear in the dashboard ready for scheduled monitoring.",
-    "observable_signal": "The manual quickstart shows two passing checks after checkly test, then says the dashboard shows the deployed checks ready to start monitoring after checkly deploy; the recommended route tells the developer to open the dashboard to see monitoring live.",
+    "outcome": "A saved API check sends its request and passes its assertions.",
+    "observable_signal": "The Checkly dashboard displays a successful check result for the configured URL.",
     "source_ids": [
       "S1"
     ]
   },
   "route_selection": {
-    "surface": "Checkly Monitoring as Code quickstart with deployed checks",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
-    "selected": null,
+    "surface": "Dashboard quickstart: first API check",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Dashboard quickstart: first API check",
     "candidates": [
       {
-        "name": "Checkly Monitoring as Code quickstart with deployed checks",
-        "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+        "name": "Dashboard quickstart: first API check",
+        "status": "selected",
+        "reason": "The dashboard API-check quickstart is hosted and avoids the Monitoring as Code CLI setup."
       },
       {
-        "name": "Manual Monitoring as Code setup",
-        "status": "unresolved",
-        "reason": "This is the fully enumerated fallback on the same page, while the vendor explicitly labels the AI-agent route recommended and fastest."
-      },
-      {
-        "name": "Dashboard-created checks",
-        "status": "unresolved",
-        "reason": "The current general Quickstart selects Monitoring as Code in an existing project rather than a dashboard-only flow."
-      },
-      {
-        "name": "Playwright test import",
-        "status": "unresolved",
-        "reason": "This is a specialized route for projects with existing Playwright tests."
+        "name": "Monitoring as Code CLI",
+        "status": "not-selected",
+        "reason": "It adds local Node.js and CLI configuration that the hosted dashboard route does not require."
       }
     ]
   },
@@ -56,41 +45,22 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Complete Checkly account creation or trial signup at the official entry URL.",
-      "required_fields": [
-        {
-          "label": "Signup identity and required account fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
-        }
-      ],
-      "observable_result": "A new Checkly account or trial session exists.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to Checkly and open the dashboard.",
+      "required_fields": [],
+      "observable_result": "The dashboard is available.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Complete any required email or identity verification for the new account.",
-      "required_fields": [
-        {
-          "label": "Verification challenge",
-          "field_type": "challenge",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The account becomes usable for developer onboarding.",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API check and enter its name, request method, and URL.",
+      "required_fields": [],
+      "observable_result": "The API check is configured.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
@@ -99,20 +69,34 @@
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Complete the documented post-login setup for the selected Checkly candidate through first success.",
-      "required_fields": [
-        {
-          "label": "Candidate-specific configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
-        }
-      ],
-      "observable_result": "The manual quickstart shows two passing checks after checkly test, then says the dashboard shows the deployed checks ready to start monitoring after checkly deploy; the recommended route tells the developer to open the dashboard to see monitoring live.",
-      "evidence_state": "unverified",
+      "action": "Save the API check with the quickstart assertion settings.",
+      "required_fields": [],
+      "observable_result": "The check exists in the dashboard.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "web-ui",
+      "action": "Run the check from the dashboard.",
+      "required_fields": [],
+      "observable_result": "Checkly executes the HTTP request.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Confirm the run is successful.",
+      "required_fields": [],
+      "observable_result": "A passing check result is displayed.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
@@ -120,19 +104,13 @@
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'environment', 'requirement': 'Have an existing project directory where Monitoring as Code can be added.', 'required': True, 'source_ids': ['S1']}",
+      "description": "A Checkly account.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'software', 'requirement': 'Install Node.js 20.19 or newer or 22.12 or newer and npm, and have a terminal.', 'required': True, 'source_ids': ['S1']}",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "{'order': 3, 'type': 'software', 'requirement': 'Have a supported AI coding agent for the recommended route; otherwise use the documented manual route.', 'required': False, 'source_ids': ['S1']}",
+      "description": "An HTTP API endpoint that Checkly can reach.",
       "source_ids": [
         "S1"
       ]
@@ -140,35 +118,16 @@
   ],
   "external_gates": [
     {
-      "description": "The quickstart assumes an existing application project.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "Node.js in a documented version range, npm, Checkly CLI dependencies, and project files are required.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "The recommended flow requires choosing an AI coding agent, while manual setup follows a different prompt branch.",
+      "description": "The target API must be reachable from Checkly's hosted locations.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "unavoidable_waits": [
-    {
-      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Deploy synthetic monitoring checks from the project's Checkly configuration.",
+      "description": "A saved API check sends its request and passes its assertions.",
       "source_ids": [
         "S1"
       ]
@@ -176,8 +135,8 @@
   ],
   "excluded": [
     {
-      "item": "Additional checks, alert channels, CI/CD, private locations, dashboards, status pages, incident management, root-cause features, and destroying resources occur after the first checks are deployed and ",
-      "reason": "Listed as excluded after success in the source record.",
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
       "source_ids": [
         "S1"
       ]
@@ -186,75 +145,22 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Checkly Quickstart - Checkly Docs",
-      "url": "https://www.checklyhq.com/docs/quickstart/",
+      "title": "Create your first API check",
+      "url": "https://www.checklyhq.com/docs/quickstarts/api-check/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Primary documented developer route and first-success framing"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "checkly login - Checkly Docs",
-      "url": "https://www.checklyhq.com/docs/cli/checkly-login/",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for checkly login - Checkly Docs"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Checkly | Active Monitoring for Dev & Ops Teams",
-      "url": "https://app.checklyhq.com/signup",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Checkly | Active Monitoring for Dev & Ops Teams"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Checkly Documentation - Checkly Docs",
-      "url": "https://www.checklyhq.com/docs/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Checkly Documentation - Checkly Docs"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Terms of use",
-      "url": "https://www.checklyhq.com/terms/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Terms of use"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact files, checks, alert channels, and prompts will the recommended agent route produce for a particular project?",
-      "impact": "The official recommended path cannot be reduced to one deterministic atomic sequence.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The quickstart explicitly says the agent's actions depend on the project and lists possible, not universal, actions."
-    },
-    {
-      "question": "What fields, validation, identity alternatives, and verification steps appear during new-user registration?",
-      "impact": "The mandatory no-account browser segment cannot be recorded atomically.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The CLI docs say Complete account registration and the live application is client-rendered with no readable form detail."
-    },
-    {
-      "question": "Does the 5-minute claim cover the recommended agent route, the manual route, or both under all prerequisites?",
-      "impact": "The claim should not be treated as a measured duration for this reconstructed no-account journey.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The docs home states the claim but does not publish its conditions or measurement method."
-    },
-    {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does Checkly show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "Authenticated UI labels can change independently of the documented quickstart.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

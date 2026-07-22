@@ -7,42 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "affe051c39471657d5c7439e2de2e29d7c5387897d5a2c4121a975810c45eaed",
+  "source_record_sha256": "13bfea387ed78e308db41ee16d4b1f14445b0c80c286975bd0c097cb59e627e8",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and email address.",
-      "No New Relic account, license key, or instrumentation exists yet."
+      "No New Relic account or license key exists.",
+      "A terminal with cURL and gzip is available."
     ]
   },
-  "developer_goal": "Create a New Relic account and see first application or system telemetry in New Relic.",
+  "developer_goal": "Create a New Relic account, copy a license key, and POST a custom event with cURL.",
   "first_success": {
-    "outcome": "First telemetry for the selected data source appears in the New Relic UI.",
-    "observable_signal": "For the Node.js APM candidate, APM shows data for the configured application name after the instrumented app receives traffic.",
+    "outcome": "Compressed cURL POST to the Event API returns HTTP 200 with a uuid acknowledgment.",
+    "observable_signal": "HTTP 200 JSON includes uuid for the submission.",
     "source_ids": [
-      "S4",
       "S1"
     ]
   },
   "route_selection": {
-    "surface": "New Relic self-service signup and Add data / agent quickstarts",
-    "rule": "Select the shortest complete signup-to-first-data route only after one telemetry source is fixed.",
-    "selected": null,
+    "surface": "New Relic Event API custom event via cURL",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "New Relic Event API custom event via cURL",
     "candidates": [
       {
-        "name": "Region-specific Guided install",
-        "status": "unresolved",
-        "reason": "General Get started recommends guided install, but the authenticated dynamic chooser steps are not fully published as a static public path."
-      },
-      {
-        "name": "Node.js manual APM agent install",
-        "status": "unresolved",
-        "reason": "Complete public candidate, but Node is not established as the platform-wide default over other agents."
-      },
-      {
-        "name": "Other APM languages, Infrastructure, Browser, Mobile, Kubernetes, OpenTelemetry, and Instant Observability quickstarts",
-        "status": "unresolved",
-        "reason": "Co-equal data-source routes with different credentials, installers, and success views."
+        "name": "New Relic Event API custom event via cURL",
+        "status": "selected",
+        "reason": "Event API docs invite creating a free account (no credit card) and submitting compressed JSON with curl using Api-Key (license key) to insights-collector.newrelic.com. Prefer cURL ingest over installing APM agents for first API success."
       }
     ]
   },
@@ -51,258 +40,117 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a free New Relic account from the public signup form.",
-      "required_fields": [
-        {
-          "label": "Company Email",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "Name",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "Terms of Service and Services Privacy Notice agreement",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ],
-          "notes": "Signup copy states that signing up constitutes agreement."
-        }
-      ],
-      "observable_result": "New Relic begins account provisioning for the submitted identity.",
-      "evidence_state": "observed-public-ui",
+      "action": "Create a New Relic account and open the account UI.",
+      "required_fields": [],
+      "observable_result": "API keys / license key settings reachable.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S3",
-        "S9"
+        "S1"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Complete email confirmation / account setup from New Relic mail, then sign in.",
-      "required_fields": [
-        {
-          "label": "Email confirmation / setup controls",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3",
-            "S6"
-          ],
-          "notes": "Account-setup docs point to signup and login troubleshooting but do not publish the exact confirmation field list."
-        }
-      ],
-      "observable_result": "The developer can sign in to New Relic.",
-      "evidence_state": "unverified",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Copy the ingest license key for the account.",
+      "required_fields": [],
+      "observable_result": "Key available for Api-Key header.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S3",
-        "S6"
+        "S1"
       ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "other",
-      "action": "Choose a telemetry source and complete its install until first data appears.",
-      "required_fields": [
-        {
-          "label": "Telemetry source / install path",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2",
-            "S4"
-          ]
-        },
-        {
-          "label": "Ingest license key and source-specific configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1",
-            "S5",
-            "S4"
-          ]
-        }
-      ],
-      "observable_result": "New Relic UI shows first data for the selected source.",
-      "evidence_state": "unverified",
+      "interface": "api",
+      "action": "POST a gzip-compressed JSON event array to https://insights-collector.newrelic.com/v1/accounts/EVENTS with Api-Key and Content-Type application/json.",
+      "required_fields": [],
+      "observable_result": "HTTP 200 with uuid.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S2",
-        "S4",
-        "S8"
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the 200 acknowledgment uuid (optionally NRQL SELECT * FROM YOUR_CUSTOM_EVENT later).",
+      "required_fields": [],
+      "observable_result": "uuid present in success body.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "For the Node.js candidate: an existing supported Node.js server application and compatible OS/runtime.",
+      "description": "New Relic account (free; no credit card required per Event API page).",
       "source_ids": [
-        "S1",
-        "S4"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Email confirmation must succeed before instrumentation can use the new account.",
-      "source_ids": [
-        "S3",
-        "S6"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "After instrumentation and traffic, New Relic may take a few minutes before APM or other UIs show data.",
-      "source_ids": [
-        "S4",
-        "S8"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Free forever tier includes ingest allowance and platform user entitlements described on signup.",
-      "source_ids": [
-        "S3",
-        "S9"
+        "S1"
       ]
     },
     {
-      "description": "Agents and guided install report telemetry into NRDB for UI exploration.",
+      "description": "License key for Api-Key header.",
       "source_ids": [
-        "S2"
+        "S1"
+      ]
+    },
+    {
+      "description": "cURL with gzip/deflate compression.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Reading New Relic University or conceptual intro pages",
-      "reason": "Learning content is not a required product action.",
+      "item": "APM agent install",
+      "reason": "After first success.",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
-      "item": "Social signup via Google, GitHub, GitLab, or Bitbucket",
-      "reason": "Peer alternatives to the observed Company Email + Name form.",
+      "item": "Alerting setup",
+      "reason": "After first success.",
       "source_ids": [
-        "S9"
+        "S1"
+      ]
+    },
+    {
+      "item": "NerdGraph configuration",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Install the Node.js agent",
-      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/installation-configuration/install-nodejs-agent/",
+      "title": "Send custom events with our Event API",
+      "url": "https://docs.newrelic.com/docs/data-apis/ingest-apis/event-api/introduction-event-api/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Node.js manual install candidate steps"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Get started with New Relic",
-      "url": "https://docs.newrelic.com/docs/new-relic-solutions/get-started/intro-new-relic/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Many capabilities",
-        "Guided install oriented onboarding"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Sign up for New Relic",
-      "url": "https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/create-your-new-relic-account/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Free account positioning",
-        "Signup CTA",
-        "Next steps after signup"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Monitor your Node.js application",
-      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/getting-started/monitor-your-nodejs-app/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Multiple Node deploy paths",
-        "APM-oriented first monitoring"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "New Relic API keys",
-      "url": "https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "License and ingest key concepts"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Login troubleshooting",
-      "url": "https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/troubleshoot-new-relics-password-email-address-login-problems/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Email/password login problem space"
-      ]
-    },
-    {
-      "id": "S8",
-      "title": "Not seeing data",
-      "url": "https://docs.newrelic.com/docs/new-relic-solutions/solve-common-issues/troubleshooting/not-seeing-data/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Data delay and missing-data troubleshooting"
-      ]
-    },
-    {
-      "id": "S9",
-      "title": "New Relic signup",
-      "url": "https://newrelic.com/signup",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Company Email",
-        "Name",
-        "Get Started Free",
-        "Terms agreement by signup",
-        "No credit card required"
+        "Create account free",
+        "curl",
+        "Api-Key",
+        "200 uuid"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which telemetry source should represent New Relic's shortest path to first success?",
-      "impact": "Credentials, installer, permissions, traffic generation, waits, and success UI vary by source; Guided install steps are not fully static in public docs.",
-      "evidence_needed": "Pick one bounded source (or capture a dated Guided install transcript for a fresh account) and verify the complete path to first UI data."
-    },
-    {
-      "question": "What exact email-confirmation fields complete New Relic account setup after signup?",
-      "impact": "Post-signup required actions and field counts remain incomplete.",
-      "evidence_needed": "A dated fresh-account email confirmation walkthrough."
+      "question": "Exact path segment for EVENTS vs account-scoped URL in current curl samples.",
+      "impact": "Request URL may include account id variants.",
+      "evidence_needed": "Docs show Linux/bash examples behind UI toggles; regional hosts are explicit."
     }
   ],
   "counts": null

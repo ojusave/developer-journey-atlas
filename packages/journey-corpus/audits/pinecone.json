@@ -7,39 +7,34 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "05d82c54a6b4a1e1c6192f91bdfaf3030ce0f42168629a27dc168b9ed8628ee6",
+  "source_record_sha256": "7095fdf721da5080acf69d8d1c4d9f9b02118ee84ef8aa74c719547754a9e3bb",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and can run Python and pip locally.",
-      "No Pinecone account, API key, index, or sample records exist yet."
+      "No Pinecone account, API key, index, or records are assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
-  "developer_goal": "Create a Pinecone account, obtain an API key, and complete the official Quickstart through a semantic search that returns ranked hits.",
+  "developer_goal": "Create a Pinecone account and API key on Starter (or equivalent), create an integrated embedding index, upsert sample text, and receive search hits over HTTPS.",
   "first_success": {
-    "outcome": "Sample records are upserted and a text query returns searchable hits from the quickstart index.",
-    "observable_signal": "The Quickstart search loop prints hit scores and content fields for the sample query.",
-    "source_ids": ["S1"]
+    "outcome": "After cURL create-for-model and upsert text, a cURL search with text against the index host returns result.hits.",
+    "observable_signal": "POST .../records/namespaces/{namespace}/search returns JSON with result.hits containing matching record ids and fields.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
   },
   "route_selection": {
-    "surface": "Pinecone console signup plus official Database Quickstart Python SDK path",
-    "rule": "Prefer a free Starter plan when it reaches the same Quickstart outcome; do not invent a winner among Starter, Builder, and Standard trial when plan choice changes cost and region limits.",
-    "selected": null,
+    "surface": "Integrated embedding index via cURL (API key + Starter plan)",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Integrated embedding index via cURL (API key + Starter plan)",
     "candidates": [
       {
-        "name": "Starter plan (free) then Python SDK Quickstart",
-        "status": "unresolved",
-        "reason": "Docs present Starter as free with one-region limits, but signup fields and whether Starter can run the documented aws/us-east-1 create_index_for_model path are not fully verified from public evidence alone."
-      },
-      {
-        "name": "Builder plan or Standard plan trial then Python SDK Quickstart",
-        "status": "unresolved",
-        "reason": "These plans change payment and entitlement relative to Starter and are consequential under the lexicographic payment rule."
-      },
-      {
-        "name": "AI coding-tool plugin Quickstart",
-        "status": "not-selected",
-        "reason": "The Quickstart presents the IDE-plugin path as an alternate surface from the self-service SDK route."
+        "name": "Integrated embedding index via cURL (API key + Starter plan)",
+        "status": "selected",
+        "reason": "Pinecone documents REST cURL for create-for-model, upsert text, and search with text. The general Quickstart requires an account/API key and offers Starter (free) among plans. An SDK install is not required when using the documented HTTP paths."
       }
     ]
   },
@@ -48,123 +43,147 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Sign up at app.pinecone.io and choose a plan.",
-      "required_fields": [
-        {
-          "label": "Plan selection",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "Starter, Builder, and Standard trial are documented choices."
-        },
-        {
-          "label": "Account signup fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": ["S1"],
-          "notes": "Public console shell does not expose a static registration field contract."
-        }
-      ],
-      "observable_result": "The developer has a Pinecone account on a chosen plan.",
-      "evidence_state": "unverified",
-      "source_ids": ["S1"]
+      "action": "Sign up for Pinecone at app.pinecone.io and choose a plan (Starter free, or Builder / Standard trial).",
+      "required_fields": [],
+      "observable_result": "Console shows the account and plan.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Create or copy a Pinecone API key from the console.",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Confirm Starter (free) capacity is sufficient, or activate Builder / Standard trial credits if choosing a paid path.",
       "required_fields": [],
-      "observable_result": "An API key value is available for the SDK client.",
+      "observable_result": "Console shows an active plan that can create indexes.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "cli",
-      "action": "Install the Pinecone Python SDK.",
-      "required_fields": [
-        {
-          "label": "pip install pinecone",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The pinecone package is available locally.",
+      "interface": "other",
+      "action": "Create or copy a Pinecone API key and store it securely.",
+      "required_fields": [],
+      "observable_result": "The key value is available locally.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "implementation",
-      "interface": "code",
-      "action": "Initialize the client, create the quickstart index for the hosted embedding model if needed, upsert sample records, wait briefly, and search.",
-      "required_fields": [
-        {
-          "label": "API key",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Index name, cloud, region, and embed model",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Sample records and search query",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "Search prints ranked hits for the sample query.",
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Export PINECONE_API_KEY in the terminal.",
+      "required_fields": [],
+      "observable_result": "The environment variable is set for the current shell.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Create an integrated embedding index with cURL POST to https://api.pinecone.io/indexes/create-for-model.",
+      "required_fields": [],
+      "observable_result": "create-for-model returns index metadata including host.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Upsert sample text with cURL to https://$INDEX_HOST/records/namespaces/$NAMESPACE/upsert.",
+      "required_fields": [],
+      "observable_result": "Upsert returns success (201).",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Search with text via cURL POST to https://$INDEX_HOST/records/namespaces/$NAMESPACE/search and confirm hits.",
+      "required_fields": [],
+      "observable_result": "result.hits contains matching records.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Local Python and pip are available for the SDK Quickstart.",
-      "source_ids": ["S1"]
-    }
-  ],
-  "external_gates": [
+      "description": "A Pinecone account that can open the console and create API keys.",
+      "source_ids": [
+        "S1"
+      ]
+    },
     {
-      "description": "Plan selection can introduce payment for Builder or trial entitlements for Standard.",
-      "source_ids": ["S1"]
-    }
-  ],
-  "unavoidable_waits": [
+      "description": "A selected plan with capacity for a serverless integrated index. Starter is free with limits; Builder and Standard trial are paid/credit alternatives documented on the Quickstart.",
+      "source_ids": [
+        "S1"
+      ]
+    },
     {
-      "description": "The Quickstart inserts a short sleep after upsert so records become searchable.",
-      "source_ids": ["S1"]
-    }
-  ],
-  "platform_outcomes": [
+      "description": "A Pinecone API key sent as Api-Key on control-plane and data-plane requests.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
     {
-      "description": "Pinecone creates the index for the hosted embedding model and serves search hits.",
-      "source_ids": ["S1"]
+      "description": "A terminal with cURL (or any HTTP client). No language SDK is required.",
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
     }
   ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Reading Quickstart documentation and optional rerank elaboration pages",
-      "reason": "Documentation reading is not a counted developer action.",
-      "source_ids": ["S1"]
+      "item": "SDK installation",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "item": "AI coding-tool plugin path",
-      "reason": "Different interaction surface from the self-service SDK Quickstart.",
-      "source_ids": ["S1"]
+      "item": "Rerank as a required step",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "item": "Optional integrated rerank with bge-reranker-v2-m3 after first search hits",
-      "reason": "First searchable hits already satisfy an earliest meaningful Quickstart success; rerank is an additional demonstration in the same page.",
-      "source_ids": ["S1"]
+      "item": "n8n and coding-agent plugin paths",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Builder/Standard paid upgrades beyond Starter first success",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
@@ -175,34 +194,52 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Account signup at app.pinecone.io",
-        "Starter, Builder, and Standard trial plan choices",
-        "API key requirement",
-        "Python create_index_for_model, upsert_records, search example"
+        "Account and API key",
+        "Starter free plan",
+        "Integrated embedding create/upsert/search pattern"
       ]
     },
     {
       "id": "S2",
-      "title": "Pinecone Console",
-      "url": "https://app.pinecone.io",
-      "source_type": "observed-public-ui",
+      "title": "Create an index with integrated embedding",
+      "url": "https://docs.pinecone.io/reference/api/2025-10/control-plane/create_for_model",
+      "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Public console entry exists",
-        "Static registration field contract not exposed without authenticated signup"
+        "cURL POST /indexes/create-for-model",
+        "Api-Key and version headers",
+        "Returned host"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Upsert text",
+      "url": "https://docs.pinecone.io/reference/api/2025-10/data-plane/upsert_records",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "cURL upsert to index host",
+        "chunk_text field mapping"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Search with text",
+      "url": "https://docs.pinecone.io/reference/api/2025-10/data-plane/search_records",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "cURL search endpoint",
+        "result.hits terminal",
+        "Optional rerank"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which plan is required for the documented aws/us-east-1 create_index_for_model Quickstart, and do Starter limits block that path?",
-      "impact": "If Starter cannot host the documented region or model path, the free route fails and a paid or trial plan becomes required.",
-      "evidence_needed": "Official plan-limit confirmation or a fresh Starter-account walkthrough that either completes or blocks the Quickstart create_index_for_model call."
-    },
-    {
-      "question": "What exact signup fields, OAuth options, agreements, and verification steps appear on app.pinecone.io registration?",
-      "impact": "Account-creation actions and fields cannot be counted without inventing auth UI.",
-      "evidence_needed": "Observed-public-ui screenshots or a read-only cold signup walkthrough of the current console register flow."
+      "question": "Whether every Starter signup still auto-surfaces an API key without a separate key-creation screen.",
+      "impact": "Credential step may be one or two console clicks.",
+      "evidence_needed": "Quickstart says you receive a key after signup and also documents creating a new key in console."
     }
   ],
   "counts": null

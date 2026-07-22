@@ -7,41 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "403e770638bac654d1308c259db8234c47ebf3a18c648292b0d664bf63fd0976",
+  "source_record_sha256": "f247d28465107c2739dc7b408088a01de06e9da8f68c60ecda7bfcef0175e64e",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser, a terminal, and can run Docker locally.",
-      "No Kong product, Konnect account, personal access token, Enterprise license, Gateway instance, or decK configuration exists yet."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create access to a Kong surface and reach the first observable proxied API success for a declared Kong product.",
+  "developer_goal": "Create a Konnect account, configure a gateway route, and proxy a first HTTP request.",
   "first_success": {
-    "outcome": "For the representative Kong Gateway getting-started candidate, a request proxied through one Gateway Service and Route returns HTTP 200.",
-    "observable_signal": "The curl request through Kong Gateway to the configured /mock or /anything route returns HTTP 200.",
+    "outcome": "A cURL request to the Konnect gateway route is forwarded to the configured upstream service.",
+    "observable_signal": "cURL returns the upstream response through the Kong proxy endpoint.",
     "source_ids": [
-      "S2"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "Kong Developer homepage with Kong Gateway getting started as one documented candidate",
-    "rule": "Select a single product and deployment model only after official docs declare one platform-wide first success; otherwise leave peer products and Gateway deployment variants unresolved.",
-    "selected": null,
+    "surface": "Konnect quickstart: proxy the first request with cURL",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Konnect quickstart: proxy the first request with cURL",
     "candidates": [
       {
-        "name": "Kong Gateway getting started via Konnect hybrid",
-        "status": "unresolved",
-        "reason": "The Gateway guide presents Konnect hybrid as a peer prerequisite path that requires Konnect registration, a personal access token, the quickstart script, and decK."
+        "name": "Konnect quickstart: proxy the first request with cURL",
+        "status": "selected",
+        "reason": "The Konnect hosted path reaches a proxied HTTP response with cURL while avoiding a local Gateway installation."
       },
       {
-        "name": "Kong Gateway getting started via self-managed Enterprise local Docker",
-        "status": "unresolved",
-        "reason": "The same guide presents an on-prem Enterprise license plus local quickstart as a peer deployment variant with different credentials and no Konnect account."
-      },
-      {
-        "name": "Kong Konnect, Insomnia, AI Gateway, Event Gateway, Mesh, or other homepage products",
-        "status": "unresolved",
-        "reason": "developer.konghq.com lists many applications and connectivity products without naming one company-wide first-success operation."
+        "name": "Local Docker Gateway quickstart",
+        "status": "not-selected",
+        "reason": "It requires a local container runtime; Konnect provides the hosted route requested for this journey."
       }
     ]
   },
@@ -50,234 +45,128 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Choose a Kong product surface and, if the Konnect Gateway branch is selected, start Konnect registration.",
-      "required_fields": [
-        {
-          "label": "Kong product or application choice",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "The developer homepage asks what the developer wants to build across multiple products."
-        },
-        {
-          "label": "Konnect identity fields for built-in or social signup",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S6"
-          ],
-          "notes": "Konnect documents username/password or Google, GitHub, or Microsoft social login, but the exact fresh-trial signup fields are not fully listed in public docs."
-        }
-      ],
-      "observable_result": "The developer has authenticated access to the selected Kong control plane or product.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to Kong Konnect.",
+      "required_fields": [],
+      "observable_result": "The Konnect dashboard is available.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S2",
-        "S6"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "On the Konnect Gateway branch, generate a Konnect personal access token.",
-      "required_fields": [
-        {
-          "label": "Personal access token generation",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "A Konnect PAT value is available to export as KONNECT_TOKEN.",
+      "action": "Create or select the quickstart gateway and configure the example upstream service.",
+      "required_fields": [],
+      "observable_result": "The service exists in gateway configuration.",
       "evidence_state": "documented",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 3,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Run the Kong quickstart script for the selected Konnect or Enterprise license path, install decK, create a Service and Route, and proxy a request.",
-      "required_fields": [
-        {
-          "label": "KONNECT_TOKEN or KONG_LICENSE_DATA",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2",
-            "S4"
-          ]
-        },
-        {
-          "label": "deck gateway apply Service and Route configuration",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "label": "Proxied curl request",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "decK can reach Gateway or Konnect, and the proxied request returns HTTP 200.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    }
-  ],
-  "prerequisites": [
-    {
-      "description": "Docker is available for the Gateway quickstart container path.",
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "description": "decK 1.64.0 or newer and cURL are required by the Gateway getting-started tutorial.",
-      "source_ids": [
-        "S2"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Self-managed Enterprise requires a Kong Gateway Enterprise license before the on-prem quickstart can run.",
-      "source_ids": [
-        "S2",
-        "S5"
-      ]
-    },
-    {
-      "description": "Konnect Plus and Enterprise users signing in with built-in authentication are prompted for MFA.",
-      "source_ids": [
-        "S6"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "The quickstart script must provision the Control Plane and local Data Plane before deck gateway ping succeeds.",
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "The Konnect quickstart provisions a Control Plane named quickstart and a local Data Plane and prints session environment exports.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "description": "Kong Gateway proxies the configured Service and Route to the upstream and returns HTTP 200.",
-      "source_ids": [
-        "S2"
-      ]
-    }
-  ],
-  "excluded": [
-    {
-      "item": "Reading Kong documentation indexes and product overview pages",
-      "reason": "Documentation is evidence for route selection, not a counted product action.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "Production Install page deployment outside the Docker quickstart",
-      "reason": "The getting-started note points production installs elsewhere after the explored quickstart path.",
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the documented route for the service.",
+      "required_fields": [],
+      "observable_result": "A proxy URL and path are available.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S2"
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Send the documented cURL request to the proxy route.",
+      "required_fields": [],
+      "observable_result": "Kong forwards the request.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Inspect the returned upstream payload.",
+      "required_fields": [],
+      "observable_result": "The expected response is returned through Kong.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A Kong Konnect account.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Permission to create gateway configuration in Konnect.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A terminal with cURL.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "The Konnect gateway endpoint must be provisioned and reachable.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "A cURL request to the Konnect gateway route is forwarded to the configured upstream service.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Kong Developer Documentation",
-      "url": "https://developer.konghq.com/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Multiple Kong products and applications on one homepage",
-        "No single platform-wide first-success declaration"
-      ]
-    },
-    {
-      "id": "S2",
       "title": "Get started with Kong Gateway",
       "url": "https://developer.konghq.com/gateway/get-started/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Konnect hybrid versus self-managed Enterprise peer prerequisites",
-        "PAT or license requirements",
-        "decK Service and Route creation",
-        "Proxied HTTP 200 terminal"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Kong Gateway quickstart script reference",
-      "url": "https://developer.konghq.com/gateway/quickstart-reference/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Quickstart script provisioning behavior"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Kong pricing and packaging",
-      "url": "https://konghq.com/pricing",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Konnect free trial packaging",
-        "Paid and Enterprise packaging context"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Konnect platform authentication",
-      "url": "https://developer.konghq.com/konnect-platform/authentication/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Built-in username and password authentication",
-        "Google, GitHub, and Microsoft social login",
-        "MFA rules by organization tier"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Kong product should represent the company-wide first developer success?",
-      "impact": "Product choice changes account model, credentials, install steps, configuration objects, and the completion signal.",
-      "evidence_needed": "A bounded workshop goal that names one Kong product and one first-success observable, or an official Kong statement of the default first developer journey."
-    },
-    {
-      "question": "If Kong Gateway is selected, is Konnect hybrid or self-managed Enterprise the comparison route?",
-      "impact": "Konnect adds account and PAT work; Enterprise adds license entitlement and a different quickstart invocation.",
-      "evidence_needed": "A policy choice between the two peer prerequisites on the current Gateway getting-started page, plus a fresh-account walkthrough of Konnect trial signup fields."
+      "question": "The current Konnect account may need region or control-plane choices not visible in public docs.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

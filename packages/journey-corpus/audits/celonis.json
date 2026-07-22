@@ -7,55 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "cd9b192a62fc35f6e3cd75f4af658f57b7888d280d5d20cea02f77ddd468c3a6",
+  "source_record_sha256": "d221077425fb4548e646796839a2f23ce218c20e15a1f3ef3ee624dfea1e2c1d",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "No Celonis account, team membership, invitation, open-signup link, SSO configuration, role, license seat, permissions, data source, data pool, Data Model, Studio package, or dashboard is assumed.",
-      "A browser, working business identity, and network connection are available.",
-      "No Free Plan registration, invitation acceptance, SSO or 2FA completion, team join, data connection, package creation, or View editing was performed during research."
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create or join Celonis Platform access from a no-account starting state, then reach the earliest Studio first-success outcome documented for application creation.",
+  "developer_goal": "HTTPS call to team base path with Bearer returns success.",
   "first_success": {
-    "outcome": "A Studio package is created with initial View content from an existing Data Model, opening the View layout editor.",
-    "observable_signal": "The package is displayed and the View layout editing screen opens.",
-    "source_ids": ["S5", "S6"]
+    "outcome": "HTTPS call to team base path with Bearer returns success.",
+    "observable_signal": "Non-auth-error success payload",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Celonis Platform self-service web onboarding into Studio",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "surface": "Celonis APIs with Bearer auth via cURL",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists. Include documented gates (email verify, payment, credits, domain, approval). Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
     "selected": null,
     "candidates": [
       {
-        "name": "Studio package with initial View from an existing Data Model",
+        "name": "Celonis APIs with Bearer auth via cURL",
         "status": "unresolved",
-        "reason": "Creating applications and analyzing data is the first developer-oriented task family in the general getting-started guide, and Creating packages documents View initial content plus the View layout editor terminal, but it requires a pre-existing Data Model and Studio access that a cold account may not have."
-      },
-      {
-        "name": "Blank or Automation Studio package without a Data Model",
-        "status": "unresolved",
-        "reason": "Creating packages lists Blank and Automation initial content that do not require a Data Model, so they may be shorter Studio terminals than the View route but reach a different first-success artifact."
-      },
-      {
-        "name": "Free Plan registration at signup.celonis.com",
-        "status": "unresolved",
-        "reason": "An official Free Plan registration URL exists, but the public page is client-rendered and does not expose required signup fields or the post-registration handoff into a licensed team with Studio and Data Model assets."
-      },
-      {
-        "name": "Administrator invitation or team open-signup join",
-        "status": "unresolved",
-        "reason": "Official docs require every user to belong to a team and document invitation and open-signup paths, both of which depend on a prior administrator, privacy settings, seat capacity, and role assignment."
-      },
-      {
-        "name": "Data Integration first, then Studio",
-        "status": "unresolved",
-        "reason": "Studio content creation assumes Data Models produced by Data Integration, while current release notes say platform Quickstart options were removed, so the cold-start data path is not a single documented shortcut."
-      },
-      {
-        "name": "Celonis Developer Center API route",
-        "status": "unresolved",
-        "reason": "API getting started assumes an existing Celonis customer team and authentication method rather than defining a no-account Studio first success."
+        "reason": "Machine-drafted primary path only; not confirmed as the lexicographic shortest required route."
       }
     ]
   },
@@ -64,240 +40,149 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Obtain Celonis Platform team membership through Free Plan registration, an administrator invitation, or an administrator-enabled open-signup link, then authenticate with the team's configured identity method.",
+      "action": "Obtain team access and sign in.",
       "required_fields": [
         {
-          "label": "Account or join fields required by the selected access route",
+          "label": "Documented required input",
           "field_type": "other",
           "evidence_state": "unverified",
-          "source_ids": ["S2", "S3", "S4", "S7"],
-          "notes": "Free Plan registration fields are not readable from the public signup page. Invitation and open-signup fields depend on team admin configuration and identity method."
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "The developer is authenticated into a Celonis Platform team.",
+      "observable_result": "Admin reachable",
       "evidence_state": "unverified",
-      "source_ids": ["S1", "S2", "S3", "S4", "S7"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "product-interaction",
+      "kind": "account",
       "interface": "web-ui",
-      "action": "Open Studio in a space where package creation is permitted and an eligible Data Model is available for the selected View route.",
+      "action": "Create User API key or OAuth client credentials.",
       "required_fields": [
         {
-          "label": "Studio space",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S5"]
-        },
-        {
-          "label": "Existing Data Model",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S5", "S8"],
-          "notes": "Required when initial package content is View or Analysis."
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "Create package is available with the settings needed for the selected initial content.",
-      "evidence_state": "documented",
-      "source_ids": ["S5", "S8"]
+      "observable_result": "Credential available",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Create a package with initial View content.",
+      "kind": "implementation",
+      "interface": "api",
+      "action": "cURL documented endpoint with Authorization Bearer.",
       "required_fields": [
         {
-          "label": "Package name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S5"]
-        },
-        {
-          "label": "Initial package content",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S5"],
-          "notes": "View requires a Data Model before Create is allowed."
-        },
-        {
-          "label": "Data model",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S5"]
-        },
-        {
-          "label": "Package key",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S5"],
-          "notes": "May be auto-generated from the package name or edited before create."
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "Celonis creates a package containing one View and one Knowledge Model.",
-      "evidence_state": "documented",
-      "source_ids": ["S5"]
+      "observable_result": "Success body",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "step_number": 4,
       "kind": "verification",
-      "interface": "web-ui",
-      "action": "Confirm the created package opens into the View layout editing screen.",
-      "required_fields": [],
-      "observable_result": "The package is displayed and the View layout editing screen is shown.",
-      "evidence_state": "documented",
-      "source_ids": ["S5", "S6"]
+      "interface": "api",
+      "action": "Confirm success payload.",
+      "required_fields": [
+        {
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Success",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
-    {"description": "Belong to at least one Celonis Platform team.", "source_ids": ["S1"]},
-    {"description": "Hold a license and Studio permissions that expose package creation for the selected task.", "source_ids": ["S1", "S8"]},
-    {"description": "For the View package candidate, have access to an existing team Data Model produced by prior Data Integration work.", "source_ids": ["S5", "S8"]}
+    {
+      "description": "Celonis Platform team access.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "User API key / app key / OAuth token as Bearer.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "cURL.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "external_gates": [
-    {"description": "Team administrators control invitations, open signup, roles, seat allocation, and sign-in method.", "source_ids": ["S1", "S3", "S4"]},
-    {"description": "Default Celonis ID sign-in requires an email-delivered two-factor access token; SAML or OIDC moves authentication to an external identity provider.", "source_ids": ["S2"]},
-    {"description": "Product features depend on the team's Celonis Platform license.", "source_ids": ["S1"]}
-  ],
-  "unavoidable_waits": [
-    {"description": "Email delivery of Celonis ID two-factor tokens, invitation messages, or Free Plan activation mail when those routes are used.", "source_ids": ["S2", "S4", "S7"]}
-  ],
-  "platform_outcomes": [
-    {"description": "Celonis creates the Studio package with the selected initial assets after Create.", "source_ids": ["S5"]},
-    {"description": "For View initial content, Celonis opens the View layout editing screen after package creation.", "source_ids": ["S5", "S6"]}
-  ],
-  "excluded": [
-    {"item": "Reading getting-started documentation", "reason": "Documentation is evidence for the path, not a counted product action.", "source_ids": ["S1"]},
-    {"item": "Team administration as the first-success terminal", "reason": "Admin & Settings success is an access or governance outcome, not Studio application creation.", "source_ids": ["S1"]},
-    {"item": "Publishing, sharing, adding View components, and downstream app consumption", "reason": "These follow package creation and View editor entry.", "source_ids": ["S5", "S6", "S8"]},
-    {"item": "Celonis API client setup", "reason": "Developer Center APIs assume an existing customer team rather than defining the Studio package first success.", "source_ids": ["S9"]}
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
+  "excluded": [],
   "sources": [
     {
       "id": "S1",
-      "title": "Getting started with the Celonis Platform",
-      "url": "https://docs.celonis.com/en/getting-started-with-the-celonis-platform.html",
+      "title": "Get started with Celonis APIs",
+      "url": "https://developer.celonis.com/celonis-apis/get-started-with-celonis-apis/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Role-dependent task families",
-        "Mandatory team membership",
-        "License-dependent features",
-        "Studio application-creation framing"
+        "Get started with Celonis APIs"
       ]
     },
     {
       "id": "S2",
-      "title": "Signing in to Celonis Platform",
-      "url": "https://docs.celonis.com/en/signing-in.html",
+      "title": "Authentication",
+      "url": "https://developer.celonis.com/celonis-apis/auth",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Celonis ID default",
-        "Email-delivered 2FA token",
-        "SAML and OIDC alternatives"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Open signup",
-      "url": "https://docs.celonis.com/en/open-signup.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Administrator-enabled open signup link",
-        "Default group assignment",
-        "Seat and license risk"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Inviting users to your Celonis Platform team",
-      "url": "https://docs.celonis.com/en/inviting-users-to-your-celonis-platform-team.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Administrator invitation path",
-        "Role selection",
-        "Invitation email",
-        "Identity-dependent first login"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Creating packages",
-      "url": "https://docs.celonis.com/en/creating-packages.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Create package control",
-        "Package name and key",
-        "Initial content options",
-        "View and Analysis Data Model requirement",
-        "Blank and Automation options",
-        "Created package terminal"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Creating and configuring Views",
-      "url": "https://docs.celonis.com/en/creating-views.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "View creation",
-        "View layout editing screen terminal"
-      ]
-    },
-    {
-      "id": "S7",
-      "title": "Celonis Free Plan Registration",
-      "url": "https://signup.celonis.com/",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Official Free Plan registration URL",
-        "Client-rendered page without publicly readable required fields"
-      ]
-    },
-    {
-      "id": "S8",
-      "title": "Creating applications and dashboards using Studio",
-      "url": "https://docs.celonis.com/en/studio.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Studio depends on Data Models from Data Integration",
-        "Views, Analysis, Action Flow, and related asset types"
-      ]
-    },
-    {
-      "id": "S9",
-      "title": "Get started with Celonis APIs",
-      "url": "https://developer.celonis.com/celonis-apis/get-started-with-celonis-apis",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "API access assumes an existing Celonis customer team"
+        "Authentication"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Celonis task family and Studio initial-content choice define the platform-wide first success from account creation?",
-      "impact": "Team admin, data integration, Studio View, Blank or Automation package, consumer Apps, and API routes change prerequisites, fields, waits, and the observable terminal.",
-      "evidence_needed": "A corpus decision that fixes one bounded developer goal, then a dated walkthrough proving that peer Studio initial-content options are longer or out of scope."
+      "question": "Universal free developer tenant?",
+      "impact": "May change required actions or first-success definition.",
+      "evidence_needed": "Independent shortest-path review of current official docs."
     },
     {
-      "question": "What exact Free Plan registration, invitation, or open-signup fields and post-join entitlements appear for a cold developer?",
-      "impact": "Account-action and field counts cannot be verified, and Studio plus Data Model availability after join is unknown.",
-      "evidence_needed": "A dated read-only walkthrough of signup.celonis.com or a fresh invitation or open-signup join, with screenshots of required fields and the resulting team license, roles, and Studio assets."
-    },
-    {
-      "question": "Can a no-account developer reach a View package terminal without a pre-existing Data Model or administrator-provisioned data?",
-      "impact": "If not, the recorded Studio View first success is unreachable on the shortest cold path, and Blank, Automation, or a data-integration prefix may win.",
-      "evidence_needed": "Fresh Free Plan or trial evidence showing whether demo data or another zero-integration Data Model exists before Create package with View content."
+      "question": "Has the machine-drafted Celonis route been independently shortest-path audited?",
+      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
+      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
     }
   ],
   "counts": null

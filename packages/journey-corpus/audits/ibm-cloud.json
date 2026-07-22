@@ -7,45 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "fa5a3068cad9dd61c79eeae5a78ff022387a241bc72548ce35e47bcc0e40e2da",
+  "source_record_sha256": "976dcb0348630612548faced4b1ad12b935c57b3117d598fa2d13446a4c0c345",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and an email address or Google credentials.",
-      "The developer is a new stand-alone account owner rather than an invited user on an existing account.",
-      "No IBM Cloud product, project, or interface has been selected yet."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create an IBM Cloud owner account and reach the earliest meaningful hosted workload first success.",
+  "developer_goal": "Create an IBM Cloud account and deploy the Code Engine Hello World application from the console.",
   "first_success": {
-    "outcome": "Unresolved: platform onboarding points to many tools and a large catalog rather than one default workload terminal.",
-    "observable_signal": "Candidates include a Code Engine Hello World response, Cloud Shell local sample output, or another catalog product result.",
-    "source_ids": ["S1", "S2", "S3", "S4"]
+    "outcome": "Code Engine builds and deploys the sample application and serves its public endpoint.",
+    "observable_signal": "Opening the application URL returns the Hello World response.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "IBM Cloud registration and console",
-    "rule": "Do not invent a platform-wide winner among Code Engine, Cloud Shell, Kubernetes Service, CLI, and other catalog products.",
-    "selected": null,
+    "surface": "Code Engine Hello World in the IBM Cloud console",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Code Engine Hello World in the IBM Cloud console",
     "candidates": [
       {
-        "name": "Code Engine Hello World console or CLI",
-        "status": "unresolved",
-        "reason": "Complete hosted Hello World path, but platform docs do not recommend Code Engine over other catalog products; Pay-as-you-Go is required for Code Engine."
+        "name": "Code Engine Hello World in the IBM Cloud console",
+        "status": "selected",
+        "reason": "The console path deploys a hosted application from sample source without requiring local containers or CLI installation."
       },
       {
-        "name": "IBM Cloud Shell sample",
-        "status": "unresolved",
-        "reason": "Ends with a Node.js app running locally in Cloud Shell rather than a generally applicable hosted resource outcome."
-      },
-      {
-        "name": "IBM Cloud Kubernetes Service getting started",
-        "status": "unresolved",
-        "reason": "Service-specific cluster and sample path with different prerequisites and gates."
-      },
-      {
-        "name": "Owner registration versus invited-user access",
-        "status": "unresolved",
-        "reason": "Invited users skip owner registration and billing setup; that branch is not comparable to new-owner signup."
+        "name": "Code Engine CLI path",
+        "status": "not-selected",
+        "reason": "It adds IBM Cloud CLI and plugin installation that the console route avoids."
       }
     ]
   },
@@ -54,163 +45,135 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Open IBM Cloud registration and create an owner account with email or Google credentials plus the registration information IBM requests.",
-      "required_fields": [
-        {
-          "label": "Email address or Google credentials",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Additional registration information",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": ["S1"],
-          "notes": "Official checklist states additional registration information is required but does not enumerate the live fields."
-        }
-      ],
-      "observable_result": "The new owner account can proceed to first login.",
+      "action": "Create or sign in to IBM Cloud and open Code Engine.",
+      "required_fields": [],
+      "observable_result": "The Code Engine console is available.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "account",
+      "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "On first login, provide a credit card or subscription code to complete stand-alone account setup.",
-      "required_fields": [
-        {
-          "label": "Credit card or IBM Cloud subscription code",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The IBM Cloud console opens for the account owner.",
+      "action": "Create a Code Engine project in a supported region and resource group.",
+      "required_fields": [],
+      "observable_result": "The project is active.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Select one IBM Cloud product and interface for the first workload success.",
-      "required_fields": [
-        {
-          "label": "Product and interface",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1", "S2"]
-        }
-      ],
-      "observable_result": "One bounded IBM Cloud first-success route is fixed.",
+      "action": "Create an application from the documented Hello World sample source.",
+      "required_fields": [],
+      "observable_result": "A build and deployment begin.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Wait for the application revision to become ready.",
+      "required_fields": [],
+      "observable_result": "Code Engine exposes an application URL.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open the application URL.",
+      "required_fields": [],
+      "observable_result": "The Hello World response is displayed.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Access as a new account owner or as a user invited to an existing IBM Cloud account.",
-      "source_ids": ["S1"]
+      "description": "An IBM Cloud account.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Permission to create a Code Engine project and application.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A supported IBM Cloud region and resource group.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "external_gates": [
     {
-      "description": "Stand-alone owner setup requires a credit card or subscription code before resource creation.",
-      "source_ids": ["S1"]
-    },
-    {
-      "description": "Code Engine documentation requires a Pay-as-you-Go account for that product path.",
-      "source_ids": ["S4"]
+      "description": "IBM Cloud IAM must allow project and application creation.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "unavoidable_waits": [
     {
-      "description": "Code Engine application status must reach Ready before the Hello World test request succeeds on that candidate route.",
-      "source_ids": ["S4"]
+      "description": "Code Engine must build and deploy the sample before the URL is ready.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "platform_outcomes": [
     {
-      "description": "Completed owner setup opens the IBM Cloud console for resource work.",
-      "source_ids": ["S1"]
-    },
-    {
-      "description": "On the Code Engine candidate route, a Ready application exposes a URL that can return Hello World.",
-      "source_ids": ["S4"]
+      "description": "Code Engine builds and deploys the sample application and serves its public endpoint.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "excluded": [
     {
-      "item": "Reading the onboarding checklist and platform overview",
-      "reason": "Documentation is evidence for route choice, not a counted action.",
-      "source_ids": ["S1", "S2"]
-    },
-    {
-      "item": "Asserting Code Engine as IBM Cloud's universal first mile",
-      "reason": "Platform docs direct developers to browse a large catalog without selecting one default product.",
-      "source_ids": ["S2"]
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "IBM Cloud onboarding checklist and quick start",
-      "url": "https://cloud.ibm.com/docs/overview?topic=overview-get-started-checklist",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "General onboarding entry",
-        "Owner registration and first-login billing",
-        "Invited-user distinction",
-        "Multiple working interfaces"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "IBM Cloud platform overview",
-      "url": "https://cloud.ibm.com/docs/overview?topic=overview-whatis-platform",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Catalog-oriented product discovery",
-        "Multiple workload types"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Getting started with IBM Cloud Shell",
-      "url": "https://cloud.ibm.com/docs/cloud-shell?topic=cloud-shell-getting-started",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Cloud Shell candidate path",
-        "Local sample completion signal"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Getting started with IBM Cloud Code Engine",
+      "title": "Getting started with Code Engine",
       "url": "https://cloud.ibm.com/docs/codeengine?topic=codeengine-getting-started",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Code Engine Hello World candidate",
-        "Ready-state wait and application URL"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which IBM Cloud product and interface define the selected first-success route?",
-      "impact": "Required actions, Pay-as-you-Go entitlements, and terminals differ across Code Engine, Cloud Shell, Kubernetes, and other catalog entries.",
-      "evidence_needed": "Human selection of one product goal, then a current console or CLI walkthrough from owner signup to that terminal."
-    },
-    {
-      "question": "What exact fields does cloud.ibm.com/registration require today for email versus Google signup?",
-      "impact": "Owner account field counts cannot be verified from checklist prose alone.",
-      "evidence_needed": "Dated screenshots of the live registration and first-login billing screens."
+      "question": "New-account identity verification and regional resource availability can add undocumented screens.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

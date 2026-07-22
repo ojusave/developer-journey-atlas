@@ -6,101 +6,73 @@
   },
   "category": "B2B SaaS and enterprise ecosystems",
   "surface": {
-    "name": "Pipedrive API-token first request through cURL",
-    "selection_basis": "Under the workshop policy, the fastest documented Pipedrive route is the direct cURL API-token request: no local or OSS CRM route exists, and cURL avoids the Postman installation required by the dedicated tool guide. The official authentication page provides the exact `GET /api/v2/deals` request. Signup is one opaque trial step, followed by public token and request instructions.",
+    "name": "Pipedrive API token + cURL GET /api/v2/deals",
+    "selection_basis": "Pipedrive authentication docs show a concise cURL request with api_token to company-domain deals. Prefer cURL over Postman/Insomnia installs. OAuth is for marketplace apps.",
     "alternatives_considered": [
       {
-        "name": "Insomnia API-token route",
+        "name": "Postman/Insomnia first-request guide",
         "url": "https://pipedrive.readme.io/docs/run-pipedrive-api-in-postman-or-insomnia",
-        "reason_not_primary": "Insomnia is a documented peer and converges on the same token-authenticated request. Postman is listed first and has a direct collection authorization sequence."
+        "reason_not_primary": "Requires installing a GUI client; cURL is documented on authentication."
       },
       {
-        "name": "Direct cURL request",
+        "name": "OAuth marketplace app",
         "url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
-        "reason_not_primary": "The authentication page shows a concise cURL example, but the dedicated first-request guide centers Postman and Insomnia."
-      },
-      {
-        "name": "OAuth app and Marketplace path",
-        "url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
-        "reason_not_primary": "Pipedrive sends app builders to OAuth. The API-token route is the shorter own-account path and avoids app registration and user installation before the first API response."
+        "reason_not_primary": "Longer path for third-party apps."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Pipedrive trial and company, retrieve the company-specific API token, and make the official direct cURL request to list deals.",
-    "starting_url": "https://pipedrive.readme.io/docs/run-pipedrive-api-in-postman-or-insomnia",
+    "developer_intent": "Create a Pipedrive trial, copy the personal API token, and list deals with cURL.",
+    "starting_url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
     "assumed_prior_state": [
-      "No Pipedrive user, company, company domain, trial, API permission, API token, deals, Postman installation, collection, or environment is assumed.",
-      "A supported computer, browser, email or Google account, and permission to install Postman are available.",
-      "No signup, Google authorization, reCAPTCHA, verification, company onboarding, API enablement, token retrieval, software installation, or API request was performed during research."
+      "No Pipedrive company or API token exists.",
+      "A terminal with cURL is available."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Make the first request to the Pipedrive API with an API token.",
-    "normalized_outcome": "An authenticated `GET https://{companydomain}.pipedrive.com/api/v2/deals` request returns HTTP 200 and a JSON body whose `success` field is true, whether the data array contains deals or is empty.",
-    "observable_completion_signal": "The Deals endpoint reference shows a 200 OK response with `success: true`, `data`, and `additional_data`; business data is not required to prove API transport and authentication success.",
+    "official_milestone": "First authenticated deals request",
+    "normalized_outcome": "GET https://{companydomain}.pipedrive.com/api/v2/deals?api_token=... returns HTTP 200 with success true.",
+    "observable_completion_signal": "JSON body includes success: true (data may be empty).",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "HTTP 200 with a JSON response whose `success` field is true.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Authentication docs demonstrate cURL with api_token against company API host; deals endpoint returns success true.",
       "source_ids": [
-        "S5"
+        "S1",
+        "S2"
       ]
     },
-    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "why_this_is_the_boundary": "First API success is authenticated JSON, not token visibility alone.",
     "source_ids": [
       "S1",
-      "S2",
-      "S3",
-      "S4",
-      "S5"
+      "S2"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
       "type": "account",
-      "requirement": "Create or access a Pipedrive trial account and its company workspace.",
+      "requirement": "Pipedrive trial/company account with API access enabled.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     },
     {
       "order": 2,
-      "type": "permission",
-      "requirement": "Have API access enabled for the user; if the API tab is absent, follow the company API-enablement route.",
+      "type": "credential",
+      "requirement": "Personal API token from Settings.",
       "required": true,
       "source_ids": [
-        "S3"
+        "S1"
       ]
     },
     {
       "order": 3,
-      "type": "domain",
-      "requirement": "Know the company domain used in the Pipedrive API base URL.",
-      "required": true,
-      "source_ids": [
-        "S4"
-      ]
-    },
-    {
-      "order": 4,
-      "type": "credential",
-      "requirement": "Retrieve the API token for the intended user and company from Personal preferences > API.",
-      "required": true,
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "order": 5,
       "type": "software",
-      "requirement": "Install Postman and import or add the Pipedrive API collection.",
+      "requirement": "cURL.",
       "required": true,
       "source_ids": [
         "S1"
@@ -110,197 +82,76 @@
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open Pipedrive’s official API-token authentication guide.",
-      "details": [],
-      "input": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
-      "output": "The direct cURL Deals request is visible.",
-      "success_signal": "The guide shows the `x-api-token` header and endpoint.",
-      "failure_or_wait": "OAuth is required for distributable apps, not this own-account first request.",
-      "required": true,
-      "source_ids": [
-        "S4"
-      ]
-    },
-    {
-      "step_number": 2,
       "phase": "account",
       "actor": "developer",
       "interface": "browser",
-      "action": "Create the no-credit-card Pipedrive trial and company as one opaque signup step.",
+      "action": "Create a Pipedrive trial and company workspace.",
       "details": [],
-      "input": "https://www.pipedrive.com/en/register",
-      "output": "An authenticated Pipedrive company workspace and company domain are available.",
-      "success_signal": "The Pipedrive web app opens.",
-      "failure_or_wait": "Complete any signup, verification, legal, company, and onboarding steps requested by Pipedrive; individual form fields are outside this record.",
+      "input": "Signup",
+      "output": "Company domain session",
+      "success_signal": "Settings / Personal preferences reachable.",
+      "failure_or_wait": "",
       "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 3,
-      "phase": "credential",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Open account name > Company settings > Personal preferences > API and copy the user’s API token.",
-      "details": [],
-      "input": "Authenticated company workspace",
-      "output": "The company-specific API token is available.",
-      "success_signal": "The API tab displays the token.",
-      "failure_or_wait": "If the API tab is absent, follow the documented API-enablement route.",
-      "required": true,
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "step_number": 4,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run the documented cURL `GET https://{companydomain}.pipedrive.com/api/v2/deals` with the token in `x-api-token`.",
-      "details": [],
-      "input": "Company domain and API token",
-      "output": "Pipedrive returns the Deals response.",
-      "success_signal": "The HTTP response is 200.",
-      "failure_or_wait": "Invalid domain, token, or API entitlement returns an error.",
-      "required": true,
-      "source_ids": [
-        "S4",
-        "S5"
-      ]
-    },
-    {
-      "step_number": 5,
-      "phase": "verify",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Inspect the JSON response envelope.",
-      "details": [],
-      "input": "Deals API response",
-      "output": "The first Pipedrive API request is complete.",
-      "success_signal": "The response has `success: true`; `data` may be populated or empty.",
-      "failure_or_wait": "Business data is not required for transport and authentication success.",
-      "required": true,
-      "source_ids": [
-        "S5"
-      ]
-    }
-  ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
-  "branches": [
-    {
-      "at_step": 2,
-      "condition": "Sign up with work email",
-      "path": "Enter a work email, accept the linked terms and privacy notice through signup, optionally choose marketing email, and pass reCAPTCHA before the hidden continuation.",
-      "effect_on_first_success": "May add email verification and account-detail steps that are not exposed publicly.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Continue with Google",
-      "path": "Leave Pipedrive for Google authorization, select or authenticate an identity, then return to the hidden Pipedrive onboarding route.",
-      "effect_on_first_success": "Replaces the initial email form but adds an external identity-provider boundary.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 3,
-      "condition": "The API tab is not visible",
-      "path": "Follow Pipedrive's enabling-API tutorial before attempting to retrieve the token.",
-      "effect_on_first_success": "Adds an administrator or permission path before credentials are available.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 3,
-      "condition": "Use Insomnia instead of Postman",
-      "path": "Import the v1 or v2 OpenAPI URL, generate the collection, select OpenAPI env, set `xApiToken`, and use the prefilled Auth values for a request.",
-      "effect_on_first_success": "Changes local setup but converges on the same authenticated API outcome.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "at_step": 3,
-      "condition": "Build a distributable app rather than an own-account integration",
-      "path": "Create an app and implement OAuth 2.0 instead of using the personal API token.",
-      "effect_on_first_success": "Adds Developer Hub registration, OAuth configuration, authorization, and installation concerns.",
+      "step_number": 2,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open Personal preferences → API and copy the API token.",
+      "details": [],
+      "input": "Company session",
+      "output": "api_token",
+      "success_signal": "Token value available.",
+      "failure_or_wait": "",
+      "required": true,
       "source_ids": [
-        "S4"
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "GET https://{companydomain}.pipedrive.com/api/v2/deals?api_token=$TOKEN with cURL.",
+      "details": [],
+      "input": "Token + company domain",
+      "output": "Deals JSON response",
+      "success_signal": "HTTP 200 with success true.",
+      "failure_or_wait": "",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm success true in the response body.",
+      "details": [],
+      "input": "Response",
+      "output": "Verified first Pipedrive API success",
+      "success_signal": "success field is true.",
+      "failure_or_wait": "",
+      "required": true,
+      "source_ids": [
+        "S2"
       ]
     }
   ],
+  "branches": [],
   "friction_gates": [
     {
       "at_step": 2,
-      "type": "form",
-      "description": "Email signup requires a work email and the public page is protected by reCAPTCHA.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "terms",
-      "description": "Signing up accepts Pipedrive's Terms of Service and Privacy Notice.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "choice",
-      "description": "Work email and Google are peer initial signup methods with different identity paths.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "access",
-      "description": "Company creation, authenticated onboarding, company domain, and settings convergence are not exposed by the public registration response.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "permission",
-      "description": "API may be disabled for a company user, in which case the API tab is absent and must be enabled before token retrieval.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 3,
       "type": "credential",
-      "description": "The API token is company-specific, exposes that user's data, and only one token can be active at a time.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "installation",
-      "description": "The selected first-request route requires Postman plus a Pipedrive API collection and inherited header authentication.",
+      "description": "API token required; API tab must be enabled for the user.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
@@ -315,114 +166,44 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Pipedrive API in Postman or Insomnia",
-      "url": "https://pipedrive.readme.io/docs/run-pipedrive-api-in-postman-or-insomnia",
+      "title": "Core API concepts authentication",
+      "url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
       "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": "Updated 5 months ago",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
       "sections_used": [
-        "Pipedrive + Postman",
-        "Setup",
-        "Authorization",
-        "Pipedrive + Insomnia"
+        "API token",
+        "cURL"
       ],
       "evidence_supported": [
-        "First-request framing",
-        "Postman collection setup",
-        "x-api-token header configuration",
-        "Inherited authorization",
-        "Insomnia and OpenAPI alternative"
+        "api_token",
+        "company domain"
       ]
     },
     {
       "id": "S2",
-      "title": "Free trial of Pipedrive - sign up | Pipedrive",
-      "url": "https://www.pipedrive.com/en/register",
-      "official_domain": true,
-      "source_type": "account-setup",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Public registration page"
-      ],
-      "evidence_supported": [
-        "Work-email field",
-        "Google alternative",
-        "No credit card requirement",
-        "Terms and privacy acceptance",
-        "Optional marketing email",
-        "reCAPTCHA",
-        "Signup-only two-minute claim",
-        "No public post-submit continuation"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "How to find the API token",
-      "url": "https://pipedrive.readme.io/docs/how-to-find-the-api-token",
+      "title": "Deals API",
+      "url": "https://pipedrive.readme.io/docs/deals",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": "Updated 8 months ago",
-      "sections_used": [
-        "How to find the API token",
-        "API is enabled",
-        "API is disabled"
-      ],
-      "evidence_supported": [
-        "Company-specific user token",
-        "One-active-token limit",
-        "Web-app settings route",
-        "API-disabled branch"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Authentication | Pipedrive Developer Documentation",
-      "url": "https://pipedrive.readme.io/docs/core-api-concepts-authentication",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": "Updated 6 months ago",
-      "sections_used": [
-        "Authentication",
-        "If you're creating an app",
-        "If you're working with an API token integration"
-      ],
-      "evidence_supported": [
-        "Authentication requirement",
-        "OAuth app branch",
-        "x-api-token header",
-        "Concrete GET /api/v2/deals request",
-        "Token sensitivity and rotation effect"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Pipedrive API Reference: Deals",
-      "url": "https://developers.pipedrive.com/docs/api/v1/Deals",
-      "official_domain": true,
-      "source_type": "api-reference",
-      "accessed_at": "2026-07-19",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Deals",
-        "Get all deals",
-        "Request",
-        "Response"
+        "GET deals"
       ],
       "evidence_supported": [
-        "GET /api/v2/deals endpoint",
-        "Read-only behavior",
-        "HTTP 200 terminal",
-        "success true response shape",
-        "Optional query parameters"
+        "success true",
+        "200 OK"
       ]
     }
   ],
   "uncertainties": [],
   "excluded_after_success": [
-    "Creating or mutating CRM records, pagination, rate-limit handling, building an OAuth app, Marketplace publication, token rotation, production secret storage, and multi-user integration behavior occur after the first authenticated Deals response."
-  ]
+    "OAuth app installation",
+    "Postman collection setup",
+    "Webhooks"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }

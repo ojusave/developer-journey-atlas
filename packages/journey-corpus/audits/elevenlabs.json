@@ -7,39 +7,34 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "aaca5db04880b4910afb98b43bdb369d1cf1331c201b5235efb4829a071a4b23",
+  "source_record_sha256": "f7adf9866a2ba03c8efc755c06f54a1b51f513ae531a57069c63cb92c20db435",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser, email inbox, and local Python with speakers for playback.",
-      "No ElevenLabs account, API key, paid plan, or generated audio exists yet."
+      "No ElevenLabs account, API key, or TTS request is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
-  "developer_goal": "Create an ElevenLabs Free account and API key, then run the official Python Quickstart until generated speech plays through the speakers.",
+  "developer_goal": "Create an ElevenLabs Free account and API key, then receive synthesized audio over HTTPS without installing an SDK.",
   "first_success": {
-    "outcome": "The Python script sends the published text-to-speech request and audibly plays the returned speech.",
-    "observable_signal": "Generated speech for the sample sentence is heard through the device speakers.",
-    "source_ids": ["S2"]
+    "outcome": "An authenticated cURL POST to https://api.elevenlabs.io/v1/text-to-speech/{voice_id} returns audio bytes (for example written to an mp3 file).",
+    "observable_signal": "The HTTP response is successful and the body is playable audio for the requested text.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ]
   },
   "route_selection": {
-    "surface": "ElevenLabs website signup plus ElevenAPI Python Quickstart",
-    "rule": "Email/password and OAuth providers are peer signup options; prefer needs-human-judgment when the identity route and optional local playback dependencies remain unresolved.",
-    "selected": null,
+    "surface": "Text to Speech API via cURL (API key + Free-tier credits)",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Text to Speech API via cURL (API key + Free-tier credits)",
     "candidates": [
       {
-        "name": "Email/password Free signup, verify email, personal API key, Python text-to-speech with play()",
-        "status": "unresolved",
-        "reason": "Best documented Free path, but password rules, verification recovery, and possible MPV/ffmpeg install remain open."
-      },
-      {
-        "name": "Google, Facebook, or GitHub OAuth Free signup, personal API key, Python text-to-speech with play()",
-        "status": "unresolved",
-        "reason": "Account guide lists OAuth peers beside email without selecting a default; Google signup permanently links email."
-      },
-      {
-        "name": "TypeScript Quickstart variant",
-        "status": "not-selected",
-        "reason": "Same account and key prerequisites on an alternate client surface."
+        "name": "Text to Speech API via cURL (API key + Free-tier credits)",
+        "status": "selected",
+        "reason": "ElevenLabs API Authentication documents xi-api-key header auth and a first cURL request. The Create speech API reference documents POST https://api.elevenlabs.io/v1/text-to-speech/{voice_id} returning audio. Billing docs assign Free tier automatically at signup with included credit quota. An SDK install is not required."
       }
     ]
   },
@@ -48,215 +43,192 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Sign up with email and password or an OAuth provider from Get started free.",
-      "required_fields": [
-        {
-          "label": "Email",
-          "field_type": "email",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "Required for traditional email registration."
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "Documented for email signup; password policy not published."
-        },
-        {
-          "label": "OAuth provider authorization",
-          "field_type": "permission",
-          "evidence_state": "unverified",
-          "source_ids": ["S1"],
-          "notes": "Applies only if Google, Facebook, or GitHub is chosen."
-        }
-      ],
-      "observable_result": "ElevenLabs accepts the registration and, for email signup, sends a verification message.",
+      "action": "Create an ElevenLabs account and verify email if using email signup.",
+      "required_fields": [],
+      "observable_result": "The dashboard and API key settings are reachable.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S3"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Open the ElevenLabs verification email and select the verification link.",
-      "required_fields": [
-        {
-          "label": "Email verification link",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "Documented for email signup; OAuth routes may skip this step."
-        }
-      ],
-      "observable_result": "The account is verified and the developer reaches the Speech Synthesis page.",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Confirm Free-tier credits are available (automatic at signup), or purchase Pay As You Go / upgrade if quota is exhausted.",
+      "required_fields": [],
+      "observable_result": "Subscription shows Free tier with remaining credits.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S4"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Create a personal API key in the dashboard and store it as ELEVENLABS_API_KEY.",
-      "required_fields": [
-        {
-          "label": "API key",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S2", "S3"]
-        }
-      ],
-      "observable_result": "A usable API key value is available to the local SDK.",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Create an API key in the dashboard and store it securely.",
+      "required_fields": [],
+      "observable_result": "The key value is available locally.",
       "evidence_state": "documented",
-      "source_ids": ["S2", "S3"]
+      "source_ids": [
+        "S2"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "implementation",
+      "kind": "product-interaction",
       "interface": "cli",
-      "action": "Install elevenlabs and python-dotenv.",
-      "required_fields": [
-        {
-          "label": "pip install elevenlabs",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        },
-        {
-          "label": "pip install python-dotenv",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        }
-      ],
-      "observable_result": "The Python packages required by the Quickstart are installed.",
+      "action": "Export the key as ELEVENLABS_API_KEY (or substitute directly into xi-api-key).",
+      "required_fields": [],
+      "observable_result": "The environment variable is set for the current shell.",
       "evidence_state": "documented",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S2"
+      ]
     },
     {
       "step_number": 5,
       "kind": "implementation",
-      "interface": "code",
-      "action": "Create and run example.py with the published text_to_speech.convert and play(audio) calls.",
-      "required_fields": [
-        {
-          "label": "ELEVENLABS_API_KEY in .env",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        },
-        {
-          "label": "text, voice_id, model_id, output_format",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        }
-      ],
-      "observable_result": "Speech audio plays through the speakers.",
+      "interface": "api",
+      "action": "POST text-to-speech with cURL to https://api.elevenlabs.io/v1/text-to-speech/{voice_id}.",
+      "required_fields": [],
+      "observable_result": "HTTP 200 with audio bytes for the requested text.",
       "evidence_state": "documented",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the response body is playable audio (for example open the saved mp3).",
+      "required_fields": [],
+      "observable_result": "Audio plays or file size is non-zero for the sample text.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Local speakers or audio output are required to observe the Quickstart terminal signal.",
-      "source_ids": ["S2"]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Email verification is required before email-registered accounts can use the service.",
-      "source_ids": ["S1"]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Delivery of the email verification link for traditional email signup.",
-      "source_ids": ["S1"]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "New accounts begin on the Free tier after successful signup and verification.",
-      "source_ids": ["S1"]
+      "description": "An ElevenLabs account (email verification for email signup, or OAuth).",
+      "source_ids": [
+        "S3"
+      ]
     },
     {
-      "description": "The text-to-speech API returns audio that play() renders locally.",
-      "source_ids": ["S2"]
+      "description": "Usable Free-tier credit quota (assigned automatically at signup). Paid subscription or Pay As You Go is required only after Free quota is exhausted.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "An API key included as xi-api-key on every request.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "A terminal with cURL (or any HTTP client). No language SDK is required.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "In-product Speech Synthesis generate exercise after signup",
-      "reason": "Account guide presents UI generation as an exercise; the selected developer goal is the ElevenAPI Quickstart terminal.",
-      "source_ids": ["S1"]
+      "item": "SDK install and speaker playback helpers",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "item": "Streaming, voice browsing, and voice cloning tutorials",
-      "reason": "Documented as next steps after first audible playback.",
-      "source_ids": ["S2"]
+      "item": "Voice cloning and Voice Library workflows",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "item": "Paid plans and commercial licensing",
-      "reason": "Outside the Free-tier Quickstart first success.",
-      "source_ids": ["S2"]
+      "item": "Paid plan upgrades beyond Free first success",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
     {
       "id": "S1",
+      "title": "Create speech",
+      "url": "https://elevenlabs.io/docs/api-reference/text-to-speech/convert",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "TTS endpoint and parameters",
+        "xi-api-key header",
+        "Binary audio success response"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API Authentication",
+      "url": "https://elevenlabs.io/docs/api-reference/authentication",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "xi-api-key header",
+        "cURL first request pattern"
+      ]
+    },
+    {
+      "id": "S3",
       "title": "Account",
       "url": "https://elevenlabs.io/docs/overview/administration/account",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Get started free signup",
-        "Email or OAuth registration",
-        "Email verification link",
-        "Speech Synthesis landing after verification"
+        "Email verification for email signup",
+        "OAuth alternatives"
       ]
     },
     {
-      "id": "S2",
+      "id": "S4",
+      "title": "Billing",
+      "url": "https://elevenlabs.io/docs/overview/administration/billing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Automatic Free tier at signup",
+        "Credit quota for generation",
+        "Pay As You Go after exhaustion"
+      ]
+    },
+    {
+      "id": "S5",
       "title": "ElevenAPI quickstart",
       "url": "https://elevenlabs.io/docs/eleven-api/quickstart",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Create API key",
-        "SDK and dotenv install",
-        "Python text-to-speech example",
-        "Audible play() terminal",
-        "Possible MPV or ffmpeg prompt"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "How do I authorize myself using an API key?",
-      "url": "https://help.elevenlabs.io/hc/en-us/articles/14599447207697-How-do-I-authorize-myself-using-an-API-key",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "API key authorization for API access"
+        "SDK path as optional alternative"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which signup identity route (email/password versus Google, Facebook, or GitHub) is the selected shortest Free path?",
-      "impact": "OAuth peers change external authorization and may skip email verification; email signup adds an email wait. No official default is published.",
-      "evidence_needed": "A human decision selecting one identity route plus a cold signup walkthrough of that route through verified Free-tier access."
-    },
-    {
-      "question": "Will this device need MPV, ffmpeg, or neither before play(audio) succeeds?",
-      "impact": "An extra local package install may be required for the documented audible terminal.",
-      "evidence_needed": "Run the Quickstart on the target OS and record whether MPV or ffmpeg is prompted, or obtain OS-specific official dependency requirements."
-    },
-    {
-      "question": "What password rules and verification-link recovery apply to email signup?",
-      "impact": "Validation failures or missing mail can add unbounded recovery actions not currently countable.",
-      "evidence_needed": "Official password policy and resend/expiration behavior, or observed signup validation messages."
+      "question": "Exact Free-tier character/credit allotment and commercial-use restrictions for API-generated audio on Free.",
+      "impact": "May affect how far demos can go before requiring Pay As You Go.",
+      "evidence_needed": "Billing points to the pricing/subscription page for plan tables rather than embedding current Free numbers in the billing article."
     }
   ],
   "counts": null

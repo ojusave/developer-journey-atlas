@@ -2,386 +2,184 @@
   "platform": {
     "name": "YugabyteDB",
     "slug": "yugabytedb",
-    "organization": "YugabyteDB, Inc."
+    "organization": "Yugabyte"
   },
   "category": "Data, databases, and search",
   "surface": {
-    "name": "YugabyteDB local Docker quick start",
-    "selection_basis": "Under the workshop policy and the explicit YugabyteDB instruction, the official local quick start takes priority over the undocumented Aeon signup. The Docker route is account-free and documents image pull, one-node cluster startup, status verification, and a ysqlsh prompt.",
+    "name": "YugabyteDB Aeon Sandbox cluster via Cloud Shell",
+    "selection_basis": "Aeon Quick start: free Sandbox is quickest path; Cloud Shell to ysqlsh. Prefer hosted over local Docker.",
     "alternatives_considered": [
       {
-        "name": "Built-in 15 minute Get Started tutorial",
-        "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
-        "reason_not_primary": "The docs say it connects to the database, loads sample data and runs queries, and explores a sample application, but do not enumerate its screens, queries, or completion signal."
-      },
-      {
-        "name": "YugabyteDB Aeon Sandbox",
-        "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
-        "reason_not_primary": "Aeon requires the undocumented signup transition; the user instruction and workshop policy prefer the complete official local quick start."
-      },
-      {
-        "name": "Desktop client shell",
-        "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-connect/connect-client-shell/",
-        "reason_not_primary": "This starts after an Aeon account and cluster exist and adds local client installation, IP allowlisting, a CA certificate, and SSL connection parameters."
-      },
-      {
-        "name": "Sample application",
-        "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/#build-an-application",
-        "reason_not_primary": "This starts after the hidden account path and cluster creation, then adds language, runtime, package, repository, TLS, configuration, build, and run steps."
+        "name": "Local Docker",
+        "url": "https://docs.yugabyte.com/stable/quick-start/",
+        "reason_not_primary": "Heavier than Sandbox."
       },
       {
         "name": "Dedicated cluster",
-        "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-basics/create-clusters-overview/",
-        "reason_not_primary": "This starts after account access and adds billing or trial access plus topology, fault tolerance, sizing, storage, and production choices."
+        "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
+        "reason_not_primary": "After Sandbox."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Start a one-node YugabyteDB cluster in Docker and connect with the bundled YSQL shell.",
-    "starting_url": "https://docs.yugabyte.com/stable/quick-start/docker/",
+    "developer_intent": "Aeon signup, Sandbox cluster, Cloud Shell SQL.",
+    "starting_url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
     "assumed_prior_state": [
-      "No pre-existing Aeon account is assumed because the official quick start begins with Sign up.",
-      "The developer can run JavaScript in a browser, but authenticated interaction was not performed.",
-      "No payment method is assumed because the official Sandbox path says no credit card is required."
+      "No Aeon account."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Create a local cluster and connect to the database.",
-    "normalized_outcome": "A one-node YugabyteDB Docker cluster is running and ysqlsh opens against it.",
-    "observable_completion_signal": "The terminal displays the `yugabyte=#` ysqlsh prompt.",
+    "official_milestone": "Connect with Cloud Shell",
+    "normalized_outcome": "Cloud Shell authenticates as admin and shows ysqlsh prompt.",
+    "observable_completion_signal": "ysqlsh prompt ready",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "yugabyte=#",
+      "official_label_or_terminal_state": "Connect to the cluster documents Launch Cloud Shell to ysqlsh.",
       "source_ids": [
-        "S1",
-        "S4",
-        "S9"
+        "S1"
       ]
     },
-    "why_this_is_the_boundary": "The ysqlsh prompt is the first demonstrated usable database terminal in the official Docker quick start. Loading sample data and exploring YSQL follow afterward.",
+    "why_this_is_the_boundary": "First interactive hosted DB success.",
     "source_ids": [
-      "S1",
-      "S4",
-      "S9"
+      "S1"
     ]
   },
   "prerequisites": [
-    {"order": 1, "type": "software", "requirement": "Install and start the Docker runtime on the local machine.", "required": true, "source_ids": ["S9"]},
-    {"order": 2, "type": "network", "requirement": "Keep local ports 7000, 9000, 15433, 5433, and 9042 available, or apply the documented macOS Monterey port-7000 workaround.", "required": true, "source_ids": ["S9"]}
-  ],
-  "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the YugabyteDB local Docker quick start.", "details": ["The page says local single-host setup is for development and learning."], "input": "https://docs.yugabyte.com/stable/quick-start/docker/", "output": "The Docker sequence is visible.", "success_signal": "Install is reached.", "failure_or_wait": "", "required": true, "source_ids": ["S9"]},
-    {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Pull the current documented YugabyteDB image.", "details": [], "input": "docker pull yugabytedb/yugabyte:2026.1.0.0-b118", "output": "The YugabyteDB image is available locally.", "success_signal": "Docker completes the pull.", "failure_or_wait": "Resolve registry or network errors and retry.", "required": true, "source_ids": ["S9"]},
-    {"step_number": 3, "phase": "run", "actor": "developer", "interface": "cli", "action": "Start the documented one-node RF=1 cluster.", "details": [], "input": "docker run -d --name yugabyte -p 7000:7000 -p 9000:9000 -p 15433:15433 -p 5433:5433 -p 9042:9042 yugabytedb/yugabyte:2026.1.0.0-b118 bin/yugabyted start --background=false", "output": "The `yugabyte` container starts.", "success_signal": "`docker exec -it yugabyte yugabyted status` reports `Status : Running.`", "failure_or_wait": "On macOS Monterey, map host port 7001 to container port 7000 or disable AirPlay receiving.", "required": true, "source_ids": ["S9"]},
-    {"step_number": 4, "phase": "connect", "actor": "developer", "interface": "cli", "action": "Open the bundled YSQL shell inside the container.", "details": [], "input": "docker exec -it yugabyte bash -c '/home/yugabyte/bin/ysqlsh --echo-queries --host $(hostname)'", "output": "ysqlsh connects to the local cluster.", "success_signal": "The terminal displays `yugabyte=#`.", "failure_or_wait": "Wait for cluster status to become Running before retrying.", "required": true, "source_ids": ["S9"]}
-  ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
-  "branches": [
     {
-      "at_step": 2,
-      "condition": "Account authentication method",
-      "path": "Use an email-based account, Google, GitHub, LinkedIn, or an organization-configured federated identity provider.",
-      "effect_on_first_success": "The methods are officially named, but their signup-time intermediate actions and convergence on the first authenticated screen are not documented.",
+      "order": 1,
+      "type": "account",
+      "requirement": "YugabyteDB Aeon account.",
+      "required": true,
       "source_ids": [
-        "S3",
-        "S8"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Existing authenticated account",
-      "path": "Continue with the fully documented post-gate sequence: choose manual or guided onboarding, create a Sandbox, save credentials, wait for Overview, launch Cloud Shell, authenticate, and observe the ysqlsh prompt.",
-      "effect_on_first_success": "This resolves the account predecessor for an existing user but does not repair the missing first-user signup journey required by the roster research.",
-      "source_ids": [
-        "S1",
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Local product route",
-      "path": "Use the separate local YugabyteDB quick start rather than Aeon.",
-      "effect_on_first_success": "Avoids the managed-account gate but changes the product surface and introduces local installation and cluster startup.",
-      "source_ids": [
-        "S6"
-      ]
-    }
-  ],
-  "friction_gates": [
-    {
-      "at_step": 2,
-      "type": "access",
-      "description": "The signup application's static unauthenticated response requires JavaScript, and official docs do not expose the form or account-creation sequence needed to reach login.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S3",
-        "S7",
-        "S8"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "choice",
-      "description": "Email-based, social, and federated authentication are named, but no complete signup candidate is documented.",
-      "documented_requirement": false,
-      "source_ids": [
-        "S3",
-        "S8"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "credential",
-      "description": "In the documented downstream wizard, the database credential file must be saved; the official Sandbox guide states that losing it means the database cannot be used.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "wait",
-      "description": "A downstream Sandbox pauses after 10 days inactive. The documented recovery is to sign in, select the cluster, and click Resume; if not resumed, it is deleted after 15 days.",
-      "documented_requirement": false,
-      "source_ids": [
-        "S2",
-        "S5"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "wait",
-      "description": "A downstream Cloud Shell session lasts one hour and may disconnect after five idle minutes. The documented recovery is to close the browser tab and connect again.",
-      "documented_requirement": false,
-      "source_ids": [
-        "S1",
-        "S4"
-      ]
-    }
-  ],
-  "time_to_first_success": {
-    "vendor_claim": false,
-    "value": "not documented",
-    "source_ids": []
-  },
-  "sources": [
-    {
-      "id": "S1",
-      "title": "YugabyteDB Aeon quick start",
-      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
-      "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Quick start",
-        "Create your Sandbox cluster",
-        "Connect to the cluster",
-        "Explore distributed SQL",
-        "Build an application"
-      ],
-      "evidence_supported": [
-        "Signup-first order",
-        "Guided tutorial summary",
-        "Manual Sandbox path",
-        "No-card claim",
-        "Provisioning wait",
-        "Cloud Shell path",
-        "Post-login prompt"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Create a Sandbox cluster",
-      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-basics/create-clusters/create-clusters-free/",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Features",
-        "Create a Sandbox cluster",
-        "Database admin credentials",
-        "Inactive Sandbox clusters",
-        "Limitations"
-      ],
-      "evidence_supported": [
-        "Full post-login wizard",
-        "All provider, region, plan, security, credential and resource choices",
-        "Credential warning",
-        "Provisioning terminal",
-        "Resource limits",
-        "Pause, resume and deletion"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Manage account authentication",
-      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/managed-security/managed-authentication/",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Manage account authentication",
-        "Social logins",
-        "Federated authentication"
-      ],
-      "evidence_supported": [
-        "Authentication classes",
-        "Google, GitHub and LinkedIn",
-        "Federated provider option",
-        "Missing signup sequence"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Connect using Cloud Shell",
-      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-connect/connect-cloud-shell/",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Connect using Cloud Shell",
-        "Limitations",
-        "Connect via Cloud Shell"
-      ],
-      "evidence_supported": [
-        "No local CA or special network",
-        "YSQL and YCQL",
-        "Cloud Shell steps",
-        "Startup wait",
-        "Password action",
-        "Post-login prompt",
-        "Session recovery and limits"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "YugabyteDB Aeon FAQ",
-      "url": "https://docs.yugabyte.com/stable/faq/yugabytedb-managed-faq/",
-      "official_domain": true,
-      "source_type": "help-center",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "What are the differences between Sandbox and Dedicated clusters?",
-        "Why is my Sandbox cluster paused?",
-        "How do I keep my Sandbox cluster from being paused or deleted?"
-      ],
-      "evidence_supported": [
-        "Sandbox limits",
-        "Price",
-        "Inactivity behavior",
-        "Resume recovery"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "YugabyteDB Aeon",
-      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "YugabyteDB Aeon",
-        "Sign up to create a Sandbox cluster",
-        "Documentation footer"
-      ],
-      "evidence_supported": [
-        "Managed-service identity",
-        "No-card positioning",
-        "YugabyteDB, Inc. ownership",
-        "Local versus managed surfaces"
-      ]
-    },
-    {
-      "id": "S7",
-      "title": "YugabyteDB Aeon",
-      "url": "https://cloud.yugabyte.com/signup",
-      "official_domain": true,
-      "source_type": "account-setup",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Public response"
-      ],
-      "evidence_supported": [
-        "JavaScript requirement",
-        "No signup fields or transition in the static unauthenticated response"
-      ]
-    },
-    {
-      "id": "S8",
-      "title": "Manage account access",
-      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/managed-security/manage-access/",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Manage account users",
-        "Invite users"
-      ],
-      "evidence_supported": [
-        "Email-based, social, and federated account access classes",
-        "Invited-user verification and password setup sequence",
-        "No self-service signup sequence"
-      ]
-    },
-    {
-      "id": "S9",
-      "title": "YugabyteDB Quick start for Docker",
-      "url": "https://docs.yugabyte.com/stable/quick-start/docker/",
-      "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": "2026-06-30",
-      "sections_used": ["Prerequisites", "Install", "Create a local cluster", "Connect to the database"],
-      "evidence_supported": ["Workshop-policy local route selection", "Current image", "One-node Docker command", "Running status", "ysqlsh prompt"]
-    }
-  ],
-  "uncertainties": [
-    {
-      "question": "What exact fields, agreements, verification, password rules, and submission states appear in self-service Aeon signup?",
-      "impact": "The required account journey, page count, authentication branch, and transition to login cannot be recorded.",
-      "reason_unresolved": "Official docs link signup but do not document its self-service sequence, and the signup application's static unauthenticated response exposes only a JavaScript requirement.",
-      "checked_source_ids": [
-        "S1",
-        "S3",
-        "S7",
-        "S8"
-      ]
-    },
-    {
-      "question": "What exact screens and queries appear in the first-login 15 minute Get Started tutorial?",
-      "impact": "The default guided route cannot be reconstructed as a candidate.",
-      "reason_unresolved": "The quick start lists its outcomes but not its ordered UI or terminal signal.",
-      "checked_source_ids": [
         "S1"
       ]
     },
     {
-      "question": "Which login methods are enabled by default for a newly created self-service account, and how does each method converge on the welcome screen?",
-      "impact": "Authentication steps may differ materially before cluster creation.",
-      "reason_unresolved": "The authentication docs list supported methods and administrator configuration but not default first-user behavior.",
-      "checked_source_ids": [
-        "S3",
-        "S8"
+      "order": 2,
+      "type": "billing",
+      "requirement": "No credit card for Sandbox.",
+      "required": false,
+      "source_ids": [
+        "S1"
       ]
     }
   ],
+  "primary_path": [
+    {
+      "step_number": 1,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Sign up and log in to Aeon.",
+      "details": [],
+      "input": "Intent",
+      "output": "Session",
+      "success_signal": "Create Cluster reachable",
+      "failure_or_wait": "Verify delay",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create Sandbox cluster; download admin credentials.",
+      "details": [],
+      "input": "Session",
+      "output": "Ready cluster",
+      "success_signal": "Cluster Overview",
+      "failure_or_wait": "~5 min wait",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Launch Cloud Shell (YSQL, admin, yugabyte DB).",
+      "details": [],
+      "input": "Cluster",
+      "output": "Password prompt",
+      "success_signal": "Shell asks password",
+      "failure_or_wait": "Up to 30s",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Enter admin password; confirm ysqlsh prompt.",
+      "details": [],
+      "input": "Password",
+      "output": "YSQL session",
+      "success_signal": "yugabyte=>",
+      "failure_or_wait": "Bad password",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "branches": [],
+  "friction_gates": [
+    {
+      "at_step": 2,
+      "type": "wait",
+      "description": "~5 minute cluster provisioning.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "around 5 minutes cluster provisioning",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Aeon quick start",
+      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Quick start",
+        "Create Sandbox",
+        "Connect"
+      ],
+      "evidence_supported": [
+        "Sandbox",
+        "Cloud Shell",
+        "ysqlsh",
+        "5 minutes"
+      ]
+    }
+  ],
+  "uncertainties": [],
   "excluded_after_success": [
-    "No complete first-success boundary is claimed while signup remains undocumented.",
-    "The documented downstream SQL tutorial, sample-data loading, and sample application are outside the blocked public path.",
-    "Desktop clients, CA certificates, application integration, API keys, ybm CLI, Terraform, Dedicated clusters, billing, VPCs, backups, scaling, and production configuration are outside scope."
-  ]
+    "Local Docker",
+    "Dedicated",
+    "Sample apps"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }

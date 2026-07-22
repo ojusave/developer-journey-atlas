@@ -7,36 +7,32 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "8683d58cc16191b120ed34bea4ae9540af6630fa84d08bba278557b79849a0de",
+  "source_record_sha256": "b466157c7b0af51c0f3e39954cd640bcb3443a238cc2f66888a3eb24ccac0997",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and can receive email when the selected route requires it.",
-      "No platform account, tenant, credentials, or product resources exist yet."
+      "No AssemblyAI account, API key, or transcript is assumed.",
+      "A terminal with cURL is available; jq is helpful for the documented poll example. No language SDK is assumed."
     ]
   },
-  "developer_goal": "Create an AssemblyAI account and use the official Python Quickstart to transcribe the hosted wildfire sample until transcript text is printed.",
+  "developer_goal": "Create an AssemblyAI account and API key, then transcribe the hosted sample over HTTPS without installing an SDK.",
   "first_success": {
-    "outcome": "The Python SDK transcribes AssemblyAI's hosted wildfire sample.",
-    "observable_signal": "The terminal prints transcript text beginning with Smoke from hundreds of wildfires...",
+    "outcome": "Authenticated cURL submit and poll against https://api.assemblyai.com/v2/transcript return completed transcript text for the hosted wildfires sample.",
+    "observable_signal": "GET /v2/transcript/{id} returns status completed and text beginning with the wildfires sample content.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S3"
     ]
   },
   "route_selection": {
-    "surface": "AssemblyAI Quickstart through a first pre-recorded transcription",
-    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
-    "selected": null,
+    "surface": "Pre-recorded transcription via cURL HTTP API (API key + free trial credits)",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Pre-recorded transcription via cURL HTTP API (API key + free trial credits)",
     "candidates": [
       {
-        "name": "Email or Google signup then Python SDK wildfire transcription",
-        "status": "unresolved",
-        "reason": "Exact signup fields and verification states are not publicly enumerated after the first choice."
-      },
-      {
-        "name": "Playground transcription without writing code",
-        "status": "not-selected",
-        "reason": "Different interaction surface from the documented SDK quickstart terminal."
+        "name": "Pre-recorded transcription via cURL HTTP API (API key + free trial credits)",
+        "status": "selected",
+        "reason": "The AssemblyAI Quickstart documents Using the HTTP API directly with cURL: authorization header (no Bearer prefix), POST /v2/transcript, then poll GET /v2/transcript/{id} until completed. Support docs state a limited free trial includes pre-recorded transcription with $50 of audio processing. An SDK install is not required."
       }
     ]
   },
@@ -45,19 +41,10 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create an AssemblyAI account and open the dashboard.",
-      "required_fields": [
-        {
-          "label": "Email or Google signup fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "An API key is available in the dashboard.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to an AssemblyAI account.",
+      "required_fields": [],
+      "observable_result": "API Keys settings are reachable.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1",
         "S2"
@@ -66,48 +53,59 @@
     {
       "step_number": 2,
       "kind": "implementation",
+      "interface": "other",
+      "action": "Confirm free-trial credits remain for pre-recorded transcription (or add a card and funds if the free $50 limit is exhausted).",
+      "required_fields": [],
+      "observable_result": "Billing shows remaining free-trial balance or positive funded balance.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Create or copy an API key from the dashboard and store it securely.",
+      "required_fields": [],
+      "observable_result": "The key value is available locally.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
       "interface": "cli",
-      "action": "Install the AssemblyAI SDK.",
-      "required_fields": [
-        {
-          "label": "pip install assemblyai",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The assemblyai package is installed.",
+      "action": "Export ASSEMBLYAI_API_KEY in the terminal.",
+      "required_fields": [],
+      "observable_result": "The environment variable is set for the current shell.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "step_number": 3,
+      "step_number": 5,
       "kind": "implementation",
-      "interface": "code",
-      "action": "Set ASSEMBLYAI_API_KEY and run the wildfire transcription sample.",
-      "required_fields": [
-        {
-          "label": "ASSEMBLYAI_API_KEY environment variable",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Transcription sample script",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "Transcript text for the hosted sample is printed.",
+      "interface": "api",
+      "action": "Submit a transcript with cURL POST to https://api.assemblyai.com/v2/transcript, then poll GET until status is completed.",
+      "required_fields": [],
+      "observable_result": "status is completed and text is present.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the transcript text is printed from the completed JSON.",
+      "required_fields": [],
+      "observable_result": "Transcript text for the wildfires sample is visible.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -116,33 +114,60 @@
   ],
   "prerequisites": [
     {
-      "description": "An API key from the dashboard is required.",
+      "description": "An AssemblyAI account that can open the dashboard API Keys page.",
       "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Google identity-provider authorization when choosing Google signup.",
-      "source_ids": [
+        "S1",
         "S2"
       ]
-    }
-  ],
-  "unavoidable_waits": [],
-  "platform_outcomes": [
+    },
     {
-      "description": "AssemblyAI returns the completed transcript for the sample audio.",
+      "description": "Usable free-trial audio processing credits (up to $50). Adding a credit card upgrades after the free limit; it is not required for the first free-trial call.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "An API key sent in the authorization header (no Bearer prefix).",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A terminal with cURL (and jq for the documented poll loop). No language SDK is required.",
       "source_ids": [
         "S1"
       ]
     }
   ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Installing AssemblyAI MCP or coding-agent skill",
-      "reason": "Optional agent tooling, not required for the SDK sample.",
+      "item": "SDK installation",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Speaker labels and language detection options",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Streaming STT and LLM Gateway",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Paid top-up beyond free-trial first success",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
@@ -151,52 +176,45 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Quickstart: Transcribe an audio file",
-      "url": "https://www.assemblyai.com/docs/getting-started/transcribe-an-audio-file",
+      "title": "Quickstart - Transcribe a pre-recorded audio file",
+      "url": "https://www.assemblyai.com/docs/pre-recorded-audio/getting-started/transcribe-an-audio-file",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "API key env",
-        "SDK install",
-        "Wildfire sample"
+        "ASSEMBLYAI_API_KEY export",
+        "cURL POST/GET /v2/transcript",
+        "Hosted wildfires sample",
+        "SDK optional"
       ]
     },
     {
       "id": "S2",
-      "title": "AssemblyAI dashboard signup",
+      "title": "AssemblyAI Sign Up",
       "url": "https://www.assemblyai.com/dashboard/signup",
-      "source_type": "observed-public-ui",
+      "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Signup entry"
+        "Google and email signup entry"
       ]
     },
     {
       "id": "S3",
-      "title": "Account management docs",
-      "url": "https://www.assemblyai.com/docs/account-management",
+      "title": "Can I sign up for free?",
+      "url": "https://support.assemblyai.com/articles/5370767329-can-i-sign-up-for-free",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Account management"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Can I sign up for free?",
-      "url": "https://support.assemblyai.com/articles/5370767329-can-i-sign-up-for-free",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Free signup positioning"
+        "$50 free audio processing",
+        "Pre-recorded transcription on free tier",
+        "Credit card upgrade / top-up after limit"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact email fields, password rules, terms, verification actions, and Google consent states lead to the dashboard API key?",
-      "impact": "Blocks verified account-step fields.",
-      "evidence_needed": "Fresh-account signup walkthrough through first API key visibility."
+      "question": "Exact email/Google signup field sequence after the first provider choice.",
+      "impact": "Account-step field inventory stays coarse for demos.",
+      "evidence_needed": "Public signup shell does not enumerate every downstream registration state."
     }
   ],
   "counts": null
