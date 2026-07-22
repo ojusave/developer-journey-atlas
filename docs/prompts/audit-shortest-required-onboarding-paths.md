@@ -1,4 +1,188 @@
-# Audit the shortest required developer onboarding paths
+# Cursor prompt: audit the shortest required developer onboarding paths
+
+## Where we are now
+
+You are working on Developer Journey Atlas.
+
+- Canonical GitHub repository: `https://github.com/ojusave/developer-journey-atlas`
+- Local repository: `/Users/ojusave/Desktop/Samples/work/workshops/devrelcon-first-mile/scanner-app`
+- Production: `https://developer-journey-atlas.onrender.com`
+- The canonical branch is `main`. Pull the latest `main` before creating a focused audit branch.
+- PR #5 established the new account-creation-to-first-success audit contract and is merged.
+- The repository contains 205 preserved source-evidence records in `packages/journey-corpus/records/`.
+- Do not rewrite those records. Their exact SHA-256 hashes are checked by the audit validator.
+- The separate authoritative audit layer is `packages/journey-corpus/audits/`.
+- `packages/journey-corpus/shortest-path-audit.schema.json` defines the machine-readable audit contract.
+- `packages/journey-corpus/audit-status.json` is generated, not hand-edited.
+- Render is the verified calibration case: 8 required actions, 13 required fields, 1 unavoidable wait, and 1 external gate.
+- Zoom is `needs-human-judgment`. Its counts are correctly withheld because the exact app goal and a reported Marketplace terms screen remain unresolved.
+- The other 203 platforms are `pending` and their legacy step totals are correctly withheld from the UI, catalog, LLM artifacts, and peer comparison.
+- The live wrapper, API, human catalog, and LLM-readable files already enforce those states. Do not rebuild the product or invent a new scoring system.
+- An unrelated local file named `docs/prompts/migrate-atlas-research-to-render-workflows.md` may be untracked. Preserve it and do not stage, edit, delete, or include it in audit commits.
+
+Before editing, run `git status -sb`, inspect the current branch, fetch `atlas`, and confirm that you are based on the latest `atlas/main`. Never push to the legacy `origin` remote.
+
+## Where we want to be
+
+Move the corpus from 1 verified, 1 unresolved, and 203 pending records toward a fully re-audited Atlas, one evidence-safe batch at a time.
+
+For every completed platform audit:
+
+1. The path starts at account creation.
+2. The path ends at the earliest meaningful, observable developer success for one bounded developer goal.
+3. The selected route is the lowest-friction complete self-service route under the lexicographic route rule below.
+4. Every required developer action is present in order.
+5. Every required field is listed under the action or form that contains it.
+6. Required actions and required fields are counted separately.
+7. Required agreements, verification, permissions, authorizations, commands, code changes, waits, gates, and observable outcomes are preserved in the correct fields.
+8. Documentation reading, optional work, passive waiting, and automatic platform behavior are not counted as developer actions.
+9. Every included fact is supported by current official evidence.
+10. If the route, field list, or terminal cannot be established safely, the audit is `needs-human-judgment` or `blocked`, and all public counts remain null.
+
+The desired result is accurate, attributable data that a human and an LLM can read without additional interpretation. It is not a large number of superficially completed JSON files.
+
+## What we are looking for
+
+For each platform, reconstruct the actual clicks and implementation work a new developer must complete, not the headings in a tutorial.
+
+Look specifically for:
+
+- every account-creation screen and required signup field;
+- email, phone, identity-provider, age, captcha, passkey, or multifactor verification;
+- legal or Marketplace agreements that are mandatory before first success;
+- workspace, organization, tenant, region, plan, role, and entitlement choices;
+- billing or payment gates, including whether a no-payment route reaches the same success;
+- repository, application, project, resource, credential, and API-key creation;
+- every mandatory field on each required form, including required values that may be prefilled or generated;
+- external authorizations, requested scopes, repository permissions, administrator approvals, and trust-boundary crossings;
+- required installation, CLI, SDK, dependency, environment, code, configuration, and command work;
+- asynchronous waits such as email delivery, provisioning, builds, deploys, review, and approval;
+- the exact action needed to observe first success and the visible success signal;
+- shorter official alternatives and why each was selected, rejected, or left unresolved;
+- optional fields, optional customization, documentation navigation, automatic platform outcomes, and post-success work that must be explicitly excluded;
+- authenticated or dynamic screens whose required fields cannot be established from public evidence;
+- contradictions between current docs, support pages, changelogs, and the current public product UI.
+
+Do not look for or claim observed drop-off, conversion, difficulty, completion time, prevalence, or usability. This corpus describes route structure only.
+
+## Execution steps
+
+### 1. Establish a safe batch
+
+- Start from latest `atlas/main` and create a focused branch such as `research/audit-cloud-batch-01`.
+- Select a small coherent batch, preferably 5 to 10 platforms in one category.
+- Do not attempt 203 audits in one unreviewable change.
+- Record the selected slugs before research and do not edit outside that batch unless a shared validator defect must be fixed.
+- Confirm that no file under `packages/journey-corpus/records/` changes.
+
+### 2. Read the contract before researching
+
+Read completely:
+
+- this prompt;
+- `packages/journey-corpus/SELECTION-POLICY.md`;
+- `packages/journey-corpus/MEASUREMENT-CONTRACT.md`;
+- `packages/journey-corpus/shortest-path-audit.schema.json`;
+- `packages/journey-corpus/audits/render.json`;
+- `packages/journey-corpus/audits/zoom.json`;
+- `packages/journey-corpus/scripts/validate-shortest-path-audits.mjs`;
+- the preserved source record for every assigned platform.
+
+Treat Render as the verified granularity example and Zoom as the correct example of withholding unsafe counts.
+
+### 3. Define one bounded developer goal
+
+- Find the vendor's current official getting-started or quickstart goal.
+- If the platform contains several products or app types, do not create a fake universal route.
+- Select one bounded goal only when official evidence establishes it as the default or shortest comparable goal.
+- Otherwise enumerate the consequential candidates and return `needs-human-judgment`.
+- Write the first-success outcome and observable signal before constructing the path.
+
+### 4. Build the route graph
+
+- Represent product states as nodes and required developer interactions as edges.
+- Include account creation as the first measured state transition.
+- Build every plausible complete official route to the same success.
+- Remove optional actions and automatic platform events from the developer-action graph.
+- Keep waits and gates as annotations, not action edges, unless a later developer interaction is required to continue.
+- Apply the lexicographic route rule below. Do not invent weighted friction values.
+
+### 5. Reconstruct every action and field
+
+- Follow the selected route screen by screen and tool by tool.
+- One submitted form is one developer action.
+- List every required field, agreement, checkbox, challenge, permission, or value beneath that form action.
+- Split actions when the developer crosses screens, tools, trust boundaries, or observable states.
+- Split independent commands and code changes when each must be executed or saved separately.
+- Never compress missing evidence into `complete setup` or `configure the app`.
+- Never split one form into one action per field.
+
+### 6. Gather current official evidence
+
+- Use official documentation, official support, official changelogs, official repositories, and observed public UI only.
+- Search results are discovery aids, not evidence.
+- Open every cited source and record the access date.
+- Inspect public unauthenticated UI when it resolves a documented gap.
+- Do not create accounts, accept terms, deploy resources, send production requests, or cause external changes merely to complete an audit.
+- If an authenticated transition hides required screens or fields, preserve the gap and lower the status.
+
+### 7. Write the sidecar audit
+
+- Create or update only `packages/journey-corpus/audits/<slug>.json` for assigned platforms.
+- Copy the exact SHA-256 of `packages/journey-corpus/records/<slug>.json` into `source_record_sha256`.
+- Use `counts: null` for every status except `verified`.
+- A verified audit cannot contain an unverified action, unverified field, unresolved consequential choice, or hidden transition.
+- Keep candidate routes, exclusions, waits, gates, platform outcomes, uncertainties, and evidence needed explicit.
+- Do not hand-edit `audit-status.json`.
+
+### 8. Perform a separate evidence review
+
+- The maker may not approve its own audit without a cold second pass.
+- Reopen every load-bearing source without relying on the draft narrative.
+- Confirm each action is required, every mandatory field is present, and no shorter no-payment or no-approval route was missed.
+- Confirm optional work, documentation reading, platform automation, and passive waits are excluded from the action count.
+- Downgrade the audit if the checker cannot reproduce the same route and terminal from the evidence.
+
+### 9. Regenerate and verify
+
+Run:
+
+```sh
+npm --prefix packages/journey-corpus run audit:paths
+npm --prefix packages/journey-corpus run audit:paths:check
+npm --prefix packages/journey-corpus run check
+npm --prefix packages/journey-corpus test
+npm --prefix packages/journey-corpus run test:app
+npm --prefix packages/journey-corpus run site
+node packages/journey-corpus/scripts/check-llm-site.mjs
+npm run test:all
+npm run typecheck
+npm run build
+render blueprints validate render.yaml
+git diff --check
+```
+
+Then verify:
+
+- source-record hashes remain unchanged;
+- verified action counts equal the path length;
+- verified field counts equal the total nested required fields;
+- nonverified audits have null counts;
+- pending records expose no legacy path or comparison totals;
+- the catalog and LLM files show `withheld` for nonverified records;
+- mobile and desktop UI do not overflow and retain progressive disclosure;
+- no score, rank, drop-off, conversion, or causal claim has been introduced.
+
+### 10. Publish one reviewable batch
+
+- Stage only the assigned audits and directly related generated or validation files.
+- Never stage unrelated local work.
+- Commit with a scoped message such as `Audit shortest paths for cloud batch 01`.
+- Push only to the `atlas` remote.
+- Open a pull request against `ojusave/developer-journey-atlas:main`.
+- In the PR, list every platform and its final status, exact unresolved evidence, validation results, and confirmation that source records were unchanged.
+- Do not merge until all required checks pass.
+- After merge, wait for the Render auto-deploy and verify the production health endpoint, audited platform APIs, audit-status file, human catalog, and `llms.txt`.
 
 ## Role
 
