@@ -129,6 +129,10 @@ let approvedCorpusDrift = 0;
 const approvedCorpusDriftPaths = new Set([
   "records/zoom.json",
   "records/paypal.json",
+  "records/openai.json",
+  "records/fireworks-ai.json",
+  "records/cohere.json",
+  "records/cerebras-inference.json",
 ]);
 for (const { path, blob } of protectedCorpusEntries) {
   const current = await readFile(resolve(root, "packages/journey-corpus", path));
@@ -141,7 +145,7 @@ for (const { path, blob } of protectedCorpusEntries) {
 }
 if (importMismatches === 0) {
   const driftNote = approvedCorpusDrift
-    ? `; ${approvedCorpusDrift} approved post-import first-success corrections (Zoom, PayPal)`
+    ? `; ${approvedCorpusDrift} approved post-import first-success corrections (API-boundary fixes)`
     : "";
   pass(
     "journey-import",
