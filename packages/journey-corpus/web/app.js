@@ -99,68 +99,30 @@ const runSearch = debounce(async (q) => {
   }
 }, 160);
 
-/* ---------- Rendering one platform's documented route ---------- */
+/* ---------- Rendering one platform's onboarding flow ---------- */
 
-// A short, honest "how to read this" strip shown with every result. It frames
-// the content as documented steps, not a measurement, score, or ranking.
-function readStrip() {
+function stepFields(fields) {
+  if (!fields || fields.length === 0) return "";
   return `
-    <p class="read-strip">
-      <strong>What this means:</strong> this is the route described by official docs. It is not observed
-      developer behavior, a conversion rate, or a product ranking.
-    </p>`;
+    <ul class="step-fields" aria-label="Required fields">
+      ${fields.map((f) => `<li><strong>${esc(f.label)}</strong>${f.type ? ` <span class="step-tag">${esc(f.type)}</span>` : ""}</li>`).join("")}
+    </ul>`;
 }
 
-function renderLoad(load) {
-  if (!load || !load.available) {
-    return `
-      <section class="load-card load-unavailable" aria-labelledby="load-title">
-        <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
-        <h3 id="load-title">${esc(load?.label || "Comparison unavailable")}</h3>
-        <p>${esc(load?.summary || "There is not enough qualified evidence for a peer comparison.")}</p>
-        <p class="microcopy">${esc(load?.note || "No drop-off score is inferred from documentation.")}</p>
-      </section>`;
-  }
-
-  const components = (load.components || []).map((component) => `
-    <li class="signal-row">
-      <span><strong>${num(component.value)}</strong> ${esc(component.label)}</span>
-      <span class="position position-${esc(component.position)}">${esc(component.position)} peer median (${num(component.peerMedian)})</span>
-    </li>`).join("");
-
+function stepFriction(gates) {
+  if (!gates || gates.length === 0) return "";
   return `
-    <section class="load-card" aria-labelledby="load-title">
-      <div class="load-head">
-        <div>
-          <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
-          <h3 id="load-title">${esc(load.label)}</h3>
-        </div>
-        <span class="load-score" aria-label="${num(load.signalsAboveMedian)} of ${num(load.signalCount)} signals above peer median">
-          ${num(load.signalsAboveMedian)}<small>/${num(load.signalCount)}</small>
-        </span>
-      </div>
-      <p>${esc(load.summary)}</p>
-      <ul class="signal-list">${components}</ul>
-      <p class="microcopy">${esc(load.note)}</p>
-    </section>`;
-}
-
-/** Counts are null for non-verified audits; never dereference routeSignals blindly. */
-function renderSignals(routeSignals) {
-  if (!routeSignals) {
-    return '<p class="withheld">Counts withheld until this path is verified.</p>';
-  }
-  return `
-        <div class="signal-counters" aria-label="Documented route signals">
-          <div><strong>${num(routeSignals.requiredActions)}</strong><span>required actions</span></div>
-          <div><strong>${num(routeSignals.requiredFields ?? routeSignals.decisions)}</strong><span>required fields</span></div>
-          <div><strong>${num(routeSignals.waits)}</strong><span>waits</span></div>
-          <div><strong>${num(routeSignals.gates)}</strong><span>gates</span></div>
-        </div>`;
+    <div class="step-friction">
+      ${gates.map((g) => `
+        <p class="friction-note">
+          <span class="chip chip-friction">${esc(g.type || "friction")}</span>
+          ${esc(g.description)}
+        </p>`).join("")}
+    </div>`;
 }
 
 function stepItem(s) {
-  const meta = [s.phase, s.actor, s.interface]
+  const meta = [s.phase, s.interface]
     .filter(Boolean)
     .map((x) => `<span class="step-tag">${esc(x)}</span>`)
     .join("");
@@ -168,122 +130,80 @@ function stepItem(s) {
     ? `<ul class="step-details">${s.details.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>`
     : "";
   const signal = s.successSignal
-    ? `<p class="step-signal"><strong>Success signal:</strong> ${esc(s.successSignal)}</p>`
+    ? `<p class="step-signal">Done when: ${esc(s.successSignal)}</p>`
     : "";
-  const optional = s.required ? "" : '<span class="step-optional">optional</span>';
+  const optional = s.required === false ? '<span class="step-optional">optional</span>' : "";
+  const frictionClass = s.hasFriction ? " step-has-friction" : "";
   return `
-    <li class="step">
+    <li class="step${frictionClass}">
       <div class="step-head"><span class="step-num">${num(s.stepNumber)}</span>${meta}${optional}</div>
       <p class="step-action">${esc(s.action)}</p>
       ${details}
+      ${stepFields(s.requiredFields)}
       ${signal}
+      ${stepFriction(s.frictionGates)}
     </li>`;
 }
 
-function renderAssessment(a) {
-  const prerequisites = a.prerequisites || [];
-  const frictionGates = a.frictionGates || [];
-  const sourceList = a.sources || [];
-  const stepList = a.steps || [];
-  const firstSuccess = a.firstSuccess || {};
-
-  const prereqs = prerequisites.length
-    ? `<ul class="prereq-list">${prerequisites
-        .map((p) => {
-          const label = p.type && p.type !== "other" ? esc(p.type) : "prerequisite";
-          const req = p.requirement ? esc(p.requirement) : label;
-          const badge = p.required
-            ? `<span class="chip chip-inline req">${label} (required)</span>`
-            : `<span class="chip chip-inline">${label}</span>`;
-          return `<li>${badge}<span class="prereq-text">${req}</span></li>`;
-        })
-        .join("")}</ul>`
-    : '<p class="lede">No prerequisites documented for this route.</p>';
-
-  const gates = frictionGates.length
-    ? `<ul class="gate-list">${frictionGates
-        .map((g) => `<li><span class="chip">${esc(g.type)}</span> ${esc(g.description)}${g.atStep ? ` <span class="gate-step">(at step ${num(g.atStep)})</span>` : ""}</li>`)
-        .join("")}</ul>`
-    : '<p class="lede">No friction gates documented on this route.</p>';
-
-  const sources = sourceList.length
-    ? `<ul class="sources-list">${sourceList
-        .slice(0, 8)
-        .map((s) => `<li><a href="${esc(s.url)}" rel="noreferrer">${esc(s.title)}</a></li>`)
-        .join("")}${sourceList.length > 8 ? `<li>+ ${sourceList.length - 8} more in the record</li>` : ""}</ul>`
-    : '<p class="lede">See the full record for sources.</p>';
-
+/** Journey-first view: platform name + numbered onboarding steps only. */
+function renderJourney(journey) {
+  const stepList = journey.steps || [];
   const steps = stepList.length
     ? `<ol class="steps-list">${stepList.map(stepItem).join("")}</ol>`
-    : '<p class="lede">Open the full record for the documented steps.</p>';
-
-  const asOf = a.researchedAt
-    ? ` Documented from official docs as of ${esc(a.researchedAt)}. Docs change.`
+    : '<p class="lede">No documented onboarding steps are available for this platform yet.</p>';
+  const frictionHint = journey.highlightedStepCount
+    ? `<p class="journey-hint">${num(journey.highlightedStepCount)} step${journey.highlightedStepCount === 1 ? "" : "s"} mark documented friction (hypothesis, not observed drop-off).</p>`
     : "";
 
-  const prompts = a.investigationPrompts?.length
-    ? `<ul class="prompt-list">${a.investigationPrompts.map((prompt) => `<li>${esc(prompt)}</li>`).join("")}</ul>`
-    : '<p class="lede">No specific investigation prompts were derived from the documented route.</p>';
-
-  const stepLabel = a.pathStepCount == null ? "see record" : `${num(a.pathStepCount)} steps`;
-
   return `
-    <div class="card">
+    <div class="card journey-card">
       <div class="assess-head">
-        <h2>${esc(a.name)}</h2>
-        <span class="pill pill-cat">${esc(a.category)}</span>
+        <h2>${esc(journey.name)}</h2>
+        <span class="pill pill-cat">${esc(journey.category)}</span>
       </div>
-      <p class="lede">${esc(a.outcome)}</p>
-      ${readStrip()}
-
-      <div class="summary-grid">
-        <div class="summary-block">
-          <p class="section-kicker">DOCUMENTED FIRST SUCCESS</p>
-          <p class="summary-answer">${esc(firstSuccess.milestone || firstSuccess.normalizedOutcome || a.outcome)}</p>
-          <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
-        </div>
-        ${renderSignals(a.routeSignals)}
-      </div>
-
-      ${renderLoad(a.onboardingLoad)}
-
-      <section class="prompt-card" aria-labelledby="prompt-title">
-        <p class="section-kicker">WHERE TO INVESTIGATE</p>
-        <h3 id="prompt-title">Possible attention points</h3>
-        <p class="microcopy">These prompts come from documented gates and prerequisites. They are not recorded causes of drop-off.</p>
-        ${prompts}
-      </section>
-
-      <details class="detail-panel">
-        <summary>Open the full documented route <span>${esc(stepLabel)}</span></summary>
-        <dl class="kv">
-          <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
-          <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
-        </dl>
-        <h3 class="steps-heading">Documented steps <span class="steps-count">${esc(stepLabel)}</span></h3>
-        ${steps}
-      </details>
-
-      <details class="detail-panel sources-block">
-        <summary>Check the evidence <span>${num(a.sourceCount)} official sources</span></summary>
-        ${sources}
-      </details>
-
-      <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Open the full evidence record (JSON)</a></p>
-      <p class="dist-line note-line">${esc(a.note)}${asOf}</p>
+      <p class="lede">Onboarding from account creation to first success, step by step.</p>
+      ${frictionHint}
+      <h3 class="steps-heading visually-hidden">Onboarding steps</h3>
+      ${steps}
     </div>`;
+}
+
+/** Fallback when only an assessment payload exists (e.g. fresh research draft). */
+function renderAssessmentAsJourney(a) {
+  const gatesByStep = new Map();
+  for (const gate of a.frictionGates || []) {
+    if (gate.atStep == null) continue;
+    const list = gatesByStep.get(gate.atStep) || [];
+    list.push(gate);
+    gatesByStep.set(gate.atStep, list);
+  }
+  const steps = (a.steps || []).map((s) => {
+    const frictionGates = gatesByStep.get(s.stepNumber) || [];
+    return { ...s, hasFriction: frictionGates.length > 0, frictionGates };
+  });
+  return renderJourney({
+    name: a.name,
+    category: a.category,
+    steps,
+    highlightedStepCount: steps.filter((s) => s.hasFriction).length,
+  });
 }
 
 async function showPlatform(slug) {
   hideSuggestions();
   el.result.hidden = false;
-  el.result.innerHTML = '<div class="state-message">Loading the documented route…</div>';
+  el.result.innerHTML = '<div class="state-message">Loading the onboarding flow…</div>';
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
   try {
-    const assessment = await api(`/api/platforms/${encodeURIComponent(slug)}`);
-    el.result.innerHTML = renderAssessment(assessment.data);
-  } catch (err) {
-    el.result.innerHTML = `<div class="state-message"><strong>Could not load that platform.</strong><br>${esc(err.message)}</div>`;
+    const journey = await api(`/api/platforms/${encodeURIComponent(slug)}/journey`);
+    el.result.innerHTML = renderJourney(journey.data);
+  } catch (journeyErr) {
+    try {
+      const assessment = await api(`/api/platforms/${encodeURIComponent(slug)}`);
+      el.result.innerHTML = renderAssessmentAsJourney(assessment.data);
+    } catch (err) {
+      el.result.innerHTML = `<div class="state-message"><strong>Could not load that platform.</strong><br>${esc(err.message || journeyErr.message)}</div>`;
+    }
   }
 }
 
@@ -326,7 +246,7 @@ function renderUnknown(query) {
     <div class="card unknown-panel">
       <p class="section-kicker">New platform</p>
       <h2>Researching ${esc(query)}</h2>
-      <p class="lede">Looking up official docs and drafting the documented route.</p>
+      <p class="lede">Looking up official docs and drafting the onboarding flow.</p>
       <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
       <button class="btn btn-secondary" id="research-btn" type="button" hidden>Retry research</button>
     </div>`;
@@ -357,7 +277,7 @@ function renderResearchError(message, query) {
 function renderResult(result, query) {
   if (result.outcome === "known") return showPlatform(result.slug);
   if (result.outcome === "completed") {
-    el.result.innerHTML = renderAssessment(result.assessment);
+    el.result.innerHTML = renderAssessmentAsJourney(result.assessment);
     return;
   }
   renderResearchError(OUTCOME_MESSAGE[result.outcome] || "Research could not be completed.", query);
