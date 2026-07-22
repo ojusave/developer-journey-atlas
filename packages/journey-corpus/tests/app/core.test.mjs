@@ -90,7 +90,9 @@ test("buildAssessment surfaces documented steps and record detail when present",
   assert.equal(a.organization, "Render Services, Inc.");
   assert.equal(a.researchedAt, "2026-07-21");
   assert.equal(a.firstSuccess.milestone, "App is live.");
-  assert.equal(a.prerequisites[0].type, "required");
+  assert.equal(a.prerequisites[0].type, "account");
+  assert.equal(a.prerequisites[0].requirement, "GitHub account");
+  assert.equal(a.prerequisites[0].required, true);
   assert.equal(a.steps.length, 1);
   assert.equal(a.steps[0].action, "Create account");
   assert.equal(a.steps[0].requiredFields[0].label, "Email");
@@ -99,6 +101,42 @@ test("buildAssessment surfaces documented steps and record detail when present",
   assert.equal(a.pathStepCount, 1);
   assert.equal(a.sourceCount, 1);
   assert.equal(a.routeSignals.requiredFields, 1);
+});
+
+test("buildAssessment prefers typed record prerequisites over audit stubs", () => {
+  const record = {
+    platform: { name: "Plaid", slug: "plaid", organization: "Plaid" },
+    category: "Payments",
+    prerequisites: [
+      { order: 1, type: "software", requirement: "Node.js for the quickstart", required: true },
+      { order: 2, type: "software", requirement: "Optional IDE only", required: false },
+    ],
+    friction_gates: [],
+    primary_path: [],
+    sources: [],
+    uncertainties: [],
+  };
+  const pathAudit = {
+    audit_status: "needs-human-judgment",
+    audited_at: "2026-07-22",
+    route_selection: { selected: null, surface: "Quickstart" },
+    first_success: { outcome: "API call succeeds.", observable_signal: "200" },
+    prerequisites: [{ description: "npm and a Unix-capable shell" }],
+    external_gates: [],
+    unavoidable_waits: [],
+    required_path: [],
+    sources: [],
+    uncertainties: [],
+    counts: null,
+  };
+  const a = buildAssessment(row({ name: "Plaid", slug: "plaid", category: "Payments" }), record, null, pathAudit);
+  assert.equal(a.prerequisites.length, 2);
+  assert.equal(a.prerequisites[0].type, "software");
+  assert.equal(a.prerequisites[0].required, true);
+  assert.match(a.prerequisites[0].requirement, /Node/);
+  assert.equal(a.prerequisites[1].type, "software");
+  assert.equal(a.prerequisites[1].required, false);
+  assert.notEqual(a.prerequisites[0].requirement, a.prerequisites[1].requirement);
 });
 
 test("buildComparison reports distribution, not a rank, and excludes not-comparable peers", () => {

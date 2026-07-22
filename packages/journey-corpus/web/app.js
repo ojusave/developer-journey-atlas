@@ -188,9 +188,16 @@ function renderAssessment(a) {
   const firstSuccess = a.firstSuccess || {};
 
   const prereqs = prerequisites.length
-    ? `<div class="chips">${prerequisites
-        .map((p) => `<span class="chip ${p.required ? "req" : ""}">${esc(p.type)}${p.required ? " (required)" : ""}</span>`)
-        .join("")}</div>`
+    ? `<ul class="prereq-list">${prerequisites
+        .map((p) => {
+          const label = p.type && p.type !== "other" ? esc(p.type) : "prerequisite";
+          const req = p.requirement ? esc(p.requirement) : label;
+          const badge = p.required
+            ? `<span class="chip chip-inline req">${label} (required)</span>`
+            : `<span class="chip chip-inline">${label}</span>`;
+          return `<li>${badge}<span class="prereq-text">${req}</span></li>`;
+        })
+        .join("")}</ul>`
     : '<p class="lede">No prerequisites documented for this route.</p>';
 
   const gates = frictionGates.length
