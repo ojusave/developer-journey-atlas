@@ -6,8 +6,8 @@
   },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "PayPal REST API get-started path through first sandbox OAuth access token",
-    "selection_basis": "PayPal's official REST API landing page is explicitly titled Get started with PayPal REST APIs and orders its path as credentials, access token, then API calls and sandbox accounts. This record follows its first cURL tab through the first returned access token, the earliest concrete API response required by all authenticated REST API families.",
+    "name": "PayPal REST API get-started path through first authenticated sandbox API response",
+    "selection_basis": "PayPal's official REST API landing page is titled Get started with PayPal REST APIs and orders credentials, access token, then API calls. The Authentication guide ends at the token; PayPal's API Requests guide continues with authenticated REST calls using Authorization: Bearer ACCESS-TOKEN. Its sample request is a GET of sandbox invoices. First success is that authenticated API response, not the token alone.",
     "alternatives_considered": [
       {
         "name": "REST APIs in Postman without a PayPal Developer account",
@@ -32,10 +32,10 @@
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-18",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Obtain credentials for a PayPal sandbox REST app and make the first OAuth 2.0 token request.",
+    "developer_intent": "Obtain PayPal sandbox REST credentials, request an OAuth access token, and complete the first authenticated PayPal REST API call.",
     "starting_url": "https://developer.paypal.com/api/rest/",
     "assumed_prior_state": [
       "The developer does not yet have a PayPal Developer Dashboard session or copied sandbox REST app credentials.",
@@ -44,17 +44,18 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Get an OAuth 2.0 access token.",
-    "normalized_outcome": "The PayPal sandbox OAuth endpoint accepts the app's client ID and client secret and returns a bearer access token with its validity duration.",
-    "observable_completion_signal": "The JSON response includes access_token, token_type Bearer, and expires_in.",
+    "official_milestone": "Use the sandbox access token to call a PayPal REST API, as shown by the API Requests sample GET invoices request.",
+    "normalized_outcome": "PayPal's sandbox REST API accepts the bearer access token and returns an HTTP success response for GET /v1/invoicing/invoices.",
+    "observable_completion_signal": "The invoices list request returns an HTTP 2xx JSON response from https://api-m.sandbox.paypal.com while authenticated with the bearer token.",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "Section 2 is Get access token and includes the token request plus a sample response; the next subsection explains how to use that token for later API calls.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Get started documents getting an access token, then using it for API calls. API Requests shows combining method, URL, resource URI, and Authorization: Bearer ACCESS-TOKEN, and samples GET https://api-m.sandbox.paypal.com/v1/invoicing/invoices.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     },
-    "why_this_is_the_boundary": "The token is the first successful response from PayPal's authenticated REST API path and is a shared prerequisite across orders, payments, subscriptions, invoicing, and disputes. Selecting a later API would impose a product-specific outcome and request payload.",
+    "why_this_is_the_boundary": "An access token only proves credential exchange. PayPal's own get-started path continues into authenticated API calls; the API Requests sample GET invoices call is the earliest documented authenticated REST request after the token and does not require constructing an Orders checkout payload.",
     "source_ids": [
       "S1",
       "S2"
@@ -269,10 +270,10 @@
     },
     {
       "step_number": 10,
-      "phase": "verify",
+      "phase": "authenticate",
       "actor": "developer",
       "interface": "cli",
-      "action": "Verify the returned access token and its metadata.",
+      "action": "Send the OAuth token request and capture the returned sandbox access token.",
       "details": [
         "Confirm access_token is present.",
         "Confirm token_type is Bearer.",
@@ -280,11 +281,49 @@
       ],
       "input": "OAuth JSON response.",
       "output": "Usable PayPal sandbox bearer token.",
-      "success_signal": "The response contains access_token, token_type, and expires_in.",
+      "success_signal": "The JSON response includes access_token, token_type Bearer, and expires_in.",
       "failure_or_wait": "If no token is returned, compare the request with the documented credentials, sandbox URL, and client-credentials grant.",
       "required": true,
       "source_ids": [
         "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Send the documented sample GET invoices request to the PayPal sandbox REST host with the bearer token.",
+      "details": [
+        "PayPal's API Requests guide samples: GET https://api-m.sandbox.paypal.com/v1/invoicing/invoices with Content-Type application/json and Authorization: Bearer ACCESS-TOKEN.",
+        "Optional query parameters such as page and page_size may be included as in the sample."
+      ],
+      "input": "Sandbox access token from the OAuth response",
+      "output": "Authenticated invoices list response",
+      "success_signal": "PayPal returns an HTTP 2xx JSON response for the invoices resource.",
+      "failure_or_wait": "Missing, expired, or malformed bearer tokens produce authorization errors instead of invoice data.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the authenticated REST response body from the sandbox invoices request.",
+      "details": [
+        "An empty invoice list is still a successful authenticated API response when HTTP status is success."
+      ],
+      "input": "GET /v1/invoicing/invoices response",
+      "output": "Verified first authenticated PayPal API success",
+      "success_signal": "The response demonstrates authorized access to a PayPal REST resource.",
+      "failure_or_wait": "HTTP 401 or 403 means the token was not accepted for API access.",
+      "required": true,
+      "source_ids": [
         "S2",
         "S3"
       ]
@@ -403,6 +442,16 @@
       "documented_requirement": true,
       "source_ids": [
         "S1"
+      ]
+    },
+    {
+      "at_step": 11,
+      "type": "credential",
+      "description": "A valid sandbox bearer access token is required in the Authorization header for REST API requests.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
       ]
     }
   ],
