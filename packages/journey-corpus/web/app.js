@@ -207,7 +207,7 @@ function renderJourney(journey) {
     ? `<ol class="steps-list">${stepList.map(stepItem).join("")}</ol>`
     : '<p class="lede">No documented onboarding steps are available for this platform yet.</p>';
   const frictionHint = journey.highlightedStepCount
-    ? `<p class="journey-hint">${num(journey.highlightedStepCount)} step${journey.highlightedStepCount === 1 ? "" : "s"} mark documented friction (requirement gates, not errors or observed drop-off).</p>`
+    ? `<p class="journey-hint">${num(journey.highlightedStepCount)} step${journey.highlightedStepCount === 1 ? "" : "s"} mark documented friction.</p>`
     : "";
 
   return `
