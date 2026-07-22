@@ -42,6 +42,8 @@ export interface JourneyOverlay {
   name: string;
   category: string;
   organization: string | null;
+  /** Official docs entry URL for the documented product surface. */
+  startingUrl: string | null;
   note: string;
   steps: JourneyStepView[];
   frictionGateCount: number;
@@ -147,11 +149,17 @@ export function buildJourneyOverlay(
     };
   });
 
+  const startingUrl =
+    typeof record.entry_point?.starting_url === "string" && /^https:\/\//.test(record.entry_point.starting_url)
+      ? record.entry_point.starting_url
+      : null;
+
   return {
     slug: record.platform.slug,
     name: record.platform.name,
     category: record.category,
     organization: record.platform.organization ?? null,
+    startingUrl,
     note:
       "Journey steps come from official documentation. Highlighted steps have documented friction gates; linked blockers are hypotheses, not observed drop-off.",
     steps,

@@ -200,6 +200,16 @@ function renderOnboardingScore(score) {
     </section>`;
 }
 
+/** Title link to the documented docs surface (opens in a new tab). */
+function journeyTitle(journey) {
+  const name = esc(journey.name);
+  const url = typeof journey.startingUrl === "string" && /^https:\/\//.test(journey.startingUrl)
+    ? journey.startingUrl
+    : null;
+  if (!url) return `<h2>${name}</h2>`;
+  return `<h2><a class="journey-title-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${name}</a></h2>`;
+}
+
 /** Journey-first view: platform name + numbered onboarding steps only. */
 function renderJourney(journey) {
   const stepList = journey.steps || [];
@@ -213,7 +223,7 @@ function renderJourney(journey) {
   return `
     <div class="card journey-card">
       <div class="assess-head">
-        <h2>${esc(journey.name)}</h2>
+        ${journeyTitle(journey)}
         <span class="pill pill-cat">${esc(journey.category)}</span>
       </div>
       <p class="lede">Onboarding from account creation to first success, step by step.</p>
