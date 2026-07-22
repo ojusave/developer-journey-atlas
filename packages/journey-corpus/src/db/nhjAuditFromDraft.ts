@@ -151,7 +151,7 @@ export function buildNhjAuditFromRecord(record: PlatformRecord): ShortestPathAud
     },
     route_selection: {
       surface: surfaceName,
-      rule: "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+      rule: "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists. Include documented gates (email verify, payment, credits, domain, approval). Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
       selected: null,
       candidates: [
         {

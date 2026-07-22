@@ -3,197 +3,271 @@
   "platform": {
     "name": "NVIDIA Developer",
     "slug": "nvidia-developer",
-    "category": "API infrastructure and developer tooling"
+    "category": "AI, ML, and agents"
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "c8754972464231d7f01f2336d909a0bcb2ec4fb32a03420c0afcd4617f61b294",
+  "source_record_sha256": "480cbbb98831fb87dd9fb31d1b751307ad0dcce324b7d15232ce9ca8df0463e6",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "A supported Ubuntu system with a CUDA-capable NVIDIA GPU is available.",
-      "The developer can use sudo and reboot the machine."
+      "No NVIDIA Developer Program membership, NVIDIA account session for the API Catalog, or NVIDIA Developer API key is assumed.",
+      "A browser and a Python environment able to run the model-page sample are available; no local NVIDIA GPU is assumed."
     ]
   },
-  "developer_goal": "Install CUDA on Ubuntu with the Debian installer and verify by building and running the nbody sample.",
+  "developer_goal": "Join the NVIDIA Developer Program (or sign in with an NVIDIA account), obtain an API Catalog API key from build.nvidia.com, and receive a hosted NIM chat-completions response.",
   "first_success": {
-    "outcome": "CUDA Toolkit is installed on Ubuntu, environment variables are set, and the nbody sample from cuda-samples runs successfully.",
-    "observable_signal": "The nbody sample executable runs from its build location after CUDA install and PATH setup.",
+    "outcome": "An authenticated request using the API Catalog key returns chat-completions model output from a hosted NIM (API Catalog quickstart example: meta/llama-3.1-8b-instruct) via POST https://integrate.api.nvidia.com/v1/chat/completions.",
+    "observable_signal": "The Python sample completes and the response includes model-generated text for the requested prompt.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "CUDA Quick Start Guide, Ubuntu Debian Installer through nbody",
+    "surface": "NVIDIA NIM API Catalog hosted quickstart (Developer Program API key + Python)",
     "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
     "selected": null,
     "candidates": [
       {
-        "name": "CUDA Quick Start Guide, Ubuntu Debian Installer through nbody",
+        "name": "NVIDIA NIM API Catalog hosted quickstart (Developer Program API key + Python)",
         "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+        "reason": "Official API Catalog Quickstart documents Get API Key \u2192 Developer Program/NVIDIA account \u2192 Python sample against hosted NIM, but signup-field opacity and live Copy Code client pins are not fully closed for a verified count."
       },
       {
-        "name": "Ubuntu Runfile Installer",
+        "name": "API Catalog web Preview UI only",
         "status": "unresolved",
-        "reason": "Peer Ubuntu installer; Debian/network package path is the lighter download variant called out in the guide."
+        "reason": "Same quickstart documents browser Preview chat; peer to the authenticated API path rather than first developer API success."
       },
       {
-        "name": "Windows Visual Studio nbody path",
+        "name": "Raw HTTP POST to integrate.api.nvidia.com/v1/chat/completions",
         "status": "unresolved",
-        "reason": "Different OS surface; Linux Ubuntu is a primary documented Linux target."
+        "reason": "LLM APIs reference documents the endpoint; the quickstart primary client path is the model-page Python sample."
       },
       {
-        "name": "Pip wheels runtime-only install",
+        "name": "Self-hosted NIM containers / Run NIM Anywhere local deploy",
         "status": "unresolved",
-        "reason": "Runtime-focused and does not include the full developer toolkit verification path."
+        "reason": "Later GPU/container path after hosted catalog prototyping."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Obtain and install the prerequisites required by the selected NVIDIA Developer candidate route.",
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open build.nvidia.com, open a catalog model page (quickstart example: meta/llama-3.1-8b-instruct), click Get API Key, and complete NVIDIA account creation or sign-in (Developer Program).",
       "required_fields": [
         {
-          "label": "Install or download choices",
-          "field_type": "other",
-          "evidence_state": "unverified",
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "NVIDIA account password (new accounts)",
+          "field_type": "password",
+          "evidence_state": "documented",
           "source_ids": [
             "S1"
           ],
-          "notes": "Exact installer, OS, version, or package selectors are release-dependent or peer-branched."
+          "notes": "Quickstart documents password setup for new accounts; full signup field set is not enumerated."
         }
       ],
-      "observable_result": "The developer has a runnable environment for the selected candidate.",
-      "evidence_state": "unverified",
+      "observable_result": "Authenticated Developer Program session redirected to the model page.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Copy the new API Catalog API key and store it securely.",
+      "required_fields": [],
+      "observable_result": "An API key value is available locally.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "step_number": 2,
+      "step_number": 3,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Follow the documented commands for the selected NVIDIA Developer first-success candidate through its terminal verification.",
+      "action": "Copy the model-page Python sample and replace API_KEY_REQUIRED_IF_EXECUTING_OUTSIDE_NGC with the API key.",
       "required_fields": [
         {
-          "label": "Route-specific commands and inputs",
-          "field_type": "command",
+          "label": "API key placeholder replacement",
+          "field_type": "other",
           "evidence_state": "documented",
           "source_ids": [
             "S1"
           ]
         }
       ],
-      "observable_result": "The nbody sample executable runs from its build location after CUDA install and PATH setup.",
+      "observable_result": "Runnable Python sample with the API key set.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Run the Python sample so it POSTs an authenticated chat-completions request to https://integrate.api.nvidia.com/v1/chat/completions and confirm model output text.",
+      "required_fields": [],
+      "observable_result": "Successful chat-completions JSON includes model-generated text.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'hardware', 'requirement': 'A CUDA-capable NVIDIA GPU on a supported Ubuntu system.', 'required': True, 'source_ids': ['S1']}",
+      "description": "An NVIDIA account with Developer Program membership created or confirmed through the Get API Key signup flow on build.nvidia.com.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "description": "An NVIDIA Developer / API Catalog API key created via Get API Key and stored securely.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'software', 'requirement': 'sudo, apt, wget, git or equivalent to obtain cuda-samples, and a CMake-capable build environment for the samples.', 'required': True, 'source_ids': ['S1', 'S2']}",
+      "description": "A Python environment able to run the model-page sample. No local NVIDIA GPU or CUDA Toolkit is required for hosted endpoints.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S3"
       ]
     }
   ],
   "external_gates": [
     {
-      "description": "A supported NVIDIA GPU and Ubuntu platform are required for the guide's verification path.",
+      "description": "Wrong user role or entitlement can block hosted endpoint consumption or NIM container pulls.",
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "A reboot is required to load NVIDIA drivers before verification.",
-      "source_ids": [
-        "S1"
+        "S3"
       ]
     }
   ],
-  "unavoidable_waits": [
-    {
-      "description": "Package download, image pull, or local service startup time for the selected install route.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Build and run the nbody sample",
+      "description": "Run the API Catalog Python sample against a hosted NIM",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     }
   ],
   "excluded": [
     {
-      "item": "Nsight tooling setup",
+      "item": "Self-hosted NIM container deploy",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "NVIDIA AI Enterprise production licensing",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "CUDA Toolkit / local GPU sample paths",
       "reason": "Listed as excluded after success in the source record.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "Cross-compilation",
+      "item": "Hugging Face Serverless NIM",
       "reason": "Listed as excluded after success in the source record.",
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "item": "Production driver policy",
-      "reason": "Listed as excluded after success in the source record.",
-      "source_ids": [
-        "S1"
+        "S3"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "CUDA Quick Start Guide",
-      "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+      "title": "API Catalog Quickstart Guide",
+      "url": "https://docs.api.nvidia.com/nim/docs/api-quickstart",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Primary documented developer route and first-success framing"
+        "Get API Key / Developer Program signup",
+        "Copy Key and Copy Code Python sample",
+        "Hosted NIM on DGX Cloud"
       ]
     },
     {
       "id": "S2",
-      "title": "NVIDIA cuda-samples",
-      "url": "https://github.com/nvidia/cuda-samples",
+      "title": "LLM APIs",
+      "url": "https://docs.api.nvidia.com/nim/reference/llm-apis",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for NVIDIA cuda-samples"
+        "https://integrate.api.nvidia.com",
+        "POST /v1/chat/completions",
+        "meta/llama-3.1-8b-instruct"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Run NIM Anywhere",
+      "url": "https://docs.api.nvidia.com/nim/docs/run-anywhere",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer Program free hosted NIM API access for prototyping",
+        "Self-host and Hugging Face alternatives"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "NVIDIA Developer Program",
+      "url": "https://developer.nvidia.com/developer-program",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer Program membership framing"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "NVIDIA API Catalog (build.nvidia.com)",
+      "url": "https://build.nvidia.com/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public catalog entry point"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which exact cuda-repo package filename and /usr/local/cuda-* version directory apply for the current toolkit release?",
-      "impact": "Install and PATH commands use placeholders that must be filled from the current CUDA downloads selector.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The Quick Start Guide uses templated package and version paths that change with toolkit releases."
+      "question": "What exact current signup fields does Get API Key show for a brand-new NVIDIA account, and which peer client route (Python sample vs raw HTTP) is the lexicographic shortest verified path?",
+      "impact": "Without closed signup fields and a locked client choice, action and field counts cannot be verified for peer comparison.",
+      "evidence_needed": "Dated read-only walkthrough of live Get API Key signup fields and the live model-page Copy Code snippet."
     },
     {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does NVIDIA Developer show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "Which exact client library and package pins does the live model-page Copy Code sample currently emit?",
+      "impact": "Configure/execute may require installing whatever client the pane currently copies.",
+      "evidence_needed": "Capture of the current build.nvidia.com Copy Code sample for meta/llama-3.1-8b-instruct."
     }
   ],
   "counts": null

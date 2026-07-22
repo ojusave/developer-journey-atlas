@@ -4,74 +4,91 @@
     "slug": "nvidia-developer",
     "organization": "NVIDIA Corporation"
   },
-  "category": "API infrastructure and developer tooling",
+  "category": "AI, ML, and agents",
   "surface": {
-    "name": "CUDA Quick Start Guide, Ubuntu Debian Installer through nbody",
-    "selection_basis": "Workshop selection policy (2026-07-19): commit to the fastest and most commonly used documented route. Prefer local/no-account when offered; otherwise the vendor's first-listed or recommended quickstart. Treat Sign up as one opaque step when form fields are not public. Selected the official CUDA Quick Start Guide Ubuntu Debian Installer path ending in building and running the nbody sample. It is local, package-manager based, and the guide's documented verification for Linux.",
+    "name": "NVIDIA NIM API Catalog hosted quickstart (Developer Program API key + Python)",
+    "selection_basis": "The official API Catalog Quickstart Guide documents hosted NIM on NVIDIA DGX Cloud via build.nvidia.com: select meta/llama-3.1-8b-instruct, Get API Key (joins the Developer Program / NVIDIA account), copy the key, paste the model-page Python sample, replace the API-key placeholder, and run it. LLM APIs reference documents the same catalog surface as POST https://integrate.api.nvidia.com/v1/chat/completions. Run NIM Anywhere states Developer Program members get free hosted NIM API access for prototyping. No local GPU or CUDA install is required.",
     "alternatives_considered": [
       {
-        "name": "Ubuntu Runfile Installer",
-        "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
-        "reason_not_primary": "Peer Ubuntu installer; Debian/network package path is the lighter download variant called out in the guide."
+        "name": "API Catalog web Preview UI only",
+        "url": "https://docs.api.nvidia.com/nim/docs/api-quickstart",
+        "reason_not_primary": "The same quickstart documents Preview chat in the browser, but first developer API success is the authenticated Python request after Get API Key."
       },
       {
-        "name": "Windows Visual Studio nbody path",
-        "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
-        "reason_not_primary": "Different OS surface; Linux Ubuntu is a primary documented Linux target."
+        "name": "Self-hosted NIM containers / Run NIM Anywhere local deploy",
+        "url": "https://docs.api.nvidia.com/nim/docs/run-anywhere",
+        "reason_not_primary": "Container pull and local or cloud GPU hosting is a later path after hosted catalog prototyping."
       },
       {
-        "name": "Pip wheels runtime-only install",
+        "name": "CUDA Toolkit Ubuntu install through nbody",
         "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
-        "reason_not_primary": "Runtime-focused and does not include the full developer toolkit verification path."
+        "reason_not_primary": "Local GPU toolkit path; not the hosted NIM API Catalog onboarding documented for first API calls."
+      },
+      {
+        "name": "Hugging Face Serverless NIM endpoints",
+        "url": "https://docs.api.nvidia.com/nim/docs/run-anywhere",
+        "reason_not_primary": "Peer prototyping route that requires a Hugging Face account instead of the NVIDIA API Catalog Get API Key flow."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Install CUDA on Ubuntu with the Debian installer and verify by building and running the nbody sample.",
-    "starting_url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+    "developer_intent": "Join the NVIDIA Developer Program (or sign in with an NVIDIA account), obtain an API Catalog API key from build.nvidia.com, and receive a hosted NIM chat-completions response.",
+    "starting_url": "https://docs.api.nvidia.com/nim/docs/api-quickstart",
     "assumed_prior_state": [
-      "A supported Ubuntu system with a CUDA-capable NVIDIA GPU is available.",
-      "The developer can use sudo and reboot the machine."
+      "No NVIDIA Developer Program membership, NVIDIA account session for the API Catalog, or NVIDIA Developer API key is assumed.",
+      "A browser and a Python environment able to run the model-page sample are available; no local NVIDIA GPU is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Build and run the nbody sample",
-    "normalized_outcome": "CUDA Toolkit is installed on Ubuntu, environment variables are set, and the nbody sample from cuda-samples runs successfully.",
-    "observable_completion_signal": "The nbody sample executable runs from its build location after CUDA install and PATH setup.",
+    "official_milestone": "Run the API Catalog Python sample against a hosted NIM",
+    "normalized_outcome": "An authenticated request using the API Catalog key returns chat-completions model output from a hosted NIM (API Catalog quickstart example: meta/llama-3.1-8b-instruct) via POST https://integrate.api.nvidia.com/v1/chat/completions.",
+    "observable_completion_signal": "The Python sample completes and the response includes model-generated text for the requested prompt.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "Install a writable copy of the samples from github.com/nvidia/cuda-samples, then build and run the nbody sample using the Linux instructions.",
+      "official_label_or_terminal_state": "The API Catalog Quickstart documents Get API Key, Developer Program / NVIDIA account signup or sign-in, Copy Key, Copy Code, replace API_KEY_REQUIRED_IF_EXECUTING_OUTSIDE_NGC, and run the Python sample. LLM APIs reference documents URL https://integrate.api.nvidia.com and Endpoint POST /v1/chat/completions for catalog models including meta/llama-3.1-8b-instruct.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     },
-    "why_this_is_the_boundary": "The Ubuntu Debian Installer section ends verification by building and running nbody.",
+    "why_this_is_the_boundary": "The first meaningful hosted NIM success is an authenticated API response after Get API Key. The official quickstart's primary non-UI path is the model-page Python sample; a local GPU and CUDA Toolkit are not required. Developer Program membership provides free hosted NIM API access for prototyping per Run NIM Anywhere.",
     "source_ids": [
       "S1",
-      "S2"
+      "S2",
+      "S3"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
-      "type": "hardware",
-      "requirement": "A CUDA-capable NVIDIA GPU on a supported Ubuntu system.",
+      "type": "account",
+      "requirement": "An NVIDIA account with Developer Program membership created or confirmed through the Get API Key signup flow on build.nvidia.com.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "credential",
+      "requirement": "An NVIDIA Developer / API Catalog API key created via Get API Key and stored securely.",
       "required": true,
       "source_ids": [
         "S1"
       ]
     },
     {
-      "order": 2,
+      "order": 3,
       "type": "software",
-      "requirement": "sudo, apt, wget, git or equivalent to obtain cuda-samples, and a CMake-capable build environment for the samples.",
+      "requirement": "A Python environment able to run the model-page sample copied from build.nvidia.com. No local NVIDIA GPU or CUDA Toolkit is required for hosted endpoints.",
       "required": true,
       "source_ids": [
         "S1",
-        "S2"
+        "S3"
       ]
     }
   ],
@@ -80,45 +97,55 @@
       "step_number": 1,
       "phase": "arrive",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Open the CUDA Quick Start Guide and select Ubuntu Debian Installer.",
-      "details": [],
-      "input": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
-      "output": "Ubuntu Debian Installer steps are visible.",
-      "success_signal": "Section 4.1.9.1 is shown.",
-      "failure_or_wait": "None documented.",
+      "interface": "browser",
+      "action": "Open build.nvidia.com, search for llama-3, and open the meta/llama-3.1-8b-instruct model page (acknowledge third-party model warnings if shown).",
+      "details": [
+        "The API Catalog Quickstart uses llama-3.1-8b-instruct as the example; any catalog model follows the same Get API Key flow."
+      ],
+      "input": "Intent to call a hosted NIM API",
+      "output": "Model page with Preview and Get API Key controls",
+      "success_signal": "The model page shows Get API Key and a code pane.",
+      "failure_or_wait": "Catalog navigation or model availability may change; pick another catalog model if needed.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S1",
+        "S5"
       ]
     },
     {
       "step_number": 2,
-      "phase": "install",
+      "phase": "account",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Install the CUDA repository package, refresh the CUDA keyring, add contrib, update apt, and install cuda.",
-      "details": [],
-      "input": "Documented apt/dpkg commands",
-      "output": "CUDA packages are installed.",
-      "success_signal": "apt-get install cuda completes.",
-      "failure_or_wait": "None documented.",
+      "interface": "browser",
+      "action": "Click Get API Key, enter email, and complete NVIDIA account creation or sign-in (joining the Developer Program).",
+      "details": [
+        "Existing NVIDIA accounts sign in with the associated email.",
+        "New accounts set a password and follow on-screen account setup.",
+        "Signing up through this flow joins the Developer Program."
+      ],
+      "input": "Email and NVIDIA account credentials",
+      "output": "Authenticated Developer Program session on the model page",
+      "success_signal": "The flow redirects back to the model page ready to show an API key.",
+      "failure_or_wait": "Account recovery follows NVIDIA sign-in; exact signup form fields are not fully enumerated in the quickstart.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S1",
+        "S4"
       ]
     },
     {
       "step_number": 3,
-      "phase": "install",
+      "phase": "credential",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Reboot the system to load the NVIDIA drivers.",
-      "details": [],
-      "input": "sudo reboot",
-      "output": "System returns with NVIDIA drivers loaded.",
-      "success_signal": "Machine boots after reboot.",
-      "failure_or_wait": "None documented.",
+      "interface": "console",
+      "action": "Copy the new API key from the popup and store it securely.",
+      "details": [
+        "The quickstart warns to paste the key somewhere safe."
+      ],
+      "input": "Authenticated API Catalog session",
+      "output": "NVIDIA Developer API key value",
+      "success_signal": "The key is copied to secure local storage.",
+      "failure_or_wait": "If the value is lost, generate a new key from the catalog settings or Get API Key flow.",
       "required": true,
       "source_ids": [
         "S1"
@@ -129,12 +156,14 @@
       "phase": "configure",
       "actor": "developer",
       "interface": "cli",
-      "action": "Export PATH and LD_LIBRARY_PATH for the installed CUDA toolkit bin and lib64 directories.",
-      "details": [],
-      "input": "shell profile or session exports",
-      "output": "nvcc and CUDA libraries are on the search path.",
-      "success_signal": "PATH includes /usr/local/cuda-*/bin.",
-      "failure_or_wait": "None documented.",
+      "action": "Click Copy Code on the model page, paste the Python sample into an editor, and replace API_KEY_REQUIRED_IF_EXECUTING_OUTSIDE_NGC with the API key.",
+      "details": [
+        "Optionally change the sample prompt from the documented limerick example."
+      ],
+      "input": "API key and model-page Python sample",
+      "output": "Runnable Python script with the API key set",
+      "success_signal": "The placeholder string is replaced with the real key.",
+      "failure_or_wait": "Missing package dependencies for the sample client fail at import or request time.",
       "required": true,
       "source_ids": [
         "S1"
@@ -142,15 +171,18 @@
     },
     {
       "step_number": 5,
-      "phase": "install",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Clone or download a writable copy of https://github.com/nvidia/cuda-samples.",
-      "details": [],
-      "input": "cuda-samples repository",
-      "output": "Sample sources are local.",
-      "success_signal": "Repository checkout exists.",
-      "failure_or_wait": "None documented.",
+      "interface": "api",
+      "action": "Run the Python sample so it sends an authenticated chat-completions request to the hosted NIM endpoint.",
+      "details": [
+        "LLM APIs reference documents base URL https://integrate.api.nvidia.com and Endpoint POST /v1/chat/completions for catalog LLM models including meta/llama-3.1-8b-instruct.",
+        "The NIM is hosted by NVIDIA on DGX Cloud per the API Catalog Quickstart."
+      ],
+      "input": "Configured Python sample and API key",
+      "output": "Hosted NIM HTTP response",
+      "success_signal": "The request returns a successful response body with model-generated text.",
+      "failure_or_wait": "Invalid key, rate limits, or entitlement errors prevent a successful completion.",
       "required": true,
       "source_ids": [
         "S1",
@@ -159,15 +191,15 @@
     },
     {
       "step_number": 6,
-      "phase": "execute",
+      "phase": "verify",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Configure and build the samples with CMake/make, then run the nbody sample from its executable location.",
+      "interface": "api",
+      "action": "Confirm the response includes model-generated text for the prompt.",
       "details": [],
-      "input": "cuda-samples build tree",
-      "output": "nbody runs successfully.",
-      "success_signal": "nbody executable starts and locates dependent resources.",
-      "failure_or_wait": "Running from the wrong working directory can fail to locate dependent resources.",
+      "input": "Hosted NIM response body",
+      "output": "Verified first hosted NIM API success",
+      "success_signal": "Model output text is present in the successful response.",
+      "failure_or_wait": "An error body means the first API call did not succeed.",
       "required": true,
       "source_ids": [
         "S1",
@@ -175,36 +207,63 @@
       ]
     }
   ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
   "branches": [
     {
-      "at_step": 2,
-      "condition": "Prefer Runfile Installer",
-      "path": "Follow Ubuntu Runfile Installer steps instead of Debian packages.",
-      "effect_on_first_success": "Same nbody verification terminal after environment setup.",
+      "at_step": 1,
+      "condition": "The developer prefers another API Catalog model instead of llama-3.1-8b-instruct.",
+      "path": "Select any catalog model and follow the same Get API Key and Copy Code flow; the quickstart states the same guide applies to any model in the catalog.",
+      "effect_on_first_success": "Same hosted NIM boundary; model id in the request changes.",
       "source_ids": [
         "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "condition": "The developer already has an NVIDIA Developer API key.",
+      "path": "Skip Get API Key signup and jump to copying the model-page Python sample (quickstart step 4).",
+      "effect_on_first_success": "Shortens account creation; credential and execute steps remain.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "condition": "The developer prefers raw HTTP against the documented LLM API instead of the model-page Python sample.",
+      "path": "POST to https://integrate.api.nvidia.com/v1/chat/completions with Authorization Bearer and a JSON body naming a catalog model such as meta/llama-3.1-8b-instruct, per the LLM APIs reference.",
+      "effect_on_first_success": "Same chat-completions endpoint; client tooling differs from the quickstart Python sample.",
+      "source_ids": [
+        "S2"
       ]
     }
   ],
   "friction_gates": [
     {
       "at_step": 2,
-      "type": "hardware",
-      "description": "A supported NVIDIA GPU and Ubuntu platform are required for the guide's verification path.",
+      "type": "account",
+      "description": "Get API Key requires email and NVIDIA account signup or sign-in, which joins the Developer Program.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "A secret API Catalog key must be copied and stored safely before the Python sample can authenticate.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
       ]
     },
     {
-      "at_step": 3,
-      "type": "wait",
-      "description": "A reboot is required to load NVIDIA drivers before verification.",
+      "at_step": 5,
+      "type": "credential",
+      "description": "Hosted NIM requests must present the API key; wrong entitlement or role can block hosted endpoint use.",
       "documented_requirement": true,
       "source_ids": [
-        "S1"
+        "S1",
+        "S3"
       ]
     }
   ],
@@ -216,55 +275,119 @@
   "sources": [
     {
       "id": "S1",
-      "title": "CUDA Quick Start Guide",
-      "url": "https://docs.nvidia.com/cuda/cuda-quick-start-guide/",
+      "title": "API Catalog Quickstart Guide",
+      "url": "https://docs.api.nvidia.com/nim/docs/api-quickstart",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-19",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Ubuntu",
-        "Debian Installer",
-        "nbody verification"
+        "Interacting with NIM through the API Endpoints",
+        "Interacting through the web based UI",
+        "Interacting through Python"
       ],
       "evidence_supported": [
-        "apt install cuda",
-        "PATH exports",
-        "build and run nbody"
+        "build.nvidia.com catalog entry and meta/llama-3.1-8b-instruct example",
+        "Get API Key joins Developer Program / NVIDIA account",
+        "Copy Key and Copy Code Python sample with API_KEY_REQUIRED_IF_EXECUTING_OUTSIDE_NGC",
+        "Hosted NIM on NVIDIA DGX Cloud"
       ]
     },
     {
       "id": "S2",
-      "title": "NVIDIA cuda-samples",
-      "url": "https://github.com/nvidia/cuda-samples",
+      "title": "LLM APIs",
+      "url": "https://docs.api.nvidia.com/nim/reference/llm-apis",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-19",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Getting Started",
-        "Building CUDA Samples - Linux",
-        "nbody sample path"
+        "Overview",
+        "URL and Endpoint",
+        "meta / llama-3.1-8b-instruct"
       ],
       "evidence_supported": [
-        "CMake build",
-        "nbody sample location"
+        "Base URL https://integrate.api.nvidia.com",
+        "Endpoint POST /v1/chat/completions",
+        "meta/llama-3.1-8b-instruct listed among catalog LLM models"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Run NIM Anywhere",
+      "url": "https://docs.api.nvidia.com/nim/docs/run-anywhere",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prototyping and learning with NIM",
+        "Pricing"
+      ],
+      "evidence_supported": [
+        "Hosted preview APIs via API Catalog account",
+        "Developer Program free access to NIM API endpoints for prototyping",
+        "Self-host and Hugging Face routes as alternatives"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "NVIDIA Developer Program",
+      "url": "https://developer.nvidia.com/developer-program",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Developer Program Community Access",
+        "Tools & Technology"
+      ],
+      "evidence_supported": [
+        "Developer Program membership framing",
+        "NIM listed among developer program tools"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "NVIDIA API Catalog (build.nvidia.com)",
+      "url": "https://build.nvidia.com/",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Catalog landing"
+      ],
+      "evidence_supported": [
+        "Public catalog entry point for hosted NIM APIs"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which exact cuda-repo package filename and /usr/local/cuda-* version directory apply for the current toolkit release?",
-      "impact": "Install and PATH commands use placeholders that must be filled from the current CUDA downloads selector.",
-      "reason_unresolved": "The Quick Start Guide uses templated package and version paths that change with toolkit releases.",
+      "question": "What exact current signup fields (identity, legal, marketing preferences) does Get API Key show for a brand-new NVIDIA account?",
+      "impact": "Signup is treated as one opaque account step; field-level action counts cannot be verified from the quickstart alone.",
+      "reason_unresolved": "The API Catalog Quickstart shows email entry and password setup for new accounts but does not enumerate every required form field.",
+      "checked_source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "question": "Which exact client library and package pins does the live model-page Copy Code sample currently emit?",
+      "impact": "Configure/execute may require installing whatever client the pane currently copies; the quickstart only documents replacing the API key placeholder and running the code.",
+      "reason_unresolved": "The quickstart instructs Copy Code from the build.nvidia.com pane without publishing a fixed snippet on the docs page.",
       "checked_source_ids": [
         "S1"
       ]
     }
   ],
   "excluded_after_success": [
-    "Nsight tooling setup",
-    "Cross-compilation",
-    "Production driver policy"
-  ]
+    "Self-hosted NIM container deploy",
+    "NVIDIA AI Enterprise production licensing",
+    "CUDA Toolkit / local GPU sample paths",
+    "Hugging Face Serverless NIM"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }

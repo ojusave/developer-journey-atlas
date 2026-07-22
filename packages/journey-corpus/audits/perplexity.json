@@ -7,7 +7,7 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "1f53aa59f3ce6504d80e6b6357eb41c07fc9e138b5002abce262ee56accf8705",
+  "source_record_sha256": "a84905476cfd64370cabdeaee8eaaaae5aae372c4a500b257c58cb7fb7d9bcc0",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
@@ -16,7 +16,7 @@
       "No language SDK is required."
     ]
   },
-  "developer_goal": "Create a Perplexity account and API group, fund prepaid API credits with a payment method, generate a key, and complete an Agent API request over HTTPS.",
+  "developer_goal": "Create a Perplexity account, fund prepaid API credits with a payment method, generate a key, and complete an Agent API request over HTTPS.",
   "first_success": {
     "outcome": "POST https://api.perplexity.ai/v1/agent with a Bearer key returns Agent API output after payment method and prepaid credits are in place.",
     "observable_signal": "The Agent API returns a successful JSON body with completed status and assistant output text (citations and usage may also be present).",
@@ -33,7 +33,7 @@
       {
         "name": "Perplexity API Quickstart, Agent API via cURL (prepaid credits)",
         "status": "selected",
-        "reason": "The general API Quickstart places Agent API first and recommends it for new projects over Sonar. The same docs surface documents cURL to https://api.perplexity.ai/v1/agent with Authorization: Bearer $PERPLEXITY_API_KEY, so an SDK install is"
+        "reason": "Quickstart documents cURL to https://api.perplexity.ai/v1/agent with preset low and input; API Groups & Billing still requires payment method and prepaid credits."
       },
       {
         "name": "SDK-first quickstart tab",
@@ -45,88 +45,45 @@
   "required_path": [
     {
       "step_number": 1,
-      "kind": "product-interaction",
-      "interface": "other",
-      "action": "Open the API Quickstart and follow its API Portal path.",
+      "kind": "account",
+      "interface": "browser",
+      "action": "Create or sign in to a Perplexity account and open the API Portal.",
       "required_fields": [],
-      "observable_result": "The developer can choose an account sign-in method.",
+      "observable_result": "Billing and API keys are reachable.",
       "evidence_state": "documented",
       "source_ids": [
         "S1",
+        "S2",
         "S3"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "browser",
-      "action": "Choose email signup and enter the email address.",
-      "required_fields": [],
-      "observable_result": "The email authentication message is received.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S2",
-        "S8"
-      ]
-    },
-    {
-      "step_number": 3,
-      "kind": "account",
-      "interface": "email",
-      "action": "Open the secure login link or enter the one-time password to authenticate.",
-      "required_fields": [],
-      "observable_result": "The API Portal can be accessed.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S2",
-        "S9"
-      ]
-    },
-    {
-      "step_number": 4,
-      "kind": "implementation",
-      "interface": "web-ui",
-      "action": "Create the first API group and choose a descriptive group name.",
-      "required_fields": [],
-      "observable_result": "Group Settings, Billing, and API keys are available.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "step_number": 5,
-      "kind": "implementation",
-      "interface": "web-ui",
-      "action": "Open Group Settings and complete the organization name, address, and tax details.",
-      "required_fields": [],
-      "observable_result": "The group is configured for billing.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "step_number": 6,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Open Billing, select Add payment method, and enter the requested credit-card information in the Stripe-managed flow.",
-      "required_fields": [],
-      "observable_result": "The Billing page shows the payment method and credit balance.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S3",
-        "S6"
-      ]
-    },
-    {
-      "step_number": 7,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Select Buy more credits and purchase enough prepaid API credits for the call.",
-      "required_fields": [],
-      "observable_result": "A positive credit balance is shown.",
+      "action": "Open Billing, add a payment method, and purchase prepaid API credits (or confirm a positive credit balance).",
+      "required_fields": [
+        {
+          "label": "Payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3",
+            "S6"
+          ]
+        },
+        {
+          "label": "Credit purchase amount",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3",
+            "S5",
+            "S6"
+          ]
+        }
+      ],
+      "observable_result": "Billing shows a payment method and a positive credit balance.",
       "evidence_state": "documented",
       "source_ids": [
         "S3",
@@ -135,36 +92,34 @@
       ]
     },
     {
-      "step_number": 8,
+      "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Open API keys and select + Generate API Key.",
+      "action": "Open API keys, select + Generate API Key, and copy the key immediately.",
       "required_fields": [],
-      "observable_result": "A new key is visible for copying.",
+      "observable_result": "The key is generated and copied to secure local storage.",
       "evidence_state": "documented",
       "source_ids": [
+        "S1",
         "S3",
         "S4"
       ]
     },
     {
-      "step_number": 9,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Copy the key immediately and store it securely before leaving the page.",
-      "required_fields": [],
-      "observable_result": "PERPLEXITY_API_KEY can be set locally.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S4"
-      ]
-    },
-    {
-      "step_number": 10,
+      "step_number": 4,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Export the copied key as `PERPLEXITY_API_KEY`.",
-      "required_fields": [],
+      "action": "Export the key as PERPLEXITY_API_KEY in the terminal.",
+      "required_fields": [
+        {
+          "label": "PERPLEXITY_API_KEY",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
       "observable_result": "PERPLEXITY_API_KEY is set for the current shell.",
       "evidence_state": "documented",
       "source_ids": [
@@ -172,42 +127,24 @@
       ]
     },
     {
-      "step_number": 11,
+      "step_number": 5,
       "kind": "verification",
       "interface": "api",
-      "action": "POST an Agent API request with cURL to https://api.perplexity.ai/v1/agent.",
+      "action": "POST https://api.perplexity.ai/v1/agent with Authorization Bearer, preset low, and input; confirm completed assistant output.",
       "required_fields": [],
-      "observable_result": "The response is completed and contains assistant output text.",
+      "observable_result": "Successful Agent JSON includes completed assistant output text.",
       "evidence_state": "documented",
       "source_ids": [
         "S1",
         "S5"
       ]
-    },
-    {
-      "step_number": 12,
-      "kind": "verification",
-      "interface": "api",
-      "action": "Confirm the Agent API JSON includes completed assistant output text.",
-      "required_fields": [],
-      "observable_result": "Assistant output text is present in the successful response.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S1"
-      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "A Perplexity account created with Apple, Google, or email link or one-time password authentication.",
+      "description": "A Perplexity account (Apple, Google, or email link / OTP).",
       "source_ids": [
         "S2",
-        "S3"
-      ]
-    },
-    {
-      "description": "Admin permission for API group billing and API key management.",
-      "source_ids": [
         "S3"
       ]
     },
@@ -233,22 +170,11 @@
       ]
     },
     {
-      "description": "API group setup requires organization name, address, and tax details.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "The official API group prerequisites require a credit card for payment setup.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Credits are purchased in advance, and the public docs do not state a minimum purchase amount for this first call.",
+      "description": "Payment method and prepaid credits are required; exhausted balances block API keys.",
       "source_ids": [
         "S3",
-        "S5"
+        "S5",
+        "S6"
       ]
     },
     {
@@ -274,6 +200,21 @@
       "source_ids": [
         "S1"
       ]
+    },
+    {
+      "item": "Organization name, address, and tax form under Group Settings",
+      "reason": "Invoice/org profile fields; not documented as a hard gate before generating a key or calling the Agent API.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "Separate create-group naming microstep",
+      "reason": "Docs direct developers to the API Portal / existing API group workspace; group naming is not a documented hard gate before first success.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
     }
   ],
   "sources": [
@@ -286,7 +227,8 @@
       "evidence_supported": [
         "Primary surface",
         "Agent recommendation",
-        "cURL Agent request",
+        "cURL Agent request to /v1/agent",
+        "preset low and input body",
         "environment variable",
         "first request and response",
         "time claim"
@@ -297,7 +239,7 @@
       "title": "Account Management and Security",
       "url": "https://www.perplexity.ai/help-center/en/articles/10352998-account-management-and-security",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
         "Apple Google and email routes",
         "login link or one-time password",
@@ -310,14 +252,13 @@
       "title": "API Groups & Billing",
       "url": "https://docs.perplexity.ai/docs/getting-started/api-groups",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Admin and card prerequisites",
-        "organization fields",
+        "Account and card prerequisites",
         "prepaid credits",
         "payment setup",
         "credit blocking",
-        "key button"
+        "Generate API Key button"
       ]
     },
     {
@@ -325,10 +266,8 @@
       "title": "API Key Management",
       "url": "https://docs.perplexity.ai/docs/admin/api-key-management",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Group prerequisite",
-        "descriptive name",
         "one-time key display",
         "key-generation troubleshooting"
       ]
@@ -338,7 +277,7 @@
       "title": "Frequently Asked Questions",
       "url": "https://docs.perplexity.ai/docs/resources/faq",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
         "Usage pricing",
         "credit purchase",
@@ -350,7 +289,7 @@
       "title": "API Payment and billing",
       "url": "https://www.perplexity.ai/help-center/en/articles/10354847-api-payment-and-billing",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
         "Billing navigation",
         "Buy more credits",
@@ -363,7 +302,7 @@
       "title": "Perplexity Terms of Service",
       "url": "https://www.perplexity.ai/cs/hub/legal/terms-of-service",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
         "Perplexity AI, Inc. organization identity"
       ]
@@ -373,7 +312,7 @@
       "title": "Troubleshooting: Not receiving one-time passcode or sign-in email",
       "url": "https://www.perplexity.ai/help-center/en/articles/11501745-troubleshooting-not-receiving-one-time-passcode-or-sign-in-email",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
         "Missing login-email recovery",
         "team@mail.perplexity.ai allowlisting",
@@ -386,7 +325,7 @@
       "title": "I am having issues signing in",
       "url": "https://www.perplexity.ai/help-center/en/articles/10354899-i-am-having-issues-signing-in",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "evidence_supported": [
         "Newest-link and same-device recovery",
         "Google or Apple alternative",
