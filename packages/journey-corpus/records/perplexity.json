@@ -6,52 +6,53 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Perplexity API Quickstart, Python Agent API route",
-    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Committed to already-reconstructed surface `Perplexity API Quickstart, Python Agent API route`. Prior basis: The general API Quickstart promises an API key and first call in under three minutes, places Agent API first, and says new projects should prefer Agent API over Sonar.",
+    "name": "Perplexity API Quickstart, Agent API via cURL (prepaid credits)",
+    "selection_basis": "The general API Quickstart places Agent API first and recommends it for new projects over Sonar. The same docs surface documents cURL to https://api.perplexity.ai/v1/agent with Authorization: Bearer $PERPLEXITY_API_KEY, so an SDK install is not required. API Groups & Billing still requires a payment method and prepaid credits before usable keys.",
     "alternatives_considered": [
+      {
+        "name": "Python perplexityai SDK Agent example",
+        "url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
+        "reason_not_primary": "Optional client library; the quickstart also documents an equivalent cURL Agent request."
+      },
       {
         "name": "Search API",
         "url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
-        "reason_not_primary": "It is a peer use-case route, while Agent API is presented first and recommended for new web-grounded projects."
+        "reason_not_primary": "Peer use-case route; Agent API is presented first for web-grounded response generation."
       },
       {
         "name": "Sonar API",
         "url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
         "reason_not_primary": "The page says Sonar is in maintenance mode and new projects should prefer Agent API."
-      },
-      {
-        "name": "Embeddings API",
-        "url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
-        "reason_not_primary": "It is for vector-generation use cases rather than the page's first presented response-generation call."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Perplexity account and API group, fund API usage, generate a key, and run the official Python Agent API first call.",
+    "developer_intent": "Create a Perplexity account and API group, fund prepaid API credits with a payment method, generate a key, and complete an Agent API request over HTTPS.",
     "starting_url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
     "assumed_prior_state": [
-      "No Perplexity account, API group, payment method, API credits, key, SDK, or request is assumed.",
-      "The developer has an email inbox or an Apple or Google identity, a credit card, and a Python environment with pip.",
-      "No account, group, billing action, credential, package installation, or API call was performed during research."
+      "No Perplexity account, API group, payment method, API credits, key, or request is assumed.",
+      "The developer has an email inbox or an Apple or Google identity, a credit card, and a terminal with cURL.",
+      "No language SDK is assumed."
     ]
   },
   "documented_first_success": {
     "official_milestone": "Make your first API call",
-    "normalized_outcome": "The Python program sends the published low-preset Agent API request and prints its web-grounded response text.",
-    "observable_completion_signal": "The terminal prints response.output_text; the documented response has status completed and an assistant output_text item with citations and usage cost.",
+    "normalized_outcome": "An authenticated cURL POST to https://api.perplexity.ai/v1/agent returns a completed Agent API response with output text.",
+    "observable_completion_signal": "The Agent API returns a successful JSON body with completed status and assistant output text (citations and usage may also be present).",
     "boundary_evidence": {
       "type": "explicitly-named",
-      "official_label_or_terminal_state": "Making Your First API Call",
+      "official_label_or_terminal_state": "Making Your First API Call; quickstart documents cURL to https://api.perplexity.ai/v1/agent with Bearer $PERPLEXITY_API_KEY.",
       "source_ids": [
         "S1"
       ]
     },
-    "why_this_is_the_boundary": "The Quickstart names this section as the first call, demonstrates its response, and lists streaming and product-specific guides afterward.",
+    "why_this_is_the_boundary": "The Quickstart names this the first call. cURL is documented for the Agent endpoint, so pip install perplexityai is optional. Prepaid credits and a payment method remain required for usable API keys.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S3"
     ]
   },
   "prerequisites": [
@@ -87,7 +88,7 @@
     {
       "order": 4,
       "type": "software",
-      "requirement": "Python and pip for the official perplexityai SDK route.",
+      "requirement": "A terminal with cURL (or any HTTP client). No language SDK is required.",
       "required": true,
       "source_ids": [
         "S1"
@@ -245,7 +246,7 @@
       "action": "Copy the key immediately and store it securely before leaving the page.",
       "details": [],
       "input": "One-time displayed API key",
-      "output": "The developer has the credential needed by the SDK.",
+      "output": "The developer has the credential needed for HTTPS requests.",
       "success_signal": "PERPLEXITY_API_KEY can be set locally.",
       "failure_or_wait": "The full key cannot be retrieved later.",
       "required": true,
@@ -255,30 +256,14 @@
     },
     {
       "step_number": 10,
-      "phase": "install",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run `pip install perplexityai`.",
-      "details": [],
-      "input": "Python environment with pip",
-      "output": "The official Python SDK is installed.",
-      "success_signal": "The Perplexity class can be imported.",
-      "failure_or_wait": "No installation failure recovery is documented in the Quickstart.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 11,
       "phase": "configure",
       "actor": "developer",
       "interface": "cli",
       "action": "Export the copied key as `PERPLEXITY_API_KEY`.",
       "details": [],
       "input": "API key",
-      "output": "The SDK can read the credential from the environment.",
-      "success_signal": "The next program can initialize Perplexity without an inline key.",
+      "output": "The shell can authenticate HTTP requests.",
+      "success_signal": "PERPLEXITY_API_KEY is set for the current shell.",
       "failure_or_wait": "No environment-variable recovery is documented.",
       "required": true,
       "source_ids": [
@@ -286,22 +271,39 @@
       ]
     },
     {
-      "step_number": 12,
+      "step_number": 11,
       "phase": "execute",
       "actor": "developer",
-      "interface": "code",
-      "action": "Run the published Python Agent API example with preset `low` and print `response.output_text`.",
+      "interface": "api",
+      "action": "POST an Agent API request with cURL to https://api.perplexity.ai/v1/agent.",
       "details": [
-        "The published prompt asks for the core findings and NLP significance of the Attention Is All You Need paper."
+        "Include Authorization: Bearer $PERPLEXITY_API_KEY and Content-Type: application/json.",
+        "Send a JSON body with model and input as shown in the quickstart cURL Agent example."
       ],
-      "input": "Official example code and funded API key",
-      "output": "An Agent API response is returned and its text is printed.",
-      "success_signal": "The response is completed and contains assistant output_text plus citations and usage data.",
+      "input": "Funded API key and Agent request body",
+      "output": "Agent API HTTP response",
+      "success_signal": "The response is completed and contains assistant output text.",
       "failure_or_wait": "A 401 can mean an invalid or deleted key or exhausted credits; a 429 requires backoff and may require a higher tier.",
       "required": true,
       "source_ids": [
         "S1",
         "S5"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the Agent API JSON includes completed assistant output text.",
+      "details": [],
+      "input": "Agent API response body",
+      "output": "Verified first Agent API success",
+      "success_signal": "Assistant output text is present in the successful response.",
+      "failure_or_wait": "An error body means the first call did not succeed.",
+      "required": true,
+      "source_ids": [
+        "S1"
       ]
     }
   ],
@@ -337,10 +339,10 @@
       ]
     },
     {
-      "at_step": 10,
-      "condition": "TypeScript or cURL",
-      "path": "Use the Quickstart's TypeScript SDK or cURL tab and equivalent Agent API request.",
-      "effect_on_first_success": "Changes local tooling while preserving the same response terminal.",
+      "at_step": 11,
+      "condition": "The developer prefers the Python or TypeScript SDK instead of cURL.",
+      "path": "Install the official SDK and run the published Agent example with the same PERPLEXITY_API_KEY and prepaid credits.",
+      "effect_on_first_success": "Adds optional local package installation without changing the authenticated Agent API boundary.",
       "source_ids": [
         "S1"
       ]
@@ -408,19 +410,19 @@
       "url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
       "official_domain": true,
       "source_type": "quickstart",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
         "Generating an API Key",
         "Choosing the Right API",
-        "Installation",
         "Authentication",
-        "Making Your First API Call"
+        "Making Your First API Call",
+        "cURL Agent example"
       ],
       "evidence_supported": [
         "Primary surface",
         "Agent recommendation",
-        "SDK install",
+        "cURL Agent request",
         "environment variable",
         "first request and response",
         "time claim"

@@ -1,66 +1,366 @@
 {
-  "platform": {"name": "GroqCloud", "slug": "groqcloud", "organization": "Groq, Inc."},
+  "platform": {
+    "name": "GroqCloud",
+    "slug": "groqcloud",
+    "organization": "Groq, Inc."
+  },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Groq API Quickstart, Python chat-completion route",
-    "selection_basis": "Under the workshop policy, the Python SDK tab in the general Quickstart is the fastest commonly used documented route: it provides one install command and a complete chat-completion program. Signup is one opaque step at the official login URL; documented key, environment, install, and request steps follow.",
+    "name": "Groq API Quickstart via cURL (Responses)",
+    "selection_basis": "Groq's quickstart documents a cURL POST to https://api.groq.com/openai/v1/responses with Authorization: Bearer $GROQ_API_KEY alongside Python and JavaScript OpenAI-compatible clients. An SDK install is not required for the first authenticated Responses call. Billing FAQs describe a Free tier that can call the API; payment methods are required only when upgrading to the Developer tier.",
     "alternatives_considered": [
-      {"name": "cURL", "url": "https://console.groq.com/docs/quickstart", "reason_not_primary": "It is a peer language tab; Python is the fully visible SDK route on the inspected page."},
-      {"name": "JavaScript", "url": "https://console.groq.com/docs/quickstart", "reason_not_primary": "It is a peer language tab rather than a separately recommended getting-started surface."},
-      {"name": "Playground", "url": "https://console.groq.com/playground", "reason_not_primary": "The Quickstart lists Playground after the first chat completion as a next step."}
+      {
+        "name": "Python OpenAI-compatible client",
+        "url": "https://docs.groq.com/docs/quickstart",
+        "reason_not_primary": "Optional convenience client against the same OpenAI-compatible base URL."
+      },
+      {
+        "name": "JavaScript OpenAI-compatible client",
+        "url": "https://docs.groq.com/docs/quickstart",
+        "reason_not_primary": "Peer SDK tab; same endpoint as the documented cURL example."
+      },
+      {
+        "name": "Developer tier upgrade",
+        "url": "https://console.groq.com/docs/billing-faqs",
+        "reason_not_primary": "Higher limits and pay-as-you-go billing after Free-tier first success."
+      }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a GroqCloud account and API key, then run the official Python first chat completion.",
-    "starting_url": "https://console.groq.com/docs/quickstart",
+    "developer_intent": "Create a GroqCloud API key and receive a Responses API JSON result over HTTPS without installing an SDK.",
+    "starting_url": "https://docs.groq.com/docs/quickstart",
     "assumed_prior_state": [
-      "No GroqCloud account, organization, project, API key, SDK, or request is assumed.",
-      "Python and pip are available locally; no package installation or API request was executed during research."
+      "No GroqCloud account or API key is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Successfully received a chat completion",
-    "normalized_outcome": "The published Python program sends a request to Groq and prints the returned chat-completion content.",
-    "observable_completion_signal": "`print(chat_completion.choices[0].message.content)` outputs the model response.",
-    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Successfully received a chat completion.", "source_ids": ["S1"]},
-    "why_this_is_the_boundary": "The Quickstart explicitly identifies the received chat completion as success and places Playground and other endpoints in Next Steps.",
-    "source_ids": ["S1", "S2", "S5"]
+    "official_milestone": "Quick Start first Responses call",
+    "normalized_outcome": "An authenticated cURL POST to https://api.groq.com/openai/v1/responses returns model output text.",
+    "observable_completion_signal": "The Responses API returns a successful JSON body with model-generated text for the quickstart prompt.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The quickstart documents Create an API key, export GROQ_API_KEY, and a cURL POST to https://api.groq.com/openai/v1/responses.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The first meaningful LLM success is a successful authenticated Responses API response. cURL is documented on the same quickstart page as the SDK tabs, so package installation is optional. Free-tier accounts can call the API; a payment method is documented for Developer-tier upgrade, not for the Free-tier first call.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "account", "requirement": "A GroqCloud Account is required to use the Cloud Services.", "required": true, "source_ids": ["S3"]},
-    {"order": 2, "type": "permission", "requirement": "Only a team owner or a user with the developer role may create or manage API keys.", "required": true, "source_ids": ["S2"]},
-    {"order": 3, "type": "credential", "requirement": "A Groq API key is required by the Quickstart request.", "required": true, "source_ids": ["S1"]},
-    {"order": 4, "type": "software", "requirement": "Python and pip are needed for the visible Python SDK route.", "required": true, "source_ids": ["S1"]}
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A GroqCloud account that can open API Keys in the console.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "credential",
+      "requirement": "An API key created in the Groq console and stored securely.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "software",
+      "requirement": "A terminal with cURL (or any HTTP client) able to send HTTPS JSON requests. No language SDK is required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Groq API Quickstart.", "details": [], "input": "https://console.groq.com/docs/quickstart", "output": "The ordered Create an API Key, key setup, and first chat completion sections are visible.", "success_signal": "The Create API Key link is available.", "failure_or_wait": "No navigation recovery is documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to GroqCloud.", "details": ["Treat signup as one opaque workshop-policy step at the official URL.", "Continuing accepts the Services Agreement and acknowledges the Privacy Policy."], "input": "https://console.groq.com/login", "output": "Authenticated GroqCloud Console access.", "success_signal": "The API Keys page is accessible.", "failure_or_wait": "Follow the displayed authentication recovery path.", "required": true, "source_ids": ["S3", "S5"]},
-    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Create and copy an API key.", "details": ["Open API Keys and select `Create API Key`.", "Use an owner or developer-role identity."], "input": "Authenticated authorized account", "output": "Groq API key.", "success_signal": "The new key value is available to copy.", "failure_or_wait": "Ask a team owner for the developer role if key creation is unavailable.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Export the key as `GROQ_API_KEY`.", "details": [], "input": "Copied Groq API key", "output": "Credential available to the Python process.", "success_signal": "The environment variable is set.", "failure_or_wait": "Correct shell quoting or environment configuration.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 5, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Groq Python library.", "details": ["Run `pip install groq`."], "input": "Python and pip", "output": "Installed Groq SDK.", "success_signal": "pip completes successfully.", "failure_or_wait": "Resolve Python environment or package errors.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published first chat-completion program.", "details": ["Use model `llama-3.3-70b-versatile`.", "Send the prompt `Explain the importance of fast language models` and print the first response message."], "input": "Installed SDK and exported key", "output": "Groq chat completion.", "success_signal": "The program prints `chat_completion.choices[0].message.content`.", "failure_or_wait": "Check the API key, model identifier, account limits, and network response.", "required": true, "source_ids": ["S1"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Groq API Quickstart.",
+      "details": [],
+      "input": "Quickstart URL",
+      "output": "Documented first-call path with cURL and SDK tabs",
+      "success_signal": "The cURL Responses example is visible.",
+      "failure_or_wait": "No navigation recovery is documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Sign up for or sign in to GroqCloud.",
+      "details": [
+        "Treat signup as one opaque step at the official console login/signup flow.",
+        "The public Login shell says continuing accepts the Groq Services Agreement."
+      ],
+      "input": "Intent to use the Groq API",
+      "output": "Authenticated GroqCloud session",
+      "success_signal": "API Keys settings are reachable.",
+      "failure_or_wait": "Follow the displayed account recovery path.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create and copy an API key.",
+      "details": [
+        "Open API Keys in the console and create a key.",
+        "Store the key securely."
+      ],
+      "input": "Authenticated account",
+      "output": "Groq API key",
+      "success_signal": "The key value is available locally.",
+      "failure_or_wait": "No manual approval wait is documented for key creation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export the key as GROQ_API_KEY in the terminal.",
+      "details": [],
+      "input": "Generated API key",
+      "output": "API key available to HTTP clients in the shell",
+      "success_signal": "The environment variable is set for the current shell.",
+      "failure_or_wait": "Shell persistence depends on the OS.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "POST a Responses API request with cURL to https://api.groq.com/openai/v1/responses.",
+      "details": [
+        "Include Content-Type: application/json and Authorization: Bearer $GROQ_API_KEY.",
+        "Send a JSON body with a model and input prompt as shown in the quickstart cURL example."
+      ],
+      "input": "GROQ_API_KEY",
+      "output": "Responses API HTTP response",
+      "success_signal": "The API returns a successful JSON body containing model output text.",
+      "failure_or_wait": "Missing key, rate limits, or invalid JSON produce API errors instead of model output.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the Responses API JSON includes the model-generated text.",
+      "details": [],
+      "input": "Responses API response body",
+      "output": "Verified first LLM API success",
+      "success_signal": "Model output text is present in the successful response.",
+      "failure_or_wait": "An error body means the first call did not succeed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
   "branches": [
-    {"at_step": 2, "condition": "Existing authenticated GroqCloud account and project", "path": "The user may already have console access and generate a project-specific key, but the current public key-generation UI sequence remains undocumented.", "effect_on_first_success": "Could bypass signup while leaving the required key form and one-time-secret behavior unestablished.", "source_ids": ["S2", "S4"]}
+    {
+      "at_step": 5,
+      "condition": "The developer prefers an official SDK instead of cURL.",
+      "path": "Use the Python or JavaScript OpenAI-compatible client against https://api.groq.com/openai/v1 and call responses.create with the same model and input; the API key requirement stays the same.",
+      "effect_on_first_success": "Adds optional local package installation without changing the authenticated Responses boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer needs higher Free-tier rate limits.",
+      "path": "Upgrade to the Developer tier in billing settings and provide a valid payment method; billing then follows progressive thresholds and monthly invoices.",
+      "effect_on_first_success": "Optional after first success; not required for a Free-tier Responses call.",
+      "source_ids": [
+        "S3"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "account", "description": "The key link requires an Account and authenticated GroqCloud console state.", "documented_requirement": true, "source_ids": ["S2", "S3"]},
-    {"at_step": 2, "type": "credential", "description": "The public API Keys shell exposes the action but not the authenticated key form or secret-display sequence.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
-    {"at_step": 2, "type": "terms", "description": "The public Login shell says continuing accepts the Groq Services Agreement and acknowledges the Privacy Policy.", "documented_requirement": true, "source_ids": ["S5"]}
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "API key creation requires an authenticated GroqCloud console session.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "terms",
+      "description": "Continuing through Login accepts the Groq Services Agreement.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "A secret API key must be created and stored safely.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "rate-limit",
+      "description": "Free-tier accounts are subject to published Free plan rate limits.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": true, "value": "The Quickstart says the Groq API can be running in a few minutes; the blocked public route prevents an end-to-end verification of that claim.", "source_ids": ["S1"]},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Quickstart", "url": "https://console.groq.com/docs/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Create an API Key", "Set up your API Key", "Requesting your first chat completion", "Next Steps"], "evidence_supported": ["Primary route", "key requirement", "Python install and program", "published completion terminal", "time claim"]},
-    {"id": "S2", "title": "API Keys", "url": "https://console.groq.com/keys", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public API Keys shell"], "evidence_supported": ["Create API Key action", "Key table structure", "Owner or developer-role permission", "Authenticated key form and secret transition are not publicly exposed"]},
-    {"id": "S3", "title": "Groq Services Agreement", "url": "https://console.groq.com/docs/legal/services-agreement", "official_domain": true, "source_type": "policy", "accessed_at": "2026-07-18", "last_updated_if_shown": "October 15, 2025", "sections_used": ["Introduction", "Definitions", "Accounts"], "evidence_supported": ["Cloud Services scope", "Account requirement", "regional Groq contracting entities"]},
-    {"id": "S4", "title": "Projects", "url": "https://console.groq.com/docs/projects", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Creating Your First Project"], "evidence_supported": ["Project creation and project-specific API keys after console access"]},
-    {"id": "S5", "title": "GroqCloud", "url": "https://console.groq.com/login", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Public login shell"], "evidence_supported": ["Legal acceptance notice", "Public signup and authentication sequence remains unexposed"]}
+    {
+      "id": "S1",
+      "title": "Groq API Quickstart",
+      "url": "https://docs.groq.com/docs/quickstart",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Welcome",
+        "cURL Responses example",
+        "OpenAI base URL"
+      ],
+      "evidence_supported": [
+        "cURL POST to /openai/v1/responses with Bearer token",
+        "Python and JavaScript peer tabs",
+        "GROQ_API_KEY usage"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API Keys",
+      "url": "https://console.groq.com/keys",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "API Keys"
+      ],
+      "evidence_supported": [
+        "Console key creation entry"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Billing FAQs",
+      "url": "https://console.groq.com/docs/billing-faqs",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Upgrading to Developer Tier",
+        "Understanding Groq's Billing Model"
+      ],
+      "evidence_supported": [
+        "Free tier exists before Developer upgrade",
+        "Payment method required to upgrade to Developer tier",
+        "Progressive billing after upgrade"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Login",
+      "url": "https://console.groq.com/login",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Login shell"
+      ],
+      "evidence_supported": [
+        "Services Agreement acceptance on continue"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Rate Limits",
+      "url": "https://console.groq.com/docs/rate-limits",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Free Plan Limits",
+        "Developer Plan Limits"
+      ],
+      "evidence_supported": [
+        "Free plan rate limits for API usage"
+      ]
+    }
   ],
-  "uncertainties": [],
-  "excluded_after_success": ["Playground", "third-party libraries", "production rate limits and billing upgrades"]
+  "uncertainties": [
+    {
+      "question": "Whether every brand-new Free-tier account can complete a Responses call without any promotional-credit or region-specific gate beyond rate limits.",
+      "impact": "Could add a rare billing or access gate before first success for some accounts.",
+      "reason_unresolved": "Billing FAQs describe Free vs Developer clearly but do not enumerate every fresh-account edge case.",
+      "checked_source_ids": [
+        "S3",
+        "S5"
+      ]
+    }
+  ],
+  "excluded_after_success": [
+    "Developer tier upgrade and payment method",
+    "Batch and higher rate limits",
+    "SDK installation"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }

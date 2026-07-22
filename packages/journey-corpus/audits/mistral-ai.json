@@ -7,48 +7,39 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "40866606b8dbaf4b67c2c3c1e7c88b2dfec7ec96eb475767311b913b0e88c280",
+  "source_record_sha256": "571f402fcfc3a8a6c0a1f32a2b02f306704faeaa774c60c78727a5651cfea120",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and Python 3.9+ or Node.js 18+ if measuring the Developer API route.",
-      "No Mistral account, Studio activation, or API key exist yet.",
-      "No product among Vibe, Studio, or Admin has been preselected by the workshop."
+      "The developer has a supported browser and a terminal with cURL.",
+      "No prior account, API key, or successful API request exists yet.",
+      "No language SDK is required."
     ]
   },
-  "developer_goal": "Choose a Mistral product first-success outcome, create a Mistral account, and complete that product's official first-use quickstart.",
+  "developer_goal": "Create a Mistral account, enable Studio Free mode, generate an API key, and complete a chat-completions request over HTTPS without installing an SDK.",
   "first_success": {
-    "outcome": "Depends on the unresolved product choice: for the Developer API route, the terminal prints a short model description of Mistral AI.",
-    "observable_signal": "For the documented first API request route, the terminal contains the short description rather than an authentication, billing, or rate-limit error.",
+    "outcome": "POST https://api.mistral.ai/v1/chat/completions with a Bearer key returns chat-completion output on Studio Free mode without a credit card.",
+    "observable_signal": "The HTTP response body includes assistant message content for the requested prompt.",
     "source_ids": [
-      "S1",
-      "S4"
+      "S3",
+      "S4",
+      "S6"
     ]
   },
   "route_selection": {
-    "surface": "Mistral documentation quickstarts grouped by product",
-    "rule": "Official docs require picking Vibe, Studio, or Admin before a first-mile path exists; do not invent a cross-product winner.",
-    "selected": null,
+    "surface": "Mistral Developer API via cURL chat completions (Studio Free mode)",
+    "rule": "Prefer the shortest complete path that reaches an authenticated API response without requiring an SDK when cURL is documented.",
+    "selected": "Mistral Developer API via cURL chat completions (Studio Free mode)",
     "candidates": [
       {
-        "name": "Studio: Activate and generate an API key only",
-        "status": "unresolved",
-        "reason": "Official Studio quickstart ends at a working Free-mode API key."
+        "name": "Mistral Developer API via cURL chat completions (Studio Free mode)",
+        "status": "selected",
+        "reason": "Mistral's Activate Studio guide states Studio is enabled in Free mode by default with no credit card required, and an API key can be generated for model calls. The API reference documents cURL to https://api.mistral.ai/v1/chat/completions. "
       },
       {
-        "name": "Developer: Send your first API request",
-        "status": "unresolved",
-        "reason": "Separate quickstart that prints a chat completion; uses the key guide as a prerequisite."
-      },
-      {
-        "name": "Vibe Work or Vibe Code first task",
-        "status": "unresolved",
-        "reason": "Equal top-level product family with different first-success signals."
-      },
-      {
-        "name": "Studio playground test without SDK",
-        "status": "unresolved",
-        "reason": "Another Studio first-use quickstart with a UI terminal rather than a local terminal print."
+        "name": "SDK-first quickstart tab",
+        "status": "not-selected",
+        "reason": "SDK install is optional when official docs document an equivalent cURL call."
       }
     ]
   },
@@ -56,42 +47,23 @@
     {
       "step_number": 1,
       "kind": "product-interaction",
-      "interface": "browser",
-      "action": "Choose the Mistral product and first-use outcome before continuing.",
-      "required_fields": [
-        {
-          "label": "Product and role choice",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "One product-scoped quickstart is selected.",
+      "interface": "other",
+      "action": "Open the Developer first-API-request quickstart and follow its API-key prerequisite link.",
+      "required_fields": [],
+      "observable_result": "Activate Studio and generate an API key is reachable.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1"
+        "S4"
       ]
     },
     {
       "step_number": 2,
       "kind": "account",
-      "interface": "web-ui",
-      "action": "Create or sign in to a Mistral account required by the selected product.",
-      "required_fields": [
-        {
-          "label": "Mistral account signup inputs",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3",
-            "S4"
-          ]
-        }
-      ],
-      "observable_result": "The developer can open Studio or the selected product surface.",
-      "evidence_state": "unverified",
+      "interface": "browser",
+      "action": "Create or sign in to a Mistral account and open Studio.",
+      "required_fields": [],
+      "observable_result": "API key creation controls are reachable.",
+      "evidence_state": "documented",
       "source_ids": [
         "S3",
         "S4"
@@ -99,152 +71,124 @@
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
+      "kind": "account",
       "interface": "web-ui",
-      "action": "If measuring Developer API: open Studio API keys, create a named key, and copy the secret.",
-      "required_fields": [
-        {
-          "label": "Key name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S3",
-            "S4"
-          ]
-        },
-        {
-          "label": "Expiration date",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S3"
-          ]
-        },
-        {
-          "label": "Connector access scope",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S3"
-          ]
-        }
-      ],
-      "observable_result": "A Free-mode API key is stored securely.",
+      "action": "Create a new API key, copy the secret immediately, and store it securely.",
+      "required_fields": [],
+      "observable_result": "The key value is saved locally.",
       "evidence_state": "documented",
       "source_ids": [
-        "S3",
-        "S4"
+        "S3"
       ]
     },
     {
       "step_number": 4,
       "kind": "implementation",
       "interface": "cli",
-      "action": "If measuring first API request: export MISTRAL_API_KEY, install the SDK, create quickstart code, and run it.",
-      "required_fields": [
-        {
-          "label": "MISTRAL_API_KEY",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4"
-          ]
-        },
-        {
-          "label": "SDK install command",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4"
-          ]
-        },
-        {
-          "label": "quickstart source file",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4"
-          ]
-        }
-      ],
-      "observable_result": "The terminal prints a short description of Mistral AI.",
+      "action": "Export the key as MISTRAL_API_KEY.",
+      "required_fields": [],
+      "observable_result": "MISTRAL_API_KEY is set in the current shell.",
       "evidence_state": "documented",
       "source_ids": [
         "S4"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "POST a chat-completions request with cURL to https://api.mistral.ai/v1/chat/completions.",
+      "required_fields": [],
+      "observable_result": "The API returns a successful JSON body containing assistant message content.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the chat-completions JSON includes assistant message content.",
+      "required_fields": [],
+      "observable_result": "Assistant content is present in the successful response.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4",
+        "S6"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Python 3.9+ or Node.js 18+ for the Developer API quickstart.",
+      "description": "A Mistral AI account that can open Studio.",
       "source_ids": [
+        "S3",
         "S4"
       ]
     },
     {
-      "description": "Studio Free mode is enabled by default with no credit card required for limited API access.",
+      "description": "A Mistral API key created in Studio, copied immediately, and exported as MISTRAL_API_KEY.",
       "source_ids": [
         "S3",
         "S4"
+      ]
+    },
+    {
+      "description": "A terminal with cURL (or any HTTP client). No language SDK is required for the HTTPS first call.",
+      "source_ids": [
+        "S6"
       ]
     }
   ],
   "external_gates": [
     {
-      "description": "A Mistral account is required before Studio API keys can be created.",
+      "description": "API access requires a Mistral account with Studio enabled.",
       "source_ids": [
         "S3",
         "S4"
       ]
     },
     {
-      "description": "Some API failures return 402 Payment Required when no payment method is on the account.",
+      "description": "Studio Free mode is enabled by default with no credit card required; usage and rate limits apply.",
       "source_ids": [
-        "S4"
+        "S3"
+      ]
+    },
+    {
+      "description": "The API key secret is shown once and must be stored safely.",
+      "source_ids": [
+        "S3"
       ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Studio issues an API key that is shown only once.",
+      "description": "POST https://api.mistral.ai/v1/chat/completions with a Bearer key returns chat-completion output on Studio Free mode without a credit card.",
       "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Chat Completions returns model text for a successful authenticated request.",
-      "source_ids": [
-        "S4"
+        "S1"
       ]
     }
   ],
   "excluded": [
     {
-      "item": "Admin organization, SSO, and workspace administration quickstarts",
-      "reason": "Separate product family from Studio/Developer first API use.",
+      "item": "Installing a language SDK",
+      "reason": "Official docs document an equivalent cURL call.",
       "source_ids": [
         "S1"
-      ]
-    },
-    {
-      "item": "Agent and RAG follow-on quickstarts",
-      "reason": "Documented as later foundations after the first API request.",
-      "source_ids": [
-        "S4"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Mistral AI Documentation",
+      "title": "Mistral documentation home",
       "url": "https://docs.mistral.ai/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Vibe, Studio, Admin product choice",
-        "Grouped first-use quickstarts"
+        "Entry to quickstarts"
       ]
     },
     {
@@ -254,7 +198,7 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Platform overview entry used by source record"
+        "Studio product context"
       ]
     },
     {
@@ -264,9 +208,9 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Free mode",
-        "Create new key fields",
-        "Key shown once"
+        "Free mode default",
+        "No credit card required",
+        "API key creation"
       ]
     },
     {
@@ -276,9 +220,9 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Account and key prerequisites",
-        "SDK install",
-        "Chat completion success and error table"
+        "Free mode prerequisite",
+        "MISTRAL_API_KEY",
+        "SDK-centered example as optional peer"
       ]
     },
     {
@@ -288,25 +232,25 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Alternate Studio first-use UI route"
+        "In-browser alternative"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "API reference",
+      "url": "https://docs.mistral.ai/api/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "cURL to https://api.mistral.ai/v1/chat/completions"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Mistral product and role should the corpus measure for the company-level slug?",
-      "impact": "It changes the first-success boundary and the complete journey.",
-      "evidence_needed": "An explicit workshop choice among Vibe, Studio/Developer API, and Admin, with one named first-success quickstart."
-    },
-    {
-      "question": "If Developer API is chosen, does success stop at generating a Free-mode key or at printing the first model response?",
-      "impact": "These are separate official quickstarts with different terminal outcomes and field counts.",
-      "evidence_needed": "A decision between the Activate Studio key guide and Send your first API request as the terminal milestone."
-    },
-    {
-      "question": "What exact Mistral signup fields appear before Studio is available?",
-      "impact": "Signup controls remain unverified and block a verified account-creation count.",
-      "evidence_needed": "A dated fresh-account signup walkthrough into Studio API Keys."
+      "question": "Exact Free-mode rate-limit and quota values for a brand-new account on the day of research.",
+      "impact": "Could cause the first cURL call to fail with a rate-limit error before any billing upgrade.",
+      "evidence_needed": "Free-mode pages state that usage and rate limits apply without enumerating the numeric Free-mode matrix on the researched pages."
     }
   ],
   "counts": null

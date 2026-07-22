@@ -2,72 +2,70 @@
   "platform": {
     "name": "Together AI",
     "slug": "together-ai",
-    "organization": "Together Computer, Inc."
+    "organization": "Together AI"
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Google OAuth, Default Project key, prepaid card credits, and Python first request",
-    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Google OAuth, Default Project key, prepaid card credits, and Python first request. Google is one of the two current official signup providers; this candidate resolves the identity-provider branch while preserving the Quickstart's Python route. Prior surface before policy commit: Together AI general Quickstart, Python serverless chat route.",
+    "name": "Together Quickstart via cURL chat completions (prepaid credits)",
+    "selection_basis": "Together's Quickstart documents a cURL POST to https://api.together.ai/v1/chat/completions with Authorization: Bearer $TOGETHER_API_KEY. The billing credits guide states Together does not offer a free trial, requires a minimum $5 credit purchase, is fully prepaid, and needs a positive credit balance to use the platform. An SDK install is not required for the first authenticated chat-completions call.",
     "alternatives_considered": [
       {
-        "name": "TypeScript SDK",
+        "name": "together Python SDK",
         "url": "https://docs.together.ai/docs/quickstart",
-        "reason_not_primary": "It is a peer language tab; Python is the first SDK shown."
+        "reason_not_primary": "Optional client library; the same quickstart documents an equivalent cURL request."
       },
       {
-        "name": "cURL or REST",
+        "name": "OpenAI-compatible client libraries",
         "url": "https://docs.together.ai/docs/quickstart",
-        "reason_not_primary": "It is a peer transport tab rather than a separate recommended surface."
-      },
-      {
-        "name": "Dedicated endpoint Quickstart",
-        "url": "https://docs.together.ai/docs/dedicated-endpoints/quickstart",
-        "reason_not_primary": "It provisions billable dedicated hardware, while the general Quickstart uses serverless inference."
+        "reason_not_primary": "Convenience wrappers for the same HTTP endpoint."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Together AI account with an official OAuth provider, buy the minimum prepaid credits, create a default-project API key, and run the Python first query.",
+    "developer_intent": "Create a Together account, add a payment method, purchase at least $5 of prepaid credits, obtain an API key, and complete a chat-completions request over HTTPS.",
     "starting_url": "https://docs.together.ai/docs/quickstart",
     "assumed_prior_state": [
-      "No Together AI account, organization, project, payment method, credits, API key, SDK, or request is assumed.",
-      "The developer has either a Google or GitHub identity, a supported payment card, and Python with pip.",
-      "No OAuth consent, account, billing action, key, package installation, or request was executed during research."
+      "No Together account, payment method, credits, API key, or prior request is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Congrats! You just made your first request to Together AI.",
-    "normalized_outcome": "The Python program sends the published MiniMax M3 chat prompt and prints the returned answer.",
-    "observable_completion_signal": "After `python main.py`, the model response appears in the terminal after a few seconds.",
+    "official_milestone": "Make your first inference request",
+    "normalized_outcome": "An authenticated cURL POST to https://api.together.ai/v1/chat/completions returns chat-completion model output.",
+    "observable_completion_signal": "The HTTP response body includes assistant message content for the requested prompt.",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "Congrats! You just made your first request to Together AI.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Quickstart documents register, create an API key, export TOGETHER_API_KEY, and a cURL POST to /v1/chat/completions. Billing credits docs require a minimum $5 prepaid purchase with no free trial.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S5"
       ]
     },
-    "why_this_is_the_boundary": "The Quickstart explicitly names the first request and puts streaming variations and other product work afterward.",
+    "why_this_is_the_boundary": "The first meaningful LLM success is a successful authenticated chat-completions response. cURL is documented on the quickstart, so pip install together is optional. Prepaid credits and a payment method are required before platform usage because Together documents no free trial and a minimum $5 credit purchase.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S5",
+      "S6"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
-      "type": "identity",
-      "requirement": "A Google or GitHub account for OAuth signup; Together does not use a traditional username and password.",
+      "type": "account",
+      "requirement": "A Together account created through the documented Google or GitHub signup route, with an organization and Default Project.",
       "required": true,
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
     {
       "order": 2,
       "type": "billing",
-      "requirement": "A supported credit or debit card and a minimum $5 prepaid credit purchase; there is no current free trial.",
+      "requirement": "A supported payment method as the default, plus at least $5 of prepaid credits and a positive usable balance. Together documents no free trial and fully prepaid access.",
       "required": true,
       "source_ids": [
         "S5",
@@ -77,7 +75,7 @@
     {
       "order": 3,
       "type": "credential",
-      "requirement": "A project-scoped API key copied at its one-time display.",
+      "requirement": "A project API key created in the Default Project, copied immediately, and exported as TOGETHER_API_KEY.",
       "required": true,
       "source_ids": [
         "S1",
@@ -87,7 +85,7 @@
     {
       "order": 4,
       "type": "software",
-      "requirement": "Python and pip for the selected official SDK route.",
+      "requirement": "A terminal with cURL (or any HTTP client). No language SDK is required.",
       "required": true,
       "source_ids": [
         "S1"
@@ -100,16 +98,15 @@
       "phase": "arrive",
       "actor": "developer",
       "interface": "documentation",
-      "action": "Open the general Quickstart and follow Register for an account.",
+      "action": "Open the Together Quickstart and follow Register for an account.",
       "details": [],
       "input": "Quickstart URL",
-      "output": "Together AI account sign-in opens.",
-      "success_signal": "Google and GitHub OAuth options are available as documented.",
+      "output": "Account registration entry",
+      "success_signal": "Signup provider choices are visible.",
       "failure_or_wait": "No navigation recovery is documented.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
@@ -119,32 +116,32 @@
       "interface": "browser",
       "action": "Choose Google or GitHub and complete that provider's OAuth sign-in.",
       "details": [
-        "The same provider must be used for future sign-ins."
+        "Google and GitHub are peer OAuth signup providers."
       ],
-      "input": "Selected provider identity and its authorization",
-      "output": "A Together AI account is set up.",
-      "success_signal": "The account's organization and Default Project are available.",
-      "failure_or_wait": "Using a different provider later produces `This email is already linked to another sign-in method.`",
+      "input": "Identity provider choice",
+      "output": "Authenticated Together session",
+      "success_signal": "An organization with a Default Project is available.",
+      "failure_or_wait": "Follow the provider or Together account recovery path.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S4"
+        "S1",
+        "S2"
       ]
     },
     {
       "step_number": 3,
       "phase": "configure",
-      "actor": "platform",
-      "interface": "web-console",
-      "action": "Provide the account's organization with its included Default Project.",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Confirm the account organization and included Default Project.",
       "details": [],
-      "input": "New Together AI account",
-      "output": "The developer has access to the Default Project.",
-      "success_signal": "Project API key settings can be opened.",
-      "failure_or_wait": "No Default Project provisioning wait or recovery is documented.",
+      "input": "Authenticated session",
+      "output": "Default Project ready for API keys and billing",
+      "success_signal": "Project settings are reachable.",
+      "failure_or_wait": "Create or select a project if none is present.",
       "required": true,
       "source_ids": [
-        "S2",
+        "S1",
         "S4"
       ]
     },
@@ -152,382 +149,113 @@
       "step_number": 4,
       "phase": "credential",
       "actor": "developer",
-      "interface": "web-console",
-      "action": "Open the Default Project, then its API keys settings.",
-      "details": [],
+      "interface": "console",
+      "action": "Create a named project API key, copy it immediately, and store it securely.",
+      "details": [
+        "Open the Default Project API keys settings, select Create API Key, optionally set expiration, and create the key.",
+        "The key value is shown once."
+      ],
       "input": "Default Project",
-      "output": "The project key list and Create API Key action are visible.",
-      "success_signal": "Create API Key is available.",
-      "failure_or_wait": "No settings-access recovery is documented.",
+      "output": "Together API key",
+      "success_signal": "The key value is saved locally.",
+      "failure_or_wait": "If the value is lost, create a new key.",
       "required": true,
       "source_ids": [
         "S1",
-        "S3",
-        "S4"
+        "S3"
       ]
     },
     {
       "step_number": 5,
-      "phase": "credential",
+      "phase": "configure",
       "actor": "developer",
-      "interface": "web-console",
-      "action": "Select Create API Key, enter a descriptive name, optionally set expiration, and select Create.",
+      "interface": "cli",
+      "action": "Export the key as TOGETHER_API_KEY.",
       "details": [],
-      "input": "Key name and optional expiration",
-      "output": "A new project-scoped key is generated.",
-      "success_signal": "The full key value is displayed once.",
-      "failure_or_wait": "No key-generation failure recovery is documented.",
+      "input": "API key value",
+      "output": "Shell environment ready for authenticated HTTP",
+      "success_signal": "TOGETHER_API_KEY is set in the current shell.",
+      "failure_or_wait": "Shell persistence depends on the OS.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 6,
-      "phase": "credential",
+      "phase": "billing",
       "actor": "developer",
-      "interface": "web-console",
-      "action": "Copy the key immediately and save it securely.",
-      "details": [],
-      "input": "One-time key value",
-      "output": "The developer retains the API credential.",
-      "success_signal": "The key can be exported locally.",
-      "failure_or_wait": "If lost, create a new key because the value cannot be shown again.",
+      "interface": "console",
+      "action": "Add a supported payment method and purchase at least $5 of prepaid credits.",
+      "details": [
+        "Open Billing settings, manage payment methods, add a supported card, and make it the default.",
+        "Purchase at least $5 through Add Credits and wait for the balance to update.",
+        "Together documents no free trial and fully prepaid access; a positive credit balance is required to use the platform.",
+        "A credit purchase can remain pending for up to 15 minutes before the balance updates."
+      ],
+      "input": "Authenticated account",
+      "output": "Positive prepaid credit balance",
+      "success_signal": "Billing shows a usable credit balance of at least the purchased amount.",
+      "failure_or_wait": "Payment verification delays or a $0 balance leave API requests unable to succeed.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3"
+        "S5",
+        "S6",
+        "S7"
       ]
     },
     {
       "step_number": 7,
-      "phase": "configure",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Export the key as `TOGETHER_API_KEY`.",
-      "details": [],
-      "input": "Copied project key",
-      "output": "The Together SDK can read the key automatically.",
-      "success_signal": "The local environment contains TOGETHER_API_KEY.",
-      "failure_or_wait": "No shell-configuration recovery is documented.",
+      "interface": "api",
+      "action": "POST a chat-completions request with cURL to https://api.together.ai/v1/chat/completions.",
+      "details": [
+        "Include Authorization: Bearer $TOGETHER_API_KEY and Content-Type: application/json.",
+        "Send a JSON body with model and messages as shown in the quickstart cURL example."
+      ],
+      "input": "TOGETHER_API_KEY and positive credit balance",
+      "output": "Chat-completions HTTP response",
+      "success_signal": "The API returns a successful JSON body containing assistant message content.",
+      "failure_or_wait": "Missing key, insufficient credits, or invalid JSON produce API errors.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 8,
-      "phase": "billing",
+      "phase": "verify",
       "actor": "developer",
-      "interface": "web-console",
-      "action": "Open Billing settings, select Manage payment methods, add a supported card, and make it the default.",
-      "details": [
-        "Prepaid and unsupported cards are rejected; a provider verification step may be required."
-      ],
-      "input": "Requested card and billing details",
-      "output": "A valid default payment method is saved.",
-      "success_signal": "The card is available for a manual credit purchase.",
-      "failure_or_wait": "For a decline, verify balance, address, expiry, activation, CVV, recurring-payment support, authorization hold, and bank prompts.",
-      "required": true,
-      "source_ids": [
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "install",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run `pip install together`.",
+      "interface": "api",
+      "action": "Confirm the chat-completions JSON includes assistant message content.",
       "details": [],
-      "input": "Python environment with pip",
-      "output": "The official Together Python SDK is installed.",
-      "success_signal": "The Together class can be imported.",
-      "failure_or_wait": "No package-install failure recovery is documented in the Quickstart.",
+      "input": "Chat-completions response body",
+      "output": "Verified first LLM API success",
+      "success_signal": "Assistant content is present in the successful response.",
+      "failure_or_wait": "An error body means the first call did not succeed.",
       "required": true,
       "source_ids": [
         "S1"
-      ]
-    },
-    {
-      "step_number": 10,
-      "phase": "prepare",
-      "actor": "developer",
-      "interface": "code",
-      "action": "Save the published Python snippet as `main.py`.",
-      "details": [
-        "It initializes Together, calls `MiniMaxAI/MiniMax-M3`, asks for the top three things to do in New York, and prints the response content."
-      ],
-      "input": "Published example code",
-      "output": "A runnable Quickstart program exists.",
-      "success_signal": "The file contains the documented client, model, prompt, and print call.",
-      "failure_or_wait": "No file-preparation recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 11,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run `python main.py`.",
-      "details": [],
-      "input": "Funded account, exported key, installed SDK, and example file",
-      "output": "Together AI processes the chat-completion request.",
-      "success_signal": "After a few seconds the model response is printed in the terminal.",
-      "failure_or_wait": "If the balance reaches zero, API access is suspended until credits are added.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S5"
-      ]
-    },
-    {
-      "step_number": 12,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open the Quickstart and follow Register for an account.",
-      "details": [],
-      "input": "Quickstart URL",
-      "output": "Together AI account sign-in opens.",
-      "success_signal": "Google sign-in is available.",
-      "failure_or_wait": "No navigation recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "step_number": 13,
-      "phase": "authenticate",
-      "actor": "developer",
-      "interface": "browser",
-      "action": "Select Google and complete Google OAuth sign-in and authorization.",
-      "details": [
-        "Continue using Google for later Together AI sign-ins."
-      ],
-      "input": "Google identity and authorization",
-      "output": "A Together AI account is set up.",
-      "success_signal": "The account organization and Default Project are available.",
-      "failure_or_wait": "A later different-provider attempt triggers the documented linked-method error.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "step_number": 14,
-      "phase": "configure",
-      "actor": "platform",
-      "interface": "web-console",
-      "action": "Provide the organization and included Default Project.",
-      "details": [],
-      "input": "New account",
-      "output": "Default Project access is available.",
-      "success_signal": "Project API key settings can be opened.",
-      "failure_or_wait": "No provisioning recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "step_number": 15,
-      "phase": "credential",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Open the Default Project and its API keys settings.",
-      "details": [],
-      "input": "Default Project",
-      "output": "Create API Key is visible.",
-      "success_signal": "The key form can be opened.",
-      "failure_or_wait": "No access recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "step_number": 16,
-      "phase": "credential",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Create a named project key with optional expiration.",
-      "details": [],
-      "input": "Key name and optional expiration",
-      "output": "The full new key is displayed once.",
-      "success_signal": "The key can be copied.",
-      "failure_or_wait": "No generation recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "step_number": 17,
-      "phase": "credential",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Copy and securely save the one-time key value.",
-      "details": [],
-      "input": "Displayed key",
-      "output": "The credential is retained.",
-      "success_signal": "The key is available locally.",
-      "failure_or_wait": "Create another key if this value is lost.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "step_number": 18,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Export the key as `TOGETHER_API_KEY`.",
-      "details": [],
-      "input": "Copied key",
-      "output": "The SDK can authenticate.",
-      "success_signal": "The environment variable is set.",
-      "failure_or_wait": "No shell recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "step_number": 19,
-      "phase": "billing",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Add a supported card in Billing settings and make it the default.",
-      "details": [],
-      "input": "Requested card and billing details",
-      "output": "A default payment method is saved.",
-      "success_signal": "The card is ready for Add Credits.",
-      "failure_or_wait": "Use the documented card and address checks for declines.",
-      "required": true,
-      "source_ids": [
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 20,
-      "phase": "billing",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Purchase at least $5 through Add Credits and wait for the balance update.",
-      "details": [],
-      "input": "Minimum $5 purchase",
-      "output": "A positive purchased-credit balance is shown.",
-      "success_signal": "Platform access is funded.",
-      "failure_or_wait": "Wait up to 15 minutes if pending and do not duplicate the purchase.",
-      "required": true,
-      "source_ids": [
-        "S5",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 21,
-      "phase": "install",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run `pip install together`.",
-      "details": [],
-      "input": "Python with pip",
-      "output": "Together SDK is installed.",
-      "success_signal": "Together can be imported.",
-      "failure_or_wait": "No install recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 22,
-      "phase": "prepare",
-      "actor": "developer",
-      "interface": "code",
-      "action": "Save the published MiniMax M3 example as `main.py`.",
-      "details": [],
-      "input": "Quickstart code",
-      "output": "The runnable file exists.",
-      "success_signal": "It prints response content.",
-      "failure_or_wait": "No preparation recovery is documented.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 23,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run `python main.py`.",
-      "details": [],
-      "input": "Funded and configured Quickstart program",
-      "output": "The model answer is returned.",
-      "success_signal": "The response is printed after a few seconds.",
-      "failure_or_wait": "Zero balance suspends API access until credits are added.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S5"
       ]
     }
   ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
   "branches": [
     {
       "at_step": 2,
-      "condition": "Google versus GitHub OAuth",
-      "path": "Authenticate with the chosen provider and always reuse it for later sign-ins.",
-      "effect_on_first_success": "Changes the external identity and consent route, then converges on the same organization and Default Project.",
+      "condition": "The developer chooses GitHub instead of Google for OAuth signup.",
+      "path": "Complete GitHub OAuth; the rest of the prepaid + cURL path is unchanged.",
+      "effect_on_first_success": "Peer identity provider; no change to the API boundary.",
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
     {
-      "at_step": 5,
-      "condition": "Temporary key",
-      "path": "Set an optional expiration date for the key.",
-      "effect_on_first_success": "Changes credential lifetime but not the first request.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 8,
-      "condition": "Enterprise ACH early access",
-      "path": "After enablement, add a US bank account while retaining a valid card and wait one to three business days for credit settlement.",
-      "effect_on_first_success": "Adds approval and settlement delay, so the selected generally available card route is faster.",
-      "source_ids": [
-        "S6"
-      ]
-    },
-    {
-      "at_step": 10,
-      "condition": "uv, TypeScript, or cURL",
-      "path": "Use the corresponding Quickstart install and request tab.",
-      "effect_on_first_success": "Changes local tooling while preserving the printed-response terminal.",
+      "at_step": 7,
+      "condition": "The developer prefers the together Python SDK instead of cURL.",
+      "path": "Run pip install together and execute the published Python snippet; the same API key and credit balance are still required.",
+      "effect_on_first_success": "Adds optional package installation without changing the authenticated chat-completions boundary.",
       "source_ids": [
         "S1"
       ]
@@ -537,43 +265,42 @@
     {
       "at_step": 2,
       "type": "choice",
-      "description": "Google and GitHub are peer OAuth signup providers, and the choice changes the identity and consent route.",
+      "description": "Google and GitHub are peer OAuth signup providers.",
       "documented_requirement": true,
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
     {
-      "at_step": 5,
+      "at_step": 4,
       "type": "credential",
       "description": "The project key is displayed only once and must be saved immediately.",
       "documented_requirement": true,
       "source_ids": [
-        "S1",
         "S3"
       ]
     },
     {
-      "at_step": 8,
+      "at_step": 6,
       "type": "payment",
-      "description": "Platform access requires a supported card; bank or provider verification can add a confirmation step.",
+      "description": "A supported payment method is required; bank or provider verification can delay readiness.",
       "documented_requirement": true,
       "source_ids": [
-        "S6",
-        "S7"
+        "S6"
       ]
     },
     {
-      "at_step": 9,
+      "at_step": 6,
       "type": "billing",
-      "description": "There is no free trial and at least $5 of prepaid credits is required before API calls.",
+      "description": "There is no free trial; at least $5 of prepaid credits and a positive balance are required before API usage.",
       "documented_requirement": true,
       "source_ids": [
         "S5"
       ]
     },
     {
-      "at_step": 9,
+      "at_step": 6,
       "type": "wait",
       "description": "A credit purchase can remain pending for up to 15 minutes before the balance updates.",
       "documented_requirement": true,
@@ -583,11 +310,9 @@
     }
   ],
   "time_to_first_success": {
-    "vendor_claim": true,
-    "value": "The current Quickstart says the first request takes a few minutes and the response prints after a few seconds; these are vendor claims, not measured end-to-end timings.",
-    "source_ids": [
-      "S1"
-    ]
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
   },
   "sources": [
     {
@@ -595,61 +320,49 @@
       "title": "Quickstart",
       "url": "https://docs.together.ai/docs/quickstart",
       "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-18",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Step 1: Create an API key",
-        "Step 2: Install the SDK",
-        "Step 3: Run your first query"
+        "Register for an account",
+        "Create an API key",
+        "cURL chat completions"
       ],
       "evidence_supported": [
-        "Primary route",
-        "key fields",
-        "SDK install",
-        "MiniMax M3 example",
-        "printed terminal",
-        "time claim"
+        "Account registration",
+        "API key export",
+        "cURL POST to /v1/chat/completions"
       ]
     },
     {
       "id": "S2",
-      "title": "Manage your account",
+      "title": "Account management",
       "url": "https://docs.together.ai/docs/account-management",
       "official_domain": true,
-      "source_type": "account-setup",
-      "accessed_at": "2026-07-18",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Create an account",
-        "Create an API key",
-        "Next steps"
+        "Signup"
       ],
       "evidence_supported": [
-        "Google and GitHub OAuth",
-        "same-provider requirement",
-        "organization and project context"
+        "Google and GitHub signup routes"
       ]
     },
     {
       "id": "S3",
-      "title": "Authentication",
+      "title": "API keys and authentication",
       "url": "https://docs.together.ai/docs/api-keys-authentication",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Create an API key",
-        "Set as an environment variable",
-        "Project key scoping"
+        "Create API Key"
       ],
       "evidence_supported": [
-        "Project key steps",
-        "optional expiration",
-        "one-time value",
-        "lost-key recovery",
-        "environment variable"
+        "One-time key display",
+        "TOGETHER_API_KEY"
       ]
     },
     {
@@ -658,57 +371,46 @@
       "url": "https://docs.together.ai/docs/projects",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "How Projects Work",
-        "Default Project",
-        "Project API Keys"
+        "Default Project"
       ],
       "evidence_supported": [
-        "Every organization includes a Default Project",
-        "member access",
-        "project-scoped keys"
+        "Default Project for keys"
       ]
     },
     {
       "id": "S5",
-      "title": "Credits",
+      "title": "Billing credits",
       "url": "https://docs.together.ai/docs/billing-credits",
       "official_domain": true,
-      "source_type": "pricing",
-      "accessed_at": "2026-07-18",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "What are credits used for?",
         "Free trial and access requirements",
-        "Auto-recharge credits"
+        "What are credits used for?"
       ],
       "evidence_supported": [
         "No free trial",
-        "minimum $5",
-        "fully prepaid",
-        "zero-balance suspension"
+        "Minimum $5 credit purchase",
+        "Fully prepaid positive balance required"
       ]
     },
     {
       "id": "S6",
-      "title": "Payment methods & invoices",
+      "title": "Payment methods and invoices",
       "url": "https://docs.together.ai/docs/billing-payment-methods",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Supported payment methods",
-        "Managing payment methods",
-        "ACH Bank Transfers"
+        "Payment methods"
       ],
       "evidence_supported": [
-        "Supported cards",
-        "default method",
-        "verification",
-        "ACH branch and wait"
+        "Add and default a payment method"
       ]
     },
     {
@@ -716,64 +418,32 @@
       "title": "Billing troubleshooting",
       "url": "https://docs.together.ai/docs/billing-troubleshooting",
       "official_domain": true,
-      "source_type": "troubleshooting",
-      "accessed_at": "2026-07-18",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Troubleshooting payment declines",
-        "Understanding pending payments"
+        "Credit purchase pending"
       ],
       "evidence_supported": [
-        "Card input checks",
-        "decline recovery",
-        "authorization hold",
-        "pending purchase behavior and timing"
-      ]
-    },
-    {
-      "id": "S8",
-      "title": "Terms of Service",
-      "url": "https://www.together.ai/terms-of-service",
-      "official_domain": true,
-      "source_type": "policy",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": "May 19, 2026",
-      "sections_used": [
-        "Introduction",
-        "Fees"
-      ],
-      "evidence_supported": [
-        "Together Computer, Inc. identity",
-        "prepaid account billing"
+        "Up to 15 minute credit balance update wait"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which OAuth provider should a new developer use?",
-      "impact": "The choice changes external identity, consent, and future sign-in requirements, so the record remains needs-human-judgment despite the complete Google candidate.",
-      "reason_unresolved": "Official docs present Google and GitHub as peers without a default.",
+      "question": "Exact card brands and regional payment-method exclusions for the default payment method.",
+      "impact": "Could block credit purchase for some payment instruments.",
+      "reason_unresolved": "Payment-methods docs list supported methods at a high level without a exhaustive regional matrix on the researched pages.",
       "checked_source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "question": "What exact Google or GitHub authorization screens and scopes appear?",
-      "impact": "The provider-managed sub-screen count cannot be stated.",
-      "reason_unresolved": "Together documents OAuth provider choices and convergence but does not reproduce the providers' current consent screens.",
-      "checked_source_ids": [
-        "S2"
+        "S6"
       ]
     }
   ],
   "excluded_after_success": [
-    "Streaming and system prompts",
-    "structured output and vision",
-    "OpenAI SDK compatibility",
-    "model selection",
-    "dedicated endpoints and containers",
-    "fine-tuning",
-    "GPU clusters",
-    "production usage controls"
-  ]
+    "Python SDK installation",
+    "Fine-tuning and dedicated endpoints",
+    "Auto-recharge configuration"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }
