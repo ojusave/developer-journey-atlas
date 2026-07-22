@@ -7,46 +7,48 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "17b0f362fd23db7607903092c0d6908b315a4c6e25d60bc77cd315bcf24906b0",
+  "source_record_sha256": "4fe5534b418b147b6a3bd02da2d857464b6999cca3b41d5e03237584e8d30568",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has arrived after discovery.",
-      "The developer does not yet have a Box Free Developer account or an API access token."
+      "The developer has a supported browser and a terminal with cURL.",
+      "No Box Free Developer account or developer token exists yet.",
+      "No language SDK is required for the compact first call."
     ]
   },
-  "developer_goal": "Create a first Box Platform application and make a first authenticated API call without a preselected authentication method or tool.",
+  "developer_goal": "Create a Box free developer account, confirm email, generate a developer token from the pre-built app, and complete an authenticated GET /users/me over HTTPS.",
   "first_success": {
-    "outcome": "A newly activated Box Free Developer account uses its automatically created and authorized CCG application to obtain an access token and retrieve the authenticated service-account user.",
-    "observable_signal": "`GET https://api.box.com/2.0/users/me` returns HTTP 200 and a user JSON object with fields such as `id`, `type`, `name`, and `login`.",
+    "outcome": "GET https://api.box.com/2.0/users/me with a Bearer developer token returns the authenticated console user JSON.",
+    "observable_signal": "`curl https://api.box.com/2.0/users/me -H \"authorization: Bearer [DEVELOPER_TOKEN]\"` returns HTTP 200 and a user JSON object with fields such as `id`, `type`, `name`, and `login`.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "Box Free Developer Plan default CCG app and Get Current User",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
-    "selected": null,
+    "surface": "Box Quick Start developer token and Get Current User via cURL",
+    "rule": "Use Quick Start for signup, email activation, pre-built app, and Generate Developer Token; prefer the Developer Tokens curl GET /users/me over heavier SDK upload-and-list tabs when the same credential reaches authenticated API success.",
+    "selected": "Quick Start signup + developer token + curl GET /users/me",
     "candidates": [
       {
-        "name": "Box Free Developer Plan default CCG app and Get Current User",
-        "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+        "name": "Quick Start signup + developer token + curl GET /users/me",
+        "status": "selected",
+        "reason": "Quick Start defines free signup, email confirmation, pre-built app, and Generate Developer Token. Developer Tokens documents curl GET /users/me as the minimal authenticated call with that token."
       },
       {
-        "name": "Platform App with developer token and Get Current User",
-        "status": "unresolved",
-        "reason": "The token guide demonstrates `/users/me`, but the first-application guide does not select that endpoint as its terminal test."
+        "name": "Quick Start SDK upload file and list root folder",
+        "status": "not-selected",
+        "reason": "Official Quick Start demo, but requires SDK install and a sample file; same developer token can authenticate curl /users/me with fewer tooling steps."
       },
       {
-        "name": "Postman List items in folder quickstart",
-        "status": "unresolved",
-        "reason": "This has an explicit first-call summary but requires the separate Postman collection and environment setup."
+        "name": "Free Developer Plan default CCG token exchange",
+        "status": "not-selected",
+        "reason": "Free Developer Plan still mentions automatic CCG app creation, but current Quick Start centers Generate Developer Token rather than a CCG client-credentials exchange."
       },
       {
-        "name": "Box CLI",
-        "status": "unresolved",
-        "reason": "The first-application guide presents CLI as an alternative test interface."
+        "name": "Postman or Box CLI quick starts",
+        "status": "not-selected",
+        "reason": "Separate tooling routes on the broader quick starts index."
       }
     ]
   },
@@ -55,41 +57,66 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Complete Box account creation or trial signup at the official entry URL.",
+      "action": "Open Quick Start and complete Free Developer signup (name, email, password, terms, Get Started).",
       "required_fields": [
         {
-          "label": "Signup identity and required account fields",
+          "label": "Name",
           "field_type": "other",
-          "evidence_state": "unverified",
+          "evidence_state": "documented",
           "source_ids": [
-            "S1"
-          ],
-          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
+            "S3"
+          ]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Terms acceptance",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
         }
       ],
-      "observable_result": "A new Box account or trial session exists.",
-      "evidence_state": "unverified",
+      "observable_result": "Signup is submitted and the account awaits or proceeds to activation.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1"
+        "S1",
+        "S3"
       ]
     },
     {
       "step_number": 2,
       "kind": "account",
       "interface": "email",
-      "action": "Complete any required email or identity verification for the new account.",
+      "action": "Confirm the email address to activate the developer account.",
       "required_fields": [
         {
-          "label": "Verification challenge",
+          "label": "Email confirmation",
           "field_type": "challenge",
-          "evidence_state": "unverified",
+          "evidence_state": "documented",
           "source_ids": [
             "S1"
-          ]
+          ],
+          "notes": "Quick Start requires confirmation; Free Developer Plan also says the account activates immediately."
         }
       ],
-      "observable_result": "The account becomes usable for developer onboarding.",
-      "evidence_state": "unverified",
+      "observable_result": "The developer account is activated and Developer Console is reachable.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
@@ -98,62 +125,74 @@
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Complete the documented post-login setup for the selected Box candidate through first success.",
-      "required_fields": [
-        {
-          "label": "Candidate-specific configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
-        }
-      ],
-      "observable_result": "`GET https://api.box.com/2.0/users/me` returns HTTP 200 and a user JSON object with fields such as `id`, `type`, `name`, and `login`.",
-      "evidence_state": "unverified",
+      "action": "Open the pre-built application in Developer Console and select Generate Developer Token.",
+      "required_fields": [],
+      "observable_result": "A developer token value is available to copy.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "api",
+      "action": "GET https://api.box.com/2.0/users/me with Authorization Bearer developer token via cURL and confirm user JSON.",
+      "required_fields": [],
+      "observable_result": "HTTP 200 user JSON for the authenticated console user.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'account', 'requirement': 'Create a Box Free Developer account with name, email, password, terms acceptance, and Get Started; the account activates immediately.', 'required': True, 'source_ids': ['S6']}",
+      "description": "Box Free Developer account with name, email, password, and terms acceptance.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "description": "Email confirmation to activate per Quick Start.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'permission', 'requirement': \"Viewing the CCG client secret requires Box two-factor authentication. The access token identifies the default app's service account and must be protected.\", 'required': True, 'source_ids': ['S7']}",
+      "description": "Developer token from the pre-built application (expires in one hour).",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A terminal with cURL or equivalent HTTP client; no SDK required for the compact path.",
+      "source_ids": [
+        "S2"
       ]
     }
   ],
   "external_gates": [
     {
-      "description": "A Free Developer account requires name, email, password, terms acceptance, and Get Started, but activates immediately without billing.",
+      "description": "Email confirmation is required to activate the developer account on Quick Start.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "CCG requires client ID, protected client secret, enterprise ID, and Box 2FA to reveal the secret.",
+      "description": "Developer tokens expire after one hour and cannot be refreshed programmatically.",
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "The token endpoint must return an active access token; server-auth tokens do not include a refresh token and must be requested again after expiry.",
-      "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     }
   ],
   "unavoidable_waits": [
     {
-      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
+      "description": "Email confirmation delivery when activating the new developer account.",
       "source_ids": [
         "S1"
       ]
@@ -161,23 +200,32 @@
   ],
   "platform_outcomes": [
     {
-      "description": "Get current user",
+      "description": "Box accepts GET /users/me with a valid developer token and returns the authenticated console user.",
       "source_ids": [
-        "S1"
+        "S2"
       ]
     }
   ],
   "excluded": [
     {
-      "item": "Additional content endpoints and application features after the authenticated identity call.",
-      "reason": "Listed as excluded after success in the source record.",
+      "item": "SDK upload and list root folder items",
+      "reason": "Quick Start SDK tabs are heavier peers; curl /users/me uses the same developer token.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     },
     {
-      "item": "Production OAuth lifecycle, app enablement, App Center publication, webhooks, enterprise rollout, metadata, AI, uploads, and custom portals are excluded.",
-      "reason": "Listed as excluded after success in the source record.",
+      "item": "CCG client-credentials token exchange",
+      "reason": "Current Quick Start centers Generate Developer Token on the pre-built app.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "item": "Custom first application, Postman, CLI, and production auth",
+      "reason": "Follow after first authenticated API success.",
       "source_ids": [
         "S1"
       ]
@@ -186,75 +234,53 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Quick starts",
-      "url": "https://developer.box.com/get-started",
+      "title": "Quick Start",
+      "url": "https://developer.box.com/guides/getting-started",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Primary documented developer route and first-success framing"
+        "Free signup framing",
+        "Email confirmation",
+        "Pre-built app",
+        "Generate Developer Token",
+        "SDK upload-and-list tabs"
       ]
     },
     {
       "id": "S2",
-      "title": "Create your first application",
-      "url": "https://developer.box.com/guides/getting-started/first-application",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Create your first application"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Tokens",
-      "url": "https://developer.box.com/guides/authentication/tokens",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Tokens"
-      ]
-    },
-    {
-      "id": "S4",
       "title": "Developer Tokens",
       "url": "https://developer.box.com/guides/authentication/tokens/developer-tokens",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for Developer Tokens"
+        "Generate Developer Token",
+        "curl GET /users/me",
+        "One-hour expiry"
       ]
     },
     {
-      "id": "S5",
-      "title": "Make an API call",
-      "url": "https://developer.box.com/guides/tooling/postman/quick-start/make-api-call",
+      "id": "S3",
+      "title": "Free Developer Plan",
+      "url": "https://developer.box.com/platform/free-developer-plan",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for Make an API call"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Free Developer Plan",
-      "url": "https://developer.box.com/platform/free-developer-plan",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Free Developer Plan"
+        "Signup fields",
+        "Get Started",
+        "Default CCG app note"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Does the automatically created free-account CCG app expose its enterprise ID in the same Configuration section as the client credentials for every account?",
-      "impact": "If the identifier appears elsewhere, the developer must navigate to another app or account settings page before requesting the token.",
-      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The Free Developer Plan confirms automatic app creation and authorization, while the CCG guide names the required enterprise ID without documenting the free-account screen layout."
+      "question": "Does Free Developer Plan 'activates immediately' override Quick Start email confirmation for some accounts?",
+      "impact": "Email confirmation may be skippable or already satisfied depending on account state, which changes the required action count.",
+      "evidence_needed": "Dated fresh-account walkthrough comparing Quick Start activation copy with live signup and inbox confirmation."
     },
     {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does Box show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "What exact current required signup UI fields appear beyond name, email, password, and terms?",
+      "impact": "Without a dated live signup capture, field counts stay unverified for peer comparison.",
+      "evidence_needed": "Read-only walkthrough screenshots of the live developer signup form."
     }
   ],
   "counts": null
