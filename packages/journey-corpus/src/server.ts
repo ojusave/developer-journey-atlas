@@ -1,6 +1,6 @@
 import express from "express";
 import path from "node:path";
-import { config } from "./config.js";
+import { config, researchConfigStatus } from "./config.js";
 import { LocalDataStore } from "./adapters/localData.js";
 import { createApiRouter } from "./api/router.js";
 import { sendError } from "./api/http.js";
@@ -61,7 +61,7 @@ function main(): void {
   app.use(express.json({ limit: "256kb" }));
 
   app.get("/healthz", (_req, res) => {
-    res.json({ status: "ok", platforms: store.meta().count, research: Boolean(researchDeps) });
+    res.json({ status: "ok", platforms: store.meta().count });
   });
 
   app.use("/api", createApiRouter(store, researchDeps));

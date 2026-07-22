@@ -12,7 +12,7 @@ export const config = {
   // owner/repo slug derived from the URL; used by the PR writer.
   githubRepoSlug: "ojusave/developer-journey-atlas",
   // Phase 2 kill switch. Off until the live-research pipeline is wired.
-  researchEnabled: process.env.RESEARCH_ENABLED === "true",
+  researchEnabled: process.env.RESEARCH_ENABLED !== "false",
   // Phase 2 search provider (You.com Web Search API). YDC_API_KEY is the
   // canonical env var name across You.com's docs and SDKs.
   youApiKey: process.env.YDC_API_KEY ?? "",
@@ -23,6 +23,14 @@ export const config = {
   // and the UI offers the drafted record for manual submission.
   githubToken: process.env.GITHUB_TOKEN ?? "",
 };
+
+export function researchConfigStatus(): { enabled: boolean; configured: boolean; missing: string[] } {
+  const missing: string[] = [];
+  if (!config.researchEnabled) missing.push("RESEARCH_ENABLED=true");
+  if (!config.youApiKey) missing.push("YDC_API_KEY");
+  if (!config.openRouterApiKey) missing.push("OPENROUTER_API_KEY");
+  return { enabled: config.researchEnabled, configured: missing.length === 0, missing };
+}
 
 /** Canonical Render signup URL with fixed campaign UTMs; only utm_content varies. */
 export function renderSignupUrl(content = "footer_link"): string {

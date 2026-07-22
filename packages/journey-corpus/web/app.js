@@ -275,11 +275,13 @@ function renderUnknown(query) {
       <p class="section-kicker">NEW PLATFORM</p>
       <h2>"${esc(query)}" is not in the Atlas yet</h2>
       <p class="lede">Research its official docs, show the draft here, then open a draft GitHub contribution for human review.</p>
-      <button class="btn btn-primary" id="research-btn" type="button">Research ${esc(query)}</button>
+      <p class="microcopy">The Atlas will research this platform automatically from official documentation and prepare a draft contribution for human review.</p>
+      <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
       <ol class="research-log" id="research-log" hidden></ol>
     </div>`;
   document.querySelector("#research-btn").addEventListener("click", () => researchPlatform(query));
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
+  researchPlatform(query);
 }
 
 function logStep(text, cls) {
