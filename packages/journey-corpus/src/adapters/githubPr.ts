@@ -6,7 +6,8 @@ const TIMEOUT_MS = 30_000;
 /**
  * Opens a human-gated draft PR adding a schema-valid record to the dataset repo.
  * Never auto-merges. Uses the GitHub REST API directly (no SDK): create a
- * branch, commit records/<slug>.json, open a draft pull request.
+ * branch, commit packages/journey-corpus/records/<slug>.json, then open a
+ * draft pull request in the canonical monorepo.
  */
 export class GitHubPrWriter implements RepoWriter {
   constructor(
@@ -20,14 +21,14 @@ export class GitHubPrWriter implements RepoWriter {
   async openDraftRecordPR(record: PlatformRecord): Promise<{ url: string }> {
     const slug = record.platform.slug;
     const branch = `research/${slug}-${Date.now()}`;
-    const path = `records/${slug}.json`;
+    const path = `packages/journey-corpus/records/${slug}.json`;
     const content = Buffer.from(`${JSON.stringify(record, null, 2)}\n`, "utf8").toString("base64");
 
     const baseSha = await this.branchSha(this.baseBranch);
     await this.createBranch(branch, baseSha);
 
     const existingSha = await this.fileSha(path, branch);
-    await this.putFile(path, branch, content, existingSha, `Add ${slug} first-mile record (machine-drafted)`);
+    await this.putFile(path, branch, content, existingSha, `Add ${slug} journey record (machine-drafted)`);
 
     return this.openPr(branch, slug, record);
   }
@@ -104,9 +105,9 @@ export class GitHubPrWriter implements RepoWriter {
 
   private async openPr(branch: string, slug: string, record: PlatformRecord): Promise<{ url: string }> {
     const body = [
-      `Machine-drafted first-mile record for **${record.platform.name}** (\`${slug}\`).`,
+      `Machine-drafted developer journey record for **${record.platform.name}** (\`${slug}\`).`,
       "",
-      "Generated live by First-Mile Atlas from official documentation via You.com search + an OpenRouter model.",
+      "Generated live by Developer Journey Atlas from official documentation via You.com search and an OpenRouter model.",
       "It passed JSON Schema validation but is **unverified**: review every step, source, and boundary claim before merging.",
       "",
       `- Category: ${record.category}`,
@@ -119,7 +120,7 @@ export class GitHubPrWriter implements RepoWriter {
       "POST",
       `/repos/${this.repo}/pulls`,
       {
-        title: `Add first-mile record: ${record.platform.name}`,
+        title: `Add journey record: ${record.platform.name}`,
         head: branch,
         base: this.baseBranch,
         body,

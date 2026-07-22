@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer-journey-atlas.invalid/reason-diagnostic-card.schema.json",
+  "title": "Developer Journey Atlas reason diagnostic card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "reason_id",
+    "review_state",
+    "reviewed_at",
+    "source_ids",
+    "limitations",
+    "observable_implication",
+    "prerequisites",
+    "nearest_lookalike_reason_ids",
+    "accepted_evidence_kinds"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "reason_id": {"type": "string", "pattern": "^[UP][0-9]{2}\\.[0-9]{2,3}$"},
+    "review_state": {"enum": ["draft", "reviewed", "locally_validated"]},
+    "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+    "source_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "observable_implication": {"type": "string", "minLength": 1},
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "accepted_evidence_kinds"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "label": {"type": "string", "minLength": 1},
+          "accepted_evidence_kinds": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"$ref": "#/$defs/prerequisite_evidence_kind"},
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "nearest_lookalike_reason_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[UP][0-9]{2}\\.[0-9]{2,3}$"},
+      "uniqueItems": true
+    },
+    "accepted_evidence_kinds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/support_evidence_kind"},
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"review_state": {"enum": ["reviewed", "locally_validated"]}}, "required": ["review_state"]},
+      "then": {
+        "properties": {
+          "reviewed_at": {"type": "string", "format": "date-time"},
+          "source_ids": {"type": "array", "minItems": 1}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "support_evidence_kind": {
+      "enum": ["direct_observation", "product_data", "support_case", "developer_interview"]
+    },
+    "prerequisite_evidence_kind": {
+      "enum": ["participant_report", "direct_observation", "product_data", "support_case", "developer_interview"]
+    }
+  }
+}

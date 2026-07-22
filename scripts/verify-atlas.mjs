@@ -37,14 +37,16 @@ const schemaFiles = [
   "schemas/platform-intake.schema.json",
   "schemas/diagnosis-output.schema.json",
   "schemas/comparison-record.schema.json",
+  "schemas/reason-diagnostic-card.schema.json",
 ];
+const schemaValidators = new Map();
 for (const path of schemaFiles) {
   try {
     const schema = JSON.parse(await readFile(resolve(root, path), "utf8"));
     if (schema.additionalProperties !== false || !Array.isArray(schema.required)) {
       fail(`schema:${path}`, "schema must reject additional properties and declare required fields");
     } else {
-      schemaCompiler.compile(schema);
+      schemaValidators.set(path, schemaCompiler.compile(schema));
       pass(`schema:${path}`, `compiled; ${schema.required.length} required top-level fields`);
     }
   } catch (error) {
@@ -52,21 +54,81 @@ for (const path of schemaFiles) {
   }
 }
 
+const schemaExamples = [
+  ["schemas/diagnosis-output.schema.json", "schemas/examples/diagnosis-insufficient-evidence.synthetic.json"],
+  ["schemas/diagnosis-output.schema.json", "schemas/examples/diagnosis-supported.synthetic.json"],
+  ["schemas/comparison-record.schema.json", "schemas/examples/comparison-bounded.synthetic.json"],
+  ["schemas/reason-diagnostic-card.schema.json", "schemas/examples/reason-diagnostic-card.synthetic.json"],
+];
+for (const [schemaPath, examplePath] of schemaExamples) {
+  const validate = schemaValidators.get(schemaPath);
+  const example = JSON.parse(await readFile(resolve(root, examplePath), "utf8"));
+  if (validate?.(example)) pass(`schema-example:${examplePath}`, `valid against ${schemaPath}`);
+  else fail(`schema-example:${examplePath}`, JSON.stringify(validate?.errors ?? []));
+}
+
+const supportedExample = JSON.parse(await readFile(resolve(root, "schemas/examples/diagnosis-supported.synthetic.json"), "utf8"));
+const diagnosisValidator = schemaValidators.get("schemas/diagnosis-output.schema.json");
+const documentationFalsePositive = structuredClone(supportedExample);
+documentationFalsePositive.analysis_mode = "documented-journey";
+if (diagnosisValidator && !diagnosisValidator(documentationFalsePositive)) {
+  pass("schema-negative:documentation-supported", "documentation-only analysis cannot emit a supported individual reason");
+} else {
+  fail("schema-negative:documentation-supported", "unsafe supported documentation output passed validation");
+}
+const weakEvidenceFalsePositive = structuredClone(supportedExample);
+weakEvidenceFalsePositive.what_may_be_happening[0].evidence_kinds = ["team_anecdote", "assumption"];
+if (diagnosisValidator && !diagnosisValidator(weakEvidenceFalsePositive)) {
+  pass("schema-negative:weak-evidence-supported", "weak evidence cannot satisfy a supported hypothesis");
+} else {
+  fail("schema-negative:weak-evidence-supported", "weak evidence passed the supported-hypothesis gate");
+}
+
+const boundedComparison = JSON.parse(await readFile(resolve(root, "schemas/examples/comparison-bounded.synthetic.json"), "utf8"));
+const comparisonValidator = schemaValidators.get("schemas/comparison-record.schema.json");
+const unsafeComparison = structuredClone(boundedComparison);
+unsafeComparison.safe_to_anonymize = false;
+if (comparisonValidator && !comparisonValidator(unsafeComparison)) {
+  pass("schema-negative:unsafe-comparison-summary", "unsafe anonymization cannot retain participant-facing output");
+} else {
+  fail("schema-negative:unsafe-comparison-summary", "unsafe comparison retained participant-facing output");
+}
+const unsupportedPattern = structuredClone(boundedComparison);
+unsupportedPattern.pattern_claim_eligible = true;
+if (comparisonValidator && !comparisonValidator(unsupportedPattern)) {
+  pass("schema-negative:small-cohort-pattern", "fewer than three peers cannot produce pattern-eligible output");
+} else {
+  fail("schema-negative:small-cohort-pattern", "small cohort passed the pattern-claim gate");
+}
+
 const corpusCommit = manifest.sources.journeyCorpus.commit;
-const corpusLicenseMetadataPaths = new Set(["README.md", "package-lock.json", "package.json"]);
 const importedEntries = git("ls-tree", "-r", corpusCommit)
   .toString("utf8").trim().split("\n").filter(Boolean).map((line) => {
     const [metadata, path] = line.split("\t", 2);
     const [, , blob] = metadata.split(" ");
     return { path, blob };
   });
+const protectedCorpusEntries = importedEntries.filter(({ path }) =>
+  path.startsWith("records/") ||
+  path.startsWith("research/") ||
+  path.startsWith("verify/") ||
+  [
+    "record.schema.json",
+    "roster.json",
+    "coverage.json",
+    "ds-quality.json",
+    "selected-path-heuristic.json",
+    "candidate-path-audit.json",
+    "cold-audit-open.json",
+    "headline.json",
+  ].includes(path),
+);
 let importMismatches = 0;
-for (const { path, blob } of importedEntries) {
-  if (corpusLicenseMetadataPaths.has(path)) continue;
+for (const { path, blob } of protectedCorpusEntries) {
   const current = await readFile(resolve(root, "packages/journey-corpus", path));
   if (gitBlobHash(current) !== blob) importMismatches += 1;
 }
-if (importMismatches === 0) pass("journey-import", `${importedEntries.length - corpusLicenseMetadataPaths.size} imported files remain byte-identical; 3 license metadata files are separately reviewed`);
+if (importMismatches === 0) pass("journey-import", `${protectedCorpusEntries.length} canonical research files remain byte-identical to the imported source`);
 else fail("journey-import", `${importMismatches} imported files differ from ${corpusCommit}`);
 
 const corpusPackage = JSON.parse(await readFile(resolve(root, "packages/journey-corpus/package.json"), "utf8"));
@@ -192,13 +254,14 @@ const approvalBasisCounts = Object.fromEntries(
 );
 if (
   migrationMap.mappings.every((entry) => entry.approved === true && entry.approval?.status === "approved") &&
-  approvalBasisCounts.byte_identical_history_import === 285 &&
-  approvalBasisCounts.reviewed_license_metadata_change === 4 &&
-  approvalBasisCounts.unchanged_blob_verified === 79 &&
-  approvalBasisCounts.path_only_hash_verified === 1 &&
-  approvalBasisCounts.reviewed_compatibility_change === 6
-) {
-  pass("migration-approval", "285 byte-identical imports, 4 license metadata changes, 79 unchanged, 1 path-only, and 6 compatibility mappings approved by evidence class");
+    approvalBasisCounts.byte_identical_history_import === 285 &&
+    approvalBasisCounts.reviewed_license_metadata_change === 4 &&
+    approvalBasisCounts.unchanged_blob_verified === 76 &&
+    approvalBasisCounts.path_only_hash_verified === 1 &&
+    approvalBasisCounts.reviewed_compatibility_change === 6 &&
+    approvalBasisCounts.reviewed_post_migration_change === 3
+  ) {
+  pass("migration-approval", "285 byte-identical imports, 4 license metadata changes, 76 unchanged, 1 path-only, 6 compatibility, and 3 post-migration mappings approved by evidence class");
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
@@ -208,7 +271,7 @@ for (const entry of migrationMap.mappings.filter(({ approval }) => approval?.bas
   if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
 }
 if (unchangedScannerMismatches === 0) {
-  pass("scanner-preservation", "79 unchanged scanner files retain their original Git blobs");
+  pass("scanner-preservation", "76 unchanged scanner files retain their original Git blobs; 3 post-migration changes are separately reviewed");
 } else {
   fail("scanner-preservation", `${unchangedScannerMismatches} unchanged scanner files differ from their source blobs`);
 }

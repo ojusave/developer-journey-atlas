@@ -20,10 +20,13 @@ The repository uses Apache License 2.0 for software and Creative Commons Attribu
 
 1. **Define canonical multi-journey identity.** Source records have platform slugs but no durable journey IDs. `journey:<slug>:documented-primary` is only a deterministic compatibility ID for generated views.
 2. **Validate research freshness.** The imported records retain their source dates and statuses. The migration did not re-research any platform, so outputs must not imply currentness beyond the cited evidence date.
-3. **Set a diagnosis evidence threshold.** The 790 blocker entries are hypotheses, not observed reasons for drop-off. Returning a blocker as a diagnosis requires attempt-level evidence and a documented eligibility rule.
-4. **Validate comparison cohorts.** Anonymous comparisons must use compatible outcomes and documented cohort rules. The current corpus does not establish market prevalence or peer performance.
-5. **Test language with real users.** The human-readable format follows the documented plain-language rules, but ADHD readability and actionability have not been tested with users.
-6. **Retarget unknown-platform automation.** The imported draft-PR research flow still reflects the original repository and configuration. Update it only after the monorepo publication target and review ownership are approved.
+3. **Validate comparison cohorts.** Anonymous comparisons now have a machine-enforced eligibility contract, but representative cohort selection has not been validated. The current corpus does not establish market prevalence or peer performance.
+4. **Test language with real users.** The human-readable format follows the documented plain-language rules, but ADHD readability and actionability have not been tested with users.
+5. **Retarget unknown-platform automation.** The imported draft-PR research flow still reflects the original repository and configuration. Update it only after the monorepo publication target and review ownership are approved.
+
+## Resolved research-contract decision
+
+The diagnosis evidence threshold is defined in `docs/research-guide/diagnosis-evidence-contract.md`. Catalog-level eligibility and attempt-level support are independent gates. The machine schemas and runtime validator enforce those gates. All 790 real blocker reasons remain `not_diagnosis_eligible`, so this resolves the contract decision without claiming that individual-reason diagnosis is outcome-validated.
 
 ## Explicitly outside the data migration
 

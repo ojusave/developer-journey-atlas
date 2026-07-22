@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import type { DataStore, DatasetMeta, MetricRow, PlatformRecord } from "../core/ports.js";
+import type { DataStore, DatasetMeta, MetricRow, PlatformRecord, QualityRow } from "../core/ports.js";
 
 interface HeuristicFile {
   score_model_version?: string;
@@ -13,6 +13,10 @@ interface CoverageFile {
   generated_at?: string;
   roster_count?: number;
   records?: Array<{ steps: number; sources: number }>;
+}
+
+interface QualityFile {
+  records?: QualityRow[];
 }
 
 function readJson<T>(file: string): T {
@@ -30,6 +34,7 @@ export class LocalDataStore implements DataStore {
   private readonly bySlug: Map<string, MetricRow>;
   private readonly metaValue: DatasetMeta;
   private readonly recordsDir: string;
+  private readonly qualityBySlug: Map<string, QualityRow>;
   private readonly recordCache = new Map<string, PlatformRecord | undefined>();
 
   constructor(dataRoot: string) {
@@ -37,6 +42,8 @@ export class LocalDataStore implements DataStore {
     this.rows = heuristic.rows ?? [];
     this.bySlug = new Map(this.rows.map((r) => [r.slug, r]));
     this.recordsDir = path.join(dataRoot, "records");
+    const quality = readJson<QualityFile>(path.join(dataRoot, "ds-quality.json"));
+    this.qualityBySlug = new Map((quality.records ?? []).map((record) => [record.slug, record]));
 
     let coverage: CoverageFile = {};
     try {
@@ -81,5 +88,9 @@ export class LocalDataStore implements DataStore {
     }
     this.recordCache.set(slug, record);
     return record;
+  }
+
+  getQuality(slug: string): QualityRow | undefined {
+    return this.qualityBySlug.get(slug);
   }
 }

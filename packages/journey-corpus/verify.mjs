@@ -72,7 +72,7 @@ async function fetchDoc(url, refresh) {
       redirect: "follow",
       signal: controller.signal,
       headers: {
-        "User-Agent": "first-mile-atlas-verifier/1.0 (+https://github.com/ojusave/devrelcon-first-mile-data)",
+        "User-Agent": "developer-journey-atlas-verifier/1.0 (+https://github.com/ojusave/developer-journey-atlas)",
         Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.8",
       },
     });

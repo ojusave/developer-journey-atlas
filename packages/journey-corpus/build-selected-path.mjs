@@ -1,7 +1,7 @@
 // Generates selected-path-heuristic.json.
 //
 // EXPERIMENTAL / INTERNAL. NOT SHOWN ON THE PUBLIC SITE.
-// The public First-Mile Atlas shows documented onboarding steps only, with no
+// The public Developer Journey Atlas shows documented onboarding steps only, with no
 // score, no rank, and no leaderboard. This generator and its output are kept in
 // the repo for reproducibility and transparency (they are not being deleted),
 // but they are internal. build-site.mjs deliberately does not publish

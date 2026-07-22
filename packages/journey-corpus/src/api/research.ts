@@ -3,6 +3,22 @@ import { config } from "../config.js";
 import { sendError } from "./http.js";
 import { runResearch, type ResearchDeps } from "../core/researchPipeline.js";
 
+const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
+const RESEARCH_LIMIT = 3;
+const attemptsByIp = new Map<string, number[]>();
+
+function takeResearchSlot(ip: string, now = Date.now()): boolean {
+  const cutoff = now - RESEARCH_WINDOW_MS;
+  const recent = (attemptsByIp.get(ip) ?? []).filter((timestamp) => timestamp > cutoff);
+  if (recent.length >= RESEARCH_LIMIT) {
+    attemptsByIp.set(ip, recent);
+    return false;
+  }
+  recent.push(now);
+  attemptsByIp.set(ip, recent);
+  return true;
+}
+
 /**
  * Phase 2 endpoint: research a platform that is not in the dataset and stream
  * progress over Server-Sent Events. Gated by RESEARCH_ENABLED and by whether the
@@ -21,6 +37,14 @@ export function startResearch(deps: ResearchDeps | null) {
     const platform = typeof req.body?.platform === "string" ? req.body.platform.trim() : "";
     if (!platform) {
       sendError(res, 400, "bad_request", "Provide a platform name.");
+      return;
+    }
+    if (platform.length > 100 || !/^[\p{L}\p{N} .&+'()_/:\-]+$/u.test(platform)) {
+      sendError(res, 400, "bad_request", "Use a platform name of 100 characters or fewer.");
+      return;
+    }
+    if (!takeResearchSlot(req.ip ?? "unknown")) {
+      sendError(res, 429, "rate_limited", "This connection has started three research jobs in the last hour. Try again later.");
       return;
     }
 

@@ -6,7 +6,7 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const outputRoot = path.join(projectRoot, "public");
 const dataRoot = path.join(outputRoot, "data");
 const sourceRoot = path.join(outputRoot, "source");
-const canonicalUrl = "https://devrelcon-research.onrender.com";
+const canonicalUrl = process.env.PUBLIC_BASE_URL ?? "https://developer-journey-atlas.onrender.com";
 
 const sourceFiles = [
   { path: "site/index.html", language: "html", description: "Accessible static-site document." },
@@ -76,13 +76,13 @@ const records = atlas.rows.map((row) => ({
 
 const dataIndex = {
   schemaVersion: 1,
-  name: "First-Mile Atlas",
+  name: "Developer Journey Atlas",
   description: "Official-documentation-grounded first-success routes for 205 developer platforms.",
   canonicalUrl,
   generatedAt: coverage.generated_at,
   interpretation: [
     "This dataset describes documented route shape, extracted from official docs, not product usability, conversion, or observed developer completion time.",
-    "This is not a ranking. Platforms are not ranked or ordered against each other on the public site.",
+    "Anonymous peer context describes visible route signals. It is not a ranking or observed behavior.",
     "Each record contains its own official source URLs and evidence mapping.",
   ],
   counts: summary,
@@ -99,8 +99,8 @@ const dataIndex = {
   records,
   sourceCode: {
     index: `${canonicalUrl}/source/index.md`,
-    license: null,
-    notice: "Source is published for inspection. No public reuse license is granted.",
+    license: "Apache-2.0",
+    notice: "Software is Apache-2.0. Original research is CC-BY-4.0 under the repository license scope.",
     files: sourceFiles.map((file) => ({
       path: file.path,
       url: sourceUrl(file.path),
@@ -122,7 +122,7 @@ const schema = await readFile(path.join(projectRoot, "record.schema.json"), "utf
 const catalog = (await readFile(path.join(projectRoot, "catalog.md"), "utf8"))
   .replaceAll("](records/", "](data/records/");
 
-const methodology = `# First-Mile Atlas methodology\n\n${readme.trim()}\n\n${selectionPolicy.trim()}\n\n${measurementContract.trim()}\n`;
+const methodology = `# Developer Journey Atlas methodology\n\n${readme.trim()}\n\n${selectionPolicy.trim()}\n\n${measurementContract.trim()}\n`;
 await writeFile(path.join(outputRoot, "methodology.md"), methodology, "utf8");
 await writeFile(path.join(outputRoot, "measurement-contract.md"), `${measurementContract.trim()}\n`, "utf8");
 await writeFile(path.join(outputRoot, "catalog.md"), `${catalog.trim()}\n`, "utf8");
@@ -136,13 +136,13 @@ for (const file of sourceFiles) {
   sourceSections.push(`## ${file.path}\n\n${file.description}\n\n${fencedCode(file.language, content)}`);
 }
 
-const sourceIndex = `# First-Mile Atlas source code\n\n> Deployed source snapshot for the First-Mile Atlas static site and its research-data generators.\n\nThe files are published for inspection and reproducibility. No public reuse license is granted. Generated research artifacts and the 205 evidence records are indexed separately in [the data manifest](${canonicalUrl}/data/index.json).\n\n## Site and build\n\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n`;
+const sourceIndex = `# Developer Journey Atlas source code\n\n> Deployed source snapshot for the Developer Journey Atlas static site and its research-data generators.\n\nSoftware is Apache-2.0 and original research is CC BY 4.0 under the repository license scope. Generated research artifacts and the 205 evidence records are indexed separately in [the data manifest](${canonicalUrl}/data/index.json).\n\n## Site and build\n\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n`;
 await writeFile(path.join(sourceRoot, "index.md"), sourceIndex, "utf8");
 
-const llmsIndex = `# First-Mile Atlas\n\n> Official-documentation-grounded first-success routes for 205 developer platforms, prepared for the DevRelCon NYC 2026 workshop.\n\nUse this corpus to inspect documented onboarding paths and evidence, not to rank product usability or claim observed completion time. This is not a ranking. Each canonical record cites the official documentation used for its steps and outcome. Source code is available for inspection, but no public reuse license is granted.\n\n## Start here\n\n- [Full LLM context](${canonicalUrl}/llms-full.txt): Methodology, measurement contract, catalog, schema, and deployed source code in one text file.\n- [Machine-readable manifest](${canonicalUrl}/data/index.json): Dataset metadata, interpretation rules, all 205 record URLs, and source-code URLs.\n- [Methodology](${canonicalUrl}/methodology.md): Research question, evidence rules, route-selection policy, measurement contract, and completion standard.\n- [Measurement contract](${canonicalUrl}/measurement-contract.md): Units, count definitions, comparability limits, provenance, and non-claims.\n- [Human-readable catalog](${canonicalUrl}/catalog.md): All platforms, selected surfaces, outcomes, normalized counts, and vendor time claims.\n\n## Research data\n\n- [Analytical quality metadata](${canonicalUrl}/data/ds-quality.json): Comparability and record-quality fields for filtering before analysis.\n- [Coverage report](${canonicalUrl}/data/coverage.json): Per-record validation counts and errors.\n- [Record schema](${canonicalUrl}/data/record.schema.json): Machine-checkable contract for canonical evidence records.\n- [Render evidence record](${canonicalUrl}/data/records/render.json): Representative complete record with step-level official sources.\n\n## Source code\n\n- [Source index](${canonicalUrl}/source/index.md): Every source file exposed by this deployment with purpose notes.\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n\n## Optional\n\n- [Interactive Atlas](${canonicalUrl}/): Browser search and filters over the selected-route heuristic.\n- [Workshop deck](https://devrelcon.onrender.com): Presentation that uses this research.\n- [FakeSaaSPI exercise](https://fakesaaspi.onrender.com): Deliberately frustrating onboarding exercise used in the workshop.\n`;
+const llmsIndex = `# Developer Journey Atlas\n\n> Official-documentation-grounded onboarding routes for 205 developer platforms.\n\nUse this corpus to inspect documented paths and evidence, not to infer conversion, drop-off, product usability, or observed completion time. Public peer context is anonymous and restricted to qualified cohorts. Each canonical record cites the official documentation used for its steps and outcome. Software is Apache-2.0 and original research is CC BY 4.0 under the repository license scope.\n\n## Start here\n\n- [Full LLM context](${canonicalUrl}/llms-full.txt): Methodology, measurement contract, catalog, schema, and deployed source code in one text file.\n- [Machine-readable manifest](${canonicalUrl}/data/index.json): Dataset metadata, interpretation rules, all 205 record URLs, and source-code URLs.\n- [Methodology](${canonicalUrl}/methodology.md): Research question, evidence rules, route-selection policy, measurement contract, and completion standard.\n- [Measurement contract](${canonicalUrl}/measurement-contract.md): Units, count definitions, comparability limits, provenance, and non-claims.\n- [Human-readable catalog](${canonicalUrl}/catalog.md): All platforms, selected surfaces, outcomes, normalized counts, and vendor time claims.\n\n## Research data\n\n- [Analytical quality metadata](${canonicalUrl}/data/ds-quality.json): Comparability and record-quality fields for filtering before analysis.\n- [Coverage report](${canonicalUrl}/data/coverage.json): Per-record validation counts and errors.\n- [Record schema](${canonicalUrl}/data/record.schema.json): Machine-checkable contract for canonical evidence records.\n- [Render evidence record](${canonicalUrl}/data/records/render.json): Representative complete record with step-level official sources.\n\n## Source code\n\n- [Source index](${canonicalUrl}/source/index.md): Every source file exposed by this deployment with purpose notes.\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n\n## Optional\n\n- [Interactive Atlas](${canonicalUrl}/): Platform search, documented route summaries, anonymous peer context, and official evidence.\n- [Workshop deck](https://devrelcon.onrender.com): Presentation that uses this research.\n- [FakeSaaSPI exercise](https://fakesaaspi.onrender.com): Deliberately frustrating onboarding exercise used in the workshop.\n`;
 await writeFile(path.join(outputRoot, "llms.txt"), llmsIndex, "utf8");
 
-const llmsFull = `# First-Mile Atlas: full LLM context\n\n> Consolidated methodology, catalog, record contract, and deployed source code. For current canonical JSON records, use ${canonicalUrl}/data/index.json.\n\nThis file is generated from the same repository inputs as the live site. Source is published for inspection; no public reuse license is granted.\n\n${methodology.trim()}\n\n# Platform catalog\n\n${catalog.replace(/^# .*\n+/, "").trim()}\n\n# Canonical record schema\n\n${fencedCode("json", schema)}\n\n# Deployed source code\n\n${sourceSections.join("\n\n")}\n`;
+const llmsFull = `# Developer Journey Atlas: full LLM context\n\n> Consolidated methodology, catalog, record contract, and deployed source code. For current canonical JSON records, use ${canonicalUrl}/data/index.json.\n\nThis file is generated from the same repository inputs as the live site. Software is Apache-2.0 and original research is CC BY 4.0 under the repository license scope.\n\n${methodology.trim()}\n\n# Platform catalog\n\n${catalog.replace(/^# .*\n+/, "").trim()}\n\n# Canonical record schema\n\n${fencedCode("json", schema)}\n\n# Deployed source code\n\n${sourceSections.join("\n\n")}\n`;
 await writeFile(path.join(outputRoot, "llms-full.txt"), llmsFull, "utf8");
 
 const sitemapUrls = [
@@ -159,4 +159,4 @@ const sitemapUrls = [
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 await writeFile(path.join(outputRoot, "sitemap.xml"), sitemap, "utf8");
 
-console.log(`Built First-Mile Atlas with ${summary.platforms} platforms.`);
+console.log(`Built Developer Journey Atlas with ${summary.platforms} platforms.`);

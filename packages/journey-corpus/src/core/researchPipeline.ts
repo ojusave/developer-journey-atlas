@@ -2,6 +2,7 @@ import type {
   DataStore, LLMProvider, MetricRow, PlatformRecord, RepoWriter, SearchProvider,
 } from "./ports.js";
 import { buildAssessment, type Assessment } from "./assessment.js";
+import { buildDocumentedOnboardingLoad } from "./onboardingLoad.js";
 
 export interface ResearchDeps {
   search: SearchProvider;
@@ -36,6 +37,26 @@ function msg(err: unknown): string {
   return err instanceof Error ? err.message : "Unexpected error.";
 }
 
+function normalizedUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    url.hash = "";
+    if (url.pathname !== "/") url.pathname = url.pathname.replace(/\/$/, "");
+    return url.toString();
+  } catch {
+    return value;
+  }
+}
+
+function validateSourceGrounding(record: PlatformRecord, docs: Array<{ url: string }>): string | null {
+  const searchedUrls = new Set(docs.map((doc) => normalizedUrl(doc.url)));
+  const unsupported = (record.sources ?? []).filter((source) => !searchedUrls.has(normalizedUrl(source.url)));
+  if (unsupported.length > 0) {
+    return `The draft cited ${unsupported.length} source URL${unsupported.length === 1 ? "" : "s"} that were not returned by the official-docs search.`;
+  }
+  return null;
+}
+
 /**
  * Orchestrate live research for an unknown platform: search official docs,
  * reconstruct a schema-valid record, measure and compare it, then (optionally)
@@ -65,10 +86,16 @@ export async function runResearch(platform: string, deps: ResearchDeps, emit: Em
 
   let record: PlatformRecord;
   try {
-    emit({ type: "status", step: "reconstruct", message: "Reconstructing the documented first-mile route from official docs…" });
+    emit({ type: "status", step: "reconstruct", message: "Reconstructing the documented onboarding route from official docs…" });
     record = await deps.llm.reconstructRecord(platform, docs);
   } catch (err) {
     emit({ type: "error", code: "llm_failed", message: msg(err) });
+    return;
+  }
+
+  const groundingError = validateSourceGrounding(record, docs);
+  if (groundingError) {
+    emit({ type: "error", code: "source_grounding_failed", message: groundingError });
     return;
   }
 
@@ -76,7 +103,7 @@ export async function runResearch(platform: string, deps: ResearchDeps, emit: Em
   try {
     emit({ type: "status", step: "assemble", message: "Assembling the documented route from official docs…" });
     const row = deps.buildRow(record);
-    assessment = buildAssessment(row, record);
+    assessment = buildAssessment(row, record, buildDocumentedOnboardingLoad(row, deps.store));
   } catch (err) {
     emit({ type: "error", code: "assemble_failed", message: msg(err) });
     return;
@@ -102,7 +129,7 @@ export async function runResearch(platform: string, deps: ResearchDeps, emit: Em
   }
 
   try {
-    emit({ type: "status", step: "pr", message: "Opening a draft pull request to the dataset…" });
+    emit({ type: "status", step: "pr", message: "Opening a draft pull request in Developer Journey Atlas…" });
     const { url } = await deps.repo.openDraftRecordPR(record);
     emit({ type: "pr", url });
   } catch (err) {

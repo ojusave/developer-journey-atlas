@@ -57,6 +57,7 @@ function main(): void {
 
   const app = express();
   app.disable("x-powered-by");
+  app.set("trust proxy", 1);
   app.use(express.json({ limit: "256kb" }));
 
   app.get("/healthz", (_req, res) => {
@@ -81,7 +82,7 @@ function main(): void {
   });
 
   app.listen(config.port, "0.0.0.0", () => {
-    console.log(`First-Mile Atlas listening on 0.0.0.0:${config.port} (${store.meta().count} platforms)`);
+    console.log(`Developer Journey Atlas listening on 0.0.0.0:${config.port} (${store.meta().count} platforms)`);
   });
 }
 

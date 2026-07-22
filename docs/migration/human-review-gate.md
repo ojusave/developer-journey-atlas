@@ -31,7 +31,7 @@ No tracked source file was intentionally excluded. Git metadata and ignored loca
 - Seven source paths existed in both repositories with different content: `.env.example`, `.gitignore`, `README.md`, `package-lock.json`, `package.json`, `render.yaml`, and `tsconfig.json`. All seven were isolated under the package boundary. None was overwritten.
 - Twenty-one same-filename, different-content pairs were reported for review. See `repository-comparison.json` for exact paths and Git blobs.
 
-Every original path and transformation is listed in `migration-map.json`. All 375 entries are approved under one of five explicit evidence classes: 285 byte-identical imports, four reviewed license metadata changes, 79 unchanged scanner blobs, one path-only taxonomy move, and six reviewed compatibility edits.
+Every original path and transformation is listed in `migration-map.json`. The release began with 285 byte-identical imports, four reviewed license metadata changes, 79 unchanged scanner blobs, one path-only taxonomy move, and six reviewed compatibility edits. Two of the 79 Scanner files now carry a separate `reviewed_post_migration_change` classification for the diagnosis evidence contract. Their original Git blobs remain recorded.
 
 ## Preservation evidence
 

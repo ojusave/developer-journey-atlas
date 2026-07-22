@@ -1,63 +1,26 @@
 services:
   - type: web
-    name: first-mile-scanner
+    name: developer-journey-atlas
     runtime: node
+    plan: free
     region: oregon
-    plan: starter
-    buildCommand: npm ci --include=dev && npm run build
-    preDeployCommand: npm run db:migrate
-    startCommand: node dist-server/server/index.js
+    rootDir: packages/journey-corpus
+    buildCommand: npm ci --include=dev && npm run build:data && npm run build:app
+    startCommand: npm start
     healthCheckPath: /healthz
-    maxShutdownDelaySeconds: 60
+    autoDeployTrigger: checksPass
     envVars:
       - key: NODE_ENV
         value: production
-      - key: VITE_ADAPTIVE_ENABLED
-        value: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: first-mile-scanner-db
-          property: connectionString
-      - key: SESSION_ENVELOPE_KEY
-        generateValue: true
-      - fromGroup: first-mile-workflow-shared
-      - key: EXECUTION_MODE
-        value: direct
-      - key: WORKFLOW_DISPATCH_TIMEOUT_MS
-        value: 10000
-      - key: REASONING_MODE
-        value: deterministic
-      - key: SESSION_TTL_HOURS
-        value: 24
-      - key: TURN_ENVELOPE_TTL_SECONDS
-        value: 900
-      - key: TRUST_PROXY
-        value: true
-      - key: RATE_LIMIT_WINDOW_SECONDS
-        value: 60
-      - key: SESSION_CREATE_LIMIT
-        value: 300
-      - key: SESSION_TURN_LIMIT
-        value: 30
-      - key: IP_TURN_LIMIT
-        value: 1200
-      - key: ARIZE_TELEMETRY_ENABLED
-        value: false
-      - key: ARIZE_PROJECT_NAME
-        value: first-mile-scanner
-      - key: ARIZE_OTLP_ENDPOINT
-        value: https://otlp.arize.com/v1/traces
-
-databases:
-  - name: first-mile-scanner-db
-    region: oregon
-    plan: basic-256mb
-    databaseName: first_mile_scanner
-    user: first_mile_scanner
-    ipAllowList: []
-
-envVarGroups:
-  - name: first-mile-workflow-shared
-    envVars:
-      - key: INTERNAL_WORKFLOW_SECRET
-        generateValue: true
+      - key: RESEARCH_ENABLED
+        value: "false"
+      - key: OPENROUTER_MODEL
+        value: openai/gpt-4.1-mini
+      # Optional live-research secrets. Add these in the Render Dashboard, then
+      # set RESEARCH_ENABLED=true. They are intentionally not committed.
+      # - key: YDC_API_KEY
+      #   sync: false
+      # - key: OPENROUTER_API_KEY
+      #   sync: false
+      # - key: GITHUB_TOKEN
+      #   sync: false

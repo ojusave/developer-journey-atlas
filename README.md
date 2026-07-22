@@ -1,165 +1,132 @@
 # Developer Journey Atlas
 
-Developer Journey Atlas combines a source-grounded corpus of documented developer journeys with a separate blocker-hypothesis taxonomy and the existing map-first scanner application.
+Open, source-grounded research into the documented onboarding routes of developer platforms.
 
-This public repository is the canonical open-source home for the combined project. Historical package, storage, and runtime identifiers remain where changing them would create unnecessary compatibility risk. The two source repositories are archived read-only for provenance.
+[Live Atlas](https://developer-journey-atlas.onrender.com) | [Data manifest](https://developer-journey-atlas.onrender.com/data/index.json) | [LLM guide](https://developer-journey-atlas.onrender.com/llms.txt) | [Research method](docs/research-guide/research-method.md)
 
-## Research boundaries
+> The Atlas describes official documentation. It does not contain observed conversion, activation, completion-time, or drop-off data.
 
-- `packages/journey-corpus/records/*.json` is the canonical source for 205 documented platform journeys.
-- `packages/blocker-taxonomy/first-mile-blocker-universe.md` is the canonical source for 790 blocker hypotheses.
-- `packages/generated-views/atlas.md` and `atlas.jsonl` are deterministic human and LLM projections. Do not edit them directly.
-- A documented friction gate is not a confirmed drop-off point.
-- A blocker hypothesis is not a diagnosis without evidence from a specific attempt.
+## Start here
 
-Run `npm run atlas:verify` after changing either canonical dataset. See `docs/research-guide/` for the data model, evidence method, retrieval contract, intake workflow, and anonymized-comparison rules.
+Search for a platform in the public wrapper. The result shows:
 
-## Existing scanner application
+- the selected documented route to first success;
+- required actions, waits, decisions, gates, and prerequisites;
+- anonymous placement beside qualified same-category peers;
+- documentation-derived investigation prompts;
+- the official sources and complete evidence record.
 
-The scanner is the application layer in this monorepo. Its implementation is verified locally and in CI, but no current production deployment is verified. Product diagnosis and workshop-readiness claims remain gated by the evidence requirements below.
+If the platform is missing, the optional research pipeline can search official docs, assemble a schema-valid draft, show it immediately, and open a draft pull request for human review.
 
-## What is implemented
+## Quick start
 
-- A friendly mobile-first React interface with deterministic name, company or project, platform, and role intake.
-- An editable eight-stage developer journey from encounter and access through a representative operation and independently verified success.
-- Two evidence-placement decisions, the furthest stage definitely reached and the earliest unresolved transition, followed by exactly one stage-specific discriminator.
-- Immediate map feedback before any cause question, participant-owned conclusions, explicit uncertainty, and valid non-intervention, legitimate-gate, deliberate-non-fit, and evidence-gap endings.
-- A compiled versioned research graph built from the repository's [blocker taxonomy](packages/blocker-taxonomy/first-mile-blocker-universe.md), containing 790 preserved blocker hypotheses across 28 universal families and 16 platform archetypes.
-- Browser resume, validated JSON import and export, Markdown journey-map export, correction retraction, clear-map deletion, and an offline application shell.
-- An anonymous Node service with Postgres persistence, revision checks, idempotency, short-lived encrypted answer envelopes, and no name or company fields.
-- An optional single-call Mastra reasoner through a pinned OpenRouter model. Deterministic reasoning is the safe default.
-- A feature-gated Render Workflow task that receives opaque IDs only. Direct processing is the safe default.
-- The earlier 16-screen adaptive interview remains in Git history for audit, but it is no longer the participant-facing path because it delayed value until the final screen.
-- Optional Arize OpenTelemetry export containing operational metadata only. Raw answers, prompts, reflections, names, companies, and Action Brief content are not exported.
+Node.js 22 is recommended.
 
-## Local run
+```sh
+git clone https://github.com/ojusave/developer-journey-atlas.git
+cd developer-journey-atlas/packages/journey-corpus
+npm ci
+npm run build:data
+npm run build:app
+npm start
+```
 
-Node 22.22.0 is the verified local and CI runtime.
+Open `http://localhost:3000` and search for `Render`.
 
-Install and verify:
+## What the comparison means
+
+`Documented onboarding load` is not a weighted score. It reports how many of four visible route signals sit above the median of an anonymous qualified peer cohort:
+
+1. required developer actions;
+2. wait or async points;
+3. decision points; and
+4. documented friction gates.
+
+A comparison appears only when at least three peers share the platform's category, normalized first-success boundary, completed research status, compatible granularity, and acceptable comparability status. Peer names are never returned by the public comparison.
+
+This is route structure, not a judgment of ease or quality. Real drop-off claims require observed journey evidence under the [diagnosis evidence contract](docs/research-guide/diagnosis-evidence-contract.md).
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| `packages/journey-corpus/records/` | 205 canonical, source-grounded platform records |
+| `packages/journey-corpus/web/` | Public search and diagnosis wrapper |
+| `packages/journey-corpus/src/` | API, research adapters, comparison contract, and GitHub contribution flow |
+| `packages/blocker-taxonomy/` | 790 preserved blocker hypotheses, not observed causes |
+| `packages/generated-views/` | Deterministic human and LLM projections |
+| `src/` and `server/` | Evidence-gated diagnostic scanner retained in the monorepo |
+| `docs/research-guide/` | Research, evidence, comparison, and intake contracts |
+| `examples/wrapper/` | Product flow and integration example |
+| `render.yaml` | Canonical Render Blueprint |
+
+## Data for humans and LLMs
+
+- Human-readable catalog: [`packages/generated-views/atlas.md`](packages/generated-views/atlas.md)
+- JSON Lines projection: [`packages/generated-views/atlas.jsonl`](packages/generated-views/atlas.jsonl)
+- Individual evidence records: [`packages/journey-corpus/records/`](packages/journey-corpus/records)
+- Record schema: [`packages/journey-corpus/record.schema.json`](packages/journey-corpus/record.schema.json)
+- Retrieval guide: [`docs/research-guide/llm-retrieval-guide.md`](docs/research-guide/llm-retrieval-guide.md)
+- Deployed LLM entry point: [`/llms.txt`](https://developer-journey-atlas.onrender.com/llms.txt)
+
+Canonical records stay readable JSON. Generated views are rebuilt from those records and must not be edited directly.
+
+## Optional live research
+
+The wrapper works without external providers. To research missing platforms:
+
+```sh
+export RESEARCH_ENABLED=true
+export YDC_API_KEY=your_you_com_key
+export OPENROUTER_API_KEY=your_openrouter_key
+export GITHUB_TOKEN=your_restricted_github_token
+npm start
+```
+
+- You.com locates official documentation.
+- OpenRouter reconstructs a draft under the repository schema.
+- `GITHUB_TOKEN` is optional. When present, it must be restricted to opening a branch and draft pull request in `ojusave/developer-journey-atlas`.
+- Every draft is labeled unverified and never auto-merged.
+
+## Verify changes
+
+From the repository root:
 
 ```sh
 npm ci
-npm run test:run
+npm --prefix packages/journey-corpus ci
+npm run test:all
 npm run typecheck
 npm run build
-npm --prefix workflows run typecheck
-npm --prefix workflows run build
 ```
 
-Run the production-shaped deterministic service without external credentials:
+For corpus-only work:
 
 ```sh
-npm run build
-ALLOW_IN_MEMORY_STORE=true REASONING_MODE=deterministic npm start
+npm --prefix packages/journey-corpus run validate
+npm --prefix packages/journey-corpus run check
+npm --prefix packages/journey-corpus run test:app
 ```
 
-Open `http://127.0.0.1:10000`. This in-memory mode is local-only. Production startup rejects it.
+See [CONTRIBUTING.md](CONTRIBUTING.md) before changing research records.
 
-For live frontend development, run the service and Vite separately:
+## Deploy on Render
 
-```sh
-npm run dev:server
-npm run dev
-```
+The root [`render.yaml`](render.yaml) creates one Node web service rooted at `packages/journey-corpus`. The public wrapper and all generated data interfaces are served together.
 
-Vite proxies `/api` to the service on port 10000.
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/ojusave/developer-journey-atlas)
 
-## Verification commands
+Live research is off by default. Add `YDC_API_KEY`, `OPENROUTER_API_KEY`, and optionally `GITHUB_TOKEN` in the Render Dashboard, then set `RESEARCH_ENABLED=true`.
 
-With the deterministic service running on port 10000:
+Render Workflows are not required for the first release. They are a reasonable later extraction if research jobs become long-running or high-volume, but Workflow services are currently separate from Blueprint-managed services.
 
-```sh
-npm run test:e2e
-CONCURRENCY=100 npm run test:load
-render blueprints validate render.yaml
-```
+## Videos
 
-The load script is a local concurrency smoke, not evidence about Render, Postgres, OpenRouter, or Workflow capacity.
+- Overview video: [placeholder and recording brief](docs/videos/README.md#overview-video)
+- Adding a missing platform: [placeholder and recording brief](docs/videos/README.md#research-contribution-video)
 
-## Data and privacy boundaries
+## License
 
-- Name and company or project stay in browser storage and exports.
-- The adaptive service accepts platform archetype context and diagnostic answers only. Profile fields are rejected.
-- Accepted answers are stored in application-encrypted envelopes. The envelope is expunged after processing or after its short TTL.
-- Ordinary logs contain operational IDs, objective IDs, status, and latency, not answer text.
-- Arize is disabled by default. When enabled, manual spans contain only pseudonymous and operational metadata. Mastra auto-instrumentation is intentionally not used because it would normally capture prompts and completions.
-- Clearing a case first confirms server deletion, then removes the browser copy.
-- Never paste secrets, customer data, real incident details, or private company information into a test case.
-
-## Enabling Mastra and OpenRouter
-
-Do not reuse a key that has appeared in chat, terminal output, screenshots, or source control. Create a new restricted key and inject it as an environment variable.
-
-Before changing `REASONING_MODE` to `mastra`:
-
-1. Pin one evaluated model in `DIAGNOSTIC_MODEL`. Auto-routing is rejected by configuration.
-2. Verify input and output logging and provider broadcast are disabled for the key and account.
-3. Approve the provider allowlist and its data-retention terms.
-4. Set a hard account credit cap and alert.
-5. Run the normal, non-attempt, aggregate, correction, dead-end, malformed, timeout, and false-green cases from the canonical evidence gate.
-6. Confirm that deterministic validation rejects invented or unsupported catalog IDs.
-
-The request already sends OpenRouter data-collection denial, zero-data-retention routing, required-parameter routing, a strict schema, one model step, no tools, and a 20-second timeout. Those request controls do not prove account-level privacy settings.
-
-## Enabling Arize
-
-Set `ARIZE_TELEMETRY_ENABLED=true` only with `ARIZE_API_KEY`, `ARIZE_SPACE_ID`, and `ARIZE_PROJECT_NAME`. The default endpoint is the Arize US OTLP HTTP trace endpoint. Change `ARIZE_OTLP_ENDPOINT` for an approved regional endpoint.
-
-Observability is outside the diagnostic authority boundary. It cannot make a candidate valid, and its failure must not determine the attendee result. A live trace has not been verified because no Arize credentials were available.
-
-## Render deployment shape
-
-`render.yaml` validates as three Blueprint actions:
-
-- one Node web service;
-- one paid Postgres database; and
-- one shared environment group for the Workflow callback secret.
-
-The Blueprint deliberately starts with `REASONING_MODE=deterministic`, `EXECUTION_MODE=direct`, and Arize disabled. Render Workflows are separate resources because Blueprints do not manage them.
-
-Optional provider credentials are not declared with `sync: false` in the initial Blueprint because Render would require every placeholder during creation even though those features are disabled. Add the relevant keys from `.env.example` in the Dashboard only when enabling that feature.
-
-Deployment is not part of the current open-source release. On July 21, 2026, the historical Scanner URL returned `404`, and the previously recorded Scanner service, database, and Workflow were no longer present in the selected Render workspace. Historical deployment checks remain evidence of past behavior only.
-
-Treat `render.yaml` as a proposed deployment shape, not the source of truth for a current environment. Validate it against a staging environment before creating or changing Render resources. The separate research static site remains connected to the historical data repository and must be retargeted in a deployment-specific change.
-
-## Rollback switches
-
-- Model problem: set `REASONING_MODE=deterministic` and restart.
-- Workflow problem: set `EXECUTION_MODE=direct` and restart.
-- Arize problem: set `ARIZE_TELEMETRY_ENABLED=false` and restart.
-- Adaptive product problem: set `VITE_ADAPTIVE_ENABLED=false`, rebuild, and deploy the guided-only client.
-- Data incident: disable the service, rotate affected credentials and `SESSION_ENVELOPE_KEY`, review Postgres retention and backups, and do not claim deletion beyond what was verified.
-
-## Licensing
-
-Repository software is licensed under the [Apache License 2.0](LICENSE). Original research records, taxonomy content, documentation, and generated research views are licensed under [Creative Commons Attribution 4.0 International](DATA_LICENSE.md).
-
-Read [LICENSE_SCOPE.md](LICENSE_SCOPE.md) for the exact path boundaries and third-party exclusions.
-
-Contributions are welcome under the evidence and licensing rules in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Report vulnerabilities and sensitive research-data concerns through the process in [SECURITY.md](SECURITY.md).
-
-## Current release gate
-
-The implementation is **artifact verified**, not **outcome validated**. No current Scanner deployment is verified or approved for workshop traffic.
-
-The first live participant-flow review failed: the app behaved like a long diagnostic interview, required 15 transitions before synthesis, and did not make the purpose of its questions clear. The current map-first frontend is the corrective release candidate. It must be redeployed and tested by Ojus and representative practitioners before replacing that failure with a workshop-readiness claim.
-
-The remaining gates are external or research-quality gates:
-
-- zero individual reason cards are currently diagnosis eligible, so the app may narrow families and prescribe evidence but must not claim an individual cause;
-- the participant-facing map currently uses deterministic research routing and does not invoke the optional OpenRouter and Mastra path;
-- the optional OpenRouter and Mastra path has not been exercised with a rotated restricted key;
-- the Arize export has not been observed in a real project;
-- automatic web-to-Workflow dispatch remains disabled until a long-lived Render API key is added and that path passes the same live checks;
-- the actual room concurrency, shared-network behavior, provider cost cap, and abuse controls have not been verified; and
-- five representative practitioners have not yet completed a moderated pilot showing that the flow is useful, understandable, and not boring.
-
-The release candidate passed 114 application and server tests plus four Workflow tests. The local browser smoke covers the map-first mobile flow, value before diagnosis, stage-specific research routing, accessibility, correction retraction, Markdown and JSON export, resume, deletion, offline shell, and layouts from 320px through 1280px. Historical checks recorded a 100-session concurrency smoke with zero failures and one successful opaque Workflow callback. Those checks do not establish the state of any current deployment. The Blueprint validates as three actions, and any future deployment must repeat the runtime checks in its target environment.
-
-The current local production build is 133.12KB gzip. Vite reports the uncompressed 661.21KB client chunk as large, primarily because the complete research catalog is available offline, so test first load on the actual event network before public use. A clean npm audit currently reports three moderate and two low transitive findings through optional Mastra dependencies, with no high or critical findings. The Mastra path is disabled by default. Track or adopt an upstream-compatible fix instead of forcing an incompatible override.
-
-Keep the QR code and public workshop claim blocked until those gates pass.
+- Software: [Apache License 2.0](LICENSE)
+- Original research and documentation: [CC BY 4.0](DATA_LICENSE.md)
+- Exact path boundaries and third-party exclusions: [LICENSE_SCOPE.md](LICENSE_SCOPE.md)

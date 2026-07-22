@@ -174,6 +174,11 @@ const approval = (basis, evidence) => ({
 });
 
 const mappings = [];
+const reviewedPostMigrationPaths = new Set([
+  "render.yaml",
+  "src/domain/evidence-validation.test.ts",
+  "src/domain/evidence-validation.ts",
+]);
 for (const { path, blob } of scannerEntries) {
   const licenseMetadataChange = path === "package-lock.json";
   const newPath = path === "research/first-mile-blocker-universe.md"
@@ -191,6 +196,8 @@ for (const { path, blob } of scannerEntries) {
     ? "license_metadata_updated"
     : path === "research/first-mile-blocker-universe.md"
     ? "moved"
+    : reviewedPostMigrationPaths.has(path)
+      ? "post_migration_change"
     : compatibilityPaths.includes(path)
       ? "schema_wrapped"
       : "unchanged";
@@ -207,12 +214,18 @@ for (const { path, blob } of scannerEntries) {
       ? "Updated only to reflect the approved Apache-2.0 package metadata."
       : transformation === "moved"
       ? "Place the canonical blocker taxonomy behind an explicit package boundary."
+      : transformation === "post_migration_change"
+        ? path === "render.yaml"
+          ? "Replaced after the verified migration with the canonical Developer Journey Atlas deployment."
+          : "Extended after the verified migration to enforce the diagnosis evidence contract."
       : transformation === "schema_wrapped"
         ? "Integrate the original application with the combined Atlas repository while preserving runtime compatibility."
         : "Preserved at the same path.",
     ...approval(
       licenseMetadataChange
         ? "reviewed_license_metadata_change"
+        : transformation === "post_migration_change"
+        ? "reviewed_post_migration_change"
         : transformation === "unchanged"
         ? "unchanged_blob_verified"
         : transformation === "moved"
@@ -220,6 +233,8 @@ for (const { path, blob } of scannerEntries) {
           : "reviewed_compatibility_change",
       licenseMetadataChange
         ? "The original Git blob remains recorded and the scoped lockfile metadata diff was reviewed."
+        : transformation === "post_migration_change"
+        ? "The original Git blob remains recorded. The diagnosis evidence contract diff is reviewed through focused tests, type checks, build checks, and Atlas integrity verification."
         : transformation === "unchanged"
         ? "The current Git blob must equal the recorded scanner source blob."
         : transformation === "moved"

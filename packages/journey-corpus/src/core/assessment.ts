@@ -1,4 +1,5 @@
 import type { MetricRow, PlatformRecord } from "./ports.js";
+import type { DocumentedOnboardingLoad } from "./onboardingLoad.js";
 
 // Guardrail copy kept consistent with MEASUREMENT-CONTRACT.md and the site.
 // The public surface shows the documented route shape only. It does not show a
@@ -44,6 +45,14 @@ export interface Assessment {
   sources: Array<{ id: string | null; title: string; url: string }>;
   sourceCount: number;
   uncertaintyCount: number;
+  routeSignals: {
+    requiredActions: number;
+    waits: number;
+    decisions: number;
+    gates: number;
+  };
+  investigationPrompts: string[];
+  onboardingLoad: DocumentedOnboardingLoad | null;
   recordUrl: string;
   note: string;
 }
@@ -54,7 +63,11 @@ export interface Assessment {
  * rather than throwing. No effort score, count-based metric, or cross-platform
  * ordering is exposed here: the public surface shows documented steps only.
  */
-export function buildAssessment(row: MetricRow, record?: PlatformRecord): Assessment {
+export function buildAssessment(
+  row: MetricRow,
+  record?: PlatformRecord,
+  onboardingLoad: DocumentedOnboardingLoad | null = null,
+): Assessment {
   const fs = record?.documented_first_success;
   const ttfs = record?.time_to_first_success;
 
@@ -104,7 +117,23 @@ export function buildAssessment(row: MetricRow, record?: PlatformRecord): Assess
     sources: (record?.sources ?? []).map((s) => ({ id: s.id ?? null, title: s.title, url: s.url })),
     sourceCount: record?.sources?.length ?? 0,
     uncertaintyCount: record?.uncertainties?.length ?? 0,
-    recordUrl: `data/records/${row.slug}.json`,
+    routeSignals: {
+      requiredActions: row.required_developer_action_count,
+      waits: row.wait_or_async_count,
+      decisions: (record?.friction_gates ?? []).filter((gate) => gate.type === "choice").length,
+      gates: row.gate_count,
+    },
+    investigationPrompts: [
+      ...(record?.friction_gates ?? []).map((gate) => {
+        const location = gate.at_step ? `At step ${gate.at_step}, ` : "";
+        return `${location}review the documented ${gate.type ?? "friction"} gate: ${gate.description ?? gate.requirement ?? "Details are not specified."}`;
+      }),
+      ...(record?.prerequisites ?? [])
+        .filter((prerequisite) => prerequisite.required)
+        .map((prerequisite) => `Check whether developers can identify and satisfy this required prerequisite before starting: ${prerequisite.requirement}`),
+    ].slice(0, 3),
+    onboardingLoad,
+    recordUrl: `/data/records/${row.slug}.json`,
     note: MEASUREMENT_NOTE,
   };
 }

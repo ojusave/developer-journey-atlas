@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publicRoot = path.join(projectRoot, "public");
-const canonicalUrl = "https://devrelcon-research.onrender.com";
+const canonicalUrl = "https://developer-journey-atlas.onrender.com";
 
 const requiredFiles = [
   "llms.txt",
@@ -27,9 +27,9 @@ for (const file of requiredFiles) {
 }
 
 const llms = await readFile(path.join(publicRoot, "llms.txt"), "utf8");
-assert.match(llms, /^# First-Mile Atlas\n\n> /);
+assert.match(llms, /^# Developer Journey Atlas\n\n> /);
 assert.match(llms, /## Source code/);
-assert.match(llms, /no public reuse license is granted/i);
+assert.match(llms, /Software is Apache-2.0 and original research is CC BY 4.0/i);
 
 const links = [...llms.matchAll(/\[[^\]]+\]\((https:\/\/[^)]+)\)/g)].map((match) => match[1]);
 assert.ok(links.length >= 15, "llms.txt should provide a curated set of useful links");
@@ -44,7 +44,7 @@ const manifest = JSON.parse(await readFile(path.join(publicRoot, "data/index.jso
 assert.equal(manifest.schemaVersion, 1);
 assert.equal(manifest.records.length, 205);
 assert.equal(manifest.counts.recordsWithErrors, 0);
-assert.equal(manifest.sourceCode.license, null);
+assert.equal(manifest.sourceCode.license, "Apache-2.0");
 assert.equal(manifest.sourceCode.files.length, 14);
 assert.match(manifest.interpretation.join(" "), /extracted from official docs/);
 assert.match(manifest.interpretation.join(" "), /not a ranking/);

@@ -7,6 +7,7 @@ const el = {
 };
 
 let currentSuggestions = [];
+let activeSuggestion = -1;
 
 function esc(value) {
   return String(value ?? "")
@@ -47,6 +48,22 @@ function debounce(fn, ms) {
 function hideSuggestions() {
   el.suggestions.hidden = true;
   el.input.setAttribute("aria-expanded", "false");
+  el.input.removeAttribute("aria-activedescendant");
+  activeSuggestion = -1;
+}
+
+function setActiveSuggestion(index) {
+  const options = [...el.suggestions.querySelectorAll(".suggestion")];
+  if (options.length === 0) return;
+  activeSuggestion = (index + options.length) % options.length;
+  options.forEach((option, optionIndex) => {
+    const active = optionIndex === activeSuggestion;
+    option.setAttribute("aria-selected", String(active));
+    if (active) {
+      el.input.setAttribute("aria-activedescendant", option.id);
+      option.scrollIntoView({ block: "nearest" });
+    }
+  });
 }
 
 function renderSuggestions(rows) {
@@ -89,10 +106,43 @@ const runSearch = debounce(async (q) => {
 function readStrip() {
   return `
     <p class="read-strip">
-      <strong>How to read this:</strong> these are the steps the platform's official docs lay out
-      to a first success, extracted from those docs. They describe the documented route, not how easy,
-      fast, or good the product is, and this is not a ranking.
+      <strong>What this means:</strong> this is the route described by official docs. It is not observed
+      developer behavior, a conversion rate, or a product ranking.
     </p>`;
+}
+
+function renderLoad(load) {
+  if (!load || !load.available) {
+    return `
+      <section class="load-card load-unavailable" aria-labelledby="load-title">
+        <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
+        <h3 id="load-title">${esc(load?.label || "Comparison unavailable")}</h3>
+        <p>${esc(load?.summary || "There is not enough qualified evidence for a peer comparison.")}</p>
+        <p class="microcopy">${esc(load?.note || "No drop-off score is inferred from documentation.")}</p>
+      </section>`;
+  }
+
+  const components = load.components.map((component) => `
+    <li class="signal-row">
+      <span><strong>${num(component.value)}</strong> ${esc(component.label)}</span>
+      <span class="position position-${esc(component.position)}">${esc(component.position)} peer median (${num(component.peerMedian)})</span>
+    </li>`).join("");
+
+  return `
+    <section class="load-card" aria-labelledby="load-title">
+      <div class="load-head">
+        <div>
+          <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
+          <h3 id="load-title">${esc(load.label)}</h3>
+        </div>
+        <span class="load-score" aria-label="${num(load.signalsAboveMedian)} of ${num(load.signalCount)} signals above peer median">
+          ${num(load.signalsAboveMedian)}<small>/${num(load.signalCount)}</small>
+        </span>
+      </div>
+      <p>${esc(load.summary)}</p>
+      <ul class="signal-list">${components}</ul>
+      <p class="microcopy">${esc(load.note)}</p>
+    </section>`;
 }
 
 function stepItem(s) {
@@ -148,6 +198,10 @@ function renderAssessment(a) {
     ? ` Documented from official docs as of ${esc(a.researchedAt)}. Docs change.`
     : "";
 
+  const prompts = a.investigationPrompts?.length
+    ? `<ul class="prompt-list">${a.investigationPrompts.map((prompt) => `<li>${esc(prompt)}</li>`).join("")}</ul>`
+    : '<p class="lede">No specific investigation prompts were derived from the documented route.</p>';
+
   return `
     <div class="card">
       <div class="assess-head">
@@ -157,21 +211,44 @@ function renderAssessment(a) {
       <p class="lede">${esc(a.outcome)}</p>
       ${readStrip()}
 
-      <dl class="kv">
-        <div><dt>Selected route</dt><dd>${esc(a.selectedSurface)}</dd></div>
-        <div><dt>Documented first success</dt><dd>${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</dd></div>
-        <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
-        <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
-        <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
-      </dl>
-
-      <h3 class="steps-heading">Documented steps <span class="steps-count">${num(a.pathStepCount)} steps, ${num(a.sourceCount)} official sources</span></h3>
-      ${steps}
-
-      <div class="sources-block">
-        <h3>Sources</h3>
-        ${sources}
+      <div class="summary-grid">
+        <div class="summary-block">
+          <p class="section-kicker">DOCUMENTED FIRST SUCCESS</p>
+          <p class="summary-answer">${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</p>
+          <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
+        </div>
+        <div class="signal-counters" aria-label="Documented route signals">
+          <div><strong>${num(a.routeSignals.requiredActions)}</strong><span>required actions</span></div>
+          <div><strong>${num(a.routeSignals.waits)}</strong><span>waits</span></div>
+          <div><strong>${num(a.routeSignals.decisions)}</strong><span>decisions</span></div>
+          <div><strong>${num(a.routeSignals.gates)}</strong><span>gates</span></div>
+        </div>
       </div>
+
+      ${renderLoad(a.onboardingLoad)}
+
+      <section class="prompt-card" aria-labelledby="prompt-title">
+        <p class="section-kicker">WHERE TO INVESTIGATE</p>
+        <h3 id="prompt-title">Possible attention points</h3>
+        <p class="microcopy">These prompts come from documented gates and prerequisites. They are not recorded causes of drop-off.</p>
+        ${prompts}
+      </section>
+
+      <details class="detail-panel">
+        <summary>Open the full documented route <span>${num(a.pathStepCount)} steps</span></summary>
+        <dl class="kv">
+          <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
+          <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
+          <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
+        </dl>
+        <h3 class="steps-heading">Documented steps <span class="steps-count">${num(a.pathStepCount)} steps</span></h3>
+        ${steps}
+      </details>
+
+      <details class="detail-panel sources-block">
+        <summary>Check the evidence <span>${num(a.sourceCount)} official sources</span></summary>
+        ${sources}
+      </details>
 
       <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Open the full evidence record (JSON)</a></p>
       <p class="dist-line note-line">${esc(a.note)}${asOf}</p>
@@ -195,9 +272,10 @@ function renderUnknown(query) {
   el.result.hidden = false;
   el.result.innerHTML = `
     <div class="card unknown-panel">
-      <h2>"${esc(query)}" isn't in the dataset yet</h2>
-      <p class="lede">Run live research: the Atlas searches official documentation, reconstructs a source-grounded first-mile record, and (when configured) opens a draft pull request back to the dataset.</p>
-      <button class="btn btn-primary" id="research-btn" type="button">Research this platform live</button>
+      <p class="section-kicker">NEW PLATFORM</p>
+      <h2>"${esc(query)}" is not in the Atlas yet</h2>
+      <p class="lede">Research its official docs, show the draft here, then open a draft GitHub contribution for human review.</p>
+      <button class="btn btn-primary" id="research-btn" type="button">Research ${esc(query)}</button>
       <ol class="research-log" id="research-log" hidden></ol>
     </div>`;
   document.querySelector("#research-btn").addEventListener("click", () => researchPlatform(query));
@@ -219,7 +297,7 @@ function draftBanner(record) {
   const blob = URL.createObjectURL(new Blob([json], { type: "application/json" }));
   return `
     <div class="draft-banner">
-      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com + an LLM. It passed schema
+      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com and OpenRouter. It passed schema
       validation but has not been human-reviewed. Treat it as a starting point, not a source of truth.
       <a href="${blob}" download="${esc(record.platform.slug)}.json">Download the drafted record (JSON)</a>
     </div>`;
@@ -308,6 +386,22 @@ async function submitQuery(q) {
 
 el.input.addEventListener("input", (e) => runSearch(e.target.value));
 el.input.addEventListener("blur", () => setTimeout(hideSuggestions, 150));
+el.input.addEventListener("keydown", (event) => {
+  if (el.suggestions.hidden) return;
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    setActiveSuggestion(activeSuggestion + 1);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    setActiveSuggestion(activeSuggestion - 1);
+  } else if (event.key === "Escape") {
+    hideSuggestions();
+  } else if (event.key === "Enter" && activeSuggestion >= 0) {
+    event.preventDefault();
+    const choice = currentSuggestions[activeSuggestion];
+    if (choice) showPlatform(choice.slug);
+  }
+});
 
 el.suggestions.addEventListener("click", (e) => {
   const li = e.target.closest(".suggestion");
