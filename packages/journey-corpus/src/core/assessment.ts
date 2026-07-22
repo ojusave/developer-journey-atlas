@@ -1,7 +1,7 @@
 import type { MetricRow, PlatformRecord, ShortestPathAudit } from "./ports.js";
 import type { DocumentedOnboardingLoad } from "./onboardingLoad.js";
 
-// Guardrail copy kept consistent with MEASUREMENT-CONTRACT.md and the site.
+// Guardrail copy kept consistent with MEASUREMENT-CONTRACT.txt and the site.
 // The public surface shows the documented route shape only. It does not show a
 // score, a rank, or any cross-platform ordering.
 export const MEASUREMENT_NOTE =

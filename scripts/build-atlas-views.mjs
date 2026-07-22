@@ -114,7 +114,7 @@ const blockerObjects = blockerNodes.map((node) => ({
   schemaVersion: 1,
   id: `blocker:${node.id}`,
   canonicalId: node.id,
-  canonicalRecordPath: "packages/blocker-taxonomy/first-mile-blocker-universe.md",
+  canonicalRecordPath: "packages/blocker-taxonomy/first-mile-blocker-universe.txt",
   sourceLine: node.sourceLine ?? null,
   kind: node.kind,
   title: node.label,
@@ -235,30 +235,30 @@ const human = [
   "## Platform journeys",
   "",
   ...platformViews.flatMap((view) => [
-    `- [${md(view.name)}](platforms/${view.slug}.md): ${md(view.goal)}`,
+    `- [${md(view.name)}](platforms/${view.slug}.txt): ${md(view.goal)}`,
   ]),
   "",
   "## Blocker hypotheses",
   "",
-  "See [the blocker hypothesis catalog](blockers.md).",
+  "See [the blocker hypothesis catalog](blockers.txt).",
   "",
 ].join("\n");
 
 const platformOutputRoot = resolve(outputRoot, "platforms");
 await rm(platformOutputRoot, { recursive: true, force: true });
 await mkdir(platformOutputRoot, { recursive: true });
-const humanPath = resolve(outputRoot, "atlas.md");
+const humanPath = resolve(outputRoot, "atlas.txt");
 const jsonlPath = resolve(outputRoot, "atlas.jsonl");
 await writeFile(humanPath, human, "utf8");
 await writeFile(jsonlPath, jsonl, "utf8");
-await writeFile(resolve(outputRoot, "blockers.md"), blockerHuman, "utf8");
+await writeFile(resolve(outputRoot, "blockers.txt"), blockerHuman, "utf8");
 for (const view of platformViews) {
-  await writeFile(resolve(platformOutputRoot, `${view.slug}.md`), view.content, "utf8");
+  await writeFile(resolve(platformOutputRoot, `${view.slug}.txt`), view.content, "utf8");
 }
 
 const platformManifest = platformViews.map((view) => ({
   slug: view.slug,
-  path: `packages/generated-views/platforms/${view.slug}.md`,
+  path: `packages/generated-views/platforms/${view.slug}.txt`,
   sha256: sha256(view.content),
 }));
 const platformManifestHash = sha256(`${platformManifest.map((item) => `${item.path}:${item.sha256}`).join("\n")}\n`);
@@ -269,11 +269,11 @@ const index = {
   generatedFromSourceSnapshot: coverage.generated_at,
   canonicalInputs: {
     journeyCorpus: "packages/journey-corpus/records/*.json",
-    blockerTaxonomy: "packages/blocker-taxonomy/first-mile-blocker-universe.md",
+    blockerTaxonomy: "packages/blocker-taxonomy/first-mile-blocker-universe.txt",
   },
   generatedFiles: {
-    human: { path: "packages/generated-views/atlas.md", sha256: sha256(human) },
-    blockers: { path: "packages/generated-views/blockers.md", sha256: sha256(blockerHuman) },
+    human: { path: "packages/generated-views/atlas.txt", sha256: sha256(human) },
+    blockers: { path: "packages/generated-views/blockers.txt", sha256: sha256(blockerHuman) },
     platforms: { count: platformManifest.length, manifestSha256: platformManifestHash, records: platformManifest },
     llm: { path: "packages/generated-views/atlas.jsonl", sha256: sha256(jsonl) },
   },

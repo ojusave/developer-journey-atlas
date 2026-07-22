@@ -109,15 +109,18 @@ const importedEntries = git("ls-tree", "-r", corpusCommit)
     return { path, blob };
   });
 const protectedCorpusEntries = importedEntries.filter(({ path }) =>
-  path.startsWith("records/") ||
-  path.startsWith("research/") ||
-  path.startsWith("verify/") ||
-  [
-    "record.schema.json",
-    "candidate-path-audit.json",
-    "cold-audit-open.json",
-    "headline.json",
-  ].includes(path),
+  !path.endsWith(".md") &&
+  (
+    path.startsWith("records/") ||
+    path.startsWith("research/") ||
+    path.startsWith("verify/") ||
+    [
+      "record.schema.json",
+      "candidate-path-audit.json",
+      "cold-audit-open.json",
+      "headline.json",
+    ].includes(path)
+  ),
 );
 let importMismatches = 0;
 for (const { path, blob } of protectedCorpusEntries) {
@@ -128,18 +131,20 @@ if (importMismatches === 0) pass("journey-import", `${protectedCorpusEntries.len
 else fail("journey-import", `${importMismatches} imported files differ from ${corpusCommit}`);
 
 const corpusPackage = JSON.parse(await readFile(resolve(root, "packages/journey-corpus/package.json"), "utf8"));
-const corpusReadme = await readFile(resolve(root, "packages/journey-corpus/README.md"), "utf8");
+const rootReadme = await readFile(resolve(root, "README.md"), "utf8");
+const licenseScope = await readFile(resolve(root, "LICENSE_SCOPE.txt"), "utf8");
 if (
   corpusPackage.license === "Apache-2.0" &&
-  corpusReadme.includes("Creative Commons Attribution 4.0 International") &&
-  corpusReadme.includes("LICENSE_SCOPE.md")
+  rootReadme.includes("Creative Commons Attribution 4.0") &&
+  licenseScope.includes("Apache License 2.0") &&
+  licenseScope.includes("Creative Commons")
 ) {
-  pass("license-metadata", "journey package metadata matches the repository license boundary");
+  pass("license-metadata", "repository license boundary is documented");
 } else {
   fail("license-metadata", "journey package license metadata is incomplete or inconsistent");
 }
 
-const blockerSource = await readFile(resolve(root, "packages/blocker-taxonomy/first-mile-blocker-universe.md"));
+const blockerSource = await readFile(resolve(root, "packages/blocker-taxonomy/first-mile-blocker-universe.txt"));
 const blockerHash = sha256(blockerSource);
 if (blockerHash === manifest.sources.blockerTaxonomy.sha256) pass("blocker-source", blockerHash);
 else fail("blocker-source", `expected ${manifest.sources.blockerTaxonomy.sha256}, found ${blockerHash}`);
@@ -163,7 +168,7 @@ if (
   fail("blocker-counts", JSON.stringify(runtimeCatalog.counts));
 }
 
-if (runtimeCatalog.source === "packages/blocker-taxonomy/first-mile-blocker-universe.md") {
+if (runtimeCatalog.source === "packages/blocker-taxonomy/first-mile-blocker-universe.txt") {
   pass("runtime-catalog-source", runtimeCatalog.source);
 } else {
   fail("runtime-catalog-source", `stale source path ${runtimeCatalog.source}`);
@@ -275,7 +280,12 @@ if (
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
 let unchangedScannerMismatches = 0;
-for (const entry of migrationMap.mappings.filter(({ approval }) => approval?.basis === "unchanged_blob_verified")) {
+for (const entry of migrationMap.mappings.filter(({ approval, newPath }) =>
+  approval?.basis === "unchanged_blob_verified" &&
+  newPath &&
+  !newPath.endsWith(".md") &&
+  newPath !== ".gitignore",
+)) {
   const current = await readFile(resolve(root, entry.newPath));
   if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
 }

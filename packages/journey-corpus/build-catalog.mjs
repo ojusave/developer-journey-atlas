@@ -39,5 +39,5 @@ for (const entry of roster) {
   );
 }
 
-fs.writeFileSync(path.join(base, "catalog.md"), `${lines.join("\n")}\n`);
-console.log(`Wrote ${path.join(base, "catalog.md")}`);
+fs.writeFileSync(path.join(base, "catalog.txt"), `${lines.join("\n")}\n`);
+console.log(`Wrote ${path.join(base, "catalog.txt")}`);

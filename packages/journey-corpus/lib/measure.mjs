@@ -12,7 +12,7 @@
 //   - Every heuristic detector returns {field, step_number, excerpt, rule, detector_version}
 //     so a reader can see why a flag fired.
 //
-// See MEASUREMENT-CONTRACT.md for the definitions these functions implement.
+// See MEASUREMENT-CONTRACT.txt for the definitions these functions implement.
 
 import fs from "node:fs";
 import path from "node:path";

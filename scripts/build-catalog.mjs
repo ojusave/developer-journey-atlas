@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appRoot = resolve(here, "..");
-const sourcePath = resolve(appRoot, "packages/blocker-taxonomy/first-mile-blocker-universe.md");
+const sourcePath = resolve(appRoot, "packages/blocker-taxonomy/first-mile-blocker-universe.txt");
 const outputPath = resolve(appRoot, "src/generated/catalog.json");
 const source = await readFile(sourcePath, "utf8");
 
@@ -147,7 +147,7 @@ try {
 const output = {
   schemaVersion: 1,
   catalogVersion: `source-${sourceHash.slice(0, 12)}`,
-  source: "packages/blocker-taxonomy/first-mile-blocker-universe.md",
+  source: "packages/blocker-taxonomy/first-mile-blocker-universe.txt",
   sourceHash,
   generatedAt: existingGeneratedAt ?? new Date().toISOString(),
   counts,

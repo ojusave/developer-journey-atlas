@@ -92,7 +92,7 @@ function reproducibility() {
     results.push({ label, file, identical });
   };
   check("coverage.json", "node validate-records.mjs --write", "coverage.json", ["generated_at"]);
-  check("catalog.md", "node build-catalog.mjs", "catalog.md");
+  check("catalog.txt", "node build-catalog.mjs", "catalog.txt");
   check("easiest-path.json", "node derive-easiest-path.mjs", "easiest-path.json", ["generated_at"]);
   return results;
 }
