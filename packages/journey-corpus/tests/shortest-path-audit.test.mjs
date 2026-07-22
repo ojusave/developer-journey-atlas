@@ -29,10 +29,13 @@ test("Render uses the verified shortest Dashboard route", () => {
   assert.ok(render.required_path.every((step) => !["documentation"].includes(step.interface)));
 });
 
-test("Zoom withholds counts until the app route and hidden terms transition are resolved", () => {
+test("Zoom withholds counts and extends first success through OAuth token exchange and an API call", () => {
   assert.equal(zoom.audit_status, "needs-human-judgment");
   assert.equal(zoom.starting_state.boundary, "account creation");
   assert.equal(zoom.counts, null);
+  assert.match(zoom.first_success.outcome, /users\/me|access_token|REST API/i);
+  assert.ok(zoom.required_path.some((step) => /oauth\/token/i.test(step.action)));
+  assert.ok(zoom.required_path.some((step) => /users\/me/i.test(step.action)));
   assert.ok(zoom.uncertainties.some((item) => /terms-acceptance/.test(item.question)));
   assert.ok(zoom.required_path.some((step) => step.evidence_state === "unverified"));
 });

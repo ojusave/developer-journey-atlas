@@ -7,35 +7,35 @@
   "category": "Communications, media, and social",
   "surface": {
     "name": "Zoom General App creation build flow",
-    "selection_basis": "The Zoom Developer Platform home presents Start building as its primary action and links it to the unified app creation build flow. That flow covers apps that surface third-party applications inside Zoom and apps that integrate Zoom products into third-party applications. Its official Quick start guide selects a General app and ends with a local test milestone.",
+    "selection_basis": "The Zoom Developer Platform home presents Start building as its primary action and links it to the unified General App creation build flow. That flow creates the OAuth client, collects redirect URLs and scopes, and uses Local Test Add App Now to obtain a user authorization code. Zoom's OAuth 2.0 documentation continues that same General App path: exchange the authorization code for an access token, then call Zoom REST APIs with the bearer token. First success is the first authenticated Zoom API response, not app creation alone.",
     "alternatives_considered": [
       {
-        "name": "Zoom REST API",
-        "url": "https://developers.zoom.us/docs/api/",
-        "reason_not_primary": "This is a capability-specific route that requires choosing OAuth or server-to-server OAuth and an API operation, while Zoom's top-level Start building action points to the unified General App flow."
+        "name": "Server-to-Server OAuth app",
+        "url": "https://developers.zoom.us/docs/internal-apps/s2s-oauth/",
+        "reason_not_primary": "Server-to-Server OAuth is a separate app type with account_credentials tokens and no user consent. The platform home Start building path creates a General App, so the selected route continues that General App OAuth code exchange into an API call."
       },
       {
         "name": "Zoom Video SDK for web",
         "url": "https://developers.zoom.us/docs/video-sdk/web/get-started/",
-        "reason_not_primary": "This is a product and runtime-specific route with its own credential, toolkit, and custom-integration branches rather than the vendor's general app-creation route."
+        "reason_not_primary": "This is a product and runtime-specific route with its own credential and toolkit branches rather than the vendor's unified General App start."
       },
       {
         "name": "Zoom Meeting SDK for web",
         "url": "https://developers.zoom.us/docs/meeting-sdk/web/get-started/",
-        "reason_not_primary": "This is a product and runtime-specific installation path rather than the vendor's unified General App route."
+        "reason_not_primary": "This is a product and runtime-specific installation path rather than the vendor's unified General App start."
       },
       {
-        "name": "Zoom Apps",
+        "name": "Zoom Apps in-client surface",
         "url": "https://developers.zoom.us/docs/zoom-apps/",
-        "reason_not_primary": "This route is specifically for third-party apps surfaced inside the Zoom client, while the unified build flow covers both in-Zoom and external integrations."
+        "reason_not_primary": "In-client Zoom Apps are one feature path inside General App creation; the shared first-success boundary for API access remains OAuth token exchange plus an authenticated REST call."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-18",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Zoom application or integration and reach the first local test state documented by Zoom.",
+    "developer_intent": "Create a Zoom General App, complete OAuth authorization, obtain an access token, and receive a successful Zoom REST API response.",
     "starting_url": "https://developers.zoom.us/",
     "assumed_prior_state": [
       "Discovery is complete and the developer has chosen Zoom.",
@@ -44,21 +44,25 @@
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Step 5: Test and preview your app, using Add App Now and then Allow for the developer's own account.",
-    "normalized_outcome": "A development General App is authorized and added to the developer's own Zoom account for local testing.",
-    "observable_completion_signal": "For a user-managed app, Zoom states that the added app is displayed in the local Zoom client's My apps area. Admin-managed apps are instead managed through the web portal and hidden from the client.",
+    "official_milestone": "Exchange the General App authorization code for an access token, then call GET /users/me on the Zoom REST API.",
+    "normalized_outcome": "An authenticated Zoom REST API response returns the current user's profile JSON from GET https://api.zoom.us/v2/users/me.",
+    "observable_completion_signal": "The Zoom API returns HTTP 200 with a JSON body that includes the authenticated user's id and email or display identity fields.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "The official Quick start guide's final numbered section is Step 5: Test and preview your app. Its own-account path ends with selecting Add App Now and then Allow. The linked Local Test page states that this authorizes and adds the app, and that a user-managed app is then displayed in My apps.",
+      "official_label_or_terminal_state": "Zoom OAuth 2.0 documents that Add App Now / Allow yields an authorization code, that POST https://zoom.us/oauth/token exchanges that code for an access_token, and that the access token authenticates Zoom API requests. The Users API documents GET /users/{userId} with userId=me as the authenticated current-user read.",
       "source_ids": [
-        "S4",
-        "S9"
+        "S11",
+        "S12",
+        "S13"
       ]
     },
-    "why_this_is_the_boundary": "This is the terminal state demonstrated by Zoom's official General App Quick start guide. Making a REST API request, implementing an SDK feature, sharing a beta app, or publishing is not part of that guide's terminal local-test step.",
+    "why_this_is_the_boundary": "App creation and Local Test authorize the OAuth client but do not prove API access. Zoom's own OAuth guide treats token exchange and API use as the continuation of the General App authorization path. GET /users/me is the shortest authenticated product API call after that token is issued and does not require creating meetings or other product resources.",
     "source_ids": [
       "S4",
-      "S9"
+      "S9",
+      "S11",
+      "S12",
+      "S13"
     ]
   },
   "prerequisites": [
@@ -532,22 +536,99 @@
     },
     {
       "step_number": 23,
-      "phase": "verify",
+      "phase": "authenticate",
       "actor": "platform",
-      "interface": "console",
-      "action": "Authorize and add the app for local testing.",
+      "interface": "browser",
+      "action": "Redirect to the configured OAuth redirect URI with an authorization code after Allow.",
       "details": [
-        "A user-managed app is displayed in My apps in the local Zoom client.",
-        "An admin-managed app is managed through the web portal and is hidden from the client."
+        "Zoom OAuth 2.0 states that after the user authorizes the app, Zoom redirects the browser to the redirect_uri and includes an authorization code such as https://example.com/callback?code=AUTH_CODE.",
+        "Add App Now on Local Test is the documented way to start that user authorization for the developer's own account."
       ],
       "input": "Allowed authorization request",
-      "output": "Development app added to the developer's own Zoom account",
-      "success_signal": "The app is visible in My apps for the user-managed branch, or is available for management in the web portal for the admin-managed branch.",
-      "failure_or_wait": "No post-authorization wait is documented.",
+      "output": "Authorization code on the redirect URI",
+      "success_signal": "The redirect URI receives a code query parameter.",
+      "failure_or_wait": "Declining authorization prevents issuance of an authorization code.",
       "required": true,
       "source_ids": [
         "S4",
-        "S9"
+        "S9",
+        "S11"
+      ]
+    },
+    {
+      "step_number": 24,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Capture the authorization code from the OAuth redirect request.",
+      "details": [
+        "The application endpoint that owns the registered redirect URI reads the code query parameter."
+      ],
+      "input": "Redirect request containing code",
+      "output": "Authorization code string",
+      "success_signal": "The code value is available to the token exchange request.",
+      "failure_or_wait": "Missing or expired codes cannot be exchanged for tokens.",
+      "required": true,
+      "source_ids": [
+        "S11"
+      ]
+    },
+    {
+      "step_number": 25,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Exchange the authorization code for an access token at Zoom's OAuth token endpoint.",
+      "details": [
+        "Send POST https://zoom.us/oauth/token with grant_type=authorization_code, the authorization code, and the same redirect_uri used during authorization.",
+        "Authenticate the token request with HTTP Basic credentials using the development client ID and client secret."
+      ],
+      "input": "Authorization code, redirect_uri, development client ID, and client secret",
+      "output": "OAuth token response",
+      "success_signal": "Zoom returns JSON containing access_token, token_type bearer, expires_in, and scope.",
+      "failure_or_wait": "Invalid code, redirect_uri mismatch, or bad client credentials cause token exchange to fail.",
+      "required": true,
+      "source_ids": [
+        "S11"
+      ]
+    },
+    {
+      "step_number": 26,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Call GET https://api.zoom.us/v2/users/me with the access token.",
+      "details": [
+        "Include Authorization: Bearer <access_token>.",
+        "userId=me selects the authenticated user on the Users API Get a user operation.",
+        "The app must have requested a user read scope such as user:read:user during scope configuration."
+      ],
+      "input": "Bearer access token from the authorization_code exchange",
+      "output": "Zoom Users API response",
+      "success_signal": "Zoom returns HTTP 200 with JSON for the authenticated user.",
+      "failure_or_wait": "Missing scopes, expired tokens, or invalid bearer credentials return API errors instead of the user profile.",
+      "required": true,
+      "source_ids": [
+        "S12",
+        "S13"
+      ]
+    },
+    {
+      "step_number": 27,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the Users API JSON identifies the authenticated Zoom user.",
+      "details": [
+        "Inspect fields such as id and email or display name in the 200 response body."
+      ],
+      "input": "GET /users/me response",
+      "output": "Verified first authenticated API success",
+      "success_signal": "The response body identifies the authorized Zoom user.",
+      "failure_or_wait": "An empty or error body means API access has not succeeded.",
+      "required": true,
+      "source_ids": [
+        "S13"
       ]
     }
   ],
@@ -575,7 +656,7 @@
       "at_step": 10,
       "condition": "The intended app is admin-managed.",
       "path": "Select Admin-managed. Account admins add and manage the app for users on their account. At the terminal local-test state the app is managed through the web portal and is hidden from the Zoom client.",
-      "effect_on_first_success": "The final verification surface is the web portal instead of My apps in the Zoom client.",
+      "effect_on_first_success": "Admin-managed apps change who can authorize the app and which scopes are available before the OAuth code exchange and API call.",
       "source_ids": [
         "S4",
         "S7",
@@ -606,7 +687,7 @@
       "at_step": 14,
       "condition": "The app needs API access or event notifications.",
       "path": "Use Access to manage the app token and, if needed, configure Event Subscription with an event endpoint. Corresponding event scopes are selected automatically.",
-      "effect_on_first_success": "Adds credential handling or event endpoint configuration before Local Test.",
+      "effect_on_first_success": "Adds credential handling or event endpoint configuration before Local Test authorization, token exchange, and the API call.",
       "source_ids": [
         "S4"
       ]
@@ -615,7 +696,7 @@
       "at_step": 14,
       "condition": "Users will open the app inside Zoom products.",
       "path": "Use Surface to select the Zoom products, enter the Home URL domain, add accepted URLs to the Domain Allow List, select applicable in-client features, and choose supported Zoom clients. The Home URL must return the required OWASP response headers.",
-      "effect_on_first_success": "Adds hosted-application, domain, security-header, product, and client-support configuration before Local Test.",
+      "effect_on_first_success": "Adds hosted-application, domain, security-header, product, and client-support configuration before Local Test authorization, token exchange, and the API call.",
       "source_ids": [
         "S4"
       ]
@@ -633,7 +714,7 @@
       "at_step": 14,
       "condition": "The app connects third-party APIs into Zoom.",
       "path": "Use Connect, upload an OpenAPI 3.0.0 through 3.1.0 JSON or YAML file or enter the base URL and authentication parameters, then configure and test GET, POST, DELETE, PATCH, or PUT endpoints.",
-      "effect_on_first_success": "Adds an API description, authentication, endpoint configuration, and endpoint test before Local Test.",
+      "effect_on_first_success": "Adds an API description, authentication, endpoint configuration, and endpoint test before Local Test authorization, token exchange, and the API call.",
       "source_ids": [
         "S4"
       ]
@@ -736,6 +817,26 @@
       "source_ids": [
         "S4",
         "S9"
+      ]
+    },
+    {
+      "at_step": 25,
+      "type": "credential",
+      "description": "Development client ID and client secret are required to exchange the authorization code for an access token.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S11",
+        "S4"
+      ]
+    },
+    {
+      "at_step": 26,
+      "type": "permission",
+      "description": "A user read scope such as user:read:user must have been granted for GET /users/me to succeed.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S13",
+        "S4"
       ]
     }
   ],
@@ -932,9 +1033,76 @@
         "Email verification wait and code",
         "Basic account completion signal"
       ]
+    },
+    {
+      "id": "S11",
+      "title": "OAuth 2.0",
+      "url": "https://developers.zoom.us/docs/integrations/oauth/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "App Type: General",
+        "Get a user authorization code",
+        "Exchange authorization code for access token"
+      ],
+      "evidence_supported": [
+        "Add App Now yields authorization for the developer's account",
+        "Redirect includes authorization code",
+        "POST https://zoom.us/oauth/token with authorization_code grant",
+        "Basic auth with client ID and client secret",
+        "access_token response shape"
+      ]
+    },
+    {
+      "id": "S12",
+      "title": "Using Zoom APIs",
+      "url": "https://developers.zoom.us/docs/api/using-zoom-apis/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Using OAuth 2.0",
+        "What is an access token?",
+        "User-authenticated"
+      ],
+      "evidence_supported": [
+        "Zoom authenticates API requests with OAuth 2.0 access tokens",
+        "Access token must be included when calling the Zoom API"
+      ]
+    },
+    {
+      "id": "S13",
+      "title": "Users APIs: Get a user",
+      "url": "https://developers.zoom.us/docs/api/users/#tag/users/get/users/%7BuserId%7D",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Get a user",
+        "Path /users/{userId}",
+        "Responses"
+      ],
+      "evidence_supported": [
+        "GET /users/{userId} on https://api.zoom.us/v2",
+        "userId may be me for the authenticated user",
+        "HTTP 200 JSON user profile response"
+      ]
     }
   ],
   "uncertainties": [
+    {
+      "question": "Which minimum user-read scope string is currently required on a fresh General App for GET /users/me?",
+      "checked_source_ids": [
+        "S13",
+        "S4"
+      ],
+      "reason_unresolved": "The live Marketplace scope picker labels and Users API scope list need a dated fresh-account confirmation for the current granular scope names.",
+      "impact": "Scope labels have migrated toward granular scopes; an outdated scope selection can block the API call after a successful token exchange."
+    },
     {
       "question": "Which management type is universal for a General App?",
       "impact": "The final verification surface differs: My apps for user-managed apps versus web-portal management for admin-managed apps.",

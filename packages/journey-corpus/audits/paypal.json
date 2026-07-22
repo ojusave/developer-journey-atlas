@@ -7,7 +7,7 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "fc489a5e1c33247d35f1c8d3c7367763ab72bc7c33b6250cf8b68f15b116fb4b",
+  "source_record_sha256": "5cca3a53591567053c7e405f3723ecb1a08193d14f5ddf54b6811349394f9ad2",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
@@ -18,9 +18,11 @@
   },
   "developer_goal": "Create or sign in to a PayPal Developer account, obtain sandbox REST credentials, and complete the earliest official authenticated first success.",
   "first_success": {
-    "outcome": "Unresolved between sandbox OAuth access-token acquisition and a later product API call such as Orders.",
-    "observable_signal": "Get Started documents an access_token response; it does not designate which product API is the shared first business success.",
-    "source_ids": ["S1", "S2"]
+    "outcome": "GET /v1/invoicing/invoices on the sandbox REST host returns an authenticated HTTP success response using the bearer access token.",
+    "observable_signal": "The sandbox REST API accepts Authorization: Bearer ACCESS-TOKEN and returns HTTP 2xx JSON.",
+    "source_ids": [
+      "S2"
+    ]
   },
   "route_selection": {
     "surface": "PayPal Developer Dashboard plus REST Get Started docs",
@@ -60,13 +62,19 @@
           "label": "PayPal account signup or login fields",
           "field_type": "other",
           "evidence_state": "unverified",
-          "source_ids": ["S1", "S3"],
+          "source_ids": [
+            "S1",
+            "S3"
+          ],
           "notes": "Docs link log in or sign up and mention email verification for new developer accounts, but do not enumerate current screens."
         }
       ],
       "observable_result": "The developer can open Apps & Credentials.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S3"]
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
     },
     {
       "step_number": 2,
@@ -78,19 +86,25 @@
           "label": "Client ID",
           "field_type": "other",
           "evidence_state": "documented",
-          "source_ids": ["S1"]
+          "source_ids": [
+            "S1"
+          ]
         },
         {
           "label": "Client secret",
           "field_type": "other",
           "evidence_state": "documented",
-          "source_ids": ["S1"],
+          "source_ids": [
+            "S1"
+          ],
           "notes": "Whether a reveal click is required is not documented."
         }
       ],
       "observable_result": "Sandbox REST credentials are available for the token request.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
@@ -102,68 +116,119 @@
           "label": "CLIENT_ID",
           "field_type": "text",
           "evidence_state": "documented",
-          "source_ids": ["S1", "S2"]
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
         },
         {
           "label": "CLIENT_SECRET",
           "field_type": "text",
           "evidence_state": "documented",
-          "source_ids": ["S1", "S2"]
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
         },
         {
           "label": "grant_type=client_credentials",
           "field_type": "other",
           "evidence_state": "documented",
-          "source_ids": ["S1", "S2"]
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
         }
       ],
       "observable_result": "PayPal returns access_token, token_type Bearer, and expires_in.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Call GET /v1/invoicing/invoices on the sandbox host with Authorization Bearer access_token.",
+      "required_fields": [
+        {
+          "label": "Authorization bearer token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "PayPal returns an authenticated invoices response.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
     }
   ],
   "prerequisites": [
     {
       "description": "US sandbox testing is documented as available with a Developer account; non-US testing and going live require a Business account.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "external_gates": [
     {
       "description": "A PayPal Business account is required to go live or to test integrations outside the US.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "description": "New developer accounts may require responding to a PayPal verification email before sandbox tools are enabled.",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S3"
+      ]
     }
   ],
   "unavoidable_waits": [
     {
       "description": "Email verification may delay Dashboard enablement after signup.",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S3"
+      ]
     }
   ],
   "platform_outcomes": [
     {
       "description": "New accounts receive a Default Application in REST API apps and default personal plus business sandbox accounts.",
-      "source_ids": ["S1", "S3"]
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
     },
     {
       "description": "The OAuth token endpoint returns a bearer access token for subsequent REST calls.",
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
   "excluded": [
     {
       "item": "Sandbox buyer/seller login exercises after the token response",
       "reason": "Get sandbox account credentials is documented after token acquisition and is not required to observe access_token.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "item": "Live Apps & Credentials and go-live Business account setup",
       "reason": "Live entitlement is an explicit later gate beyond US sandbox first success.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
