@@ -3,6 +3,7 @@ import type { DataStore, MetricRow } from "../core/ports.js";
 import { buildAssessment } from "../core/assessment.js";
 import { buildDocumentedOnboardingLoad } from "../core/onboardingLoad.js";
 import { sendData, sendError } from "./http.js";
+import { ensureRow } from "./storeHelpers.js";
 
 /**
  * Compact summary used by list and search results. Intentionally free of any
@@ -28,9 +29,9 @@ export function listPlatforms(store: DataStore) {
 }
 
 export function getPlatform(store: DataStore) {
-  return (req: Request, res: Response): void => {
+  return async (req: Request, res: Response): Promise<void> => {
     const slug = String(req.params.slug);
-    const row = store.getRow(slug);
+    const row = await ensureRow(store, slug);
     if (!row) {
       sendError(res, 404, "not_found", `No platform found for "${slug}".`);
       return;

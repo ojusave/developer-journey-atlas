@@ -127,8 +127,6 @@ export async function persistResearchDraft(
     const platformCount = await prisma.platform.count();
     const meta = await prisma.datasetMeta.findUnique({ where: { id: "singleton" } });
     const prev = (meta?.metaJson as Record<string, unknown> | null) ?? {};
-    const pending = { ...((prev.pendingResearch as Record<string, unknown> | undefined) ?? {}) };
-    delete pending[slug];
     await prisma.datasetMeta.upsert({
       where: { id: "singleton" },
       create: {
@@ -137,7 +135,6 @@ export async function persistResearchDraft(
           ...prev,
           count: platformCount,
           totals: { platforms: platformCount, steps: 0, sources: 0 },
-          pendingResearch: pending,
         }),
       },
       update: {
@@ -148,7 +145,6 @@ export async function persistResearchDraft(
             ...((prev.totals as Record<string, unknown> | undefined) ?? {}),
             platforms: platformCount,
           },
-          pendingResearch: pending,
         }),
       },
     });
@@ -157,37 +153,4 @@ export async function persistResearchDraft(
   } finally {
     if (ownsClient) await prisma.$disconnect();
   }
-}
-
-export interface PendingResearch {
-  runId: string;
-  platform: string;
-  startedAt: string;
-}
-
-/** Remember an in-flight Workflow run so a later visit can resume without the URL. */
-export async function rememberPendingResearch(
-  slug: string,
-  pending: PendingResearch,
-  prisma: PrismaClient,
-): Promise<void> {
-  const meta = await prisma.datasetMeta.findUnique({ where: { id: "singleton" } });
-  const prev = (meta?.metaJson as Record<string, unknown> | null) ?? {};
-  const map = { ...((prev.pendingResearch as Record<string, PendingResearch> | undefined) ?? {}) };
-  map[slug] = pending;
-  await prisma.datasetMeta.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", metaJson: asJson({ ...prev, pendingResearch: map }) },
-    update: { metaJson: asJson({ ...prev, pendingResearch: map }) },
-  });
-}
-
-export async function getPendingResearch(
-  slug: string,
-  prisma: PrismaClient,
-): Promise<PendingResearch | null> {
-  const meta = await prisma.datasetMeta.findUnique({ where: { id: "singleton" } });
-  const prev = (meta?.metaJson as Record<string, unknown> | null) ?? {};
-  const map = (prev.pendingResearch as Record<string, PendingResearch> | undefined) ?? {};
-  return map[slug] ?? null;
 }

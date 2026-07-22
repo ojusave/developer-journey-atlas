@@ -77,7 +77,10 @@ export function buildAssessment(
   const ttfs = record?.time_to_first_success;
   const verified = audit?.audit_status === "verified";
 
-  const steps: StepView[] = (audit?.required_path ?? []).map((s) => ({
+  // Prefer an audited required_path when present. Live research drafts often have
+  // no audit yet: fall back to the machine-drafted primary_path so the UI shows
+  // the onboarding steps instead of an empty route.
+  const auditSteps: StepView[] = (audit?.required_path ?? []).map((s) => ({
     stepNumber: s.step_number,
     phase: s.kind ?? null,
     actor: "developer",
@@ -95,6 +98,20 @@ export function buildAssessment(
     })),
     evidenceState: s.evidence_state ?? null,
   }));
+  const recordSteps: StepView[] = (record?.primary_path ?? []).map((s, index) => ({
+    stepNumber: s.step_number ?? index + 1,
+    phase: s.phase ?? null,
+    actor: s.actor ?? "developer",
+    interface: s.interface ?? null,
+    action: s.action,
+    details: Array.isArray(s.details) ? s.details.map(String) : [],
+    successSignal: s.success_signal ?? null,
+    required: s.required !== false,
+    sourceIds: s.source_ids ?? [],
+    requiredFields: [],
+    evidenceState: null,
+  }));
+  const steps = auditSteps.length > 0 ? auditSteps : recordSteps;
 
   return {
     name: row.name,
@@ -127,17 +144,17 @@ export function buildAssessment(
       }));
     })(),
     frictionGates: (() => {
-      if (audit) {
-        return [
-          ...audit.external_gates.map((gate) => ({ atStep: null, type: "external gate", description: gate.description })),
-          ...audit.unavoidable_waits.map((wait) => ({ atStep: null, type: "wait", description: wait.description })),
-        ];
-      }
-      return (record?.friction_gates ?? []).map((g) => ({
+      const fromRecord = (record?.friction_gates ?? []).map((g) => ({
         atStep: g.at_step ?? null,
         type: g.type ?? "gate",
         description: g.description ?? g.requirement ?? "",
       }));
+      if (!audit) return fromRecord;
+      const fromAudit = [
+        ...audit.external_gates.map((gate) => ({ atStep: null, type: "external gate", description: gate.description })),
+        ...audit.unavoidable_waits.map((wait) => ({ atStep: null, type: "wait", description: wait.description })),
+      ];
+      return fromAudit.length > 0 ? fromAudit : fromRecord;
     })(),
     steps,
     timeToFirstSuccess:

@@ -48,6 +48,31 @@ test("buildAssessment surfaces documented content and degrades without a record"
   assert.ok(!("rank" in a));
 });
 
+test("buildAssessment falls back to primary_path when no audit is present", () => {
+  const record = {
+    platform: { name: "You.com", slug: "you-com", organization: "You.com" },
+    category: "AI, ML, and agents",
+    researched_at: "2026-07-22",
+    documented_first_success: { normalized_outcome: "Search API returns JSON." },
+    prerequisites: [{ order: 1, type: "account", requirement: "You.com account", required: true }],
+    friction_gates: [{ at_step: 3, type: "credential", description: "Create an API key" }],
+    primary_path: [
+      { step_number: 1, phase: "arrive", actor: "developer", interface: "browser", action: "Open quickstart", required: true, source_ids: ["S1"] },
+      { step_number: 2, phase: "account", actor: "developer", interface: "web-ui", action: "Sign in", required: true, source_ids: ["S1"] },
+    ],
+    sources: [{ id: "S1", title: "Quickstart", url: "https://you.com/docs" }],
+    uncertainties: [],
+  };
+  const a = buildAssessment(row({ name: "You.com", slug: "you-com", category: "AI, ML, and agents" }), record);
+  assert.equal(a.steps.length, 2);
+  assert.equal(a.steps[0].action, "Open quickstart");
+  assert.equal(a.steps[1].action, "Sign in");
+  assert.equal(a.prerequisites.length, 1);
+  assert.equal(a.frictionGates.length, 1);
+  assert.equal(a.frictionGates[0].description, "Create an API key");
+  assert.equal(a.auditStatus, "pending");
+});
+
 test("buildAssessment surfaces documented steps and record detail when present", () => {
   const record = {
     platform: { name: "Render", slug: "render", organization: "Render Services, Inc." },

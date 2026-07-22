@@ -160,3 +160,18 @@ model DatasetMeta {
   id      String @id @default("singleton")
   metaJson Json
 }
+
+/// Durable claim for in-flight / completed live research. Unique on slug so
+/// concurrent developers researching the same platform share one Workflow run.
+model ResearchClaim {
+  slug      String   @id
+  runId     String   @default("")
+  platform  String
+  status    String
+  clientIp  String?
+  startedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, startedAt])
+  @@index([clientIp, startedAt])
+}
