@@ -7,143 +7,327 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "d05cb2b32862a6dfc2818f1a3488ae832ceeb079ebbad93f7f85193a47c035df",
+  "source_record_sha256": "11167d4980c1c16cff9aec0c464e5d9a54858d73ac667a35b1f170f98b755c66",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and can receive email when the selected route requires it.",
-      "No platform account, tenant, credentials, or product resources exist yet."
+      "The developer has a supported browser, email address, and a workstation that can install Node.js LTS and npm.",
+      "No Atlassian account, Forge API token, cloud developer site, or Forge app exists yet."
     ]
   },
-  "developer_goal": "Installed Forge app panel visible on a Jira issue.",
+  "developer_goal": "Create an Atlassian developer identity and reach a first visible Forge hello-world issue panel on Jira Cloud.",
   "first_success": {
     "outcome": "Installed Forge app panel visible on a Jira issue.",
-    "observable_signal": "Hello-world panel renders",
+    "observable_signal": "On a signed-in Jira issue, selecting Apps then the installed app shows the hello-world issue panel.",
     "source_ids": [
-      "S1"
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "Forge CLI: Jira hello-world issue panel",
-    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists. Include documented gates (email verify, payment, credits, domain, approval). Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
-    "selected": null,
+    "surface": "Forge CLI with free cloud developer site and Jira hello-world issue panel",
+    "rule": "Complete shared Forge setup, then select one host-product hello world. Prefer the vendor's recommended or featured first-app route when peer product tutorials remain otherwise comparable.",
+    "selected": "Forge CLI Jira hello-world issue panel",
     "candidates": [
       {
-        "name": "Forge CLI: Jira hello-world issue panel",
-        "status": "unresolved",
-        "reason": "Machine-drafted primary path only; not confirmed as the lexicographic shortest required route."
+        "name": "Forge CLI Jira hello-world issue panel",
+        "status": "selected",
+        "reason": "Start building with Atlassian and Jira Software Getting started with Forge both feature the Jira hello-world tutorial after recommending Forge. Shared getting started still lists peers, but the featured first-app links resolve the tie to Jira."
+      },
+      {
+        "name": "Forge CLI Confluence hello world",
+        "status": "not-selected",
+        "reason": "Peer official tutorial on the same cloud developer site with a different module and verification surface."
+      },
+      {
+        "name": "Forge CLI Bitbucket hello world",
+        "status": "not-selected",
+        "reason": "Peer official tutorial that requires a shared Bitbucket team workspace rather than the free cloud developer site path."
+      },
+      {
+        "name": "Forge CLI Jira Service Management hello world",
+        "status": "not-selected",
+        "reason": "Peer official tutorial with a different queue-page module and verification navigation."
+      },
+      {
+        "name": "Raw Jira REST without Forge",
+        "status": "not-selected",
+        "reason": "Atlassian recommends Forge for new cloud apps; REST alone is not the documented first-app onboarding path."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
-      "kind": "product-interaction",
-      "interface": "cli",
-      "action": "Install @forge/cli; forge --version.",
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or sign in to an Atlassian account usable for Forge development.",
       "required_fields": [
         {
-          "label": "Documented required input",
+          "label": "Work email or social identity",
           "field_type": "other",
-          "evidence_state": "unverified",
+          "evidence_state": "observed-public-ui",
           "source_ids": [
-            "S1"
+            "S3"
           ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+          "notes": "Cloud developer signup shows work email plus Google, Microsoft, Apple, and Slack. Exact password and email-verification fields for a cold email route remain unverified."
         }
       ],
-      "observable_result": "Version prints",
+      "observable_result": "The developer has an Atlassian account email usable for API token and cloud developer site creation.",
       "evidence_state": "unverified",
       "source_ids": [
-        "S1"
+        "S1",
+        "S3"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Create Forge API token; forge login.",
-      "required_fields": [
-        {
-          "label": "Documented required input",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
-        }
-      ],
-      "observable_result": "Logged in",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install Node.js LTS 22.x or 24.x and verify with `node --version`.",
+      "required_fields": [],
+      "observable_result": "`node --version` reports 22.x or 24.x.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
       "step_number": 3,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Create cloud developer site.",
-      "required_fields": [
-        {
-          "label": "Documented required input",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
-        }
-      ],
-      "observable_result": "Site ready",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install the Forge CLI globally with `npm install -g @forge/cli` and verify with `forge --version`.",
+      "required_fields": [],
+      "observable_result": "The Forge CLI prints its version.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
       "step_number": 4,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "forge create (jira-issue-panel); deploy; install.",
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create an Atlassian API token with scopes for Forge.",
       "required_fields": [
         {
-          "label": "Documented required input",
-          "field_type": "other",
-          "evidence_state": "unverified",
+          "label": "API token name",
+          "field_type": "text",
+          "evidence_state": "documented",
           "source_ids": [
-            "S1",
-            "S2"
+            "S1"
+          ]
+        },
+        {
+          "label": "Token expiry",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Forge app selection",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Forge scopes",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
           ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+          "notes": "Confirm recommended scopes or select a custom subset."
         }
       ],
-      "observable_result": "Install OK",
-      "evidence_state": "unverified",
+      "observable_result": "The full Forge-scoped token value is available to copy for CLI login.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "account",
+      "interface": "cli",
+      "action": "Run `forge login` and authenticate with the Atlassian account email and scoped token.",
+      "required_fields": [
+        {
+          "label": "CLI analytics preference",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Account email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "API scoped token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Forge reports a successful login.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create the free Atlassian cloud developer site and complete its setup wizard.",
+      "required_fields": [
+        {
+          "label": "Developer site email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "A free cloud developer site with Jira available is ready for app install.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Run `forge create`, choose `development`, select Jira UI Kit `jira-issue-panel`, and enter the generated app directory.",
+      "required_fields": [
+        {
+          "label": "App name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Default environment",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Tutorial uses development."
+        },
+        {
+          "label": "Atlassian app",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Jira."
+        },
+        {
+          "label": "Category",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "UI Kit."
+        },
+        {
+          "label": "Template",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "jira-issue-panel."
+        }
+      ],
+      "observable_result": "The generated app directory contains the manifest and source files.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Run `forge deploy` from the app top-level directory.",
+      "required_fields": [],
+      "observable_result": "Forge reports a successful deploy without compilation errors.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1",
         "S2"
       ]
     },
     {
-      "step_number": 5,
-      "kind": "verification",
-      "interface": "web-ui",
-      "action": "Open Jira issue; confirm hello-world panel.",
+      "step_number": 9,
+      "kind": "external-authorization",
+      "interface": "cli",
+      "action": "Run `forge install`, select Jira, enter the developer-site URL, and complete any prompted consent.",
       "required_fields": [
         {
-          "label": "Documented required input",
-          "field_type": "other",
-          "evidence_state": "unverified",
+          "label": "Atlassian context",
+          "field_type": "select",
+          "evidence_state": "documented",
           "source_ids": [
             "S2"
           ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+          "notes": "Jira."
+        },
+        {
+          "label": "Site URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Install consent",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Complete any prompted authorization for required API access."
         }
       ],
-      "observable_result": "Panel visible",
-      "evidence_state": "unverified",
+      "observable_result": "The CLI displays the successful installation message.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "While signed in, open a Jira issue, select Apps, and select the installed app.",
+      "required_fields": [],
+      "observable_result": "The hello-world issue panel is visible on the Jira issue.",
+      "evidence_state": "documented",
       "source_ids": [
         "S2"
       ]
@@ -151,55 +335,169 @@
   ],
   "prerequisites": [
     {
-      "description": "Node 22/24 LTS + npm; @forge/cli.",
+      "description": "JavaScript familiarity is expected by the Forge getting-started guide.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "Atlassian account + Forge-scoped API token.",
+      "description": "Forge apps cannot be viewed by anonymous users; the tester must be logged in to the cloud developer site.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A scoped API token with Forge selected must be created in Atlassian account security settings before CLI login.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "Free cloud developer site.",
+      "description": "forge install requires authorizing the app onto the chosen Jira site context.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Atlassian must finish provisioning the free cloud developer site before install and verification.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "description": "forge deploy must finish building and deploying before forge install can link the app to the site.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Forge CLI stores authenticated developer credentials after forge login or environment-variable auth.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "forge deploy builds and deploys the app; forge install links it to the developer site.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional manifest title customization before first deploy",
+      "reason": "The tutorial changes the panel title, but a default title still reaches a visible hello-world panel.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "forge tunnel",
+      "reason": "Used for iterative local changes after first install, not required to observe first success.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Part 2 Jira API call and Part 3 UI Kit tutorials",
+      "reason": "Occur after the Part 1 hello-world panel is visible.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Marketplace listing and production environments",
+      "reason": "Occur after local install and hello-world verification.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Compass-specific integration getting started",
+      "reason": "Different product surface from the shared Forge setup and selected Jira hello world.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "external_gates": [],
-  "unavoidable_waits": [],
-  "platform_outcomes": [],
-  "excluded": [],
   "sources": [
     {
       "id": "S1",
-      "title": "Getting started with Forge",
+      "title": "Prepare to build your first Forge app",
       "url": "https://developer.atlassian.com/platform/forge/getting-started/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Getting started with Forge"
+        "Node.js 22.x or 24.x and Forge CLI setup",
+        "Scoped Forge API token login",
+        "Cloud developer site via go.atlassian.com/cloud-dev",
+        "Peer hello-world product links",
+        "create, deploy, install order"
       ]
     },
     {
       "id": "S2",
-      "title": "Jira hello world",
+      "title": "Build a Jira hello world app",
       "url": "https://developer.atlassian.com/platform/forge/build-a-hello-world-app-in-jira/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Jira hello world"
+        "Jira issue panel template path",
+        "development environment default",
+        "forge create, deploy, and install",
+        "Anonymous-user restriction",
+        "Issue Apps panel verification"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Atlassian cloud developer site signup",
+      "url": "https://www.atlassian.com/try/cloud/signup?developer=true",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free development sites for Jira Software, Jira Service Management, and Confluence",
+        "Work email and social signup options",
+        "No credit card required"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Start building with Atlassian",
+      "url": "https://developer.atlassian.com/developer-guide/start-building-with-atlassian/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Forge recommended for new apps",
+        "Jira hello world featured as a getting-started tutorial"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Getting started with Forge for Jira Software",
+      "url": "https://developer.atlassian.com/cloud/jira/software/getting-started-with-forge/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Forge preferred for Jira Software",
+        "Building a hello world app in Jira listed first under Start today"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Has the machine-drafted Atlassian route been independently shortest-path audited?",
-      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
-      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
+      "question": "What exact required fields appear after submitting work email on a cold Atlassian account signup, including password and email verification?",
+      "impact": "Account-creation field counts cannot be finalized, so public action and field counts stay withheld.",
+      "evidence_needed": "A dated cold walkthrough of Atlassian account creation through the email route without an existing login."
     }
   ],
   "counts": null
