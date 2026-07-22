@@ -7,17 +7,27 @@
   "category": "B2B SaaS and enterprise ecosystems",
   "surface": {
     "name": "Forge CLI: Jira hello-world issue panel",
-    "selection_basis": "Forge getting started + Jira hello-world: CLI login, developer site, create/deploy/install, visible panel.",
+    "selection_basis": "Atlassian documents Forge as the recommended cloud app platform. Getting started presents peer hello-world tutorials for Bitbucket, Confluence, Jira, and Jira Service Management after shared setup. Start building with Atlassian and Jira Software Getting started with Forge both highlight the Jira hello-world tutorial as the featured first app. Selected route: create, deploy, install, and view the Jira UI Kit jira-issue-panel hello world.",
     "alternatives_considered": [
       {
-        "name": "Confluence/Bitbucket/JSM hello world",
-        "url": "https://developer.atlassian.com/platform/forge/getting-started/",
-        "reason_not_primary": "Peer products."
+        "name": "Confluence Forge hello world",
+        "url": "https://developer.atlassian.com/platform/forge/build-a-hello-world-app-in-confluence/",
+        "reason_not_primary": "Peer official tutorial after shared Forge setup; uses confluence-macro and a different host verification surface."
       },
       {
-        "name": "Raw Jira REST",
+        "name": "Bitbucket Forge hello world",
+        "url": "https://developer.atlassian.com/platform/forge/build-a-hello-world-app-in-bitbucket/",
+        "reason_not_primary": "Peer official tutorial that requires a shared Bitbucket team workspace instead of the free cloud developer site path used for Jira and Confluence."
+      },
+      {
+        "name": "Jira Service Management Forge hello world",
+        "url": "https://developer.atlassian.com/platform/forge/build-a-hello-world-app-in-jira-service-management/",
+        "reason_not_primary": "Peer official tutorial with a queue-page module and different verification navigation."
+      },
+      {
+        "name": "Raw Jira REST without Forge",
         "url": "https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/",
-        "reason_not_primary": "Forge is recommended app path."
+        "reason_not_primary": "Atlassian recommends Forge for new cloud apps; REST alone is not the documented first-app onboarding path."
       }
     ]
   },
@@ -25,161 +35,275 @@
   "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Forge setup through visible Jira panel.",
+    "developer_intent": "Create an Atlassian developer identity and reach a first visible Forge hello-world app on Jira Cloud.",
     "starting_url": "https://developer.atlassian.com/platform/forge/getting-started/",
     "assumed_prior_state": [
-      "Node LTS available."
+      "The developer has a supported browser, email address, and a workstation that can install Node.js and npm.",
+      "No Atlassian account, Forge API token, cloud developer site, or Forge app exists yet."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Install and view Jira hello-world issue panel",
+    "official_milestone": "The Jira hello-world issue panel is visible on a Jira issue after Apps selection.",
     "normalized_outcome": "Installed Forge app panel visible on a Jira issue.",
-    "observable_completion_signal": "Hello-world panel renders",
+    "observable_completion_signal": "On a signed-in Jira issue, selecting Apps then the installed app shows the hello-world issue panel.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "Getting started deploy/install; Jira tutorial issue panel template.",
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
+      "official_label_or_terminal_state": "Jira tutorial View your app: issue panel visible after Apps selection.",
+      "source_ids": ["S2"]
     },
-    "why_this_is_the_boundary": "Visible installed app is first success.",
-    "source_ids": [
-      "S1",
-      "S2"
-    ]
+    "why_this_is_the_boundary": "This is the earliest observable installed-app success in the selected official Jira hello-world tutorial.",
+    "source_ids": ["S1", "S2"]
   },
   "prerequisites": [
     {
       "order": 1,
-      "type": "software",
-      "requirement": "Node 22/24 LTS + npm; @forge/cli.",
+      "type": "knowledge",
+      "requirement": "Forge apps are written in JavaScript; the shared guide expects JavaScript familiarity.",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1"]
     },
     {
       "order": 2,
-      "type": "account",
-      "requirement": "Atlassian account + Forge-scoped API token.",
+      "type": "software",
+      "requirement": "Node.js LTS 22.x or 24.x and npm must be available before installing the Forge CLI.",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1"]
     },
     {
       "order": 3,
       "type": "account",
-      "requirement": "Free cloud developer site.",
+      "requirement": "An Atlassian account email is required for scoped API token creation and the free cloud developer site.",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1", "S3"]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "configure",
+      "phase": "access",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Install @forge/cli; forge --version.",
-      "details": [],
-      "input": "npm",
-      "output": "CLI",
-      "success_signal": "Version prints",
-      "failure_or_wait": "Perms",
+      "interface": "console",
+      "action": "Create or sign in to an Atlassian account usable for Forge development.",
+      "details": [
+        "Cloud developer signup accepts a work email or Google, Microsoft, Apple, or Slack identity.",
+        "No credit card is required for free development sites."
+      ],
+      "input": "Email or supported social identity.",
+      "output": "Atlassian account email.",
+      "success_signal": "The developer can open account security settings and cloud developer signup with that identity.",
+      "failure_or_wait": "Missing identity or incomplete signup blocks token and site creation.",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1", "S3"]
     },
     {
       "step_number": 2,
-      "phase": "authenticate",
+      "phase": "install",
       "actor": "developer",
-      "interface": "browser",
-      "action": "Create Forge API token; forge login.",
-      "details": [],
-      "input": "Account",
-      "output": "CLI auth",
-      "success_signal": "Logged in",
-      "failure_or_wait": "Bad token",
+      "interface": "cli",
+      "action": "Install Node.js LTS 22.x or 24.x and run `node --version`.",
+      "details": [
+        "On macOS and Linux, Atlassian recommends nvm (`nvm install --lts` and `nvm use --lts`).",
+        "Restart the terminal if `nvm` or `node` is not found.",
+        "Do not install or run Forge as root."
+      ],
+      "input": "Supported workstation and install permission.",
+      "output": "Supported Node.js runtime.",
+      "success_signal": "`node --version` reports 22.x or 24.x.",
+      "failure_or_wait": "Unsupported Node, installer permission errors, or command-not-found require repairing the Node install and retrying.",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1"]
     },
     {
       "step_number": 3,
-      "phase": "account",
+      "phase": "install",
       "actor": "developer",
-      "interface": "browser",
-      "action": "Create cloud developer site.",
-      "details": [],
-      "input": "Account",
-      "output": "Site",
-      "success_signal": "Site ready",
-      "failure_or_wait": "Provision wait",
+      "interface": "cli",
+      "action": "Run `npm install -g @forge/cli`, then run `forge --version`.",
+      "details": [
+        "Forge must not be installed with root privileges."
+      ],
+      "input": "Supported Node.js and npm.",
+      "output": "Installed Forge CLI.",
+      "success_signal": "The CLI prints its version.",
+      "failure_or_wait": "If no version appears, repeat installation, repair npm permissions, and restart the terminal if needed.",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1"]
     },
     {
       "step_number": 4,
-      "phase": "execute",
+      "phase": "access",
       "actor": "developer",
-      "interface": "cli",
-      "action": "forge create (jira-issue-panel); deploy; install.",
-      "details": [],
-      "input": "CLI+site",
-      "output": "Installed app",
-      "success_signal": "Install OK",
-      "failure_or_wait": "Compile/consent",
+      "interface": "console",
+      "action": "Create an Atlassian API token with scopes for Forge.",
+      "details": [
+        "Open https://id.atlassian.com/manage-profile/security/api-tokens.",
+        "Choose Create API token with scopes.",
+        "Enter a token name and expiry, select Forge as the app, confirm recommended or custom scopes, then create and copy the token."
+      ],
+      "input": "Authenticated Atlassian account.",
+      "output": "Forge-scoped API token value.",
+      "success_signal": "The full token is available to paste into `forge login`.",
+      "failure_or_wait": "Missing Forge app selection, scopes, expiry, or copied token value blocks CLI authentication.",
       "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
+      "source_ids": ["S1"]
     },
     {
       "step_number": 5,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `forge login`, answer the analytics prompt, and authenticate with the account email and scoped token.",
+      "details": [
+        "On systems without a supported keychain or libsecret, set `FORGE_EMAIL` and `FORGE_API_TOKEN` instead of running `forge login`."
+      ],
+      "input": "Atlassian email and Forge-scoped token.",
+      "output": "Authenticated Forge CLI.",
+      "success_signal": "Forge reports a successful login.",
+      "failure_or_wait": "Wrong email, token, scopes, keychain access, or root execution requires correcting authentication and retrying.",
+      "required": true,
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 6,
+      "phase": "access",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create the free cloud developer site, wait for provisioning, sign in, and complete the setup wizard.",
+      "details": [
+        "Open http://go.atlassian.com/cloud-dev and create the site with the Atlassian account email.",
+        "The free developer site includes Confluence and Jira applications used for install and verification.",
+        "Forge apps are not visible to anonymous users; remain signed in while testing."
+      ],
+      "input": "Authenticated Atlassian account.",
+      "output": "Ready Jira-capable cloud developer site URL.",
+      "success_signal": "The setup wizard is complete and Jira is available on the site.",
+      "failure_or_wait": "Site provisioning or an incomplete wizard delays install and verification.",
+      "required": true,
+      "source_ids": ["S1", "S2", "S3"]
+    },
+    {
+      "step_number": 7,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `forge create`, name the app, set the default environment to `development`, select Jira, UI Kit, and the `jira-issue-panel` template, then enter the app directory.",
+      "details": [
+        "Forge prompts for a default environment when creating a new app; the Jira tutorial uses `development`."
+      ],
+      "input": "Authenticated Forge CLI and writable parent directory.",
+      "output": "Generated Jira issue-panel Forge app.",
+      "success_signal": "The app directory contains `manifest.yml`, package files, and generated source.",
+      "failure_or_wait": "Naming, environment, product, category, template, or filesystem errors prevent project generation.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 8,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "From the app top-level directory, run `forge deploy` and wait for build, compilation, and deployment to finish.",
+      "details": [
+        "`forge deploy` must succeed before `forge install` because installation links the deployed app to a site."
+      ],
+      "input": "Generated Forge app.",
+      "output": "App deployed to the development environment.",
+      "success_signal": "Forge reports a successful deploy without compilation errors.",
+      "failure_or_wait": "Lint, manifest, compile, bundle, authentication, or platform errors must be corrected before redeploying.",
+      "required": true,
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 9,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run `forge install`, select Jira as the Atlassian context, enter the developer-site URL, and complete any prompted consent.",
+      "details": [
+        "Use the site hostname such as `example.atlassian.net`."
+      ],
+      "input": "Successful deploy and Jira development site URL.",
+      "output": "Forge app installed on the Jira site.",
+      "success_signal": "The CLI displays the successful installation message.",
+      "failure_or_wait": "Wrong context, URL, permissions, or consent prevents the app from being ready to use.",
+      "required": true,
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 10,
       "phase": "verify",
       "actor": "developer",
-      "interface": "browser",
-      "action": "Open Jira issue; confirm hello-world panel.",
-      "details": [],
-      "input": "Install",
-      "output": "Verified",
-      "success_signal": "Panel visible",
-      "failure_or_wait": "Wrong context",
+      "interface": "console",
+      "action": "While signed in, create or open a Jira issue, select the Apps grid control, and select the installed app.",
+      "details": [
+        "The selected Forge module renders as an issue panel."
+      ],
+      "input": "Signed-in Jira user and installed Forge app.",
+      "output": "Visible Forge hello-world issue panel.",
+      "success_signal": "The hello-world issue panel is visible on the Jira issue.",
+      "failure_or_wait": "Anonymous access, missing install, wrong site, or an unavailable Apps entry means the documented terminal has not been reached.",
       "required": true,
-      "source_ids": [
-        "S2"
-      ]
+      "source_ids": ["S2"]
     }
   ],
-  "branches": [],
+  "branches": [
+    {
+      "at_step": 2,
+      "condition": "Node.js is absent on macOS or Linux.",
+      "path": "Install nvm, run `nvm install --lts` and `nvm use --lts`, restart the terminal if needed, then confirm `node --version` reports 22.x or 24.x before installing the Forge CLI.",
+      "effect_on_first_success": "A version-manager Node setup precedes the CLI install.",
+      "source_ids": ["S1"]
+    },
+    {
+      "at_step": 5,
+      "condition": "The local system lacks a supported keychain or libsecret.",
+      "path": "Set `FORGE_EMAIL` and `FORGE_API_TOKEN` as environment variables and do not run `forge login`.",
+      "effect_on_first_success": "Keychain login is replaced by environment-variable authentication.",
+      "source_ids": ["S1"]
+    },
+    {
+      "at_step": 7,
+      "condition": "A peer host-product hello world is chosen instead of Jira.",
+      "path": "Follow that product's official Forge hello-world tutorial for template, install context, and verification navigation.",
+      "effect_on_first_success": "The visible module and host surface change with the selected product.",
+      "source_ids": ["S1"]
+    }
+  ],
   "friction_gates": [
     {
       "at_step": 2,
-      "type": "credential",
-      "description": "Forge API token required.",
+      "type": "installation",
+      "description": "Supported Node.js LTS installation and `node --version` verification must precede Forge CLI installation.",
       "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1"]
     },
     {
-      "at_step": 3,
-      "type": "account",
-      "description": "Developer site required.",
+      "at_step": 4,
+      "type": "credential",
+      "description": "A scoped Forge API token with name, expiry, Forge app selection, and scopes must be created and copied for CLI authentication.",
       "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
+      "source_ids": ["S1"]
+    },
+    {
+      "at_step": 5,
+      "type": "environment",
+      "description": "Keychain or libsecret availability determines whether `forge login` or `FORGE_EMAIL`/`FORGE_API_TOKEN` is used; root execution is prohibited.",
+      "documented_requirement": true,
+      "source_ids": ["S1"]
+    },
+    {
+      "at_step": 6,
+      "type": "wait",
+      "description": "The free cloud developer site must finish provisioning before the setup wizard and later install can complete.",
+      "documented_requirement": true,
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "at_step": 9,
+      "type": "permission",
+      "description": "`forge install` requires selecting the Jira context and authorizing the app onto the developer site.",
+      "documented_requirement": true,
+      "source_ids": ["S2"]
     }
   ],
   "time_to_first_success": {
@@ -190,45 +314,120 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Getting started with Forge",
+      "title": "Prepare to build your first Forge app",
       "url": "https://developer.atlassian.com/platform/forge/getting-started/",
       "official_domain": true,
       "source_type": "documentation",
       "accessed_at": "2026-07-22",
-      "last_updated_if_shown": null,
+      "last_updated_if_shown": "Mar 30, 2026",
       "sections_used": [
-        "Node",
-        "CLI",
-        "login",
-        "site",
-        "create/deploy/install"
+        "Before you begin",
+        "Set up Node.js",
+        "Install the Forge CLI",
+        "Build your first Forge app",
+        "Log in with an Atlassian API scoped token",
+        "Using environment variables to login",
+        "Next steps"
       ],
       "evidence_supported": [
-        "forge login",
-        "developer site"
+        "Node.js 22.x or 24.x requirement",
+        "Forge CLI install and non-root warning",
+        "Scoped Forge API token creation",
+        "forge login and env-var auth",
+        "Cloud developer site via go.atlassian.com/cloud-dev",
+        "Peer Bitbucket, Confluence, Jira, and JSM hello-world destinations",
+        "create, deploy, install order"
       ]
     },
     {
       "id": "S2",
-      "title": "Jira hello world",
+      "title": "Build a Jira hello world app",
       "url": "https://developer.atlassian.com/platform/forge/build-a-hello-world-app-in-jira/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": "Apr 16, 2026",
+      "sections_used": [
+        "Before you begin",
+        "Set up a cloud developer site",
+        "Create your app",
+        "Install your app",
+        "View your app"
+      ],
+      "evidence_supported": [
+        "development default environment",
+        "Jira UI Kit jira-issue-panel template",
+        "deploy before install",
+        "Jira context and site URL install prompts",
+        "Anonymous-user restriction",
+        "Issue Apps panel verification"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Atlassian cloud developer site signup",
+      "url": "https://www.atlassian.com/try/cloud/signup?developer=true",
+      "official_domain": true,
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Cloud Developer Bundle",
+        "Create your account"
+      ],
+      "evidence_supported": [
+        "Free development sites for Jira Software, Jira Service Management, and Confluence",
+        "Work email field",
+        "Google, Microsoft, Apple, and Slack signup options",
+        "No credit card required"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Start building with Atlassian",
+      "url": "https://developer.atlassian.com/developer-guide/start-building-with-atlassian/",
       "official_domain": true,
       "source_type": "documentation",
       "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "create",
-        "install"
+        "Explore Forge"
       ],
       "evidence_supported": [
-        "jira-issue-panel"
+        "Forge recommended for new apps",
+        "Jira hello world listed as a featured getting-started tutorial"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Getting started with Forge for Jira Software",
+      "url": "https://developer.atlassian.com/cloud/jira/software/getting-started-with-forge/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": "Jun 18, 2026",
+      "sections_used": [
+        "Getting started with Forge"
+      ],
+      "evidence_supported": [
+        "Forge preferred for Jira Software cloud apps",
+        "Building a hello world app in Jira listed first under Start today"
       ]
     }
   ],
-  "uncertainties": [],
+  "uncertainties": [
+    {
+      "question": "What exact required fields appear after submitting work email on a cold Atlassian account signup, including password and email verification?",
+      "impact": "Account-creation field counts for the email route remain incomplete even though work email and social options are publicly visible.",
+      "reason_unresolved": "The public cloud developer signup page exposes work email and social providers, but the full post-submit email-route form was not fully inventoried in this pass.",
+      "checked_source_ids": ["S3"]
+    }
+  ],
   "excluded_after_success": [
-    "Part 2 API call",
-    "Marketplace"
+    "Optional manifest title customization before first deploy",
+    "forge tunnel and iterative local reloads",
+    "Part 2 Jira API call and Part 3 UI Kit customization tutorials",
+    "Marketplace listing, production environments, permissions upgrades, remotes, and continuous delivery"
   ],
   "candidate_paths": [],
   "candidate_path_gap": null
