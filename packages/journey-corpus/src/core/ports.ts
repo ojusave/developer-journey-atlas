@@ -24,6 +24,14 @@ export interface MetricRow {
   comparability_status: string;
 }
 
+/** Quality and comparability fields loaded from ds-quality.json. */
+export interface QualityRow {
+  slug: string;
+  decision_count: number;
+  re_researched: boolean;
+  comparability_status: string;
+}
+
 /** Dataset-level metadata surfaced to the UI. */
 export interface DatasetMeta {
   count: number;
@@ -77,6 +85,7 @@ export interface DataStore {
   getRow(slug: string): MetricRow | undefined;
   /** Canonical record. May be absent even when a row exists (degrade gracefully). */
   getRecord(slug: string): PlatformRecord | undefined;
+  getQuality(slug: string): QualityRow | undefined;
 }
 
 /** A single documented onboarding signal for a platform (Phase 2 research output). */

@@ -175,6 +175,7 @@ const approval = (basis, evidence) => ({
 
 const mappings = [];
 const reviewedPostMigrationPaths = new Set([
+  "render.yaml",
   "src/domain/evidence-validation.test.ts",
   "src/domain/evidence-validation.ts",
 ]);
@@ -214,7 +215,9 @@ for (const { path, blob } of scannerEntries) {
       : transformation === "moved"
       ? "Place the canonical blocker taxonomy behind an explicit package boundary."
       : transformation === "post_migration_change"
-        ? "Extended after the verified migration to enforce the diagnosis evidence contract."
+        ? path === "render.yaml"
+          ? "Replaced after the verified migration with the canonical Developer Journey Atlas deployment."
+          : "Extended after the verified migration to enforce the diagnosis evidence contract."
       : transformation === "schema_wrapped"
         ? "Integrate the original application with the combined Atlas repository while preserving runtime compatibility."
         : "Preserved at the same path.",

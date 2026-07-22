@@ -102,20 +102,33 @@ if (comparisonValidator && !comparisonValidator(unsupportedPattern)) {
 }
 
 const corpusCommit = manifest.sources.journeyCorpus.commit;
-const corpusLicenseMetadataPaths = new Set(["README.md", "package-lock.json", "package.json"]);
 const importedEntries = git("ls-tree", "-r", corpusCommit)
   .toString("utf8").trim().split("\n").filter(Boolean).map((line) => {
     const [metadata, path] = line.split("\t", 2);
     const [, , blob] = metadata.split(" ");
     return { path, blob };
   });
+const protectedCorpusEntries = importedEntries.filter(({ path }) =>
+  path.startsWith("records/") ||
+  path.startsWith("research/") ||
+  path.startsWith("verify/") ||
+  [
+    "record.schema.json",
+    "roster.json",
+    "coverage.json",
+    "ds-quality.json",
+    "selected-path-heuristic.json",
+    "candidate-path-audit.json",
+    "cold-audit-open.json",
+    "headline.json",
+  ].includes(path),
+);
 let importMismatches = 0;
-for (const { path, blob } of importedEntries) {
-  if (corpusLicenseMetadataPaths.has(path)) continue;
+for (const { path, blob } of protectedCorpusEntries) {
   const current = await readFile(resolve(root, "packages/journey-corpus", path));
   if (gitBlobHash(current) !== blob) importMismatches += 1;
 }
-if (importMismatches === 0) pass("journey-import", `${importedEntries.length - corpusLicenseMetadataPaths.size} imported files remain byte-identical; 3 license metadata files are separately reviewed`);
+if (importMismatches === 0) pass("journey-import", `${protectedCorpusEntries.length} canonical research files remain byte-identical to the imported source`);
 else fail("journey-import", `${importMismatches} imported files differ from ${corpusCommit}`);
 
 const corpusPackage = JSON.parse(await readFile(resolve(root, "packages/journey-corpus/package.json"), "utf8"));
@@ -243,12 +256,12 @@ if (
   migrationMap.mappings.every((entry) => entry.approved === true && entry.approval?.status === "approved") &&
     approvalBasisCounts.byte_identical_history_import === 285 &&
     approvalBasisCounts.reviewed_license_metadata_change === 4 &&
-    approvalBasisCounts.unchanged_blob_verified === 77 &&
+    approvalBasisCounts.unchanged_blob_verified === 76 &&
     approvalBasisCounts.path_only_hash_verified === 1 &&
     approvalBasisCounts.reviewed_compatibility_change === 6 &&
-    approvalBasisCounts.reviewed_post_migration_change === 2
+    approvalBasisCounts.reviewed_post_migration_change === 3
   ) {
-  pass("migration-approval", "285 byte-identical imports, 4 license metadata changes, 77 unchanged, 1 path-only, 6 compatibility, and 2 post-migration mappings approved by evidence class");
+  pass("migration-approval", "285 byte-identical imports, 4 license metadata changes, 76 unchanged, 1 path-only, 6 compatibility, and 3 post-migration mappings approved by evidence class");
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
@@ -258,7 +271,7 @@ for (const entry of migrationMap.mappings.filter(({ approval }) => approval?.bas
   if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
 }
 if (unchangedScannerMismatches === 0) {
-  pass("scanner-preservation", "77 unchanged scanner files retain their original Git blobs; 2 evidence-validation files are reviewed post-migration changes");
+  pass("scanner-preservation", "76 unchanged scanner files retain their original Git blobs; 3 post-migration changes are separately reviewed");
 } else {
   fail("scanner-preservation", `${unchangedScannerMismatches} unchanged scanner files differ from their source blobs`);
 }

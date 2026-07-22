@@ -110,3 +110,21 @@ test("known platform short-circuits to the existing record", async () => {
   assert.equal(events[0].type, "known");
   assert.equal(events[0].slug, "peer");
 });
+
+test("drafts cannot cite URLs that were not returned by the docs search", async () => {
+  const repo = new FakeRepoWriter();
+  const ungrounded = draftRecord({
+    sources: [{ id: "S1", title: "Invented", url: "https://invented.example/docs" }],
+  });
+  const deps = {
+    search: new FakeSearchProvider(hits),
+    llm: new FakeLLMProvider(ungrounded),
+    repo,
+    store: store(),
+    buildRow: selectedPathRow,
+  };
+  const events = await collect("Acme", deps);
+  assert.ok(events.some((event) => event.type === "error" && event.code === "source_grounding_failed"));
+  assert.ok(!events.some((event) => event.type === "result"));
+  assert.equal(repo.calls, 0);
+});

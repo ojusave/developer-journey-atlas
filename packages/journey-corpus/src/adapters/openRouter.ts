@@ -95,8 +95,8 @@ export class OpenRouterProvider implements LLMProvider {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://first-mile-atlas.onrender.com",
-          "X-Title": "First-Mile Atlas",
+          "HTTP-Referer": "https://developer-journey-atlas.onrender.com",
+          "X-Title": "Developer Journey Atlas",
         },
         body: JSON.stringify({
           model: this.model,

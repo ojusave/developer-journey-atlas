@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { DataStore, MetricRow } from "../core/ports.js";
 import { buildAssessment } from "../core/assessment.js";
+import { buildDocumentedOnboardingLoad } from "../core/onboardingLoad.js";
 import { sendData, sendError } from "./http.js";
 
 /**
@@ -33,7 +34,7 @@ export function getPlatform(store: DataStore) {
       sendError(res, 404, "not_found", `No platform found for "${slug}".`);
       return;
     }
-    const assessment = buildAssessment(row, store.getRecord(slug));
+    const assessment = buildAssessment(row, store.getRecord(slug), buildDocumentedOnboardingLoad(row, store));
     sendData(res, assessment, { recordAvailable: assessment.recordAvailable });
   };
 }
