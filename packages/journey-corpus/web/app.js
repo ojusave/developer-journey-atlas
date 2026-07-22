@@ -181,14 +181,20 @@ function stepItem(s) {
 }
 
 function renderAssessment(a) {
-  const prereqs = a.prerequisites.length
-    ? `<div class="chips">${a.prerequisites
+  const prerequisites = a.prerequisites || [];
+  const frictionGates = a.frictionGates || [];
+  const sourceList = a.sources || [];
+  const stepList = a.steps || [];
+  const firstSuccess = a.firstSuccess || {};
+
+  const prereqs = prerequisites.length
+    ? `<div class="chips">${prerequisites
         .map((p) => `<span class="chip ${p.required ? "req" : ""}">${esc(p.type)}${p.required ? " (required)" : ""}</span>`)
         .join("")}</div>`
     : '<p class="lede">No prerequisites documented for this route.</p>';
 
-  const gates = a.frictionGates.length
-    ? `<ul class="gate-list">${a.frictionGates
+  const gates = frictionGates.length
+    ? `<ul class="gate-list">${frictionGates
         .map((g) => `<li><span class="chip">${esc(g.type)}</span> ${esc(g.description)}${g.atStep ? ` <span class="gate-step">(at step ${num(g.atStep)})</span>` : ""}</li>`)
         .join("")}</ul>`
     : '<p class="lede">No friction gates documented on this route.</p>';
@@ -197,15 +203,15 @@ function renderAssessment(a) {
     ? `${esc(a.timeToFirstSuccess.value)} ${a.timeToFirstSuccess.vendorClaim ? "(vendor claim)" : ""}`
     : "Not documented";
 
-  const sources = a.sources.length
-    ? `<ul class="sources-list">${a.sources
+  const sources = sourceList.length
+    ? `<ul class="sources-list">${sourceList
         .slice(0, 8)
         .map((s) => `<li><a href="${esc(s.url)}" rel="noreferrer">${esc(s.title)}</a></li>`)
-        .join("")}${a.sources.length > 8 ? `<li>+ ${a.sources.length - 8} more in the record</li>` : ""}</ul>`
+        .join("")}${sourceList.length > 8 ? `<li>+ ${sourceList.length - 8} more in the record</li>` : ""}</ul>`
     : '<p class="lede">See the full record for sources.</p>';
 
-  const steps = a.steps.length
-    ? `<ol class="steps-list">${a.steps.map(stepItem).join("")}</ol>`
+  const steps = stepList.length
+    ? `<ol class="steps-list">${stepList.map(stepItem).join("")}</ol>`
     : '<p class="lede">Open the full record for the documented steps.</p>';
 
   const asOf = a.researchedAt
@@ -230,7 +236,7 @@ function renderAssessment(a) {
       <div class="summary-grid">
         <div class="summary-block">
           <p class="section-kicker">DOCUMENTED FIRST SUCCESS</p>
-          <p class="summary-answer">${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</p>
+          <p class="summary-answer">${esc(firstSuccess.milestone || firstSuccess.normalizedOutcome || a.outcome)}</p>
           <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
         </div>
         ${renderSignals(a.routeSignals)}
