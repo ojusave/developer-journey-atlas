@@ -1,5 +1,5 @@
 import type {
-  DataStore, DatasetMeta, DocHit, LLMProvider, MetricRow, PlatformRecord, QualityRow,
+  DataStore, DatasetMeta, DocHit, LLMProvider, MetricRow, PlatformRecord, QualityRow, ShortestPathAudit,
   RepoWriter, SearchProvider,
 } from "../core/ports.js";
 
@@ -12,6 +12,7 @@ export class InMemoryDataStore implements DataStore {
     private readonly rows: MetricRow[],
     records: Record<string, PlatformRecord> = {},
     private readonly quality: Record<string, QualityRow> = {},
+    private readonly audits: Record<string, ShortestPathAudit> = {},
     private readonly metaValue: DatasetMeta = {
       count: rows.length,
       generatedAt: "2026-07-19",
@@ -35,6 +36,9 @@ export class InMemoryDataStore implements DataStore {
   }
   getRecord(slug: string): PlatformRecord | undefined {
     return this.records.get(slug);
+  }
+  getAudit(slug: string): ShortestPathAudit | undefined {
+    return this.audits[slug];
   }
   getQuality(slug: string): QualityRow | undefined {
     return this.quality[slug];

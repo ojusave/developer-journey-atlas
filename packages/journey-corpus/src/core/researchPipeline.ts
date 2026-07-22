@@ -59,8 +59,9 @@ function validateSourceGrounding(record: PlatformRecord, docs: Array<{ url: stri
 
 /**
  * Orchestrate live research for an unknown platform: search official docs,
- * reconstruct a schema-valid record, measure and compare it, then (optionally)
- * open a draft PR. Every external step is isolated: a failure emits a typed
+ * reconstruct a schema-valid source-evidence record, show it without audited
+ * counts or comparison, then optionally open a draft PR. A separate shortest-
+ * path audit is required before publication. Every external step is isolated: a failure emits a typed
  * error/skip event and never throws out of the function. Push-based so the SSE
  * layer can flush each event as it happens.
  */
@@ -86,7 +87,7 @@ export async function runResearch(platform: string, deps: ResearchDeps, emit: Em
 
   let record: PlatformRecord;
   try {
-    emit({ type: "status", step: "reconstruct", message: "Reconstructing the documented onboarding route from official docs…" });
+    emit({ type: "status", step: "reconstruct", message: "Reconstructing a source-evidence draft from account creation to first success…" });
     record = await deps.llm.reconstructRecord(platform, docs);
   } catch (err) {
     emit({ type: "error", code: "llm_failed", message: msg(err) });
@@ -101,7 +102,7 @@ export async function runResearch(platform: string, deps: ResearchDeps, emit: Em
 
   let assessment: Assessment;
   try {
-    emit({ type: "status", step: "assemble", message: "Assembling the documented route from official docs…" });
+    emit({ type: "status", step: "assemble", message: "Assembling the unaudited source draft with counts withheld…" });
     const row = deps.buildRow(record);
     assessment = buildAssessment(row, record, buildDocumentedOnboardingLoad(row, deps.store));
   } catch (err) {
@@ -122,7 +123,7 @@ export async function runResearch(platform: string, deps: ResearchDeps, emit: Em
   if (record.research_status !== "complete") {
     emit({
       type: "pr_skipped",
-      reason: `Record marked "${record.research_status}", so no automatic PR was opened. Review it before submitting.`,
+      reason: `Record marked "${record.research_status}", so no automatic PR was opened. Resolve its evidence gaps before creating a shortest-path audit.`,
     });
     emit({ type: "done" });
     return;

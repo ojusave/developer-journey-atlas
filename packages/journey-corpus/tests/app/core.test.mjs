@@ -38,7 +38,9 @@ test("buildAssessment surfaces documented content and degrades without a record"
   assert.equal(a.steps.length, 0);
   assert.equal(a.prerequisites.length, 0);
   assert.equal(a.recordUrl, "/data/records/render.json");
-  assert.match(a.note, /not a ranking/);
+  assert.equal(a.auditStatus, "pending");
+  assert.equal(a.routeSignals, null);
+  assert.match(a.note, /Counts and peer comparison are withheld/);
   // The public assessment may expose direct counts, but never the internal
   // weighted effort score or a rank.
   assert.ok(!("heuristic_effort_score" in a));
@@ -61,18 +63,42 @@ test("buildAssessment surfaces documented steps and record detail when present",
     sources: [{ id: "S1", title: "Deploy tutorial", url: "https://render.com/docs" }],
     uncertainties: [],
   };
-  const a = buildAssessment(row(), record);
+  const pathAudit = {
+    audit_status: "verified",
+    audited_at: "2026-07-21",
+    route_selection: { selected: "Dashboard deploy", surface: "Dashboard" },
+    first_success: { outcome: "App is live.", observable_signal: "Root content loads." },
+    prerequisites: [{ description: "GitHub repository" }],
+    external_gates: [{ description: "Authorize GitHub" }],
+    unavoidable_waits: [{ description: "Wait for deploy" }],
+    required_path: [{
+      step_number: 1,
+      kind: "account",
+      interface: "web-ui",
+      action: "Create account",
+      observable_result: "Dashboard opens",
+      evidence_state: "documented",
+      source_ids: ["S1"],
+      required_fields: [{ label: "Email", field_type: "email", evidence_state: "documented", source_ids: ["S1"] }],
+    }],
+    sources: [{ id: "S1", title: "Deploy tutorial", url: "https://render.com/docs" }],
+    uncertainties: [],
+    counts: { required_actions: 1, required_fields: 1, external_gates: 1, unavoidable_waits: 1 },
+  };
+  const a = buildAssessment(row(), record, null, pathAudit);
   assert.equal(a.recordAvailable, true);
   assert.equal(a.organization, "Render Services, Inc.");
-  assert.equal(a.researchedAt, "2026-07-19");
-  assert.equal(a.firstSuccess.milestone, "You've deployed your first app.");
-  assert.equal(a.prerequisites[0].type, "account");
+  assert.equal(a.researchedAt, "2026-07-21");
+  assert.equal(a.firstSuccess.milestone, "App is live.");
+  assert.equal(a.prerequisites[0].type, "required");
   assert.equal(a.steps.length, 1);
-  assert.equal(a.steps[0].action, "Open docs");
-  assert.equal(a.steps[0].successSignal, "Docs load");
-  assert.equal(a.frictionGates[0].atStep, 3);
+  assert.equal(a.steps[0].action, "Create account");
+  assert.equal(a.steps[0].requiredFields[0].label, "Email");
+  assert.equal(a.steps[0].successSignal, "Dashboard opens");
+  assert.equal(a.frictionGates[0].type, "external gate");
   assert.equal(a.pathStepCount, 1);
   assert.equal(a.sourceCount, 1);
+  assert.equal(a.routeSignals.requiredFields, 1);
 });
 
 test("buildComparison reports distribution, not a rank, and excludes not-comparable peers", () => {
@@ -122,6 +148,15 @@ function quality(slug, overrides = {}) {
   };
 }
 
+function audit(slug, overrides = {}) {
+  return {
+    platform: { slug },
+    audit_status: "verified",
+    counts: { required_actions: 6, required_fields: 5, unavoidable_waits: 1, external_gates: 3 },
+    ...overrides,
+  };
+}
+
 test("documented onboarding load uses transparent components and anonymizes peers", () => {
   const rows = [
     row({ slug: "render", name: "Render", first_success_type: "deploy / host", required_developer_action_count: 8, wait_or_async_count: 1, gate_count: 3 }),
@@ -129,12 +164,21 @@ test("documented onboarding load uses transparent components and anonymizes peer
     row({ slug: "peer-b", name: "Peer B", first_success_type: "deploy / host", required_developer_action_count: 6, wait_or_async_count: 1, gate_count: 3 }),
     row({ slug: "peer-c", name: "Peer C", first_success_type: "deploy / host", required_developer_action_count: 10, wait_or_async_count: 2, gate_count: 4 }),
   ];
-  const store = new InMemoryDataStore(rows, {}, Object.fromEntries(rows.map((candidate) => [candidate.slug, quality(candidate.slug)])));
+  const audits = Object.fromEntries(rows.map((candidate) => [candidate.slug, audit(candidate.slug, {
+    counts: {
+      required_actions: candidate.required_developer_action_count,
+      required_fields: 5,
+      unavoidable_waits: candidate.wait_or_async_count,
+      external_gates: candidate.gate_count,
+    },
+  })]));
+  const store = new InMemoryDataStore(rows, {}, Object.fromEntries(rows.map((candidate) => [candidate.slug, quality(candidate.slug)])), audits);
   const load = buildDocumentedOnboardingLoad(rows[0], store);
   assert.equal(load.available, true);
   assert.equal(load.peerCount, 3);
   assert.equal(load.components.length, 4);
   assert.equal(load.components.find((component) => component.key === "requiredActions").peerMedian, 6);
+  assert.equal(load.components.find((component) => component.key === "requiredFields").peerMedian, 5);
   assert.match(load.note, /not a drop-off score/);
   const publicOutput = JSON.stringify(load);
   assert.doesNotMatch(publicOutput, /Peer A|peer-a|Peer B|peer-b|Peer C|peer-c/);
@@ -146,7 +190,8 @@ test("documented onboarding load refuses cohorts smaller than three", () => {
     row({ slug: "peer-a", first_success_type: "deploy / host" }),
     row({ slug: "peer-b", first_success_type: "other" }),
   ];
-  const store = new InMemoryDataStore(rows, {}, Object.fromEntries(rows.map((candidate) => [candidate.slug, quality(candidate.slug)])));
+  const audits = Object.fromEntries(rows.map((candidate) => [candidate.slug, audit(candidate.slug)]));
+  const store = new InMemoryDataStore(rows, {}, Object.fromEntries(rows.map((candidate) => [candidate.slug, quality(candidate.slug)])), audits);
   const load = buildDocumentedOnboardingLoad(rows[0], store);
   assert.equal(load.available, false);
   assert.equal(load.peerCount, 1);
@@ -161,7 +206,8 @@ test("documented onboarding load keeps research granularity cohorts separate", (
     row({ slug: "peer-c", first_success_type: "deploy / host" }),
   ];
   const qualityRows = Object.fromEntries(rows.map((candidate) => [candidate.slug, quality(candidate.slug, { re_researched: candidate.slug !== "render" })]));
-  const store = new InMemoryDataStore(rows, {}, qualityRows);
+  const audits = Object.fromEntries(rows.map((candidate) => [candidate.slug, audit(candidate.slug)]));
+  const store = new InMemoryDataStore(rows, {}, qualityRows, audits);
   const load = buildDocumentedOnboardingLoad(rows[0], store);
   assert.equal(load.available, false);
   assert.equal(load.peerCount, 0);

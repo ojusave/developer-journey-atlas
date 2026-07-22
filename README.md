@@ -1,19 +1,20 @@
 # Developer Journey Atlas
 
-Open, source-grounded research into the documented onboarding routes of developer platforms.
+Open, source-grounded research into the shortest required path from account creation to first developer success.
 
 [Live Atlas](https://developer-journey-atlas.onrender.com) | [Data manifest](https://developer-journey-atlas.onrender.com/data/index.json) | [LLM guide](https://developer-journey-atlas.onrender.com/llms.txt) | [Research method](docs/research-guide/research-method.md)
 
-> The Atlas describes official documentation. It does not contain observed conversion, activation, completion-time, or drop-off data.
+> The repository preserves 205 official-documentation evidence records. Only records that pass the new shortest-path audit expose action counts or peer context. This is not observed conversion, activation, completion-time, or drop-off data.
 
 ## Start here
 
 Search for a platform in the public wrapper. The result shows:
 
-- the selected documented route to first success;
-- required actions, waits, decisions, gates, and prerequisites;
+- the audit status for the selected platform;
+- every verified required action and field from account creation to first success;
+- unavoidable waits, external gates, platform outcomes, and explicit exclusions;
 - anonymous placement beside qualified same-category peers;
-- documentation-derived investigation prompts;
+- exact unresolved evidence when a route cannot yet be verified;
 - the official sources and complete evidence record.
 
 If the platform is missing, the optional research pipeline can search official docs, assemble a schema-valid draft, show it immediately, and open a draft pull request for human review.
@@ -35,14 +36,14 @@ Open `http://localhost:3000` and search for `Render`.
 
 ## What the comparison means
 
-`Documented onboarding load` is not a weighted score. It reports how many of four visible route signals sit above the median of an anonymous qualified peer cohort:
+Peer context is not a weighted score. When enough verified peers exist, it compares four visible signals with an anonymous qualified peer cohort:
 
 1. required developer actions;
-2. wait or async points;
-3. decision points; and
-4. documented friction gates.
+2. required fields;
+3. unavoidable waits; and
+4. external gates.
 
-A comparison appears only when at least three peers share the platform's category, normalized first-success boundary, completed research status, compatible granularity, and acceptable comparability status. Peer names are never returned by the public comparison.
+A comparison appears only when the subject and at least three peers have verified shortest-path audits, complete source research, the same category and normalized first-success type, compatible research granularity, and acceptable comparability metadata. Peer names are never returned by the public comparison.
 
 This is route structure, not a judgment of ease or quality. Real drop-off claims require observed journey evidence under the [diagnosis evidence contract](docs/research-guide/diagnosis-evidence-contract.md).
 
@@ -50,7 +51,9 @@ This is route structure, not a judgment of ease or quality. Real drop-off claims
 
 | Path | Purpose |
 | --- | --- |
-| `packages/journey-corpus/records/` | 205 canonical, source-grounded platform records |
+| `packages/journey-corpus/records/` | 205 preserved source-grounded evidence records |
+| `packages/journey-corpus/audits/` | Reviewed shortest-required-path audits |
+| `packages/journey-corpus/audit-status.json` | Corpus-wide verified, unresolved, blocked, and pending state |
 | `packages/journey-corpus/web/` | Public search and diagnosis wrapper |
 | `packages/journey-corpus/src/` | API, research adapters, comparison contract, and GitHub contribution flow |
 | `packages/blocker-taxonomy/` | 790 preserved blocker hypotheses, not observed causes |
@@ -65,11 +68,14 @@ This is route structure, not a judgment of ease or quality. Real drop-off claims
 - Human-readable catalog: [`packages/generated-views/atlas.md`](packages/generated-views/atlas.md)
 - JSON Lines projection: [`packages/generated-views/atlas.jsonl`](packages/generated-views/atlas.jsonl)
 - Individual evidence records: [`packages/journey-corpus/records/`](packages/journey-corpus/records)
+- Shortest-path audits: [`packages/journey-corpus/audits/`](packages/journey-corpus/audits)
+- Corpus audit status: [`packages/journey-corpus/audit-status.json`](packages/journey-corpus/audit-status.json)
 - Record schema: [`packages/journey-corpus/record.schema.json`](packages/journey-corpus/record.schema.json)
+- Audit schema: [`packages/journey-corpus/shortest-path-audit.schema.json`](packages/journey-corpus/shortest-path-audit.schema.json)
 - Retrieval guide: [`docs/research-guide/llm-retrieval-guide.md`](docs/research-guide/llm-retrieval-guide.md)
 - Deployed LLM entry point: [`/llms.txt`](https://developer-journey-atlas.onrender.com/llms.txt)
 
-Canonical records stay readable JSON. Generated views are rebuilt from those records and must not be edited directly.
+Canonical source records and audit records stay readable JSON. Source records are preserved during re-audit. Generated views must not be edited directly.
 
 ## Optional live research
 
@@ -104,6 +110,7 @@ For corpus-only work:
 
 ```sh
 npm --prefix packages/journey-corpus run validate
+npm --prefix packages/journey-corpus run audit:paths:check
 npm --prefix packages/journey-corpus run check
 npm --prefix packages/journey-corpus run test:app
 ```

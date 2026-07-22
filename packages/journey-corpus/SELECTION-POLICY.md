@@ -1,21 +1,39 @@
-# Workshop route selection policy
+# Shortest required path selection policy
 
-Date: 2026-07-19
+Date: 2026-07-21
 
-When official documentation presents peer getting-started routes, or when a
-cloud signup gate previously left a record `needs-human-judgment` or `blocked`,
-this workshop commits to one route using the following order:
+## Boundary
 
-1. Prefer a local, no-account, Docker, or OSS quickstart when official docs
-   offer one as a first-mile path.
-2. Otherwise prefer the vendor's first-listed, recommended, or "quickest"
-   cloud / dashboard quickstart (most commonly used surface).
-3. When signup is required but form fields are not publicly enumerated, record
-   "Sign up" as a single opaque step citing the official signup URL, then
-   reconstruct every publicly documented post-login step. Do not invent form
-   fields.
-4. Set `research_status` to `complete` only when the committed route has a
-   documented first-success terminal reconstructed from official sources.
+Every audited journey begins at account creation and ends at the earliest meaningful first-success outcome established by current official evidence.
 
-This policy is an explicit workshop decision. It does not claim the vendor
-named a single canonical path when the docs leave peers open.
+The account, tenant, credentials, product resources, connected repositories, legal acceptance, and permissions do not exist at the start unless the developer goal explicitly names a prior artifact, such as an existing Git repository to deploy.
+
+## Selected surface
+
+Use the platform's self-service web onboarding surface when one exists. Do not replace the product flow with a CLI, coding agent, infrastructure template, or third-party automation unless the selected developer goal explicitly requires that surface or no self-service path exists.
+
+## Shortest-path rule
+
+Reconstruct complete official candidate routes to the same outcome, then select lexicographically:
+
+1. Prefer a route without payment, administrator work, manual approval, or unavailable entitlement.
+2. Minimize required developer actions.
+3. When tied, prefer fewer unavoidable waits and fewer external-system handoffs.
+4. When still tied, prefer the vendor's documented recommended, quickstart, default, or first route.
+5. If a consequential tie remains, do not invent a winner. Mark the audit `needs-human-judgment`.
+
+No opaque weighted friction score is used.
+
+## Units
+
+- A required action is one developer interaction or implementation action that changes state.
+- A required field is tracked under the form action that contains it and counted separately.
+- Documentation reading, optional work, platform automation, and passive waiting are not developer actions.
+- Required agreements, verifications, permissions, and external authorizations are included.
+- Platform automation and waits remain visible in their own fields.
+
+## Publication gate
+
+The preserved source records in `records/` are evidence archives. A record is not a verified shortest path until a matching audit in `audits/` passes `shortest-path-audit.schema.json`, source-hash checks, evidence-reference checks, and cold or independent review.
+
+Only audits marked `verified` may expose action counts or peer comparison. All others must show their exact status and evidence gap.
