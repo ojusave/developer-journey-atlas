@@ -199,10 +199,6 @@ function renderAssessment(a) {
         .join("")}</ul>`
     : '<p class="lede">No friction gates documented on this route.</p>';
 
-  const time = a.timeToFirstSuccess
-    ? `${esc(a.timeToFirstSuccess.value)} ${a.timeToFirstSuccess.vendorClaim ? "(vendor claim)" : ""}`
-    : "Not documented";
-
   const sources = sourceList.length
     ? `<ul class="sources-list">${sourceList
         .slice(0, 8)
@@ -254,7 +250,6 @@ function renderAssessment(a) {
       <details class="detail-panel">
         <summary>Open the full documented route <span>${esc(stepLabel)}</span></summary>
         <dl class="kv">
-          <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
           <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
           <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
         </dl>
