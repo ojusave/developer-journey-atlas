@@ -226,6 +226,7 @@ export class OpenRouterProvider implements LLMProvider {
       "- Prefer the vendor quickstart or hosted API/console path when one exists.",
       "- Include documented gates (email verify, payment, credits, domain, approval).",
       "- Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
+      "- Do not invent knowledge/skill prerequisites (e.g. 'know JavaScript'). Omit soft knowledge requirements.",
       "- Compact primary_path (roughly account → gates → credentials → execute → verify).",
       "- If the docs do not establish a single first-success milestone, set research_status to",
       "  'needs-human-judgment' and record the ambiguity in `uncertainties` rather than guessing.",

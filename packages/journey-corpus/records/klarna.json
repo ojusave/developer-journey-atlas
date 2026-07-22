@@ -1,13 +1,29 @@
 {
-  "platform": {"name": "Klarna", "slug": "klarna", "organization": "Klarna Bank AB"},
+  "platform": {
+    "name": "Klarna",
+    "slug": "klarna",
+    "organization": "Klarna Bank AB"
+  },
   "category": "Payments, fintech, and commerce",
   "surface": {
     "name": "Klarna Payments playground web integration with the in-line widget",
     "selection_basis": "Klarna's web prerequisites explicitly call the in-line widget the recommended solution and state that its guide covers initiation, checkout, and order creation. The official testing guide publicly documents playground account creation and key generation, allowing the full route to be reconstructed without assuming an existing merchant account.",
     "alternatives_considered": [
-      {"name": "Hosted Payment Page", "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-hpp/", "reason_not_primary": "Klarna presents browser redirect as an alternative and explicitly recommends the in-line widget for the best user experience."},
-      {"name": "Platform integrations", "url": "https://docs.klarna.com/platform-solutions/", "reason_not_primary": "These are platform-specific plugin routes rather than Klarna's general direct web-payment guide."},
-      {"name": "Mobile SDK", "url": "https://docs.klarna.com/acquirer/klarna/mobile-payments/", "reason_not_primary": "This is the strongly recommended route for mobile applications, not a website integration."}
+      {
+        "name": "Hosted Payment Page",
+        "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-hpp/",
+        "reason_not_primary": "Klarna presents browser redirect as an alternative and explicitly recommends the in-line widget for the best user experience."
+      },
+      {
+        "name": "Platform integrations",
+        "url": "https://docs.klarna.com/platform-solutions/",
+        "reason_not_primary": "These are platform-specific plugin routes rather than Klarna's general direct web-payment guide."
+      },
+      {
+        "name": "Mobile SDK",
+        "url": "https://docs.klarna.com/acquirer/klarna/mobile-payments/",
+        "reason_not_primary": "This is the strongly recommended route for mobile applications, not a website integration."
+      }
     ]
   },
   "research_status": "complete",
@@ -27,57 +43,531 @@
     "official_milestone": "Create a one-time payment order in the Klarna playground",
     "normalized_outcome": "A test customer completes the Klarna widget flow and the server exchanges the authorization token for a Klarna order.",
     "observable_completion_signal": "The create-order request succeeds, closes the payment session, charges the test customer, and returns `order_id`, `fraud_status`, and `authorized_payment_method`.",
-    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "A create-order success response containing `order_id`, `fraud_status`, and `authorized_payment_method`.", "source_ids": ["S5"]},
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "A create-order success response containing `order_id`, `fraud_status`, and `authorized_payment_method`.",
+      "source_ids": [
+        "S5"
+      ]
+    },
     "why_this_is_the_boundary": "Klarna structures the direct web integration as initiate a payment, check out, and create an order. Order management is linked as the next section, so the first returned test order is the documented integration terminal.",
-    "source_ids": ["S2", "S3", "S4", "S5"]
+    "source_ids": [
+      "S2",
+      "S3",
+      "S4",
+      "S5"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "account", "requirement": "A test Merchant portal account in the correct Klarna credential region.", "required": true, "source_ids": ["S1"]},
-    {"order": 2, "type": "legal", "requirement": "Acceptance of Klarna's Terms & Conditions while activating the playground account.", "required": true, "source_ids": ["S1"]},
-    {"order": 3, "type": "credential", "requirement": "A playground Klarna API Key ID, used as API username, and Secret, used as API password.", "required": true, "source_ids": ["S1", "S3"]},
-    {"order": 4, "type": "knowledge", "requirement": "A supported purchase country, locale, currency, order amount, tax amount, and order lines for a one-time purchase.", "required": true, "source_ids": ["S3"]},
-    {"order": 5, "type": "software", "requirement": "A server-side API client and a checkout page that can load Klarna's JavaScript SDK.", "required": true, "source_ids": ["S3", "S4"]}
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A test Merchant portal account in the correct Klarna credential region.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Acceptance of Klarna's Terms & Conditions while activating the playground account.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "credential",
+      "requirement": "A playground Klarna API Key ID, used as API username, and Secret, used as API password.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "A server-side API client and a checkout page that can load Klarna's JavaScript SDK.",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Klarna's Before you test guide.", "details": [], "input": "https://docs.klarna.com/resources/developer-tools/testing-payments/before-you-test/", "output": "Playground prerequisites and account steps are shown.", "success_signal": "The guide lists Merchant portal access, test API keys, and sample data.", "failure_or_wait": "No navigation recovery is specified.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "documentation", "action": "Click Log in in the Klarna Docs navigation.", "details": [], "input": "Klarna Docs", "output": "The credential region and environment selector opens.", "success_signal": "Region and environment controls are available.", "failure_or_wait": "Use the region matching the intended API endpoints.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 3, "phase": "account", "actor": "developer", "interface": "browser", "action": "Select the credential region, select Playground, and click Sign up.", "details": [], "input": "Region and Playground environment", "output": "The playground account signup form opens.", "success_signal": "An email field and SIGN-UP action are available.", "failure_or_wait": "A production environment would not create the test account used by this path.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 4, "phase": "account", "actor": "developer", "interface": "browser", "action": "Enter an email address and click SIGN-UP.", "details": [], "input": "Developer email address", "output": "Klarna sends a confirmation email.", "success_signal": "The confirmation email arrives.", "failure_or_wait": "Email delivery time is not stated.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "email", "action": "Open the confirmation email and click Activate account.", "details": [], "input": "Klarna confirmation email", "output": "Account activation continues in the browser.", "success_signal": "Terms, password, and name setup are presented.", "failure_or_wait": "No expiry or resend path is documented on this page.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "account", "actor": "developer", "interface": "browser", "action": "Accept the Terms & Conditions, choose a new password, enter a name, and log in to the Merchant portal.", "details": [], "input": "Terms acceptance, password, and name", "output": "The playground Merchant portal opens.", "success_signal": "The developer is authenticated in the test Merchant portal.", "failure_or_wait": "Password requirements are not stated in the guide.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 7, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Open Payment settings, select Klarna API Keys, and click Generate new Klarna API key.", "details": [], "input": "Playground Merchant portal", "output": "A downloadable API credential file is generated.", "success_signal": "The key dialog offers the .txt file.", "failure_or_wait": "The guide does not document generation latency.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 8, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Download the .txt file and close the dialog.", "details": ["The secret is displayed only once."], "input": "Generated credential", "output": "The developer has Key ID and Secret for playground API URLs.", "success_signal": "Both credential values are stored securely.", "failure_or_wait": "If the secret is lost, a new key is required.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 9, "phase": "build", "actor": "developer", "interface": "api", "action": "Create a one-time payment session with an authenticated POST to the regional playground `/payments/v1/sessions` endpoint.", "details": ["Use HTTP Basic authentication with Key ID as username and Secret as password.", "Set intent to buy and provide acquiring channel, purchase country, currency, locale, order amount, tax amount, and order lines."], "input": "Playground credentials and test cart", "output": "Klarna returns session_id, client_token, and payment_method_categories.", "success_signal": "The response contains a client_token for the JavaScript SDK.", "failure_or_wait": "The session remains open for 48 hours or until an order is placed.", "required": true, "source_ids": ["S3"]},
-    {"step_number": 10, "phase": "build", "actor": "developer", "interface": "code", "action": "Add Klarna's JavaScript SDK script and an asynchronous callback to the checkout page.", "details": ["Load https://x.klarnacdn.net/kp/lib/v1/api.js."], "input": "Checkout HTML", "output": "Klarna.Payments becomes available in the callback.", "success_signal": "The SDK can be initialized.", "failure_or_wait": "The SDK script is asynchronous.", "required": true, "source_ids": ["S4"]},
-    {"step_number": 11, "phase": "configure", "actor": "developer", "interface": "sdk", "action": "Call `Klarna.Payments.init` with the session's client_token.", "details": [], "input": "client_token", "output": "The SDK is bound to the payment session.", "success_signal": "Initialization completes before load is called.", "failure_or_wait": "The token depends on a session that expires after 48 hours.", "required": true, "source_ids": ["S4"]},
-    {"step_number": 12, "phase": "build", "actor": "developer", "interface": "code", "action": "Add the `klarna-payments-container` element and call `Klarna.Payments.load` with its selector.", "details": ["Use identifier, localized name, and asset_urls from the session response when presenting the option."], "input": "Initialized SDK and container", "output": "The Klarna widget loads in checkout.", "success_signal": "The callback returns `show_form: true` and the Klarna option is displayed.", "failure_or_wait": "If show_form is false, Klarna is unavailable for that purchase and the option must be handled accordingly.", "required": true, "source_ids": ["S4"]},
-    {"step_number": 13, "phase": "execute", "actor": "developer", "interface": "browser", "action": "Select Klarna in the checkout and trigger the Buy action using Klarna's sample customer data.", "details": ["Do not use real personal data in playground."], "input": "Sample customer and payment data", "output": "Klarna opens its customer flow.", "success_signal": "The test customer can log in and choose a Klarna payment option.", "failure_or_wait": "The test must use region-appropriate sample data.", "required": true, "source_ids": ["S1", "S4"]},
-    {"step_number": 14, "phase": "authenticate", "actor": "developer", "interface": "sdk", "action": "Call `Klarna.Payments.authorize` with the required customer details when the Buy action occurs.", "details": ["Provide billing address and, when distinct, shipping address.", "Avoid delays between the click and authorize call so the browser does not block Klarna's pop-up."], "input": "Customer details and active session", "output": "Klarna evaluates the purchase and returns an authorization token on success.", "success_signal": "The authorize response contains an authorization_token.", "failure_or_wait": "An authorization failure or browser-blocked pop-up stops order creation.", "required": true, "source_ids": ["S4"]},
-    {"step_number": 15, "phase": "execute", "actor": "developer", "interface": "api", "action": "Send the authorization token in an authenticated POST to the session's `/order` endpoint within 60 minutes.", "details": ["Use the regional playground API URL and the same HTTP Basic credentials."], "input": "session_id and authorization_token", "output": "Klarna creates the one-time payment order and closes the session.", "success_signal": "The response returns order_id, fraud_status, and authorized_payment_method.", "failure_or_wait": "Validation can fail if order creation occurs more than 60 minutes after authorization or request data is invalid.", "required": true, "source_ids": ["S5"]},
-    {"step_number": 16, "phase": "verify", "actor": "developer", "interface": "api", "action": "Verify that the create-order success response contains `order_id`, `fraud_status`, and `authorized_payment_method`.", "details": [], "input": "Create-order response", "output": "The first playground Klarna order is confirmed.", "success_signal": "The documented example shows `fraud_status: ACCEPTED`, but the success contract returns the fraud-status field rather than guaranteeing that example value for every order.", "failure_or_wait": "Use Merchant portal logs for API troubleshooting if the request fails.", "required": true, "source_ids": ["S1", "S5"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open Klarna's Before you test guide.",
+      "details": [],
+      "input": "https://docs.klarna.com/resources/developer-tools/testing-payments/before-you-test/",
+      "output": "Playground prerequisites and account steps are shown.",
+      "success_signal": "The guide lists Merchant portal access, test API keys, and sample data.",
+      "failure_or_wait": "No navigation recovery is specified.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Click Log in in the Klarna Docs navigation.",
+      "details": [],
+      "input": "Klarna Docs",
+      "output": "The credential region and environment selector opens.",
+      "success_signal": "Region and environment controls are available.",
+      "failure_or_wait": "Use the region matching the intended API endpoints.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Select the credential region, select Playground, and click Sign up.",
+      "details": [],
+      "input": "Region and Playground environment",
+      "output": "The playground account signup form opens.",
+      "success_signal": "An email field and SIGN-UP action are available.",
+      "failure_or_wait": "A production environment would not create the test account used by this path.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Enter an email address and click SIGN-UP.",
+      "details": [],
+      "input": "Developer email address",
+      "output": "Klarna sends a confirmation email.",
+      "success_signal": "The confirmation email arrives.",
+      "failure_or_wait": "Email delivery time is not stated.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "email",
+      "action": "Open the confirmation email and click Activate account.",
+      "details": [],
+      "input": "Klarna confirmation email",
+      "output": "Account activation continues in the browser.",
+      "success_signal": "Terms, password, and name setup are presented.",
+      "failure_or_wait": "No expiry or resend path is documented on this page.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Accept the Terms & Conditions, choose a new password, enter a name, and log in to the Merchant portal.",
+      "details": [],
+      "input": "Terms acceptance, password, and name",
+      "output": "The playground Merchant portal opens.",
+      "success_signal": "The developer is authenticated in the test Merchant portal.",
+      "failure_or_wait": "Password requirements are not stated in the guide.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Open Payment settings, select Klarna API Keys, and click Generate new Klarna API key.",
+      "details": [],
+      "input": "Playground Merchant portal",
+      "output": "A downloadable API credential file is generated.",
+      "success_signal": "The key dialog offers the .txt file.",
+      "failure_or_wait": "The guide does not document generation latency.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Download the .txt file and close the dialog.",
+      "details": [
+        "The secret is displayed only once."
+      ],
+      "input": "Generated credential",
+      "output": "The developer has Key ID and Secret for playground API URLs.",
+      "success_signal": "Both credential values are stored securely.",
+      "failure_or_wait": "If the secret is lost, a new key is required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Create a one-time payment session with an authenticated POST to the regional playground `/payments/v1/sessions` endpoint.",
+      "details": [
+        "Use HTTP Basic authentication with Key ID as username and Secret as password.",
+        "Set intent to buy and provide acquiring channel, purchase country, currency, locale, order amount, tax amount, and order lines."
+      ],
+      "input": "Playground credentials and test cart",
+      "output": "Klarna returns session_id, client_token, and payment_method_categories.",
+      "success_signal": "The response contains a client_token for the JavaScript SDK.",
+      "failure_or_wait": "The session remains open for 48 hours or until an order is placed.",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 10,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Add Klarna's JavaScript SDK script and an asynchronous callback to the checkout page.",
+      "details": [
+        "Load https://x.klarnacdn.net/kp/lib/v1/api.js."
+      ],
+      "input": "Checkout HTML",
+      "output": "Klarna.Payments becomes available in the callback.",
+      "success_signal": "The SDK can be initialized.",
+      "failure_or_wait": "The SDK script is asynchronous.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 11,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "sdk",
+      "action": "Call `Klarna.Payments.init` with the session's client_token.",
+      "details": [],
+      "input": "client_token",
+      "output": "The SDK is bound to the payment session.",
+      "success_signal": "Initialization completes before load is called.",
+      "failure_or_wait": "The token depends on a session that expires after 48 hours.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 12,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Add the `klarna-payments-container` element and call `Klarna.Payments.load` with its selector.",
+      "details": [
+        "Use identifier, localized name, and asset_urls from the session response when presenting the option."
+      ],
+      "input": "Initialized SDK and container",
+      "output": "The Klarna widget loads in checkout.",
+      "success_signal": "The callback returns `show_form: true` and the Klarna option is displayed.",
+      "failure_or_wait": "If show_form is false, Klarna is unavailable for that purchase and the option must be handled accordingly.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 13,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Select Klarna in the checkout and trigger the Buy action using Klarna's sample customer data.",
+      "details": [
+        "Do not use real personal data in playground."
+      ],
+      "input": "Sample customer and payment data",
+      "output": "Klarna opens its customer flow.",
+      "success_signal": "The test customer can log in and choose a Klarna payment option.",
+      "failure_or_wait": "The test must use region-appropriate sample data.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 14,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "sdk",
+      "action": "Call `Klarna.Payments.authorize` with the required customer details when the Buy action occurs.",
+      "details": [
+        "Provide billing address and, when distinct, shipping address.",
+        "Avoid delays between the click and authorize call so the browser does not block Klarna's pop-up."
+      ],
+      "input": "Customer details and active session",
+      "output": "Klarna evaluates the purchase and returns an authorization token on success.",
+      "success_signal": "The authorize response contains an authorization_token.",
+      "failure_or_wait": "An authorization failure or browser-blocked pop-up stops order creation.",
+      "required": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 15,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Send the authorization token in an authenticated POST to the session's `/order` endpoint within 60 minutes.",
+      "details": [
+        "Use the regional playground API URL and the same HTTP Basic credentials."
+      ],
+      "input": "session_id and authorization_token",
+      "output": "Klarna creates the one-time payment order and closes the session.",
+      "success_signal": "The response returns order_id, fraud_status, and authorized_payment_method.",
+      "failure_or_wait": "Validation can fail if order creation occurs more than 60 minutes after authorization or request data is invalid.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 16,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Verify that the create-order success response contains `order_id`, `fraud_status`, and `authorized_payment_method`.",
+      "details": [],
+      "input": "Create-order response",
+      "output": "The first playground Klarna order is confirmed.",
+      "success_signal": "The documented example shows `fraud_status: ACCEPTED`, but the success contract returns the fraud-status field rather than guaranteeing that example value for every order.",
+      "failure_or_wait": "Use Merchant portal logs for API troubleshooting if the request fails.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
   ],
   "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 1, "condition": "The developer chooses browser redirect", "path": "Use Klarna Hosted Payment Page instead of the in-line JavaScript widget.", "effect_on_first_success": "Replaces client-side SDK integration with a server-side HPP session and customer redirect.", "source_ids": ["S2"]},
-    {"at_step": 9, "condition": "The purchase is recurring", "path": "Use intent tokenize, buy_and_tokenize, or buy_and_default_tokenize as documented for the recurring scenario.", "effect_on_first_success": "Changes session intent, authorization response, and order or token terminal.", "source_ids": ["S3"]},
-    {"at_step": 12, "condition": "load returns show_form false", "path": "Hide or disable Klarna, or leave it visible with Klarna's unavailable message.", "effect_on_first_success": "No Klarna order can be created for that test purchase; use valid supported test data before retrying.", "source_ids": ["S4"]}
+    {
+      "at_step": 1,
+      "condition": "The developer chooses browser redirect",
+      "path": "Use Klarna Hosted Payment Page instead of the in-line JavaScript widget.",
+      "effect_on_first_success": "Replaces client-side SDK integration with a server-side HPP session and customer redirect.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 9,
+      "condition": "The purchase is recurring",
+      "path": "Use intent tokenize, buy_and_tokenize, or buy_and_default_tokenize as documented for the recurring scenario.",
+      "effect_on_first_success": "Changes session intent, authorization response, and order or token terminal.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 12,
+      "condition": "load returns show_form false",
+      "path": "Hide or disable Klarna, or leave it visible with Klarna's unavailable message.",
+      "effect_on_first_success": "No Klarna order can be created for that test purchase; use valid supported test data before retrying.",
+      "source_ids": [
+        "S4"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 3, "type": "choice", "description": "The developer must choose the credential region and Playground environment.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 4, "type": "account", "description": "A verified playground Merchant portal account is required.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 6, "type": "terms", "description": "Klarna requires Terms & Conditions acceptance during account activation.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 8, "type": "credential", "description": "The API Secret is only displayed in the generated file once.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 12, "type": "configuration", "description": "Klarna pre-assesses availability and only displays the payment option when load returns show_form true.", "documented_requirement": true, "source_ids": ["S4"]},
-    {"at_step": 15, "type": "limit", "description": "The order must be created within 60 minutes of authorization.", "documented_requirement": true, "source_ids": ["S5"]}
+    {
+      "at_step": 3,
+      "type": "choice",
+      "description": "The developer must choose the credential region and Playground environment.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "account",
+      "description": "A verified playground Merchant portal account is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "terms",
+      "description": "Klarna requires Terms & Conditions acceptance during account activation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 8,
+      "type": "credential",
+      "description": "The API Secret is only displayed in the generated file once.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 12,
+      "type": "configuration",
+      "description": "Klarna pre-assesses availability and only displays the payment option when load returns show_form true.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "at_step": 15,
+      "type": "limit",
+      "description": "The order must be created within 60 minutes of authorization.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Before you test", "url": "https://docs.klarna.com/resources/developer-tools/testing-payments/before-you-test/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["What to keep in mind", "Accessing the test Merchant portal", "Creating a new test account", "Getting test credentials for APIs", "Sample data", "Troubleshooting"], "evidence_supported": ["Complete playground signup", "Test-key generation", "Sample-data rule", "Merchant portal logs"]},
-    {"id": "S2", "title": "Integration options", "url": "https://docs.klarna.com/acquirer/klarna/web-payments/prerequisites/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["In-line widget", "Browser redirect"], "evidence_supported": ["Recommended in-line route", "Three-stage payment scope", "HPP alternative"]},
-    {"id": "S3", "title": "Authentication and initiate a payment", "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-1-initiate-a-payment/", "official_domain": true, "source_type": "tutorial", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Authentication", "Common parameters", "Payment scenarios and intent", "One-time payment"], "evidence_supported": ["HTTP Basic authentication", "Create-session request", "session_id and client_token response"]},
-    {"id": "S4", "title": "Set up Klarna's JavaScript SDK", "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-2-checkout/", "official_domain": true, "source_type": "tutorial", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Add the SDK", "Initialize the SDK", "Add a container to your page", "Display Klarna", "Get authorization"], "evidence_supported": ["SDK script and initialization", "Widget load terminal", "Customer authorization token"]},
-    {"id": "S5", "title": "One-time payment order", "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-3-create-an-order/", "official_domain": true, "source_type": "tutorial", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["One-time payment order", "Success response", "Error response"], "evidence_supported": ["Create-order request", "60-minute authorization window", "order_id, fraud_status, and authorized_payment_method response fields"]}
+    {
+      "id": "S1",
+      "title": "Before you test",
+      "url": "https://docs.klarna.com/resources/developer-tools/testing-payments/before-you-test/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What to keep in mind",
+        "Accessing the test Merchant portal",
+        "Creating a new test account",
+        "Getting test credentials for APIs",
+        "Sample data",
+        "Troubleshooting"
+      ],
+      "evidence_supported": [
+        "Complete playground signup",
+        "Test-key generation",
+        "Sample-data rule",
+        "Merchant portal logs"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Integration options",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/prerequisites/",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "In-line widget",
+        "Browser redirect"
+      ],
+      "evidence_supported": [
+        "Recommended in-line route",
+        "Three-stage payment scope",
+        "HPP alternative"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Authentication and initiate a payment",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-1-initiate-a-payment/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Authentication",
+        "Common parameters",
+        "Payment scenarios and intent",
+        "One-time payment"
+      ],
+      "evidence_supported": [
+        "HTTP Basic authentication",
+        "Create-session request",
+        "session_id and client_token response"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Set up Klarna's JavaScript SDK",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-2-checkout/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Add the SDK",
+        "Initialize the SDK",
+        "Add a container to your page",
+        "Display Klarna",
+        "Get authorization"
+      ],
+      "evidence_supported": [
+        "SDK script and initialization",
+        "Widget load terminal",
+        "Customer authorization token"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "One-time payment order",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-3-create-an-order/",
+      "official_domain": true,
+      "source_type": "tutorial",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "One-time payment order",
+        "Success response",
+        "Error response"
+      ],
+      "evidence_supported": [
+        "Create-order request",
+        "60-minute authorization window",
+        "order_id, fraud_status, and authorized_payment_method response fields"
+      ]
+    }
   ],
   "uncertainties": [],
   "excluded_after_success": [
