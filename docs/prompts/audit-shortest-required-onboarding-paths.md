@@ -24,7 +24,20 @@ Before editing, run `git status -sb`, inspect the current branch, fetch `atlas`,
 
 ## Where we want to be
 
-Move the corpus from 1 verified, 1 unresolved, and 203 pending records toward a fully re-audited Atlas, one evidence-safe batch at a time.
+Complete the entire corpus re-audit in this assignment. Do not stop after a calibration set, category, batch, or progress report.
+
+The terminal corpus state is:
+
+- all 205 roster entries have a sidecar audit;
+- all 203 currently pending platforms have been researched and independently checked;
+- `audit-status.json` reports `pending: 0`;
+- every platform is honestly classified as `verified`, `needs-human-judgment`, or `blocked`;
+- every verified platform has exact derived action and field counts;
+- every nonverified platform has `counts: null` and states the exact evidence needed for resolution;
+- all preserved source-record hashes still match;
+- the public UI, API, catalog, LLM artifacts, and peer comparison use only verified audit data.
+
+Finishing all platforms does not mean forcing all platforms to `verified`. A properly evidenced unresolved or blocked audit is complete. A guess labeled verified is not.
 
 For every completed platform audit:
 
@@ -67,13 +80,30 @@ Do not look for or claim observed drop-off, conversion, difficulty, completion t
 
 ## Execution steps
 
-### 1. Establish a safe batch
+### 1. Establish the full-corpus audit program
 
-- Start from latest `atlas/main` and create a focused branch such as `research/audit-cloud-batch-01`.
-- Select a small coherent batch, preferably 5 to 10 platforms in one category.
-- Do not attempt 203 audits in one unreviewable change.
-- Record the selected slugs before research and do not edit outside that batch unless a shared validator defect must be fixed.
-- Confirm that no file under `packages/journey-corpus/records/` changes.
+- Start from latest `atlas/main` and create a branch such as `research/audit-entire-corpus`.
+- Freeze the ordered roster and SHA-256 hash of every preserved source record before research begins.
+- Partition all 203 pending slugs into non-overlapping category-based shards.
+- You are explicitly authorized to spawn agents and nested subagents. Use the maximum safe parallelism available instead of processing the corpus serially.
+- Use a coordinator hierarchy when the agent runtime supports it:
+  - one parent coordinator owns the contract, roster, assignments, integration, and terminal state;
+  - category leads own mutually exclusive platform shards and monitor completeness;
+  - maker agents research and write only their assigned audit files;
+  - separate checker agents independently reopen sources and approve, correct, or downgrade each audit;
+  - verification agents run cross-corpus integrity, generated-artifact, API, UI, and production checks.
+- Agents may spawn subagents for official-source discovery, route reconstruction, field verification, and contradiction checks, but the assigning agent remains accountable for evidence completeness.
+- Assign one maker and one different checker to every shard or platform. No agent may verify its own work.
+- Give each worker exclusive ownership of its assigned `audits/<slug>.json` files. Workers must not edit shared generated files, schemas, validators, source records, or another worker's audit.
+- Use isolated worktrees when available. If agents share one checkout, enforce exclusive file ownership and serialize integration writes.
+- Run research and independent checking concurrently across shards. A checker must reopen the official sources and may not approve from the maker's narrative alone.
+- The parent owns the roster, assignment map, shared contract, conflict resolution, status generation, integration, tests, and publication.
+- Every worker return must include assigned slugs, final status per slug, official URLs inspected, unresolved evidence, files changed, validator result, and confirmation that preserved source records were untouched.
+- If subagents are unavailable, process the complete roster sequentially with a cold second pass per platform. Do not reduce scope.
+- Do not stop when one shard finishes. Continue until every assigned slug has a final audit status and `pending` reaches zero.
+- Confirm throughout that no file under `packages/journey-corpus/records/` changes.
+
+Use internal checkpoints only to detect drift and rebalance work. Checkpoints are not completion. Report progress as `completed / 203`, but keep working until it reaches `203 / 203`.
 
 ### 2. Read the contract before researching
 
@@ -126,16 +156,16 @@ Treat Render as the verified granularity example and Zoom as the correct example
 - Do not create accounts, accept terms, deploy resources, send production requests, or cause external changes merely to complete an audit.
 - If an authenticated transition hides required screens or fields, preserve the gap and lower the status.
 
-### 7. Write the sidecar audit
+### 7. Write every sidecar audit
 
-- Create or update only `packages/journey-corpus/audits/<slug>.json` for assigned platforms.
+- Create or update `packages/journey-corpus/audits/<slug>.json` for every assigned platform until all 205 roster entries have a sidecar.
 - Copy the exact SHA-256 of `packages/journey-corpus/records/<slug>.json` into `source_record_sha256`.
 - Use `counts: null` for every status except `verified`.
 - A verified audit cannot contain an unverified action, unverified field, unresolved consequential choice, or hidden transition.
 - Keep candidate routes, exclusions, waits, gates, platform outcomes, uncertainties, and evidence needed explicit.
 - Do not hand-edit `audit-status.json`.
 
-### 8. Perform a separate evidence review
+### 8. Perform a separate evidence review for every platform
 
 - The maker may not approve its own audit without a cold second pass.
 - Reopen every load-bearing source without relying on the draft narrative.
@@ -173,14 +203,15 @@ Then verify:
 - mobile and desktop UI do not overflow and retain progressive disclosure;
 - no score, rank, drop-off, conversion, or causal claim has been introduced.
 
-### 10. Publish one reviewable batch
+### 10. Publish the completed corpus
 
-- Stage only the assigned audits and directly related generated or validation files.
+- Do not publish a partial corpus as task completion. The final integration must have `pending: 0`.
+- Stage all 205 audit sidecars and directly related generated or validation files.
 - Never stage unrelated local work.
-- Commit with a scoped message such as `Audit shortest paths for cloud batch 01`.
+- Commit with a scoped message such as `Complete shortest-path audit for entire corpus`.
 - Push only to the `atlas` remote.
 - Open a pull request against `ojusave/developer-journey-atlas:main`.
-- In the PR, list every platform and its final status, exact unresolved evidence, validation results, and confirmation that source records were unchanged.
+- In the PR, include the full status totals, a machine-readable platform-status manifest, every unresolved evidence requirement, validation results, checker coverage, and confirmation that source records were unchanged.
 - Do not merge until all required checks pass.
 - After merge, wait for the Render auto-deploy and verify the production health endpoint, audited platform APIs, audit-status file, human catalog, and `llms.txt`.
 
@@ -346,9 +377,9 @@ Never expose an action count or comparison for a record whose audit status is no
 1. Freeze hashes for all canonical source records.
 2. Audit Render and Zoom as calibration cases.
 3. Run deterministic checks against the two cases and correct the contract if either path still includes documentation, optional actions, or platform events.
-4. Audit the remaining roster in bounded batches with one maker and one independent checker per record when independent agents are available.
+4. Audit the entire remaining roster in parallel non-overlapping shards with one maker and one independent checker per record when independent agents are available.
 5. If independent agents are unavailable, use a cold review that reopens the original prompt, official sources, and audit record without relying on the maker's explanation.
-6. Keep unaudited records visible as `pending re-audit`, but do not show their path count, peer placement, or onboarding-load comparison as verified.
+6. During execution, keep unaudited records visible as `pending re-audit`, but do not show their path count, peer placement, or onboarding-load comparison as verified. Do not finish the assignment until no pending records remain.
 7. Regenerate public and LLM-readable artifacts only from verified audit records.
 8. Confirm source-record hashes remain unchanged.
 
