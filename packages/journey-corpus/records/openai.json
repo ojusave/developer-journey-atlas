@@ -6,62 +6,88 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "OpenAI Responses API, JavaScript developer quickstart",
-    "selection_basis": "OpenAI's official Developer quickstart explicitly says to create an API key and run a first API call. Its first language tab is JavaScript and the documented terminal signal is printed model output. This establishes the boundary without selecting it independently.",
+    "name": "OpenAI Responses API via cURL (API key + funded credits)",
+    "selection_basis": "OpenAI's Developer quickstart creates an API key and demonstrates a Responses API call. The same page documents a cURL request to https://api.openai.com/v1/responses with Authorization: Bearer $OPENAI_API_KEY, so an SDK install is not required. OpenAI prepaid-billing help states that after purchasing credits you can start using the API, and billing setup includes adding payment details.",
     "alternatives_considered": [
       {
-        "name": "Python quickstart",
-        "url": "https://developers.openai.com/api/docs/quickstart",
-        "reason_not_primary": "The same official page offers an equivalent Python tab; JavaScript is the first displayed route, so only local package and run commands differ."
+        "name": "JavaScript / Python / other SDK tabs",
+        "url": "https://platform.openai.com/docs/quickstart",
+        "reason_not_primary": "SDK tabs are optional convenience clients. The quickstart also documents cURL against the same Responses endpoint with only an API key."
       },
       {
         "name": "Agents SDK quickstart",
         "url": "https://developers.openai.com/api/docs/guides/agents/quickstart",
-        "reason_not_primary": "This is a later, more specialized agent path; the general Developer quickstart first establishes a basic Responses API call."
+        "reason_not_primary": "This is a later specialized agent path after a basic Responses API call."
+      },
+      {
+        "name": "Chat Completions legacy path",
+        "url": "https://platform.openai.com/docs/api-reference/chat",
+        "reason_not_primary": "The current Developer quickstart centers the Responses API as the first call."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-18",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create credentials and receive output from a first OpenAI API request.",
-    "starting_url": "https://developers.openai.com/api/docs/quickstart",
+    "developer_intent": "Create an OpenAI Platform API key, fund usable prepaid credits with a payment method, and receive a Responses API JSON result over HTTPS.",
+    "starting_url": "https://platform.openai.com/docs/quickstart",
     "assumed_prior_state": [
-      "The developer has arrived at OpenAI's official Developer quickstart.",
-      "The developer has no configured API key, SDK package, or example file yet."
+      "The developer has no OpenAI Platform API key, prepaid credit balance, or prior Responses request.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Run an API Call",
-    "normalized_outcome": "A JavaScript program sends the documented Responses API request and prints the model-generated text.",
-    "observable_completion_signal": "Running `node example.mjs` prints the output text; the page then says `Congrats on running a free test API request!`.",
+    "official_milestone": "Run an API Call to the Responses API",
+    "normalized_outcome": "An authenticated HTTPS Responses API request to https://api.openai.com/v1/responses returns model-generated output text.",
+    "observable_completion_signal": "The Responses API returns a successful JSON body that includes model output text for the requested prompt.",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "The quickstart's heading is `Install the OpenAI SDK and Run an API Call`, followed by a printed response and a congratulations message for the free test request.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The Developer quickstart documents Create an API Key, export OPENAI_API_KEY, and a cURL POST to https://api.openai.com/v1/responses with Authorization: Bearer $OPENAI_API_KEY. Prepaid billing help states that after purchasing credits you should be able to start using the API.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     },
-    "why_this_is_the_boundary": "It is the first complete authenticated API interaction explicitly established by the general official quickstart, before billing credits and more specialized capabilities.",
+    "why_this_is_the_boundary": "The first meaningful LLM success is a successful authenticated Responses API response. An SDK is not required because the official quickstart documents the same call with cURL. Usable prepaid credits (and payment details to purchase them when free-trial credit is $0) are required for API usage per OpenAI's prepaid billing help; a key alone is not enough once free-trial credit is exhausted or unavailable.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
       "type": "account",
-      "requirement": "Access to the OpenAI Platform dashboard is required to create an API key.",
+      "requirement": "An OpenAI Platform account that can open the API keys and billing settings.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "billing",
+      "requirement": "Payment details and prepaid credits with a usable balance. OpenAI's prepaid billing setup shows Add payment details and states that after purchasing credits you can start using the API; exhausted credits return a billing-quota error on API requests.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "credential",
+      "requirement": "An API key created in the OpenAI dashboard and stored securely.",
       "required": true,
       "source_ids": [
         "S1"
       ]
     },
     {
-      "order": 2,
+      "order": 4,
       "type": "software",
-      "requirement": "A server-side JavaScript runtime such as Node.js, Deno, or Bun and an npm-compatible package manager are needed for the selected tab.",
+      "requirement": "A terminal with cURL (or any HTTP client) able to send HTTPS JSON requests. No language SDK is required.",
       "required": true,
       "source_ids": [
         "S1"
@@ -71,6 +97,43 @@
   "primary_path": [
     {
       "step_number": 1,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create or sign in to an OpenAI Platform account and open the dashboard.",
+      "details": [],
+      "input": "Intent to use the OpenAI API",
+      "output": "Authenticated Platform session",
+      "success_signal": "API keys and billing settings are reachable.",
+      "failure_or_wait": "Account recovery follows the dashboard sign-in flow.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Open billing settings, add payment details, and purchase prepaid credits (or confirm a usable credit balance).",
+      "details": [
+        "Prepaid billing setup includes Add payment details under the billing overview.",
+        "After purchasing credits, OpenAI states you should be able to start using the API; systems may take a couple of minutes to reflect the balance.",
+        "If free-trial credit remaining is already $0, payment details and a credit purchase are required before API usage continues."
+      ],
+      "input": "Authenticated Platform account",
+      "output": "Usable prepaid credit balance",
+      "success_signal": "Billing shows a positive usable credit balance (or non-zero free-trial credit still available).",
+      "failure_or_wait": "Payment verification delays or a $0 balance leave API requests failing with billing-quota errors.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
       "phase": "authenticate",
       "actor": "developer",
       "interface": "console",
@@ -78,47 +141,10 @@
       "details": [
         "The quickstart warns to keep the key in a safe location."
       ],
-      "input": "OpenAI Platform account access.",
-      "output": "New API key.",
+      "input": "Funded Platform account",
+      "output": "New API key",
       "success_signal": "The key is generated and copied to secure local storage.",
-      "failure_or_wait": "The page does not document a manual approval wait.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 2,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Export the key as `OPENAI_API_KEY` in the terminal.",
-      "details": [
-        "The macOS and Linux example uses `export`; PowerShell uses `setx`.",
-        "OpenAI SDKs read this environment variable automatically."
-      ],
-      "input": "Generated API key.",
-      "output": "API key available to the SDK process.",
-      "success_signal": "The environment variable is set for the runtime.",
-      "failure_or_wait": "Shell persistence and process refresh behavior depend on the operating system.",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 3,
-      "phase": "install",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Install the official JavaScript SDK with `npm install openai`.",
-      "details": [
-        "The selected tab supports server-side Node.js, Deno, or Bun environments."
-      ],
-      "input": "JavaScript project and package manager.",
-      "output": "OpenAI SDK dependency installed.",
-      "success_signal": "The `openai` package is available to import.",
-      "failure_or_wait": "Package installation requires network and filesystem access.",
+      "failure_or_wait": "No manual approval wait is documented for key creation.",
       "required": true,
       "source_ids": [
         "S1"
@@ -128,16 +154,15 @@
       "step_number": 4,
       "phase": "configure",
       "actor": "developer",
-      "interface": "ide",
-      "action": "Create `example.mjs` with the documented Responses API example.",
+      "interface": "cli",
+      "action": "Export the key as OPENAI_API_KEY in the terminal.",
       "details": [
-        "Import OpenAI and instantiate the client.",
-        "Call `client.responses.create` with the documented model and one-sentence bedtime-story input, then log `response.output_text`."
+        "macOS/Linux: export OPENAI_API_KEY=...; PowerShell: setx OPENAI_API_KEY ..."
       ],
-      "input": "Documented JavaScript example.",
-      "output": "Runnable example program.",
-      "success_signal": "The file contains the client, request, and print statements.",
-      "failure_or_wait": "Incorrect environment loading or a missing key prevents authentication.",
+      "input": "Generated API key",
+      "output": "API key available to HTTP clients in the shell",
+      "success_signal": "The environment variable is set for the current shell.",
+      "failure_or_wait": "Shell persistence depends on the OS.",
       "required": true,
       "source_ids": [
         "S1"
@@ -147,15 +172,32 @@
       "step_number": 5,
       "phase": "execute",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Run `node example.mjs`.",
+      "interface": "api",
+      "action": "POST a Responses API request with cURL to https://api.openai.com/v1/responses.",
       "details": [
-        "The SDK authenticates from the environment and calls the Responses API."
+        "Include Content-Type: application/json and Authorization: Bearer $OPENAI_API_KEY.",
+        "Send a JSON body with a model and input prompt as shown in the quickstart cURL example."
       ],
-      "input": "Runnable example and configured API key.",
-      "output": "Model response object and printed output text.",
-      "success_signal": "A generated one-sentence story appears in the terminal and the quickstart's congratulations state is reached.",
-      "failure_or_wait": "The docs say output should appear in a few moments; API errors are not detailed in this quickstart section.",
+      "input": "OPENAI_API_KEY and usable credit balance",
+      "output": "Responses API HTTP response",
+      "success_signal": "The API returns a successful JSON body containing model output text.",
+      "failure_or_wait": "Missing key, insufficient credits, or invalid JSON produce API errors instead of model output.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the Responses API JSON includes the model-generated text.",
+      "details": [],
+      "input": "Responses API response body",
+      "output": "Verified first LLM API success",
+      "success_signal": "Model output text is present in the successful response.",
+      "failure_or_wait": "An error body means the first call did not succeed.",
       "required": true,
       "source_ids": [
         "S1"
@@ -165,18 +207,19 @@
   "branches": [
     {
       "at_step": 2,
-      "condition": "The developer uses Windows PowerShell.",
-      "path": "Use `setx OPENAI_API_KEY \"your_api_key_here\"`, then continue with the selected SDK runtime.",
-      "effect_on_first_success": "Only environment-variable setup changes.",
+      "condition": "The account still has usable free-trial credit remaining.",
+      "path": "Skip purchasing additional prepaid credits while free-trial credit remains; the quickstart may still show Congrats on running a free test API request. When free-trial credit is $0, add payment details and purchase credits before further API usage.",
+      "effect_on_first_success": "Billing purchase may be deferred only while free-trial credit remains usable.",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     },
     {
-      "at_step": 3,
-      "condition": "The developer selects Python, .NET, Java, Go, or Ruby.",
-      "path": "Use the corresponding official SDK install, example code, and runtime command in the parallel language tab.",
-      "effect_on_first_success": "All routes end at a first Responses API output, but local tooling differs.",
+      "at_step": 5,
+      "condition": "The developer prefers an official SDK instead of cURL.",
+      "path": "Install the language SDK shown on the quickstart tab and run the equivalent Responses example; the API endpoint and API-key header requirements stay the same.",
+      "effect_on_first_success": "Adds optional local package installation without changing the authenticated Responses boundary.",
       "source_ids": [
         "S1"
       ]
@@ -184,27 +227,27 @@
   ],
   "friction_gates": [
     {
-      "at_step": 1,
-      "type": "account",
-      "description": "The developer needs dashboard access to create the API key.",
+      "at_step": 2,
+      "type": "payment",
+      "description": "Payment details and prepaid credits are required to start or continue API usage when free-trial credit is $0; exhausted credits cause billing-quota API errors.",
       "documented_requirement": true,
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 1,
-      "type": "credential",
-      "description": "A secret API key must be created, copied, stored safely, and exposed to the SDK without embedding it in code.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
+        "S2"
       ]
     },
     {
       "at_step": 3,
-      "type": "installation",
-      "description": "The official SDK must be installed for the selected language.",
+      "type": "credential",
+      "description": "A secret API key must be created and stored safely.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 5,
+      "type": "credential",
+      "description": "The Authorization Bearer token must be the API key for https://api.openai.com/v1/responses.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
@@ -220,42 +263,59 @@
     {
       "id": "S1",
       "title": "Developer quickstart",
-      "url": "https://developers.openai.com/api/docs/quickstart",
+      "url": "https://platform.openai.com/docs/quickstart",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
         "Create and export an API key",
-        "Install the OpenAI SDK and Run an API Call",
-        "Add credits to keep building"
+        "cURL Responses example",
+        "Add credits to keep building",
+        "Congrats on running a free test API request"
       ],
       "evidence_supported": [
-        "General first-API-call boundary",
-        "Dashboard key and environment steps",
-        "Language SDK alternatives",
-        "JavaScript install, file, request, run, and printed-output signals",
-        "Free-test congratulations and post-success billing step"
+        "API key creation and export",
+        "cURL POST to /v1/responses with Bearer token",
+        "Free-test congratulations and post-call Add credits CTA"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "How can I set up prepaid billing?",
+      "url": "https://help.openai.com/en/articles/8264644-what-is-prepaid-billing",
+      "official_domain": true,
+      "source_type": "help-center",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Setting up prepaid billing",
+        "Purchasing additional credits"
+      ],
+      "evidence_supported": [
+        "Add payment details in billing overview",
+        "Purchase prepaid credits before using the API",
+        "Billing-quota errors when credits are exhausted",
+        "Possible short delay after credit purchase"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What account states receive the free test API request referenced by the quickstart?",
-      "impact": "Some developers may encounter a billing or credit gate before the same terminal response.",
-      "reason_unresolved": "The quickstart congratulates the reader for a free test and places Add credits afterward, but does not define eligibility conditions on this page.",
+      "question": "Which brand-new accounts currently receive non-zero free-trial credit versus $0 free-trial credit requiring immediate payment details?",
+      "impact": "Some accounts may complete the first Responses call before purchasing credits; others hit billing before any successful LLM response.",
+      "reason_unresolved": "The quickstart mentions a free test request while prepaid billing help shows Free trial credit remaining $0.00 with Add payment details; eligibility is account-state dependent and not fully enumerated on these pages.",
       "checked_source_ids": [
-        "S1"
+        "S1",
+        "S2"
       ]
     }
   ],
   "excluded_after_success": [
-    "Adding credits for higher limits",
-    "Responses starter application",
-    "Image and file analysis",
-    "Built-in tools and function calling",
     "Agents SDK",
-    "Production key management, retries, monitoring, and cost controls"
+    "Image and file analysis",
+    "Production monitoring and cost controls",
+    "Higher rate limits beyond initial prepaid balance"
   ],
   "candidate_paths": [],
   "candidate_path_gap": null

@@ -7,7 +7,7 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "86d7d3029baeedfd931374ea464de047e89bc91ed91e03578c8aa6f7547116c1",
+  "source_record_sha256": "fef1bf53c9ed88c27bcec98e4ac5998cfbcaf94b788a8fe3f5c1b4083d3cab5f",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
@@ -15,11 +15,13 @@
       "No Fireworks account, payment method, credits, API key, or Serverless request exists yet."
     ]
   },
-  "developer_goal": "Create a Fireworks developer account, obtain a usable funded API key, and run the official Python Serverless first call.",
+  "developer_goal": "Fund Fireworks credits, create an API key, and complete a cURL Serverless chat-completions call.",
   "first_success": {
-    "outcome": "The Fireworks Python SDK sends the published DeepSeek V3.1 Serverless request and prints the model reply.",
-    "observable_signal": "The program prints chat-completion content such as a Spanish greeting.",
-    "source_ids": ["S1"]
+    "outcome": "POST https://api.fireworks.ai/inference/v1/chat/completions with a Bearer key returns model output such as \u00a1Hola!.",
+    "observable_signal": "Assistant content is present in the HTTP JSON response.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
     "surface": "Fireworks dashboard signup plus Serverless Quickstart",
@@ -54,25 +56,33 @@
           "label": "Identity route (Email, Google, GitHub, or LinkedIn)",
           "field_type": "select",
           "evidence_state": "observed-public-ui",
-          "source_ids": ["S2"]
+          "source_ids": [
+            "S2"
+          ]
         },
         {
           "label": "Email",
           "field_type": "email",
           "evidence_state": "observed-public-ui",
-          "source_ids": ["S2"],
+          "source_ids": [
+            "S2"
+          ],
           "notes": "Visible for the email path; OAuth routes may not collect it on this screen."
         },
         {
           "label": "Terms of service and Data Processing Agreement",
           "field_type": "agreement",
           "evidence_state": "observed-public-ui",
-          "source_ids": ["S2"]
+          "source_ids": [
+            "S2"
+          ]
         }
       ],
       "observable_result": "The developer reaches an authenticated Fireworks dashboard.",
       "evidence_state": "unverified",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S2"
+      ]
     },
     {
       "step_number": 2,
@@ -84,13 +94,18 @@
           "label": "Payment method and billing address",
           "field_type": "other",
           "evidence_state": "documented",
-          "source_ids": ["S3"],
+          "source_ids": [
+            "S3"
+          ],
           "notes": "Credit FAQ requires adding payment method and purchasing credits before usage; whether a $1 starter credit still applies without a card is unclear."
         }
       ],
       "observable_result": "The account has a positive credit balance usable for Serverless calls.",
       "evidence_state": "unverified",
-      "source_ids": ["S3", "S4"]
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
     },
     {
       "step_number": 3,
@@ -100,33 +115,12 @@
       "required_fields": [],
       "observable_result": "An API key value is available to export as FIREWORKS_API_KEY.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Export FIREWORKS_API_KEY and install the Fireworks Python SDK with the documented pre-release flag.",
-      "required_fields": [
-        {
-          "label": "export FIREWORKS_API_KEY",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "pip install --pre fireworks-ai",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The fireworks package is installed and the key is in the environment.",
-      "evidence_state": "documented",
-      "source_ids": ["S1"]
-    },
-    {
-      "step_number": 5,
       "kind": "implementation",
       "interface": "code",
       "action": "Run the published Serverless chat.completions.create example and print the content.",
@@ -135,47 +129,82 @@
           "label": "model and messages",
           "field_type": "code",
           "evidence_state": "documented",
-          "source_ids": ["S1"]
+          "source_ids": [
+            "S1"
+          ]
         }
       ],
       "observable_result": "The terminal prints the Serverless model reply.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "POST https://api.fireworks.ai/inference/v1/chat/completions with Authorization Bearer and confirm model output.",
+      "required_fields": [],
+      "observable_result": "Model output such as \u00a1Hola! is returned.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
       "description": "Local Python and pip are available for the Serverless Quickstart.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "external_gates": [
     {
       "description": "Signup requires agreeing to Terms of service and the Data Processing Agreement.",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S2"
+      ]
     },
     {
       "description": "Fireworks uses prepaid credits; usage pauses when the balance reaches zero without auto top-up.",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S3"
+      ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
       "description": "Fireworks returns a Serverless chat completion for the selected model.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "excluded": [
     {
       "item": "Onboarding playground exploration",
       "reason": "Separate from the Serverless API first-call terminal.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "item": "Priority tier and Fast mode",
       "reason": "Documented as advanced Serverless options after the basic first call.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Installing the Fireworks Python SDK",
+      "reason": "Quickstart documents an equivalent cURL call.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [

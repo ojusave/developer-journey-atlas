@@ -7,7 +7,7 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "0a77d70bb926bf0a3dbb09c40079ae725cee021fb790738415cbe178b54206f7",
+  "source_record_sha256": "950679518fe80ce5e4537c391b3de50eed0c3a8d30114de668356b11546ff098",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
@@ -15,11 +15,13 @@
       "No Cohere account, trial API key, SDK install, or Chat request exists yet."
     ]
   },
-  "developer_goal": "Create a Cohere account, obtain a trial API key, and run a first native Python Chat call that prints a Command model response.",
+  "developer_goal": "Obtain a Cohere trial API key and complete a cURL Chat API v2 call.",
   "first_success": {
-    "outcome": "A Python ClientV2 Chat request returns and prints a Cohere message response.",
-    "observable_signal": "The executed program prints response.message.content text from the Chat endpoint.",
-    "source_ids": ["S2"]
+    "outcome": "POST https://api.cohere.ai/v2/chat with a Bearer trial key returns an assistant message.",
+    "observable_signal": "Assistant message content text is present in the JSON response.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
     "surface": "Cohere Platform dashboard signup plus native Python SDK quickstart",
@@ -48,124 +50,100 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Cohere account from the dashboard register surface.",
-      "required_fields": [
-        {
-          "label": "Email",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S1"],
-          "notes": "Visible on the email signup form; OAuth routes may not collect this field directly."
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S1"],
-          "notes": "Visible on the email signup form only."
-        },
-        {
-          "label": "Terms of Use and Privacy Policy acknowledgement",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S1"],
-          "notes": "Signup states that clicking Sign up constitutes agreement."
-        }
-      ],
-      "observable_result": "The developer has an authenticated Cohere account that can open the dashboard.",
-      "evidence_state": "unverified",
-      "source_ids": ["S1", "S3"]
+      "action": "Create a Cohere account and copy the trial API key.",
+      "required_fields": [],
+      "observable_result": "A trial API key is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Open API Keys and copy the automatically issued Trial API key.",
-      "required_fields": [],
-      "observable_result": "A Trial API key value is available to paste into local code.",
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export CO_API_KEY.",
+      "required_fields": [
+        {
+          "label": "CO_API_KEY",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The shell can authenticate requests.",
       "evidence_state": "documented",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Install or upgrade the Cohere Python SDK.",
-      "required_fields": [
-        {
-          "label": "pip install -U cohere",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        }
-      ],
-      "observable_result": "The cohere package is available in the local Python environment.",
+      "kind": "verification",
+      "interface": "api",
+      "action": "POST https://api.cohere.ai/v2/chat with Authorization bearer and confirm assistant text.",
+      "required_fields": [],
+      "observable_result": "Assistant message text is returned.",
       "evidence_state": "documented",
-      "source_ids": ["S2"]
-    },
-    {
-      "step_number": 4,
-      "kind": "implementation",
-      "interface": "code",
-      "action": "Create a ClientV2 with the trial key and call chat with a user message, then print the response text.",
-      "required_fields": [
-        {
-          "label": "API key",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        },
-        {
-          "label": "model",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        },
-        {
-          "label": "messages",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        }
-      ],
-      "observable_result": "The program prints Chat response text from a Command model.",
-      "evidence_state": "documented",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
       "description": "Local Python and pip are available to install the Cohere SDK.",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S2"
+      ]
     }
   ],
   "external_gates": [
     {
       "description": "Signup requires accepting Cohere Terms of Use and Privacy Policy.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
       "description": "Cohere automatically creates a Trial API key when an account is created.",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S3"
+      ]
     },
     {
       "description": "The Chat endpoint returns generated message content for the submitted user prompt.",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S2"
+      ]
     }
   ],
   "excluded": [
     {
       "item": "Reading installation and platform-options documentation",
       "reason": "Documentation reading is not a counted developer action.",
-      "source_ids": ["S4"]
+      "source_ids": [
+        "S4"
+      ]
     },
     {
       "item": "Bedrock, SageMaker, Azure, or private-deployment client setup",
       "reason": "These are alternate platforms with different credentials than the Cohere Platform trial route.",
-      "source_ids": ["S4"]
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "item": "Installing the Cohere Python SDK",
+      "reason": "Chat API docs document an equivalent cURL call.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [

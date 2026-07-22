@@ -1,73 +1,456 @@
 {
-  "platform": {"name": "Fireworks AI", "slug": "fireworks-ai", "organization": "Fireworks AI, Inc."},
+  "platform": {
+    "name": "Fireworks AI",
+    "slug": "fireworks-ai",
+    "organization": "Fireworks AI, Inc."
+  },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Serverless Quickstart, Fireworks Python SDK route",
-    "selection_basis": "Under the workshop policy, the Fireworks Python SDK tab in the Serverless Quickstart is the fastest documented route: the page explicitly calls Serverless the fastest way to start and places the vendor SDK first. Signup is one opaque step at the official URL; documented billing, key, install, and request steps follow.",
+    "name": "Serverless Quickstart, cURL chat completions",
+    "selection_basis": "Fireworks' Serverless Quickstart is the documented fastest start. It includes a cURL tab that POSTs to https://api.fireworks.ai/inference/v1/chat/completions with Authorization: Bearer $FIREWORKS_API_KEY, so a Python SDK install is not required. Prepaid credits and a payment method remain required before usage.",
     "alternatives_considered": [
-      {"name": "OpenAI-compatible Python", "url": "https://docs.fireworks.ai/getting-started/quickstart", "reason_not_primary": "It is a peer tab using a third-party SDK, while the Fireworks SDK is the first tab and is vendor-owned."},
-      {"name": "Anthropic-compatible Python", "url": "https://docs.fireworks.ai/getting-started/quickstart", "reason_not_primary": "It is a peer compatibility route using the Anthropic SDK."},
-      {"name": "JavaScript or cURL", "url": "https://docs.fireworks.ai/getting-started/quickstart", "reason_not_primary": "These are peer language and transport tabs rather than separately recommended surfaces."}
+      {
+        "name": "Fireworks Python SDK",
+        "url": "https://docs.fireworks.ai/getting-started/quickstart",
+        "reason_not_primary": "Optional client library; the same quickstart documents an equivalent cURL request."
+      },
+      {
+        "name": "OpenAI-compatible Python SDK",
+        "url": "https://docs.fireworks.ai/getting-started/quickstart",
+        "reason_not_primary": "Third-party SDK convenience route to the same HTTP endpoint."
+      },
+      {
+        "name": "Anthropic-compatible SDK",
+        "url": "https://docs.fireworks.ai/getting-started/quickstart",
+        "reason_not_primary": "Compatibility tab, not required for the first Serverless call."
+      }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Fireworks developer account, obtain and fund an API key, then run the official Python Serverless first call.",
+    "developer_intent": "Create a Fireworks account, fund prepaid credits, obtain an API key, and complete a Serverless chat-completions request over HTTPS.",
     "starting_url": "https://docs.fireworks.ai/getting-started/quickstart",
     "assumed_prior_state": [
-      "No Fireworks account, payment method, credits, API key, SDK, or request is assumed.",
-      "The developer has an email address or a Google, GitHub, or LinkedIn identity, a valid payment method and billing address, and Python with pip.",
-      "No signup, legal acceptance, billing action, key, installation, or API request was performed during research."
+      "No Fireworks account, payment method, credits, API key, or prior request is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
     "official_milestone": "Make your first Serverless API call",
-    "normalized_outcome": "The Fireworks Python SDK sends the published DeepSeek V3.1 request and prints a Spanish greeting.",
-    "observable_completion_signal": "The program prints model output like `¡Hola!`.",
-    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "You should see a response like: `¡Hola!`", "source_ids": ["S1"]},
-    "why_this_is_the_boundary": "The Quickstart explicitly demonstrates this as the first Serverless API call. Streaming and other capabilities follow later.",
-    "source_ids": ["S1", "S2"]
+    "normalized_outcome": "An authenticated cURL POST to Fireworks Serverless chat completions returns model output such as a Spanish greeting.",
+    "observable_completion_signal": "The HTTP response body includes assistant content like `\u00a1Hola!`.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "You should see a response like: `\u00a1Hola!`",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "The Quickstart demonstrates this as the first Serverless API call. cURL is documented alongside SDKs, so installing fireworks-ai is optional.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S5"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "identity", "requirement": "An email address or Google, GitHub, or LinkedIn identity for one of the current signup routes.", "required": true, "source_ids": ["S2"]},
-    {"order": 2, "type": "legal", "requirement": "Signup signifies agreement to Fireworks Terms of Service and Data Processing Agreement.", "required": true, "source_ids": ["S2", "S8"]},
-    {"order": 3, "type": "billing", "requirement": "A valid payment method and billing address, followed by prepaid credits before usage according to the current credit-system guide.", "required": true, "source_ids": ["S5"]},
-    {"order": 4, "type": "credential", "requirement": "A Fireworks API key stored safely and exported locally.", "required": true, "source_ids": ["S1", "S3"]},
-    {"order": 5, "type": "software", "requirement": "Python and pip; the Fireworks Python SDK is alpha and requires the `--pre` install flag.", "required": true, "source_ids": ["S1"]}
+    {
+      "order": 1,
+      "type": "identity",
+      "requirement": "An email address or Google, GitHub, or LinkedIn identity for one of the current signup routes.",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "legal",
+      "requirement": "Signup signifies agreement to Fireworks Terms of Service and Data Processing Agreement.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S8"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "billing",
+      "requirement": "A valid payment method and billing address, followed by prepaid credits before usage according to the current credit-system guide.",
+      "required": true,
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "credential",
+      "requirement": "A Fireworks API key stored safely and exported locally.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "order": 5,
+      "type": "software",
+      "requirement": "A terminal with cURL (or any HTTP client). No language SDK is required.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Serverless Quickstart and follow its Fireworks dashboard key link or account entry.", "details": [], "input": "Quickstart URL", "output": "The Fireworks account or dashboard route opens.", "success_signal": "A new user can reach Create Account.", "failure_or_wait": "No navigation recovery is documented.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for or sign in to Fireworks.", "details": ["Treat signup as one opaque workshop-policy step at the official URL.", "Signup signifies agreement to the Terms of Service and Data Processing Agreement."], "input": "https://app.fireworks.ai/signup", "output": "An authenticated Fireworks dashboard session.", "success_signal": "User Settings and Billing are accessible.", "failure_or_wait": "Follow the displayed account recovery path.", "required": true, "source_ids": ["S2", "S4", "S8"]},
-    {"step_number": 3, "phase": "billing", "actor": "developer", "interface": "web-console", "action": "Ensure the account has usable prepaid credits.", "details": ["Add the documented payment method and billing address and purchase credits when the account has no usable balance."], "input": "Authenticated account", "output": "A positive usable credit balance.", "success_signal": "The account is not paused for zero credits.", "failure_or_wait": "Resolve payment verification, budget, or missing-credit issues using the billing guidance.", "required": true, "source_ids": ["S5", "S6"]},
-    {"step_number": 4, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Create and copy an API key.", "details": ["Open Profile, User Settings, API Keys, then select Create API Key.", "Store the key safely."], "input": "Authenticated funded account", "output": "Fireworks API key.", "success_signal": "The new key is displayed and copied.", "failure_or_wait": "Verify account access and key permissions.", "required": true, "source_ids": ["S1", "S3"]},
-    {"step_number": 5, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Export the API key as `FIREWORKS_API_KEY`.", "details": [], "input": "Copied API key", "output": "Credential available to the SDK process.", "success_signal": "The environment variable is set.", "failure_or_wait": "Correct shell quoting or environment configuration.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install the Fireworks Python SDK.", "details": ["Run `pip install --pre fireworks-ai` because the SDK is currently alpha."], "input": "Python and pip", "output": "Installed Fireworks SDK.", "success_signal": "pip completes successfully.", "failure_or_wait": "Resolve Python environment or package errors.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "code", "action": "Run the published first Serverless chat-completion example.", "details": ["Use model `accounts/fireworks/models/deepseek-v3p1`.", "Send `Say hello in Spanish` and print `response.choices[0].message.content`."], "input": "Installed SDK and exported key", "output": "Model-generated Spanish greeting.", "success_signal": "The program prints output like `¡Hola!`.", "failure_or_wait": "Check the API key, credit balance, model identifier, and network response.", "required": true, "source_ids": ["S1"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Serverless Quickstart and follow its Fireworks dashboard key link or account entry.",
+      "details": [],
+      "input": "Quickstart URL",
+      "output": "The Fireworks account or dashboard route opens.",
+      "success_signal": "A new user can reach Create Account.",
+      "failure_or_wait": "No navigation recovery is documented.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Sign up for or sign in to Fireworks.",
+      "details": [
+        "Treat signup as one opaque workshop-policy step at the official URL.",
+        "Signup signifies agreement to the Terms of Service and Data Processing Agreement."
+      ],
+      "input": "https://app.fireworks.ai/signup",
+      "output": "An authenticated Fireworks dashboard session.",
+      "success_signal": "User Settings and Billing are accessible.",
+      "failure_or_wait": "Follow the displayed account recovery path.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S4",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "billing",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Ensure the account has usable prepaid credits.",
+      "details": [
+        "Add the documented payment method and billing address and purchase credits when the account has no usable balance."
+      ],
+      "input": "Authenticated account",
+      "output": "A positive usable credit balance.",
+      "success_signal": "The account is not paused for zero credits.",
+      "failure_or_wait": "Resolve payment verification, budget, or missing-credit issues using the billing guidance.",
+      "required": true,
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-console",
+      "action": "Create and copy an API key.",
+      "details": [
+        "Open Profile, User Settings, API Keys, then select Create API Key.",
+        "Store the key safely."
+      ],
+      "input": "Authenticated funded account",
+      "output": "Fireworks API key.",
+      "success_signal": "The new key is displayed and copied.",
+      "failure_or_wait": "Verify account access and key permissions.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export the API key as `FIREWORKS_API_KEY`.",
+      "details": [],
+      "input": "Copied API key",
+      "output": "Credential available to the SDK process.",
+      "success_signal": "The environment variable is set.",
+      "failure_or_wait": "Correct shell quoting or environment configuration.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "POST https://api.fireworks.ai/inference/v1/chat/completions with cURL using the Bearer API key.",
+      "details": [
+        "Include Content-Type: application/json and Authorization: Bearer $FIREWORKS_API_KEY.",
+        "Use model accounts/fireworks/models/deepseek-v3p1 and message Say hello in Spanish as in the quickstart cURL example."
+      ],
+      "input": "Exported FIREWORKS_API_KEY and usable prepaid credits",
+      "output": "Chat completions HTTP response",
+      "success_signal": "The response includes model output such as \u00a1Hola!.",
+      "failure_or_wait": "Check API key, credit balance, model id, and network errors.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 2, "condition": "Email, Google, GitHub, or LinkedIn signup", "path": "Begin the selected identity route; its intermediate verification and convergence are not documented publicly.", "effect_on_first_success": "The identity route changes, but no route can be reconstructed through the required account and dashboard transition.", "source_ids": ["S2"]}
+    {
+      "at_step": 2,
+      "condition": "Email, Google, GitHub, or LinkedIn signup",
+      "path": "Begin the selected identity route; its intermediate verification and convergence are not documented publicly.",
+      "effect_on_first_success": "The identity route changes, but no route can be reconstructed through the required account and dashboard transition.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer prefers the Fireworks or OpenAI-compatible SDK tab.",
+      "path": "Install the selected SDK and run the published example against the same Serverless endpoint.",
+      "effect_on_first_success": "Adds optional package installation only.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 2, "type": "choice", "description": "The signup screen offers four peer identity routes without selecting a default.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 2, "type": "terms", "description": "Signup states that the user agrees to the Terms of Service and Data Processing Agreement.", "documented_requirement": true, "source_ids": ["S2", "S8"]},
-    {"at_step": 2, "type": "account", "description": "The post-selection verification, account result, and authenticated dashboard transition are not documented publicly.", "documented_requirement": true, "source_ids": ["S2", "S4"]}
+    {
+      "at_step": 2,
+      "type": "choice",
+      "description": "The signup screen offers four peer identity routes without selecting a default.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "terms",
+      "description": "Signup states that the user agrees to the Terms of Service and Data Processing Agreement.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S8"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "account",
+      "description": "The post-selection verification, account result, and authenticated dashboard transition are not documented publicly.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": true, "value": "The Serverless Quickstart says it makes the first call in minutes; the blocked public account route prevents end-to-end verification of that claim.", "source_ids": ["S1"]},
+  "time_to_first_success": {
+    "vendor_claim": true,
+    "value": "The Serverless Quickstart says it makes the first call in minutes; the blocked public account route prevents end-to-end verification of that claim.",
+    "source_ids": [
+      "S1"
+    ]
+  },
   "sources": [
-    {"id": "S1", "title": "Serverless Quickstart", "url": "https://docs.fireworks.ai/getting-started/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Step 1: Create and export an API key", "Step 2: Make your first Serverless API call"], "evidence_supported": ["Primary route", "serverless recommendation", "key export", "alpha SDK install", "DeepSeek call", "Spanish output", "time claim"]},
-    {"id": "S2", "title": "Sign Up", "url": "https://app.fireworks.ai/signup", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Create Account", "Authentication Section"], "evidence_supported": ["Email Google GitHub and LinkedIn routes", "Terms and DPA agreement"]},
-    {"id": "S3", "title": "Onboarding", "url": "https://docs.fireworks.ai/getting-started/onboarding", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["How to get your API key", "Using your API key"], "evidence_supported": ["Profile to User Settings to API Keys", "Create API Key", "copy and secure"]},
-    {"id": "S4", "title": "Concepts", "url": "https://docs.fireworks.ai/getting-started/concepts", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Account", "User"], "evidence_supported": ["Account billing boundary", "developer account ID generated from signup email"]},
-    {"id": "S5", "title": "Credit system", "url": "https://docs.fireworks.ai/faq/billing-pricing-usage/billing/credit-system", "official_domain": true, "source_type": "pricing", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Billing and credit usage", "Account suspension", "Missing credits"], "evidence_supported": ["Payment method and billing address", "prepaid credits", "zero-balance pause", "budget and verification recovery"]},
-    {"id": "S6", "title": "How do credits work?", "url": "https://docs.fireworks.ai/faq-new/billing-pricing/what-happens-when-i-finish-my-1-dollar-credit", "official_domain": true, "source_type": "pricing", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["What happens when I finish my $1 credit?", "Account Status"], "evidence_supported": ["Referenced $1 credit", "payment requirement after depletion", "credit receipt behavior"]},
-    {"id": "S7", "title": "Account setup & management", "url": "https://docs.fireworks.ai/faq/account/access/setup-management", "official_domain": true, "source_type": "troubleshooting", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Multiple account access", "Signing in from different Fireworks accounts"], "evidence_supported": ["Google login behavior", "wrong-account recovery", "support path"]},
-    {"id": "S8", "title": "Terms of Service (7.10.26)", "url": "https://fireworks.ai/terms-of-service", "official_domain": true, "source_type": "policy", "accessed_at": "2026-07-18", "last_updated_if_shown": "July 10, 2026", "sections_used": ["Introduction"], "evidence_supported": ["Legal acceptance applies to Service use"]},
-    {"id": "S9", "title": "Model Library", "url": "https://app.fireworks.ai/models", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Footer"], "evidence_supported": ["Fireworks AI, Inc. organization identity"]}
+    {
+      "id": "S1",
+      "title": "Serverless Quickstart",
+      "url": "https://docs.fireworks.ai/getting-started/quickstart",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Step 1: Create and export an API key",
+        "Step 2: Make your first Serverless API call"
+      ],
+      "evidence_supported": [
+        "Primary route",
+        "serverless recommendation",
+        "key export",
+        "alpha SDK install",
+        "DeepSeek call",
+        "Spanish output",
+        "time claim"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sign Up",
+      "url": "https://app.fireworks.ai/signup",
+      "official_domain": true,
+      "source_type": "account-setup",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Create Account",
+        "Authentication Section"
+      ],
+      "evidence_supported": [
+        "Email Google GitHub and LinkedIn routes",
+        "Terms and DPA agreement"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Onboarding",
+      "url": "https://docs.fireworks.ai/getting-started/onboarding",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "How to get your API key",
+        "Using your API key"
+      ],
+      "evidence_supported": [
+        "Profile to User Settings to API Keys",
+        "Create API Key",
+        "copy and secure"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Concepts",
+      "url": "https://docs.fireworks.ai/getting-started/concepts",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Account",
+        "User"
+      ],
+      "evidence_supported": [
+        "Account billing boundary",
+        "developer account ID generated from signup email"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Credit system",
+      "url": "https://docs.fireworks.ai/faq/billing-pricing-usage/billing/credit-system",
+      "official_domain": true,
+      "source_type": "pricing",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Billing and credit usage",
+        "Account suspension",
+        "Missing credits"
+      ],
+      "evidence_supported": [
+        "Payment method and billing address",
+        "prepaid credits",
+        "zero-balance pause",
+        "budget and verification recovery"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "How do credits work?",
+      "url": "https://docs.fireworks.ai/faq-new/billing-pricing/what-happens-when-i-finish-my-1-dollar-credit",
+      "official_domain": true,
+      "source_type": "pricing",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "What happens when I finish my $1 credit?",
+        "Account Status"
+      ],
+      "evidence_supported": [
+        "Referenced $1 credit",
+        "payment requirement after depletion",
+        "credit receipt behavior"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Account setup & management",
+      "url": "https://docs.fireworks.ai/faq/account/access/setup-management",
+      "official_domain": true,
+      "source_type": "troubleshooting",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Multiple account access",
+        "Signing in from different Fireworks accounts"
+      ],
+      "evidence_supported": [
+        "Google login behavior",
+        "wrong-account recovery",
+        "support path"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Terms of Service (7.10.26)",
+      "url": "https://fireworks.ai/terms-of-service",
+      "official_domain": true,
+      "source_type": "policy",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": "July 10, 2026",
+      "sections_used": [
+        "Introduction"
+      ],
+      "evidence_supported": [
+        "Legal acceptance applies to Service use"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Model Library",
+      "url": "https://app.fireworks.ai/models",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Footer"
+      ],
+      "evidence_supported": [
+        "Fireworks AI, Inc. organization identity"
+      ]
+    }
   ],
   "uncertainties": [],
-  "excluded_after_success": ["Streaming", "function calling", "structured output", "reasoning and vision", "Priority tier and Fast mode", "deployments", "fine-tuning", "production quota management"]
+  "excluded_after_success": [
+    "Streaming",
+    "function calling",
+    "structured output",
+    "reasoning and vision",
+    "Priority tier and Fast mode",
+    "deployments",
+    "fine-tuning",
+    "production quota management",
+    "Fireworks Python SDK installation",
+    "OpenAI-compatible SDK installation"
+  ]
 }

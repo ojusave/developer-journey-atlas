@@ -6,62 +6,51 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Cerebras Inference Quickstart through the first Python chat completion",
-    "selection_basis": "Under the workshop policy, the official Python Quickstart is the fastest documented route: it promises a first Cerebras API call in minutes and ends with a printed chat-completion response.",
+    "name": "Cerebras Inference Quickstart via cURL",
+    "selection_basis": "The Cerebras Inference Quickstart states you can call the API directly with cURL and documents curl https://api.cerebras.ai/v1/chat/completions with Authorization: Bearer ${CEREBRAS_API_KEY}. SDK install is explicitly optional.",
     "alternatives_considered": [
       {
-        "name": "Developer Playground",
-        "url": "https://cloud.cerebras.ai/",
-        "reason_not_primary": "The Quickstart presents the playground as an option for interacting before an API call, but its stated goal is the first API request."
+        "name": "Python SDK",
+        "url": "https://inference-docs.cerebras.ai/quickstart",
+        "reason_not_primary": "Optional; the Quickstart says you can also call the API directly with cURL."
       },
       {
         "name": "Node.js SDK",
         "url": "https://inference-docs.cerebras.ai/quickstart",
-        "reason_not_primary": "This is a peer language tab; Python is selected as the first tab and has the same request terminal."
+        "reason_not_primary": "Peer language SDK tab."
       },
       {
-        "name": "Direct cURL request",
-        "url": "https://inference-docs.cerebras.ai/quickstart",
-        "reason_not_primary": "This avoids SDK installation but is a peer request tab rather than the first Python path."
-      },
-      {
-        "name": "AWS Marketplace",
-        "url": "https://inference-docs.cerebras.ai/integrations/aws-marketplace",
-        "reason_not_primary": "This adds AWS subscription, account linking, marketplace billing, and an integration header before the same API use."
+        "name": "Developer Playground",
+        "url": "https://cloud.cerebras.ai/",
+        "reason_not_primary": "In-browser option before a programmatic API call."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Cerebras account and API key, then run the official Python Quickstart until a chat-completion message is printed.",
+    "developer_intent": "Create a Cerebras API key and complete a chat-completions request over HTTPS without installing an SDK.",
     "starting_url": "https://inference-docs.cerebras.ai/quickstart",
     "assumed_prior_state": [
-      "No Cerebras account, project, API key, payment method, SDK, or prior request is assumed.",
-      "The developer is at least 13 or the minimum age of digital consent required in their country, will provide accurate current account information, and is authorized to accept the Website Terms of Use.",
-      "Python and pip are available for the selected Python tab.",
-      "No account, agreement, credential, package installation, or API request was performed during research."
+      "No Cerebras account, project, or API key is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Make the first Cerebras API request.",
-    "normalized_outcome": "The Python SDK returns and prints a `gpt-oss-120b` chat completion.",
-    "observable_completion_signal": "The terminal prints answer text to `Why is fast inference important?`.",
+    "official_milestone": "Make your first API request",
+    "normalized_outcome": "An authenticated cURL POST to https://api.cerebras.ai/v1/chat/completions returns a chat-completion message.",
+    "observable_completion_signal": "The response includes assistant content answering Why is fast inference important?.",
     "boundary_evidence": {
       "type": "explicitly-named",
-      "official_label_or_terminal_state": "The Quickstart's `Make your first API request` example prints response text.",
+      "official_label_or_terminal_state": "Make your first API request includes a cURL example and shows expected response text.",
       "source_ids": [
-        "S1",
-        "S4",
-        "S5"
+        "S1"
       ]
     },
-    "why_this_is_the_boundary": "The printed completion is the terminal of the guide's explicitly named first-request section.",
+    "why_this_is_the_boundary": "The Quickstart names this the first API request and documents cURL as a first-class path. Free accounts can call the API with lower rate limits; paid upgrades are not required for first success.",
     "source_ids": [
-      "S1",
-      "S4",
-      "S5"
+      "S1"
     ]
   },
   "prerequisites": [
@@ -98,7 +87,7 @@
     {
       "order": 4,
       "type": "software",
-      "requirement": "Python with pip for the selected SDK path.",
+      "requirement": "A terminal with cURL (or any HTTP client). No language SDK is required.",
       "required": true,
       "source_ids": [
         "S1"
@@ -129,7 +118,9 @@
       "actor": "developer",
       "interface": "browser",
       "action": "Sign up for Cerebras Cloud using the official Cloud Console.",
-      "details": ["Treat signup as one opaque prerequisite under the workshop policy."],
+      "details": [
+        "Treat signup as one opaque prerequisite under the workshop policy."
+      ],
       "input": "https://cloud.cerebras.ai/",
       "output": "An authenticated Cerebras Cloud account is available.",
       "success_signal": "The Cloud Console opens.",
@@ -141,11 +132,92 @@
         "S5"
       ]
     },
-    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-ui", "action": "Open API Keys in the left navigation, create a key, and copy it.", "details": [], "input": "Authenticated Cloud Console", "output": "A Cerebras API key is available.", "success_signal": "The new key is displayed.", "failure_or_wait": "Paid accounts can require project selection.", "required": true, "source_ids": ["S1", "S2", "S4"]},
-    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Export the key as `CEREBRAS_API_KEY` and run `echo $CEREBRAS_API_KEY`.", "details": [], "input": "Copied key", "output": "The key is present in the shell.", "success_signal": "The echo command prints the value.", "failure_or_wait": "Set it in the same shell that runs the code.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 5, "phase": "install", "actor": "developer", "interface": "cli", "action": "Run `pip install --upgrade cerebras_cloud_sdk`.", "details": [], "input": "Python and pip", "output": "The Cerebras SDK is installed.", "success_signal": "Installation completes.", "failure_or_wait": "Resolve Python environment errors before continuing.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "build", "actor": "developer", "interface": "code", "action": "Save the Quickstart's Python chat-completion example.", "details": ["Use model `gpt-oss-120b` and the published prompt."], "input": "Published Python sample", "output": "A runnable first-request script exists.", "success_signal": "The script prints the first choice's message content.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 7, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run the Python script.", "details": [], "input": "Script and environment key", "output": "A chat completion is returned.", "success_signal": "The terminal prints response text.", "failure_or_wait": "The guide documents 401, 404, and 429 recovery.", "required": true, "source_ids": ["S1"]}
+    {
+      "step_number": 3,
+      "phase": "credential",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open API Keys in the left navigation, create a key, and copy it.",
+      "details": [],
+      "input": "Authenticated Cloud Console",
+      "output": "A Cerebras API key is available.",
+      "success_signal": "The new key is displayed.",
+      "failure_or_wait": "Paid accounts can require project selection.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Export the key as `CEREBRAS_API_KEY` and run `echo $CEREBRAS_API_KEY`.",
+      "details": [],
+      "input": "Copied key",
+      "output": "The key is present in the shell.",
+      "success_signal": "The echo command prints the value.",
+      "failure_or_wait": "Set it in the same shell that runs the code.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "build",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Save the Quickstart's Python chat-completion example.",
+      "details": [
+        "Use model `gpt-oss-120b` and the published prompt."
+      ],
+      "input": "Published Python sample",
+      "output": "A runnable first-request script exists.",
+      "success_signal": "The script prints the first choice's message content.",
+      "failure_or_wait": "None documented.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "POST https://api.cerebras.ai/v1/chat/completions with cURL using Authorization: Bearer ${CEREBRAS_API_KEY}.",
+      "details": [
+        "Send model gpt-oss-120b and the quickstart user message Why is fast inference important?."
+      ],
+      "input": "CEREBRAS_API_KEY",
+      "output": "Chat completions HTTP response",
+      "success_signal": "Assistant content is returned.",
+      "failure_or_wait": "401 means the key is unset; 429 means rate limit on free accounts.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the chat-completion message text in the JSON response.",
+      "details": [],
+      "input": "API response",
+      "output": "Verified first Cerebras API success",
+      "success_signal": "Answer text is present.",
+      "failure_or_wait": "An error body means the call failed.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "candidate_paths": [],
   "candidate_path_gap": null,
@@ -175,6 +247,15 @@
       "effect_on_first_success": "Adds project selection; the free-trial path does not document this requirement.",
       "source_ids": [
         "S2"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "The developer prefers the Python or Node SDK tab.",
+      "path": "Install the selected SDK and run the published example against the same chat-completions endpoint.",
+      "effect_on_first_success": "Adds optional package installation only.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
@@ -358,6 +439,8 @@
     }
   ],
   "excluded_after_success": [
-    "Streaming, tool calling, structured outputs, reasoning, model selection, integrations, paid tiers, monitoring, and production design are outside the blocked selected path."
+    "Streaming, tool calling, structured outputs, reasoning, model selection, integrations, paid tiers, monitoring, and production design are outside the blocked selected path.",
+    "Python SDK installation",
+    "Node.js SDK installation"
   ]
 }

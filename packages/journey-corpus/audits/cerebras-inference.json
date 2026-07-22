@@ -7,7 +7,7 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "cf40df4f3bf2f318da28d02e66252277623fa1797a473588edaaee420d87c8eb",
+  "source_record_sha256": "586f22039b278e9bf62a09700b32f276f33444cefce8691e2940c48f90e0d5a3",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
@@ -16,11 +16,13 @@
       "No Cerebras account, API key, payment method, or chat-completion request exists yet."
     ]
   },
-  "developer_goal": "Create a Cerebras Cloud account and API key, then run the official Python Quickstart until a chat-completion message is printed.",
+  "developer_goal": "Create a Cerebras API key and complete a cURL chat-completions call.",
   "first_success": {
-    "outcome": "The Cerebras Python SDK returns and prints a gpt-oss-120b chat completion.",
-    "observable_signal": "The terminal prints answer text for Why is fast inference important?.",
-    "source_ids": ["S1"]
+    "outcome": "POST https://api.cerebras.ai/v1/chat/completions with a Bearer key returns a chat-completion message.",
+    "observable_signal": "Assistant content answering the quickstart prompt is present.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
     "surface": "Cerebras Cloud Console plus official Inference Quickstart Python SDK",
@@ -50,13 +52,19 @@
           "label": "Cloud Console signup fields and agreements",
           "field_type": "other",
           "evidence_state": "unverified",
-          "source_ids": ["S1", "S4"],
+          "source_ids": [
+            "S1",
+            "S4"
+          ],
           "notes": "Official docs do not enumerate registration controls."
         }
       ],
       "observable_result": "The developer has an authenticated Cloud Console session.",
       "evidence_state": "unverified",
-      "source_ids": ["S1", "S4"]
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
     },
     {
       "step_number": 2,
@@ -66,33 +74,13 @@
       "required_fields": [],
       "observable_result": "An API key value is available to export as CEREBRAS_API_KEY.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Export CEREBRAS_API_KEY, confirm it with echo, and install cerebras_cloud_sdk.",
-      "required_fields": [
-        {
-          "label": "export CEREBRAS_API_KEY",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "pip install --upgrade cerebras_cloud_sdk",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The SDK is installed and the key is present in the shell.",
-      "evidence_state": "documented",
-      "source_ids": ["S1"]
-    },
-    {
-      "step_number": 4,
       "kind": "implementation",
       "interface": "code",
       "action": "Run the published chat.completions.create example and print the message content.",
@@ -101,47 +89,82 @@
           "label": "messages and model",
           "field_type": "code",
           "evidence_state": "documented",
-          "source_ids": ["S1"]
+          "source_ids": [
+            "S1"
+          ]
         }
       ],
       "observable_result": "The terminal prints the chat-completion content.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "api",
+      "action": "POST https://api.cerebras.ai/v1/chat/completions with Authorization Bearer and confirm completion text.",
+      "required_fields": [],
+      "observable_result": "Chat-completion message text is returned.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
       "description": "Local Python and pip are available for the Quickstart SDK install.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "external_gates": [
     {
       "description": "Website Terms of Use apply through access or use and include minimum-age and accuracy requirements.",
-      "source_ids": ["S5"]
+      "source_ids": [
+        "S5"
+      ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
       "description": "Cerebras returns a chat completion for the Quickstart model and messages.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "description": "Pricing states $5 in free credits after making an account for the Free Trial tier.",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S3"
+      ]
     }
   ],
   "excluded": [
     {
       "item": "Playground experimentation",
       "reason": "Quickstart presents playground as an optional alternate for users already familiar with LLM APIs.",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "item": "Paid Developer tier starting at $10",
       "reason": "Only required if free-trial limits are insufficient; not established as mandatory for first success.",
-      "source_ids": ["S3"]
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "Installing the Cerebras Python or Node SDK",
+      "reason": "Quickstart documents an equivalent cURL call and states SDK install is optional.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
