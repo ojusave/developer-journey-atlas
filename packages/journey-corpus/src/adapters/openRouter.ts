@@ -40,7 +40,7 @@ function docsBlock(docs: DocHit[]): string {
 export class OpenRouterProvider implements LLMProvider {
   constructor(
     private readonly apiKey: string,
-    private readonly model: string,
+    private readonly model: string | undefined,
     private readonly validate: RecordValidator,
     private readonly schemaText: string,
     private readonly categories: string[] = [],
@@ -99,7 +99,7 @@ export class OpenRouterProvider implements LLMProvider {
           "X-Title": "Developer Journey Atlas",
         },
         body: JSON.stringify({
-          model: this.model,
+          ...(this.model ? { model: this.model } : {}),
           messages,
           temperature: 0.2,
           response_format: { type: "json_object" },

@@ -19,7 +19,7 @@ export const config = {
   youApiKey: process.env.YDC_API_KEY ?? "",
   // Phase 2 LLM provider (OpenRouter). Model is overridable per deployment.
   openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
-  openRouterModel: process.env.OPENROUTER_MODEL ?? "openai/gpt-4.1-mini",
+  openRouterModel: process.env.OPENROUTER_MODEL || undefined,
   // Phase 2 auto-PR. Optional: when absent, research still runs and displays,
   // and the UI offers the drafted record for manual submission.
   githubToken: process.env.GITHUB_TOKEN ?? "",
