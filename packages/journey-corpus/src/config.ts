@@ -22,8 +22,9 @@ export const config = {
   // --- Workflow service: provider credentials for the research tasks ---
   // You.com Web Search API. YDC_API_KEY is You.com's canonical env var name.
   youApiKey: process.env.YDC_API_KEY ?? "",
-  // OpenRouter LLM provider. The model is optional: when unset, no model is sent
-  // and OpenRouter uses the account/payer default.
+  // OpenRouter LLM provider. No model is pinned in code, but OpenRouter has no
+  // server-side default: OPENROUTER_MODEL must be set (e.g. openai/gpt-4.1-mini)
+  // or reconstruction fails with "No models provided".
   openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
   openRouterModel: process.env.OPENROUTER_MODEL ?? "",
   // Auto-PR token. Optional: without it, research still runs and the drafted

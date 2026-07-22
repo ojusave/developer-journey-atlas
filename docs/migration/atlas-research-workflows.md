@@ -50,7 +50,7 @@ Two layers. The web service keeps a bounded in-memory map of recently started ru
 
 ## Model behavior
 
-`OPENROUTER_MODEL` is optional. When unset, the request omits the `model` field entirely and OpenRouter uses the account/payer default. No stale model is pinned in config or on Render.
+No model is pinned in code: the adapter only sends a `model` when `OPENROUTER_MODEL` is set. OpenRouter has no server-side default, so omitting the field returns `No models provided` and reconstruction fails. In practice `OPENROUTER_MODEL` is therefore required for the Workflow service. The deployed value is `openai/gpt-4.1-mini` (the model Atlas already used before this migration); change it in one env field to swap models without a code change.
 
 ## Environment fields
 
@@ -62,7 +62,7 @@ Web service `developer-journey-atlas`:
 Workflow service `developer-journey-atlas-workflows`:
 
 - `YDC_API_KEY`, `OPENROUTER_API_KEY`, `GITHUB_TOKEN` (secrets, rotated).
-- `OPENROUTER_MODEL` (optional, leave unset).
+- `OPENROUTER_MODEL` (required for OpenRouter; set to e.g. `openai/gpt-4.1-mini`).
 - `GITHUB_REPO_SLUG` (optional, non-secret).
 
 After migration, the provider and GitHub secrets are removed from the web service, and the legacy `RESEARCH_ENABLED` field is gone (research availability is now derived from the presence of `RENDER_API_KEY` and the task slug). Blueprints cannot manage Workflow services, so `render.yaml` declares only the web service; the Workflow service is created with the Render CLI or Dashboard.
