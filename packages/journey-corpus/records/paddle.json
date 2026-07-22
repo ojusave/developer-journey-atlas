@@ -6,312 +6,163 @@
   },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Paddle Billing end-to-end sandbox Quickstart",
-    "selection_basis": "Under the workshop policy, Paddle’s end-to-end sandbox Quickstart is primary: there is no local or OSS Paddle billing service, and the docs identify sandbox as the recommended testing route. Signup is one opaque step at the official sandbox URL, followed by the complete public catalog, Paddle.js, checkout, and webhook sequence.",
-    "alternatives_considered": [
-      {
-        "name": "Backend SDK quickstarts",
-        "url": "https://developer.paddle.com/get-started/",
-        "reason_not_primary": "Node.js, Python, Go, and PHP are peer SDK-specific first-request routes, while the selected Quickstart is explicitly the end-to-end integration."
-      },
-      {
-        "name": "Starter kits",
-        "url": "https://developer.paddle.com/get-started/",
-        "reason_not_primary": "The Next.js and web monetization kits start from working applications rather than the framework-agnostic walkthrough."
-      },
-      {
-        "name": "Paddle.js five-minute quickstart",
-        "url": "https://developer.paddle.com/paddle-js/about/",
-        "reason_not_primary": "This narrower route stops at opening a first checkout, while the selected general Quickstart includes catalog, payment, and webhook handling."
-      }
-    ]
+    "name": "Paddle.js overlay checkout quickstart (sandbox test payment)",
+    "selection_basis": "The official documentation presents this as the hosted path from account setup to Take a test payment. It reaches the requested first-success boundary without extending into post-success production work.",
+    "alternatives_considered": []
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Create a Paddle sandbox account and complete the official end-to-end Quickstart until a second test checkout sends lifecycle webhooks to the configured Hookdeck destination.",
-    "starting_url": "https://developer.paddle.com/get-started/quickstart/",
+    "developer_intent": "A Paddle.js overlay checkout opens in sandbox and completes a test payment for a configured price.",
+    "starting_url": "https://developer.paddle.com/paddle-js/about/",
     "assumed_prior_state": [
-      "No Paddle sandbox or live account, catalog, product, price, client-side token, default payment link, notification destination, transaction, customer, subscription, or prior integration is assumed.",
-      "A browser and a personal and business identity suitable for sandbox signup are available; the downstream guide also uses the public Paddle CodePen and Hookdeck Console.",
-      "No account was created, details or terms were submitted, checkout was opened, payment was taken, webhook destination was created, or webhook was sent during research."
+      "The developer has no prior Paddle setup for this journey.",
+      "The journey starts at account creation and stops at the first documented successful outcome."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Complete the end-to-end Quickstart with a pricing page connected to Paddle Checkout and webhooks flowing for provisioning.",
-    "normalized_outcome": "The intended terminal is a Paddle sandbox pricing page that completes a test checkout and sends the resulting transaction lifecycle webhooks to Hookdeck Console.",
-    "observable_completion_signal": "After a second test payment, Hookdeck Console displays incoming Paddle events, including the illustrated `transaction.completed` payload.",
+    "official_milestone": "Take a test payment",
+    "normalized_outcome": "A Paddle.js overlay checkout opens in sandbox and completes a test payment for a configured price.",
+    "observable_completion_signal": "The overlay displays the successful checkout state after valid sandbox payment details are submitted.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "After the second sandbox checkout, Hookdeck receives Paddle lifecycle events including `transaction.completed`.",
+      "official_label_or_terminal_state": "The official documentation leads the developer to: Take a test payment.",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
-    "why_this_is_the_boundary": "This is the earliest observable terminal in the selected official quickstart. The workshop policy permits treating signup as one opaque step and then reconstructing the publicly documented post-login path.",
+    "why_this_is_the_boundary": "This is the first observable happy-path result on the selected Paddle.js overlay checkout quickstart (sandbox test payment) surface; later configuration and production hardening occur after success.",
     "source_ids": [
-      "S2",
-      "S3",
-      "S4"
+      "S1"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
       "type": "account",
-      "requirement": "Create a separate Paddle sandbox account even if a live account already exists.",
+      "requirement": "A Paddle sandbox account.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     },
     {
       "order": 2,
       "type": "configuration",
-      "requirement": "Create Starter and Pro products with monthly and annual prices, then retain their price IDs.",
+      "requirement": "A sandbox product and price.",
       "required": true,
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
       "order": 3,
       "type": "credential",
-      "requirement": "Create and copy a sandbox client-side token for Paddle.js.",
+      "requirement": "A sandbox client-side token.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     },
     {
       "order": 4,
-      "type": "domain",
-      "requirement": "Set a default payment link; the sandbox guide permits any domain without verification, and the Quickstart permits `https://localhost/` when no website exists.",
+      "type": "software",
+      "requirement": "A web page capable of loading Paddle.js.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "order": 5,
-      "type": "other",
-      "requirement": "Use an owned email address, a supported country, a valid ZIP or postal code when required, and Paddle's published sandbox card values for the test checkout.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "arrive",
+      "phase": "account",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Open the official end-to-end Paddle Quickstart.",
+      "interface": "browser",
+      "action": "Create or sign in to Paddle Sandbox.",
       "details": [],
-      "input": "https://developer.paddle.com/get-started/quickstart/",
-      "output": "The sandbox-to-webhook route is visible.",
-      "success_signal": "The guide lists its five stages.",
-      "failure_or_wait": "None documented.",
+      "input": "A new developer starting at account creation",
+      "output": "The sandbox dashboard is accessible.",
+      "success_signal": "The sandbox dashboard is accessible.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
       "step_number": 2,
-      "phase": "account",
+      "phase": "configure",
       "actor": "developer",
-      "interface": "browser",
-      "action": "Create a Paddle sandbox account as one opaque signup step.",
+      "interface": "console",
+      "action": "Create a product and price, then create or copy a sandbox client-side token.",
       "details": [],
-      "input": "https://sandbox-login.paddle.com/signup",
-      "output": "An authenticated Paddle sandbox dashboard is available.",
-      "success_signal": "The sandbox dashboard opens.",
-      "failure_or_wait": "Complete any signup, verification, legal, and business setup requested by Paddle; individual form fields are outside this record.",
+      "input": "Output of the preceding step",
+      "output": "A sandbox price ID and client-side token are available.",
+      "success_signal": "A sandbox price ID and client-side token are available.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 3,
-      "phase": "build",
+      "phase": "configure",
       "actor": "developer",
-      "interface": "web-console",
-      "action": "Create Starter and Pro products, each with monthly and annual prices.",
+      "interface": "browser",
+      "action": "Load Paddle.js on a page, initialize it for sandbox with the client-side token, and configure an overlay checkout for the price.",
       "details": [],
-      "input": "Authenticated sandbox account",
-      "output": "Four sandbox prices exist.",
-      "success_signal": "The products and prices appear under Catalog.",
-      "failure_or_wait": "Save each product and price.",
+      "input": "Output of the preceding step",
+      "output": "The page can open a Paddle overlay for the configured item.",
+      "success_signal": "The page can open a Paddle overlay for the configured item.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
       "step_number": 4,
-      "phase": "credential",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "web-console",
-      "action": "Create and copy a sandbox client-side token under Developer tools > Authentication.",
+      "interface": "browser",
+      "action": "Open the overlay and submit the documented sandbox test payment details.",
       "details": [],
-      "input": "Sandbox account",
-      "output": "A `test_` client-side token is available.",
-      "success_signal": "The token is copied.",
-      "failure_or_wait": "A live token does not match the sandbox environment.",
+      "input": "Output of the preceding step",
+      "output": "Paddle accepts the sandbox payment.",
+      "success_signal": "Paddle accepts the sandbox payment.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 5,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "browser",
-      "action": "Put the token and four price IDs into the official getting-started CodePen.",
-      "details": [],
-      "input": "Client token and price IDs",
-      "output": "The pricing page loads localized prices.",
-      "success_signal": "Starter and Pro prices render and the billing toggle works.",
-      "failure_or_wait": "Check token and `pri_` IDs if prices do not appear.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 6,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Set the Default payment link under Checkout settings, using `https://localhost/` if no website exists.",
-      "details": [],
-      "input": "Sandbox dashboard",
-      "output": "Paddle Checkout can generate required URLs.",
-      "success_signal": "The setting saves successfully.",
-      "failure_or_wait": "Checkout may fail without this setting.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "step_number": 7,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "browser",
-      "action": "Open checkout from CodePen and complete a sandbox payment with Paddle’s published test values.",
-      "details": [],
-      "input": "Configured pricing page",
-      "output": "A test transaction is paid without real money.",
-      "success_signal": "Checkout completes successfully.",
-      "failure_or_wait": "Use a supported country and valid test values.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "step_number": 8,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "web-console",
-      "action": "Open Hookdeck Console, copy its endpoint, then create a Paddle platform webhook destination for all events.",
-      "details": [],
-      "input": "No-account Hookdeck endpoint",
-      "output": "Paddle has an enabled notification destination.",
-      "success_signal": "The destination saves successfully.",
-      "failure_or_wait": "Use the event endpoint, not the Hookdeck console URL.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "browser",
-      "action": "Complete another sandbox checkout.",
-      "details": [],
-      "input": "Enabled webhook destination",
-      "output": "Paddle emits transaction lifecycle webhooks.",
-      "success_signal": "Events arrive in Hookdeck.",
-      "failure_or_wait": "Check Paddle notification logs if no events arrive.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 10,
       "phase": "verify",
       "actor": "developer",
       "interface": "browser",
-      "action": "Inspect the received Hookdeck events.",
+      "action": "Confirm the checkout success state in the overlay.",
       "details": [],
-      "input": "Second sandbox checkout",
-      "output": "The end-to-end Paddle Quickstart is complete.",
-      "success_signal": "Hookdeck shows lifecycle events including `transaction.completed`.",
-      "failure_or_wait": "Queued or failed deliveries are not the terminal.",
+      "input": "Output of the preceding step",
+      "output": "The test payment completion state is visible.",
+      "success_signal": "The test payment completion state is visible.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
-        "S2"
+        "S1"
       ]
     }
   ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
-  "branches": [
-    {
-      "at_step": 1,
-      "condition": "Choose a backend SDK or starter kit instead",
-      "path": "Follow the selected Node.js, Python, Go, PHP, Next.js, or web monetization start from Paddle Get started.",
-      "effect_on_first_success": "Changes the implementation, credentials, and terminal from the framework-agnostic checkout-and-webhook route.",
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "at_step": 3,
-      "condition": "A sandbox account already exists",
-      "path": "Log in, create Starter and Pro products with monthly and annual prices, create a client-side token, put the token and four price IDs into the getting-started CodePen, verify localized prices, set a default payment link, and take a test payment.",
-      "effect_on_first_success": "Skips the blocked signup transition and reaches the checkout portion of the Quickstart.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 3,
-      "condition": "Continue from the first test payment to the Quickstart terminal",
-      "path": "Open Hookdeck Console, copy its endpoint, create a platform webhook destination for all events, save it, run checkout again, and verify the lifecycle webhooks in Hookdeck.",
-      "effect_on_first_success": "Completes the guide's stated provisioning-webhook outcome after account access is available.",
-      "source_ids": [
-        "S2"
-      ]
-    }
-  ],
+  "branches": [],
   "friction_gates": [
     {
-      "at_step": 1,
-      "type": "choice",
-      "description": "Paddle offers an end-to-end walkthrough, four backend SDK starts, AI-tool routes, and starter kits; this record follows the explicitly end-to-end Quickstart.",
+      "at_step": 2,
+      "type": "configuration",
+      "description": "The client-side token and price must belong to the sandbox environment.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
@@ -319,51 +170,11 @@
     },
     {
       "at_step": 3,
-      "type": "account",
-      "description": "A separate Paddle sandbox account is required for testing.",
+      "type": "environment",
+      "description": "Paddle.js must be loaded and initialized on a browser page in an allowed environment.",
       "documented_requirement": true,
       "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "form",
-      "description": "The sandbox documentation requires personal and business details, but the current form is not publicly enumerable without JavaScript.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "credential",
-      "description": "The downstream pricing page requires a sandbox client-side token and four price IDs.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "configuration",
-      "description": "Checkout requires a default payment link before the first test payment.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "at_step": 3,
-      "type": "payment",
-      "description": "The Quickstart uses published test payment details in sandbox and no real money.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     }
   ],
@@ -375,93 +186,36 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Get started | Paddle Developer Docs",
-      "url": "https://developer.paddle.com/get-started/",
+      "title": "Take a test payment",
+      "url": "https://developer.paddle.com/paddle-js/about/",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-19",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Pick your path",
-        "All docs"
+        "Take a test payment"
       ],
       "evidence_supported": [
-        "End-to-end Quickstart selection",
-        "Peer SDK, starter-kit, and AI-tool routes"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Quickstart | Paddle Developer Docs",
-      "url": "https://developer.paddle.com/get-started/quickstart/",
-      "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "What we're building",
-        "Overview",
-        "Sign up for Paddle",
-        "Set up your product catalog",
-        "Build your pricing page",
-        "Open a checkout",
-        "Listen for webhooks",
-        "Pick a starting point"
-      ],
-      "evidence_supported": [
-        "Selected sandbox route",
-        "Catalog entities",
-        "Dashboard steps",
-        "Client-side token",
-        "CodePen configuration",
-        "Default payment link",
-        "Test checkout values",
-        "Hookdeck destination",
-        "Webhook terminal and recovery guidance"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Sandbox | Paddle Developer Docs",
-      "url": "https://developer.paddle.com/sdks/sandbox/",
-      "official_domain": true,
-      "source_type": "account-setup",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Types of Paddle accounts",
-        "Create a sandbox account",
-        "Authenticate with sandbox",
-        "Differences between sandbox and live",
-        "Test cards"
-      ],
-      "evidence_supported": [
-        "Separate sandbox account",
-        "High-level signup action",
-        "Credential identifiers",
-        "No real payment",
-        "Domain approval difference",
-        "Test card details"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Paddle Login | Sign into your Paddle Account",
-      "url": "https://sandbox-login.paddle.com/signup",
-      "official_domain": true,
-      "source_type": "account-setup",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Public response"
-      ],
-      "evidence_supported": [
-        "Current sandbox signup requires client-side JavaScript and exposes no reproducible fields or completion state"
+        "A Paddle.js overlay checkout opens in sandbox and completes a test payment for a configured price.",
+        "The overlay displays the successful checkout state after valid sandbox payment details are submitted."
       ]
     }
   ],
-  "uncertainties": [],
+  "uncertainties": [
+    {
+      "question": "Does the current fresh-account UI exactly match every navigation label in the documented Take a test payment path?",
+      "impact": "Navigation wording may differ while the required outcome and boundary remain the same.",
+      "reason_unresolved": "The official documentation establishes the journey but account-specific UI state can vary.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
+  ],
   "excluded_after_success": [
-    "Production account verification, domain approval, live credentials, go-live migration, real payments, provisioning implementation, customer portal, Retain, refunds, and subscription lifecycle management occur after the sandbox webhook terminal."
-  ]
+    "Live account approval",
+    "Production payments",
+    "Webhook fulfillment"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }

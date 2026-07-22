@@ -6,77 +6,77 @@
   },
   "category": "Payments, fintech, and commerce",
   "surface": {
-    "name": "Build and complete Stripe-hosted Checkout with Next.js",
-    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Build and complete Stripe-hosted Checkout with Next.js. The Checkout quickstart has peer language tabs, and its Next.js tab provides a complete client, Route Handler, hosted-payment, and success-route path ending in the guide's explicit congratulations statement. Prior surface before policy commit: Stripe-hosted Checkout quickstart, implementation branch not selected.",
-    "alternatives_considered": [
-      {
-        "name": "Stripe-hosted Checkout in Node",
-        "url": "https://docs.stripe.com/checkout/quickstart.md",
-        "reason_not_primary": "Node is one documented tab, but no inspected platform-level text selects it over the other language and framework tabs."
-      },
-      {
-        "name": "Other Stripe quickstarts",
-        "url": "https://docs.stripe.com/quickstarts",
-        "reason_not_primary": "Stripe lists distinct product outcomes for subscriptions, invoices, Terminal, Connect, webhooks, machine payments, and other use cases; the general Get started page nonetheless points developers to hosted Checkout as its build route."
-      }
-    ]
+    "name": "Stripe-hosted Checkout via cURL Checkout Session",
+    "selection_basis": "The official documentation presents this as the hosted path from account setup to Complete a Stripe-hosted Checkout payment. It reaches the requested first-success boundary without extending into post-success production work.",
+    "alternatives_considered": []
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Build the first Stripe-hosted test checkout from the recommended platform getting-started route.",
-    "starting_url": "https://docs.stripe.com/get-started",
+    "developer_intent": "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+    "starting_url": "https://docs.stripe.com/checkout/quickstart",
     "assumed_prior_state": [
-      "The developer has arrived after discovery.",
-      "A programming language or framework has not been selected."
+      "The developer has no prior Stripe setup for this journey.",
+      "The journey starts at account creation and stops at the first documented successful outcome."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Congratulations! You have a basic Checkout integration working.",
-    "normalized_outcome": "In the selected implementation branch, a local application creates a Checkout Session, redirects to Stripe-hosted Checkout, accepts a documented test-card payment, and redirects to the configured success page.",
-    "observable_completion_signal": "After the developer uses the successful test card, Stripe returns the browser to the application's success URL and the quickstart displays its congratulations statement.",
+    "official_milestone": "Complete Stripe-hosted Checkout payment",
+    "normalized_outcome": "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+    "observable_completion_signal": "Stripe-hosted Checkout displays the successful completion flow after test card details are submitted.",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "The Try it out section is followed by `Congratulations! You have a basic Checkout integration working.`",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The official documentation leads the developer to: Complete a Stripe-hosted Checkout payment.",
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
-    "why_this_is_the_boundary": "The official terminal outcome is established, but one atomic journey requires a human-selected implementation tab because install, server, client, run, and failure steps differ.",
+    "why_this_is_the_boundary": "This is the first observable happy-path result on the selected Stripe-hosted Checkout via cURL Checkout Session surface; later configuration and production hardening occur after success.",
     "source_ids": [
       "S1",
-      "S2",
-      "S3"
+      "S2"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
-      "type": "software",
-      "requirement": "Select and install the runtime, package manager, and local application structure required by one supported quickstart tab.",
+      "type": "account",
+      "requirement": "A Stripe account with test mode available.",
       "required": true,
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
     {
       "order": 2,
       "type": "credential",
-      "requirement": "Use test API keys. Signed-in developers can retrieve their test secret key; coding agents can instead provision an anonymous sandbox with working keys using the documented Stripe CLI command.",
+      "requirement": "A Stripe test secret key.",
       "required": true,
       "source_ids": [
         "S1",
-        "S2",
-        "S3"
+        "S2"
       ]
     },
     {
       "order": 3,
-      "type": "other",
-      "requirement": "A publicly accessible success URL is required by the Checkout Session, though the sample can use its provided local development setup for testing.",
+      "type": "configuration",
+      "requirement": "A test-mode Price ID for the Checkout line item.",
       "required": true,
       "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "A terminal with cURL and a browser.",
+      "required": true,
+      "source_ids": [
+        "S1",
         "S2"
       ]
     }
@@ -84,56 +84,49 @@
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "arrive",
+      "phase": "account",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Follow Stripe Get started to the recommended hosted Checkout quickstart.",
-      "details": [
-        "The Get started page also lists common no-code and product-specific use cases.",
-        "The selected quickstart is a full working client and server sample."
-      ],
-      "input": "Intent to start building a Stripe payment integration.",
-      "output": "Stripe-hosted Checkout quickstart.",
-      "success_signal": "The official tutorial and its terminal milestone are identified.",
-      "failure_or_wait": "A different business use case can route to another quickstart with a different outcome.",
+      "interface": "browser",
+      "action": "Create or sign in to Stripe and switch to test mode.",
+      "details": [],
+      "input": "A new developer starting at account creation",
+      "output": "Test-mode Developers and product settings are accessible.",
+      "success_signal": "Test-mode Developers and product settings are accessible.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
         "S1",
-        "S3"
+        "S2"
       ]
     },
     {
       "step_number": 2,
-      "phase": "access",
+      "phase": "configure",
       "actor": "developer",
       "interface": "console",
-      "action": "Create or sign in to a Stripe account and open its test mode or sandbox context.",
-      "details": [
-        "The normal human path supplies test credentials; a coding agent can instead provision an anonymous sandbox with the documented Stripe CLI route."
-      ],
-      "input": "Stripe identity and account access.",
-      "output": "Stripe test environment.",
-      "success_signal": "The test-mode or sandbox Dashboard is accessible.",
-      "failure_or_wait": "Account, sign-in, or sandbox access must be resolved before keys are available.",
+      "action": "Create or select a test product price and copy its Price ID and test secret key.",
+      "details": [],
+      "input": "Output of the preceding step",
+      "output": "A test Price ID and secret key are available.",
+      "success_signal": "A test Price ID and secret key are available.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
         "S1",
-        "S3"
+        "S2"
       ]
     },
     {
       "step_number": 3,
-      "phase": "authenticate",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "console",
-      "action": "Retrieve the test publishable key and test secret key for the selected Stripe environment.",
-      "details": [
-        "Only test credentials are used for the documented simulated payment."
-      ],
-      "input": "Accessible Stripe test environment.",
-      "output": "Test publishable and secret keys.",
-      "success_signal": "Both keys are available for local environment configuration.",
-      "failure_or_wait": "Wrong-mode, missing, or inaccessible keys prevent Checkout Session creation or client initialization.",
+      "interface": "api",
+      "action": "Use cURL to create a Checkout Session with the Price ID, success URL, cancel URL, and test secret key.",
+      "details": [],
+      "input": "Output of the preceding step",
+      "output": "Stripe returns a Checkout Session with a hosted URL.",
+      "success_signal": "Stripe returns a Checkout Session with a hosted URL.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
         "S1",
@@ -142,253 +135,58 @@
     },
     {
       "step_number": 4,
-      "phase": "install",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Create or enter the Next.js project and install `stripe`, `@stripe/stripe-js`, and `next` as documented.",
-      "details": [
-        "The selected tab determines the project files and package commands."
-      ],
-      "input": "Supported Node.js and npm environment.",
-      "output": "Next.js project with Stripe dependencies.",
-      "success_signal": "The packages install and the project can compile.",
-      "failure_or_wait": "Package, runtime, network, lockfile, or project errors stop implementation.",
+      "interface": "browser",
+      "action": "Open the returned Checkout URL and submit Stripe's documented test payment details.",
+      "details": [],
+      "input": "Output of the preceding step",
+      "output": "Stripe accepts the test payment and completes Checkout.",
+      "success_signal": "Stripe accepts the test payment and completes Checkout.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
     {
       "step_number": 5,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "other",
-      "action": "Set the documented publishable-key and secret-key environment variables in the Next.js project.",
-      "details": [
-        "The secret key stays on the server side."
-      ],
-      "input": "Stripe test keys.",
-      "output": "Configured local Stripe credentials.",
-      "success_signal": "The Next.js server and client can read their respective variables.",
-      "failure_or_wait": "Missing, swapped, live-mode, or exposed secret-key configuration prevents the test integration or creates a security problem.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 6,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "other",
-      "action": "Create the Next.js Route Handler that initializes Stripe and creates a Checkout Session with product or price data, payment mode, and a publicly accessible `success_url`.",
-      "details": [
-        "Stripe explicitly requires the success page URL to be publicly accessible so it can redirect customers to it.",
-        "The success URL carries the Checkout Session identifier for the success route."
-      ],
-      "input": "Secret key, product data, payment mode, and publicly accessible success URL.",
-      "output": "Server endpoint that returns or redirects to the hosted Checkout Session.",
-      "success_signal": "The Route Handler compiles and can create a session in test mode.",
-      "failure_or_wait": "Invalid key, product data, mode, server code, or a success URL that Stripe cannot reach prevents the documented redirect loop.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 7,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "other",
-      "action": "Implement the order preview and checkout request, then implement the success route that retrieves the completed Checkout Session.",
-      "details": [
-        "The success route renders confirmation for the customer email after the hosted redirect."
-      ],
-      "input": "Client UI, publishable key, Checkout endpoint, and session-retrieval logic.",
-      "output": "Local order, checkout, and success pages.",
-      "success_signal": "The Next.js project compiles all three pieces.",
-      "failure_or_wait": "Client request, redirect, route, environment-variable, or session-retrieval errors block the full browser loop.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 8,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run `npm run dev` and open the documented local application URL.",
-      "details": [
-        "If the sample reports the documented OpenSSL error, set `NODE_OPTIONS=--openssl-legacy-provider` and restart."
-      ],
-      "input": "Configured Next.js application.",
-      "output": "Running local Checkout sample.",
-      "success_signal": "The order preview loads in the browser.",
-      "failure_or_wait": "Compile, port, environment, or OpenSSL errors require correction and restart.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "console",
-      "action": "Select Checkout and verify that the browser redirects to Stripe-hosted Checkout.",
-      "details": [
-        "The redirect uses the Checkout Session created by the server Route Handler."
-      ],
-      "input": "Running order preview and Checkout action.",
-      "output": "Stripe-hosted test Checkout page.",
-      "success_signal": "The hosted payment form opens for the test session.",
-      "failure_or_wait": "Session-creation, client, redirect, or key errors prevent hosted Checkout from opening.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 10,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "console",
-      "action": "Enter the successful test card `4242424242424242` and submit the payment.",
-      "details": [
-        "The 3DS test branch uses `4000002500003155` and requires authentication.",
-        "The decline test branch uses `4000000000009995` and produces a declined payment.",
-        "Both are documented alternatives, not the simple-success route."
-      ],
-      "input": "Hosted test Checkout and card number `4242424242424242`.",
-      "output": "Completed simulated payment and redirect.",
-      "success_signal": "Checkout accepts the test payment and redirects to the configured success URL.",
-      "failure_or_wait": "Card `4000000000009995` is declined; card `4000002500003155` adds 3DS authentication before success; invalid details must be corrected.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 11,
       "phase": "verify",
       "actor": "developer",
-      "interface": "console",
-      "action": "Verify the success route and the quickstart's completion statement.",
-      "details": [
-        "The success page retrieves the Checkout Session and renders the customer confirmation."
-      ],
-      "input": "Successful hosted Checkout redirect.",
-      "output": "Working basic Checkout integration.",
-      "success_signal": "The success page renders and the guide reaches `Congratulations! You have a basic Checkout integration working.`",
-      "failure_or_wait": "A missing success page or failed session retrieval means the browser loop has not reached the documented boundary.",
+      "interface": "browser",
+      "action": "Confirm the hosted completion flow or configured success redirect is reached.",
+      "details": [],
+      "input": "Output of the preceding step",
+      "output": "The test Checkout payment is complete.",
+      "success_signal": "The test Checkout payment is complete.",
+      "failure_or_wait": "The path cannot continue until this documented requirement succeeds.",
       "required": true,
       "source_ids": [
-        "S2"
-      ]
-    }
-  ],
-  "branches": [
-    {
-      "at_step": 1,
-      "condition": "A human developer is starting through the normal Get started path.",
-      "path": "Create or sign in to a Stripe account, use the account's test mode or sandbox credentials, then continue to the selected Checkout implementation.",
-      "effect_on_first_success": "The normal path includes account registration or sign-in before test credentials are available.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 1,
-      "condition": "A coding agent needs credentials without registering a human account.",
-      "path": "Install the Stripe CLI and run `stripe sandbox create --help` as directed by Get started to provision an anonymous sandbox with working API keys, then use those sandbox credentials in the Checkout quickstart.",
-      "effect_on_first_success": "The account-registration gate is replaced by a temporary anonymous coding-agent sandbox, while the implementation and test-payment boundary remain the same.",
-      "source_ids": [
         "S1",
-        "S3"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "A supported server-rendered language tab is selected.",
-      "path": "Install that Stripe SDK or download its sample project, initialize the Stripe client with the test secret key, add a server endpoint that creates a Checkout Session with product or price data, payment mode, and success URL, redirect to the returned session URL, add the success page and order preview page with checkout button, build and run the documented server and client pieces, open the documented local URL, select Checkout, and use a documented test card.",
-      "effect_on_first_success": "The browser returns from hosted Checkout to the success page after a simulated payment and the tutorial declares a basic Checkout integration working.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Next.js is selected.",
-      "path": "Install `stripe`, `@stripe/stripe-js`, and `next`, create a Route Handler for the Checkout Session, set publishable and secret environment variables, implement the order preview and checkout request, implement the success route that retrieves the session, run `npm run dev`, open the local application, select Checkout, and complete a documented test-card scenario.",
-      "effect_on_first_success": "The complete session redirects to the success route, which renders confirmation for the customer email.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "The documented sample reports an OpenSSL error after `npm start`.",
-      "path": "Run `export NODE_OPTIONS=--openssl-legacy-provider`, then restart the sample with `npm start`.",
-      "effect_on_first_success": "The local runtime adds a documented environment-variable recovery before the app can be tested.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "The declined or 3DS test card is used.",
-      "path": "Checkout demonstrates a declined payment or an added 3DS authentication step instead of the simple successful card path.",
-      "effect_on_first_success": "The interaction adds a failure or authentication branch before the successful return signal.",
-      "source_ids": [
         "S2"
       ]
     }
   ],
+  "branches": [],
   "friction_gates": [
-    {
-      "at_step": 1,
-      "type": "choice",
-      "description": "Stripe has materially different product and business-use-case quickstarts, though Get started directly links hosted Checkout for developers ready to build.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "choice",
-      "description": "A language or framework tab must be chosen before the install and run path is atomic.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "credential",
-      "description": "The server requires a test secret key and must not expose it in code or client-side requests.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
     {
       "at_step": 2,
       "type": "configuration",
-      "description": "Checkout Session product data, mode, success URL, redirect handling, and local client/server topology must be configured.",
+      "description": "The secret key and Price ID must both be from test mode.",
       "documented_requirement": true,
       "source_ids": [
+        "S1",
         "S2"
       ]
     },
     {
-      "at_step": 2,
-      "type": "verification",
-      "description": "The test-card scenario determines whether the payment succeeds, requires 3DS, or is declined.",
+      "at_step": 3,
+      "type": "configuration",
+      "description": "Checkout Session creation requires valid success and cancel URLs for the selected mode.",
       "documented_requirement": true,
       "source_ids": [
+        "S1",
         "S2"
       ]
     }
@@ -401,95 +199,52 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Get started",
-      "url": "https://docs.stripe.com/get-started",
+      "title": "Build a Stripe-hosted checkout page",
+      "url": "https://docs.stripe.com/checkout/quickstart",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Create an account",
-        "Common use cases",
-        "Start building",
-        "More resources"
+        "Complete a Stripe-hosted Checkout payment"
       ],
       "evidence_supported": [
-        "Direct recommendation of Checkout quickstart",
-        "Account and anonymous-sandbox alternatives",
-        "Product and no-code alternatives"
+        "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+        "Stripe-hosted Checkout displays the successful completion flow after test card details are submitted."
       ]
     },
     {
       "id": "S2",
-      "title": "Build a Stripe-hosted checkout page",
-      "url": "https://docs.stripe.com/checkout/quickstart.md",
+      "title": "Create a Checkout Session",
+      "url": "https://docs.stripe.com/api/checkout/sessions/create",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Stripe-hosted page",
-        "Install library or package",
-        "Create a Checkout Session",
-        "Define a product to sell",
-        "Choose a mode",
-        "Supply success URL",
-        "Redirect to Checkout",
-        "Add a success page",
-        "Add an order preview page",
-        "Add a checkout button",
-        "Set environment variables",
-        "Run the application",
-        "Try it out",
-        "Congratulations"
+        "Complete a Stripe-hosted Checkout payment"
       ],
       "evidence_supported": [
-        "Coequal implementation tabs",
-        "Full implementation sequence",
-        "Credential and configuration requirements",
-        "Test-card branches",
-        "Explicit first-success milestone"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Quickstart guides",
-      "url": "https://docs.stripe.com/quickstarts",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Payments",
-        "Platforms and marketplaces",
-        "Developer resources"
-      ],
-      "evidence_supported": [
-        "Alternative Stripe product outcomes",
-        "Language and framework options",
-        "Anonymous sandbox guidance"
+        "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+        "Stripe-hosted Checkout displays the successful completion flow after test card details are submitted."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which quickstart language or framework should define Stripe's atomic first-mile page sequence?",
-      "impact": "SDK installation, source files, environment variables, build commands, local URLs, client/server topology, and troubleshooting differ by tab.",
-      "reason_unresolved": "The official hosted Checkout tutorial presents multiple supported implementation tabs without selecting one at the platform level.",
+      "question": "Does the current fresh-account UI exactly match every navigation label in the documented Complete a Stripe-hosted Checkout payment path?",
+      "impact": "Navigation wording may differ while the required outcome and boundary remain the same.",
+      "reason_unresolved": "The official documentation establishes the journey but account-specific UI state can vary.",
       "checked_source_ids": [
         "S1",
-        "S2",
-        "S3"
+        "S2"
       ]
     }
   ],
   "excluded_after_success": [
-    "Checkout appearance customization",
-    "Customer prefill and shipping data",
-    "Tax activation",
-    "Webhook-based fulfillment",
-    "Production activation and live API keys",
-    "Subscriptions, Connect, Terminal, invoicing, and other product quickstarts"
+    "Building a server framework integration",
+    "Webhook fulfillment",
+    "Live payments and account activation"
   ],
   "candidate_paths": [],
   "candidate_path_gap": null

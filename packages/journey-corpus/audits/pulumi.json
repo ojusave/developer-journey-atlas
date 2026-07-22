@@ -7,42 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "b6db95cd0571091e502d6bd38a8bdce5d52ac6bf16ed118ddff80a6891db95de",
+  "source_record_sha256": "1d0cd12dff6745ce98a370019d8c60101e80a24a521b341fe77e91cfd61fa2f7",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and local machine.",
-      "No Pulumi Cloud account, CLI login, cloud provider credentials, project, or stack update exists yet."
+      "No prior Pulumi account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Create Pulumi access and deploy the first infrastructure resource for one declared provider and language route.",
+  "developer_goal": "Pulumi creates the getting-started AWS resource and records a successful stack update in Pulumi Cloud.",
   "first_success": {
-    "outcome": "For the representative AWS Get Started candidate, the stack update creates the tutorial bucket and AWS CLI lists it without error.",
-    "observable_signal": "aws s3 ls s3://$(pulumi stack output bucketName) returns an empty listing without error.",
+    "outcome": "Pulumi creates the getting-started AWS resource and records a successful stack update in Pulumi Cloud.",
+    "observable_signal": "pulumi up completes successfully and reports the created resource and stack outputs.",
     "source_ids": [
-      "S2",
-      "S4"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "Pulumi IaC Get Started router",
-    "rule": "Do not invent a winner among peer clouds and languages on the Get Started router; leave the route unresolved until product, provider, language, and state backend are fixed.",
-    "selected": null,
+    "surface": "Pulumi Cloud + AWS get started: first pulumi up",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Pulumi Cloud + AWS get started: first pulumi up",
     "candidates": [
       {
-        "name": "Pulumi IaC with AWS and TypeScript S3 tutorial",
-        "status": "unresolved",
-        "reason": "A common documented deploy-and-verify path, but Get Started requires choosing among AWS, Azure, Google Cloud, and Kubernetes and then a language."
-      },
-      {
-        "name": "Pulumi IaC with Azure, Google Cloud, or Kubernetes",
-        "status": "unresolved",
-        "reason": "Peer provider tutorials with different accounts, credentials, resources, and verification commands."
-      },
-      {
-        "name": "Pulumi Cloud signup identity method",
-        "status": "unresolved",
-        "reason": "Public signup offers GitHub, Google, SSO, and work email peers; required email fields and post-create CLI login prompts are not fully fixed from public evidence alone."
+        "name": "Pulumi Cloud + AWS get started: first pulumi up",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -51,264 +40,147 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Pulumi Cloud account from the signup surface.",
-      "required_fields": [
-        {
-          "label": "Signup identity method",
-          "field_type": "select",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S5"
-          ],
-          "notes": "Public UI offers Continue with GitHub, Google, SSO, and work email."
-        },
-        {
-          "label": "Work email",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S5"
-          ],
-          "notes": "Visible for the email continuation path; OAuth routes may not collect it on this page."
-        },
-        {
-          "label": "Terms of Service and Privacy Policy acknowledgement",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S5"
-          ]
-        }
-      ],
-      "observable_result": "The developer has a Pulumi Cloud identity that can authenticate the CLI or console.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to Pulumi Cloud.",
+      "required_fields": [],
+      "observable_result": "The Pulumi Cloud organization is accessible.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S5"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Install Pulumi CLI and language runtime prerequisites for the selected tutorial.",
-      "required_fields": [
-        {
-          "label": "Pulumi install command",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S3"
-          ]
-        },
-        {
-          "label": "Language runtime prerequisites",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "AWS Get Started lists different runtimes per language tab."
-        }
-      ],
-      "observable_result": "pulumi version runs and the chosen language toolchain is available.",
+      "action": "Install and authenticate the Pulumi CLI, then configure AWS credentials.",
+      "required_fields": [],
+      "observable_result": "The CLI can access Pulumi Cloud and AWS.",
       "evidence_state": "documented",
       "source_ids": [
-        "S2",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 3,
-      "kind": "external-authorization",
+      "kind": "implementation",
       "interface": "cli",
-      "action": "Authenticate Pulumi to a state backend and configure cloud provider credentials.",
-      "required_fields": [
-        {
-          "label": "Pulumi login or backend authentication",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Get Started assumes access configuration; exact CLI login prompts depend on backend choice."
-        },
-        {
-          "label": "Cloud provider credentials",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "AWS account is a documented prerequisite for the AWS tutorial."
-        }
-      ],
-      "observable_result": "Pulumi and the cloud provider CLI can act on the target account.",
-      "evidence_state": "unverified",
+      "action": "Create the AWS getting-started project and review its generated resource code.",
+      "required_fields": [],
+      "observable_result": "A Pulumi stack and starter project exist.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
       "step_number": 4,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Create the tutorial project and stack, run pulumi up, and verify the resource.",
-      "required_fields": [
-        {
-          "label": "pulumi new prompts",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Exact new-project prompts depend on template and language."
-        },
-        {
-          "label": "pulumi up confirmation",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4"
-          ],
-          "notes": "Deploy docs require approving the update."
-        },
-        {
-          "label": "aws s3 ls verification command",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4"
-          ]
-        }
-      ],
-      "observable_result": "The stack update finishes and the verification command lists the new bucket without error.",
+      "action": "Run pulumi up and approve the proposed deployment.",
+      "required_fields": [],
+      "observable_result": "The stack update creates the AWS resource successfully.",
       "evidence_state": "documented",
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    }
-  ],
-  "prerequisites": [
-    {
-      "description": "An AWS account and local AWS CLI access for the representative AWS verification command.",
-      "source_ids": [
-        "S2",
-        "S4"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Cloud provider credentials and permissions must allow creating the tutorial resource.",
-      "source_ids": [
-        "S2"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "pulumi up must create the cloud resource before verification can succeed.",
-      "source_ids": [
-        "S4"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Pulumi creates the stack resources in the target cloud and writes stack outputs such as bucketName.",
-      "source_ids": [
-        "S4"
-      ]
-    }
-  ],
-  "excluded": [
-    {
-      "item": "Reading Pulumi concepts and migration guides",
-      "reason": "Supporting documentation, not required product actions for first deploy.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "Kubernetes Get Started configure path",
-      "reason": "Peer provider route, not selected until the router choice is fixed.",
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Inspect the completed update and its reported resources or outputs.",
+      "required_fields": [],
+      "observable_result": "pulumi up reports a successful update.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S6"
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A Pulumi Cloud account.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "An AWS account with credentials authorized to create the tutorial resource.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The Pulumi CLI, an AWS credential configuration, and a supported project runtime.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "AWS credentials need permission to create the resource in the selected region.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "AWS resource usage can incur charges under the AWS account.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Pulumi creates the getting-started AWS resource and records a successful stack update in Pulumi Cloud.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Editing the starter infrastructure",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "CI/CD deployment",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Destroying the stack after verification",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Get Started with Pulumi",
-      "url": "https://www.pulumi.com/docs/iac/get-started/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Provider router for AWS, Azure, Google Cloud, and Kubernetes"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Pulumi AWS Get Started",
+      "title": "Deploy with pulumi up",
       "url": "https://www.pulumi.com/docs/iac/get-started/aws/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "AWS account prerequisite",
-        "Language-specific runtime prerequisites"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Install Pulumi",
-      "url": "https://www.pulumi.com/docs/iac/get-started/aws/begin/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "CLI install commands",
-        "pulumi version check"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Deploy stack",
-      "url": "https://www.pulumi.com/docs/iac/get-started/aws/deploy-stack/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "pulumi up approval",
-        "AWS CLI bucket verification"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Pulumi Cloud signup",
-      "url": "https://app.pulumi.com/signup",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "GitHub, Google, SSO, and work email signup options",
-        "Terms acknowledgement"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Kubernetes Get Started configure",
-      "url": "https://www.pulumi.com/docs/iac/get-started/kubernetes/configure/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Kubernetes as a peer Get Started provider"
+        "Pulumi creates the getting-started AWS resource and records a successful stack update in Pulumi Cloud.",
+        "pulumi up completes successfully and reports the created resource and stack outputs."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Pulumi product, cloud provider, language, and state backend define first success?",
-      "impact": "These choices change account work, install prerequisites, credentials, prompts, and the verification command.",
-      "evidence_needed": "A bounded goal naming provider and language, plus a fresh Pulumi Cloud signup and CLI walkthrough through the tutorial verification command."
+      "question": "Does fresh-account UI wording differ from the documented Deploy with pulumi up path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null

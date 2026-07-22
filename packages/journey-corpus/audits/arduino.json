@@ -7,40 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "4aec707a191564c98b28a3fe6fba293b2027863a40f73fec9787a44b52f902d6",
+  "source_record_sha256": "60dd0313375cfb8d2aa8eb4ba4ba4501004181774095ff2cb720bbb4a9697658",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported computer and permission to install software.",
-      "An Arduino board and a compatible data USB cable are available for a hardware upload outcome.",
-      "No Arduino IDE install, board package, Cloud Editor session, or Arduino account is assumed yet."
+      "No prior Arduino account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Reach Arduino's official first sketch-running-on-board success from a fresh developer setup, including account creation only if the selected route requires it.",
+  "developer_goal": "Arduino Cloud accepts the application credentials and returns an access token for hosted API use.",
   "first_success": {
-    "outcome": "A sketch is compiled, uploaded, and starts running on the connected Arduino board.",
-    "observable_signal": "Upload completes without error and the sketch starts on the board; with the guide's Blink example, LED_BUILTIN behavior is visible on boards that expose it.",
-    "source_ids": ["S1", "S5"]
+    "outcome": "Arduino Cloud accepts the application credentials and returns an access token for hosted API use.",
+    "observable_signal": "The authentication request returns a bearer access token without an authentication error.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Official Arduino IDE sketch upload path versus Arduino Cloud Editor",
-    "rule": "Begin at the account-creation boundary required by the corpus policy, then select the shortest complete self-service route to a running sketch. Do not invent a winner when the documented primary IDE path omits account creation.",
-    "selected": null,
+    "surface": "Arduino Cloud Application API via API key (hosted)",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Arduino Cloud Application API via API key (hosted)",
     "candidates": [
       {
-        "name": "Desktop Arduino IDE 2 upload of built-in Blink",
-        "status": "unresolved",
-        "reason": "Official Help Center upload guide and software page route new developers here and end with the sketch running on the board, but the path does not create an Arduino account, which conflicts with the corpus account-creation boundary."
-      },
-      {
-        "name": "Arduino Cloud Editor with Create Agent and account",
-        "status": "unresolved",
-        "reason": "Requires Arduino account signup, email verification, Create Agent install, and browser upload; reaches a similar board-programmed result on a different surface."
-      },
-      {
-        "name": "Arduino CLI upload",
-        "status": "not-selected",
-        "reason": "Documented as an alternate tooling surface; the docs home and first-upload guide select the graphical IDE route."
+        "name": "Arduino Cloud Application API via API key (hosted)",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -49,145 +40,129 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create an Arduino account with the email route if the selected surface is Cloud Editor or another account-gated Arduino service.",
-      "required_fields": [
-        {"label": "Email", "field_type": "email", "evidence_state": "documented", "source_ids": ["S7"]},
-        {"label": "Password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S7"]},
-        {"label": "Username", "field_type": "text", "evidence_state": "documented", "source_ids": ["S7"]},
-        {"label": "Privacy Policy and Terms of Service acceptance", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S7"]},
-        {"label": "Date of birth", "field_type": "other", "evidence_state": "documented", "source_ids": ["S7"], "notes": "Entered as DD/MM/YYYY after the initial credentials step."}
-      ],
-      "observable_result": "Arduino accepts the signup details and sends an email verification message.",
+      "action": "Create or sign in to an Arduino account and open Arduino Cloud.",
+      "required_fields": [],
+      "observable_result": "Arduino Cloud is accessible.",
       "evidence_state": "documented",
-      "source_ids": ["S7", "S8"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Open the verification email and select Confirm Now.",
-      "required_fields": [
-        {"label": "Email verification confirmation", "field_type": "other", "evidence_state": "documented", "source_ids": ["S7"]}
-      ],
-      "observable_result": "The Arduino account registration is complete.",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key in Arduino Cloud and copy its client ID and client secret.",
+      "required_fields": [],
+      "observable_result": "Application API credentials are available.",
       "evidence_state": "documented",
-      "source_ids": ["S7"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "browser",
-      "action": "Download and install the current Arduino IDE 2 release for the computer's operating system if the selected route is the desktop IDE.",
+      "interface": "api",
+      "action": "Submit the documented client-credentials authentication request to Arduino Cloud.",
       "required_fields": [],
-      "observable_result": "Arduino IDE opens successfully.",
+      "observable_result": "The authentication endpoint returns an access token.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S2", "S3"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "product-interaction",
-      "interface": "other",
-      "action": "Connect the Arduino board to the computer with a compatible data USB cable.",
-      "required_fields": [],
-      "observable_result": "The board powers on and is available for IDE detection.",
-      "evidence_state": "documented",
-      "source_ids": ["S1", "S4"]
-    },
-    {
-      "step_number": 5,
-      "kind": "product-interaction",
-      "interface": "ide",
-      "action": "Install the board package when Arduino IDE reports that support files for the detected board are missing.",
-      "required_fields": [],
-      "observable_result": "The board can be selected without a missing-platform warning.",
-      "evidence_state": "documented",
-      "source_ids": ["S1"]
-    },
-    {
-      "step_number": 6,
-      "kind": "product-interaction",
-      "interface": "ide",
-      "action": "Select the correct board and serial port using the IDE 2 board selector or Tools menu.",
-      "required_fields": [
-        {"label": "Board", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]},
-        {"label": "Port", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]}
-      ],
-      "observable_result": "Arduino IDE is configured for the connected board and upload port.",
-      "evidence_state": "documented",
-      "source_ids": ["S1", "S4"]
-    },
-    {
-      "step_number": 7,
-      "kind": "product-interaction",
-      "interface": "ide",
-      "action": "Open the built-in Blink example through File > Examples > 01.Basics > Blink.",
-      "required_fields": [],
-      "observable_result": "The Blink sketch is loaded and ready to compile.",
-      "evidence_state": "documented",
-      "source_ids": ["S1", "S5"]
-    },
-    {
-      "step_number": 8,
-      "kind": "product-interaction",
-      "interface": "ide",
-      "action": "Click Upload and wait while the IDE compiles and programs the board.",
-      "required_fields": [],
-      "observable_result": "The upload finishes without a failed-upload error.",
-      "evidence_state": "documented",
-      "source_ids": ["S1"]
-    },
-    {
-      "step_number": 9,
       "kind": "verification",
-      "interface": "other",
-      "action": "Observe the uploaded sketch starting on the board.",
+      "interface": "api",
+      "action": "Confirm that the response contains a bearer access token usable with the Application API.",
       "required_fields": [],
-      "observable_result": "The sketch runs on the hardware; for Blink on boards with LED_BUILTIN, the onboard LED changes state repeatedly.",
+      "observable_result": "A non-empty access token is present.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S5"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
-    {"description": "A supported Windows, macOS, or 64-bit Linux computer for Arduino IDE 2.", "source_ids": ["S2", "S3"]},
-    {"description": "An Arduino board and a compatible data USB cable, not a charge-only cable.", "source_ids": ["S1"]},
-    {"description": "Network access to download the IDE and any missing board package.", "source_ids": ["S1", "S2"]}
+    {
+      "description": "An Arduino account with access to Arduino Cloud.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "An Arduino Cloud API key and client secret.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "An HTTPS client such as cURL.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "external_gates": [
-    {"description": "Operating-system permission for application install and USB or serial-port access may be required.", "source_ids": ["S1", "S4"]}
+    {
+      "description": "The client secret is shown as a sensitive credential and must be retained securely.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "unavoidable_waits": [
-    {"description": "Email delivery and confirmation are required to finish Arduino account signup when the Cloud route is used.", "source_ids": ["S7"]},
-    {"description": "Board-package download, compilation, and upload must finish before the sketch can run on the board.", "source_ids": ["S1"]}
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
-    {"description": "Arduino creates the account after email verification when the account route is used.", "source_ids": ["S7"]},
-    {"description": "Arduino IDE compiles the sketch and transfers it to board flash memory.", "source_ids": ["S1"]},
-    {"description": "The uploaded sketch starts running on the board and runs again after reset.", "source_ids": ["S1"]}
+    {
+      "description": "Arduino Cloud accepts the application credentials and returns an access token for hosted API use.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "excluded": [
-    {"item": "Reading board-specific quickstart guides", "reason": "Documentation reading is evidence, not a measured product action.", "source_ids": ["S1"]},
-    {"item": "Optional Verify before Upload", "reason": "The upload guide treats Verify as optional because Upload compiles.", "source_ids": ["S1"]},
-    {"item": "Arduino CLI and App Lab first runs", "reason": "Different surfaces from the Help Center IDE upload guide.", "source_ids": ["S2"]}
+    {
+      "item": "Provisioning an Arduino device",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Creating Things, dashboards, or variables",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Uploading a local sketch",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "sources": [
-    {"id": "S1", "title": "Upload a sketch in Arduino IDE", "url": "https://support.arduino.cc/hc/en-us/articles/4733418441116-Upload-a-sketch-in-Arduino-IDE", "source_type": "official-support", "accessed_at": "2026-07-22", "evidence_supported": ["IDE download pointer", "USB connection", "Board package prompt", "Board and port selection", "Blink example", "Upload and sketch-running terminal"]},
-    {"id": "S2", "title": "Download and install Arduino IDE", "url": "https://support.arduino.cc/hc/en-us/articles/360019833020-Download-and-install-Arduino-IDE", "source_type": "official-support", "accessed_at": "2026-07-22", "evidence_supported": ["OS-specific IDE installation", "Cloud Editor alternative for Chromebook"]},
-    {"id": "S3", "title": "Arduino software downloads", "url": "https://www.arduino.cc/en/software", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Arduino IDE 2 current release", "Cloud Editor alternative"]},
-    {"id": "S4", "title": "If your board is not detected by Arduino IDE", "url": "https://support.arduino.cc/hc/en-us/articles/4412955149586-If-your-board-is-not-detected-by-Arduino-IDE", "source_type": "official-support", "accessed_at": "2026-07-22", "evidence_supported": ["USB detection failures", "Permission and cable troubleshooting"]},
-    {"id": "S5", "title": "Blink built-in example context in upload guide", "url": "https://support.arduino.cc/hc/en-us/articles/4733418441116-Upload-a-sketch-in-Arduino-IDE", "source_type": "official-support", "accessed_at": "2026-07-22", "evidence_supported": ["File > Examples > 01.Basics > Blink", "Sketch starts running after upload"]},
-    {"id": "S7", "title": "Create an Arduino account", "url": "https://support.arduino.cc/hc/en-us/articles/360016724040-Create-an-Arduino-account", "source_type": "official-support", "accessed_at": "2026-07-22", "evidence_supported": ["Email signup fields", "Terms acceptance", "Date of birth", "Email verification", "SSO alternatives"]},
-    {"id": "S8", "title": "Arduino login", "url": "https://login.arduino.cc/login", "source_type": "observed-public-ui", "accessed_at": "2026-07-22", "evidence_supported": ["Public login and account entry surface"]}
+    {
+      "id": "S1",
+      "title": "Authenticate to the Arduino Cloud Application API",
+      "url": "https://docs.arduino.cc/arduino-cloud/api/api-overview/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Arduino Cloud accepts the application credentials and returns an access token for hosted API use.",
+        "The authentication request returns a bearer access token without an authentication error."
+      ]
+    }
   ],
   "uncertainties": [
     {
-      "question": "Does the corpus account-creation boundary require selecting Arduino Cloud Editor even though the official first-upload guide uses desktop IDE without an account?",
-      "impact": "Choosing Cloud adds account, verification, and Create Agent steps; choosing IDE omits account creation and cannot satisfy the boundary as written.",
-      "evidence_needed": "A maintained policy decision that either exempts hardware IDE-only first success from account creation or designates Cloud Editor as the measured Arduino route."
-    },
-    {
-      "question": "For a given board family, is the automatic board-package prompt always required, and is LED_BUILTIN Blink behavior always the observable terminal?",
-      "impact": "Package install and hardware verification steps change by board and may drop out of the required path.",
-      "evidence_needed": "A bounded board model plus a dated walkthrough of IDE package prompts and onboard LED behavior for that model."
+      "question": "Does fresh-account UI wording differ from the documented Authenticate to the Arduino Cloud Application API path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null

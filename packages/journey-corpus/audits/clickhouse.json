@@ -7,47 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "6d5c1dc3db80fbddeb23e9a817441fd98993a8586f33269ee2dd2d01377e2b97",
+  "source_record_sha256": "6889c197151e65d180a2cf685326577ed5bc6c411bb89a47e3079ecad88c9210",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a browser and can complete ClickHouse Cloud signup or use the public Playground without an account.",
-      "No ClickHouse Cloud organization or service is assumed to exist yet."
+      "No prior ClickHouse account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Reach a first successful ClickHouse query using the vendor's primary getting-started route.",
+  "developer_goal": "A ClickHouse Cloud service accepts SHOW databases in its hosted SQL console and returns database rows.",
   "first_success": {
-    "outcome": "A ClickHouse query returns a visible result on the selected surface.",
-    "observable_signal": "For Cloud SQL console, SHOW databases returns the default database list; for Playground cURL, the command prints Play ClickHouse.",
+    "outcome": "A ClickHouse Cloud service accepts SHOW databases in its hosted SQL console and returns database rows.",
+    "observable_signal": "The SQL console displays the result set for SHOW databases.",
     "source_ids": [
-      "S1",
-      "S3"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "ClickHouse Cloud console self-service web, with Playground as a documented accountless alternate",
-    "rule": "Official Cloud quick start calls creating a Cloud service the quickest and easiest general route and begins at account creation; Playground is a complete no-account peer that conflicts with the account-creation measurement boundary.",
-    "selected": null,
+    "surface": "ClickHouse Cloud quick start: service + SQL console SHOW databases",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "ClickHouse Cloud quick start: service + SQL console SHOW databases",
     "candidates": [
       {
-        "name": "ClickHouse Cloud email signup, onboarding wizard, SQL console SHOW databases",
-        "status": "unresolved",
-        "reason": "Vendor-selected quickest route, but email signup fields, password rules, and post-submit states are not enumerated; default Scale tier sizing may imply billing exposure."
-      },
-      {
-        "name": "Google or Microsoft SSO or cloud marketplace signup then SQL console",
-        "status": "unresolved",
-        "reason": "Named peer account branches without intermediate steps or shared return state into the onboarding wizard."
-      },
-      {
-        "name": "ClickHouse Playground accountless cURL or web SQL",
-        "status": "unresolved",
-        "reason": "Fully demonstrated without signup, but it is not the Cloud quick start the docs call quickest and easiest and skips account creation."
-      },
-      {
-        "name": "Open-source local quick start",
-        "status": "not-selected",
-        "reason": "Changes the surface to local installation rather than the vendor Cloud route."
+        "name": "ClickHouse Cloud quick start: service + SQL console SHOW databases",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -56,51 +40,21 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a ClickHouse Cloud account using email, SSO, or a marketplace route if the Cloud path is selected.",
-      "required_fields": [
-        {
-          "label": "Signup method",
-          "field_type": "select",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Email, Google SSO, Microsoft SSO, AWS Marketplace, Google Cloud, and Microsoft Azure are named peers."
-        },
-        {
-          "label": "Email and password",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1",
-            "S4"
-          ],
-          "notes": "Quick start says create an account and verify email within 24 hours but does not list form fields."
-        }
-      ],
-      "observable_result": "The developer can log in and the Cloud onboarding wizard starts.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to ClickHouse Cloud.",
+      "required_fields": [],
+      "observable_result": "The ClickHouse Cloud console is accessible.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "If using email signup, verify the email address via the emailed link.",
-      "required_fields": [
-        {
-          "label": "Email verification link",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The email identity is verified for the new account.",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a ClickHouse Cloud service and wait until it is ready.",
+      "required_fields": [],
+      "observable_result": "The service reports a ready/running state.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -110,35 +64,9 @@
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Complete the onboarding wizard by choosing region and service name, optionally adjusting replica sizing, then create the service.",
-      "required_fields": [
-        {
-          "label": "Service region",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Service name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Replica size minimum and maximum",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Optional customization; defaults place new orgs on Scale tier with 3 replicas."
-        }
-      ],
-      "observable_result": "The ClickHouse Cloud service is running and onboarding completes.",
+      "action": "Open the service SQL console and run SHOW databases.",
+      "required_fields": [],
+      "observable_result": "The query executes successfully.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -148,18 +76,9 @@
       "step_number": 4,
       "kind": "verification",
       "interface": "web-ui",
-      "action": "In SQL console, create a query tab and run SHOW databases.",
-      "required_fields": [
-        {
-          "label": "SHOW databases",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The console lists the default databases.",
+      "action": "Confirm that the SQL console displays database names.",
+      "required_fields": [],
+      "observable_result": "A result set containing databases is visible.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -168,7 +87,13 @@
   ],
   "prerequisites": [
     {
-      "description": "Marketplace signup branches require an authorized cloud-provider billing relationship outside ClickHouse.",
+      "description": "A ClickHouse Cloud account.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A ClickHouse Cloud service created through the Cloud quick start.",
       "source_ids": [
         "S1"
       ]
@@ -176,35 +101,16 @@
   ],
   "external_gates": [
     {
-      "description": "Email signup requires verifying email within 24 hours.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "Default Scale-tier service creation may involve plan or payment entitlements not fully spelled out on the quick start.",
+      "description": "Service creation has a platform-managed provisioning wait before the SQL console is usable.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "unavoidable_waits": [
-    {
-      "description": "Email verification delivery on the email signup route.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "Service provisioning during Create service before SQL console use.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "ClickHouse Cloud creates the service and redirects to the web SQL console after onboarding.",
+      "description": "A ClickHouse Cloud service accepts SHOW databases in its hosted SQL console and returns database rows.",
       "source_ids": [
         "S1"
       ]
@@ -212,22 +118,22 @@
   ],
   "excluded": [
     {
-      "item": "Creating helloworld tables and inserting sample rows",
-      "reason": "Presented after the SHOW databases connection check under Add data.",
+      "item": "ClickHouse Playground",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "clickhouse client local install path",
-      "reason": "Optional after SQL console is already available.",
+      "item": "Loading sample datasets",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "IP access list hardening",
-      "reason": "Recommended after first queries, not required to run SHOW databases.",
+      "item": "Connecting an external SQL client",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
         "S1"
       ]
@@ -236,66 +142,21 @@
   "sources": [
     {
       "id": "S1",
-      "title": "ClickHouse Cloud quick start",
+      "title": "Run a query in the SQL console",
       "url": "https://clickhouse.com/docs/getting-started/quick-start/cloud",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Cloud called quickest and easiest",
-        "Signup method list",
-        "Email verification",
-        "Onboarding wizard fields",
-        "SHOW databases terminal"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "SQL Console",
-      "url": "https://clickhouse.com/docs/cloud/get-started/sql-console",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Web SQL console as Cloud query surface"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "ClickHouse playground",
-      "url": "https://clickhouse.com/docs/getting-started/playground",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Accountless Playground queries",
-        "cURL example returning Play ClickHouse"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "ClickHouse Cloud sign up",
-      "url": "https://console.clickhouse.cloud/signUp",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Signup entry URL",
-        "Form fields not reconstructable from static unauthenticated shell alone"
+        "A ClickHouse Cloud service accepts SHOW databases in its hosted SQL console and returns database rows.",
+        "The SQL console displays the result set for SHOW databases."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact fields, agreements, and password rules appear on email signup, and how do SSO and marketplace routes converge on the onboarding wizard?",
-      "impact": "Account-creation actions and external gates cannot be finalized for the Cloud path.",
-      "evidence_needed": "Fresh-account walkthroughs of email, Google SSO, Microsoft SSO, and one marketplace route through first wizard screen."
-    },
-    {
-      "question": "Does every new trial or free signup avoid a payment method even when the wizard defaults to Scale tier with multi-replica sizing?",
-      "impact": "A payment or plan gate would change route eligibility under the no-payment preference.",
-      "evidence_needed": "Official plan/billing statement or a fresh-account capture of Create service entitlements."
-    },
-    {
-      "question": "Should first success be measured on Cloud SQL console or on the accountless Playground example?",
-      "impact": "Playground removes account creation entirely and conflicts with the corpus account-creation boundary while being operationally shorter.",
-      "evidence_needed": "Human judgment applying SELECTION-POLICY to Cloud-versus-Playground for this atlas entry."
+      "question": "Does fresh-account UI wording differ from the documented Run a query in the SQL console path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null

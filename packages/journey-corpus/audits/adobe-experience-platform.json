@@ -7,40 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "055fd45844aba600ee59a0a6f4cdf9fbd52bb39c3b593da3d2959caca01279e3",
+  "source_record_sha256": "77c405bc4df250d219b0374d0af4327b1cc8219a3a8a8e7a3fe5a0009f86874e",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer may create an Adobe ID, but no Experience Platform organization entitlement, Admin Console role, sandbox, or API credential exists yet for that developer.",
-      "No Experience Platform API surface beyond generic authentication has been preselected.",
-      "The organization may or may not already be licensed for Experience Platform."
+      "No prior Adobe Experience Platform account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Obtain authorized Adobe Experience Platform API credentials and prove them with the earliest official authenticated API result.",
+  "developer_goal": "Create or sign in to an Adobe Developer Console project for Experience Platform, obtain API credentials, and complete the documented XDM classes credential test.",
   "first_success": {
-    "outcome": "Generate Experience Platform API credentials and successfully list standard global XDM classes from the Schema Registry.",
-    "observable_signal": "GET https://platform.adobe.io/data/foundation/schemaregistry/global/classes returns standard XDM classes using the generated access token, API key, and org ID.",
-    "source_ids": ["S1"]
+    "outcome": "An authenticated cURL request to the global XDM classes endpoint returns a successful response.",
+    "observable_signal": "The XDM classes request returns HTTP 200 and a JSON response instead of an authentication error.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Adobe Developer Console and Experience Platform authentication tutorial",
-    "rule": "Use the official authentication tutorial's credential-test terminal only when organization entitlement and Admin Console grants are available. Do not treat unlicensed self-serve signup as equivalent.",
-    "selected": null,
+    "surface": "Experience Platform API auth tutorial + cURL XDM classes credential test",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Experience Platform API auth tutorial + cURL XDM classes credential test",
     "candidates": [
       {
-        "name": "Licensed org: Admin Console developer+user grants, Developer Console OAuth Server-to-Server, Schema Registry global classes test",
-        "status": "unresolved",
-        "reason": "Official API authentication path, but it presupposes an organization with Experience Platform access and an Admin Console administrator."
-      },
-      {
-        "name": "API reference page Sign in and generate credentials in-docs",
-        "status": "unresolved",
-        "reason": "Documented alternate credential collection UX that still requires the same org entitlement and permissions."
-      },
-      {
-        "name": "Unaffiliated Adobe ID with no Experience Platform organization",
-        "status": "unresolved",
-        "reason": "Public evidence does not establish a self-serve path to a licensed Experience Platform org from account creation alone."
+        "name": "Experience Platform API auth tutorial + cURL XDM classes credential test",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -49,98 +40,147 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create or sign in with an Adobe ID.",
-      "required_fields": [
-        {"label": "Adobe ID signup or sign-in fields", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1"], "notes": "Tutorial allows Create a new account but does not enumerate signup fields."}
-      ],
-      "observable_result": "The developer can authenticate to Adobe Developer Console.",
-      "evidence_state": "unverified",
-      "source_ids": ["S1"]
+      "action": "Sign in to Adobe Developer Console and select the Experience Platform organization.",
+      "required_fields": [],
+      "observable_result": "The organization and an API project are accessible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "external-authorization",
+      "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Have an Admin Console administrator add the developer as both developer and user on an Experience Platform product profile.",
-      "required_fields": [
-        {"label": "Product profile developer grant", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S1", "S2"]},
-        {"label": "Product profile user grant", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S1", "S2"]}
-      ],
-      "observable_result": "The Adobe ID can create Experience Platform API integrations for the organization.",
+      "action": "Create or open an Experience Platform API project and obtain the required credential values.",
+      "required_fields": [],
+      "observable_result": "API key, organization ID, access token, and sandbox name are available.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S2"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Create a Developer Console project, add Experience Platform API with OAuth Server-to-Server, and select product profiles.",
-      "required_fields": [
-        {"label": "Organization selection", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]},
-        {"label": "Credential name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S1"]},
-        {"label": "Product profiles including AEP-Default-All-Users", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S1"]}
-      ],
-      "observable_result": "API_KEY and ORG_ID credentials are available on the project.",
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Set shell variables for the documented Experience Platform authentication headers.",
+      "required_fields": [],
+      "observable_result": "The terminal contains the credential values required by the API request.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Generate an access token and execute the documented Schema Registry global classes request.",
-      "required_fields": [
-        {"label": "ACCESS_TOKEN", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]},
-        {"label": "API_KEY", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]},
-        {"label": "ORG_ID", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]}
-      ],
-      "observable_result": "The global classes endpoint returns standard XDM classes.",
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Send the documented cURL credential test to the global XDM classes endpoint.",
+      "required_fields": [],
+      "observable_result": "The endpoint returns HTTP 200 with XDM classes JSON.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Inspect the response and confirm that XDM classes were returned.",
+      "required_fields": [],
+      "observable_result": "A successful authenticated XDM classes response is visible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
-    {"description": "An organization with access to Adobe Experience Platform is required.", "source_ids": ["S1"]},
-    {"description": "An Admin Console administrator must be able to add the developer and user product-profile grants.", "source_ids": ["S1", "S2"]},
-    {"description": "A system administrator may also need to grant attribute-based access controls for API operations.", "source_ids": ["S1"]}
+    {
+      "description": "An Adobe Developer Console account with access to an Experience Platform organization.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Experience Platform API credentials, including API key, organization ID, access token, and sandbox name.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A terminal with cURL.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "external_gates": [
-    {"description": "Experience Platform licensing and organization membership sit outside self-serve Adobe ID creation.", "source_ids": ["S1"]},
-    {"description": "Admin Console administrator action is required before Developer Console integrations can be created.", "source_ids": ["S1", "S2"]},
-    {"description": "Only system administrators can add developers and assign API credential permissions in the documented admin flow.", "source_ids": ["S2"]}
+    {
+      "description": "The Adobe organization must be entitled to Experience Platform and the user must be able to create or use API credentials.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Access tokens expire and must be current when the cURL request is sent.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "unavoidable_waits": [
-    {"description": "Administrator grant processing and any organization invitation or procurement steps must complete before API project setup.", "source_ids": ["S1"]},
-    {"description": "Access tokens must be refreshed about every 24 hours after initial generation.", "source_ids": ["S1"]}
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
-    {"description": "Developer Console issues API_KEY, ORG_ID, and access tokens for OAuth Server-to-Server credentials.", "source_ids": ["S1"]},
-    {"description": "Schema Registry returns global XDM classes for a successful authenticated test call.", "source_ids": ["S1"]}
+    {
+      "description": "An authenticated cURL request to the global XDM classes endpoint returns a successful response.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "excluded": [
-    {"item": "Post-authentication business workflows such as ingestion, profile, or segmentation", "reason": "The authentication tutorial intentionally stops at a generic credential test.", "source_ids": ["S1"]},
-    {"item": "Reading sandboxes conceptual documentation beyond the auth tutorial headers", "reason": "Sandbox selection is a later API concern once credentials exist.", "source_ids": ["S3"]}
+    {
+      "item": "Ingesting data into datasets",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Creating schemas or datasets",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Product-specific Experience Platform API workflows",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "sources": [
-    {"id": "S1", "title": "Authenticate and access Experience Platform APIs", "url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Org and admin prerequisites", "Developer and user grants", "Developer Console OAuth Server-to-Server setup", "Access token generation", "Global classes credential test"]},
-    {"id": "S2", "title": "Add developers and give permissions to API credentials", "url": "https://experienceleague.adobe.com/en/docs/platform-learn/tutorials/admin/add-developers", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["System administrator requirement", "Admin Console developer add", "API credential permission assignment"]},
-    {"id": "S3", "title": "Sandboxes in Experience Platform", "url": "https://experienceleague.adobe.com/en/docs/experience-platform/sandbox/home", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Sandbox isolation context for later API calls"]}
+    {
+      "id": "S1",
+      "title": "Test access credentials",
+      "url": "https://experienceleague.adobe.com/en/docs/experience-platform/landing/platform-apis/api-authentication",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "An authenticated cURL request to the global XDM classes endpoint returns a successful response.",
+        "The XDM classes request returns HTTP 200 and a JSON response instead of an authentication error."
+      ]
+    }
   ],
   "uncertainties": [
     {
-      "question": "Can a developer starting only with account creation obtain a licensed Experience Platform organization without prior enterprise procurement or invitation?",
-      "impact": "If not, the journey is blocked by entitlement before any Developer Console step, and counts cannot be verified from public self-serve evidence.",
-      "evidence_needed": "Official public documentation of a self-serve Experience Platform org path, or confirmation that enterprise entitlement is always required."
-    },
-    {
-      "question": "What exact Adobe ID signup fields and organization-invitation steps precede Admin Console access for a cold developer?",
-      "impact": "Account-creation and invitation burden remain unverified.",
-      "evidence_needed": "A dated walkthrough of Adobe ID creation plus any org invite or Admin Console first-access flow."
-    },
-    {
-      "question": "Which Experience Platform API workflow should follow generic authentication as the organization-wide first mile?",
-      "impact": "Schema, ingestion, profile, and other APIs add different roles, sandbox headers, and success signals after the credential test.",
-      "evidence_needed": "A bounded API goal beyond the global XDM classes credential test."
+      "question": "Does fresh-account UI wording differ from the documented Test access credentials path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null

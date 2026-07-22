@@ -7,44 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "df3c944cdd036518d723d16ef20c0137c9386b2e0e1bc42824568ea8c7314704",
+  "source_record_sha256": "9e86a212b482036122c197cd0b5e5bc8e421679c2b453459f0394e907ebf1f49",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and an email address.",
-      "No Wise business account, personal API token, partner client credentials, or Developer Hub access exists yet.",
-      "Sandbox work is acceptable when the partner route is selected."
+      "No prior Wise Platform account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Create the required Wise access relationship and complete the earliest official first API success for that relationship.",
+  "developer_goal": "Wise accepts a Business personal API token and returns the authenticated account's profiles from GET /v1/profiles.",
   "first_success": {
-    "outcome": "Unresolved between personal-token profile listing for an SMB business account and partner OAuth first calls after sales-issued credentials.",
-    "observable_signal": "Personal-token docs show GET /v1/profiles returning profiles, while partner guides require client credentials from Wise before sandbox API work.",
+    "outcome": "Wise accepts a Business personal API token and returns the authenticated account's profiles from GET /v1/profiles.",
+    "observable_signal": "The API returns HTTP 200 with a JSON array of Wise profiles.",
     "source_ids": [
-      "S1",
-      "S3",
-      "S4"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "Wise Getting started guide plus personal-token or Developer Hub auth routes",
-    "rule": "Select the shortest complete route only after the access relationship (SMB personal token versus partner OAuth) is fixed; do not invent a winner across unequal entitlements.",
-    "selected": null,
+    "surface": "Wise Business personal API token + cURL GET /v1/profiles",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Wise Business personal API token + cURL GET /v1/profiles",
     "candidates": [
       {
-        "name": "Wise Business personal API token then GET profiles",
-        "status": "unresolved",
-        "reason": "Official docs support self-serve token creation for automating an existing Wise business account, but this is a different access relationship from partner Platform integrations and has limited endpoints."
-      },
-      {
-        "name": "Partner or enterprise OAuth via Developer Hub",
-        "status": "unresolved",
-        "reason": "Getting started states Wise issues client ID and secret during partner onboarding and must grant Developer Hub access, so self-serve shortest-path comparison is blocked."
-      },
-      {
-        "name": "Sandbox account for exploratory API play",
-        "status": "unresolved",
-        "reason": "Help Centre describes a free sandbox signup path, but Platform getting-started still centers partner credentials and personal-token business automation as distinct models."
+        "name": "Wise Business personal API token + cURL GET /v1/profiles",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -53,102 +40,66 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Establish the Wise account or partner relationship required by the selected access model.",
-      "required_fields": [
-        {
-          "label": "Access relationship choice",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1",
-            "S4"
-          ],
-          "notes": "Personal token versus partner OAuth changes actors, credentials, and available endpoints."
-        },
-        {
-          "label": "Account or partner onboarding fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1",
-            "S5"
-          ],
-          "notes": "Public docs do not inventory current Wise.com business signup or sandbox signup fields."
-        }
-      ],
-      "observable_result": "The developer has either a Wise business account or partner sandbox credentials path.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to the Wise Business account used for API access.",
+      "required_fields": [],
+      "observable_result": "Business account settings are accessible.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S5"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Create the credentials for the selected auth model.",
-      "required_fields": [
-        {
-          "label": "Personal API token or partner client credentials",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1",
-            "S3"
-          ],
-          "notes": "Personal tokens require 2-step verification; partner credentials are issued by Wise."
-        }
-      ],
-      "observable_result": "An API credential is available for authenticated requests.",
+      "action": "Create a personal API token in the documented Wise settings flow and copy it securely.",
+      "required_fields": [],
+      "observable_result": "A personal API token is available.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "cli",
-      "action": "Call the first documented authenticated endpoint for the selected route.",
-      "required_fields": [
-        {
-          "label": "Authorization bearer or OAuth token",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S3"
-          ]
-        },
-        {
-          "label": "First API operation",
-          "field_type": "select",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3",
-            "S2"
-          ],
-          "notes": "Personal-token example uses GET /v1/profiles while profile reference also documents /v2/profiles."
-        }
-      ],
-      "observable_result": "The selected route returns a successful authenticated API response.",
-      "evidence_state": "unverified",
+      "interface": "api",
+      "action": "Send the documented authenticated cURL GET request to /v1/profiles with the personal token.",
+      "required_fields": [],
+      "observable_result": "Wise returns the profiles response.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S2",
-        "S3"
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the response is HTTP 200 and contains the account's profile objects.",
+      "required_fields": [],
+      "observable_result": "A profiles JSON array is visible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Personal API tokens require a Wise.com business account and 2-step verification.",
+      "description": "A Wise Business account eligible to create a personal API token.",
       "source_ids": [
-        "S3"
+        "S1"
       ]
     },
     {
-      "description": "Partner Developer Hub access and client credentials require Wise onboarding.",
+      "description": "A Wise personal API token.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A terminal with cURL.",
       "source_ids": [
         "S1"
       ]
@@ -156,128 +107,68 @@
   ],
   "external_gates": [
     {
-      "description": "Partner client credentials and Developer Hub login are granted by Wise, not created fully self-serve.",
+      "description": "Personal API tokens are for eligible Wise Business customers and are not the partner OAuth path.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "Personal tokens are limited to a documented subset of payout automation endpoints.",
-      "source_ids": [
-        "S3"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Partner onboarding and implementation-team access may delay Developer Hub and credential availability.",
+      "description": "The bearer token must be protected because it grants access to the associated Wise account.",
       "source_ids": [
         "S1"
       ]
     }
   ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Wise returns profile data for an authenticated personal-token GET profiles call.",
+      "description": "Wise accepts a Business personal API token and returns the authenticated account's profiles from GET /v1/profiles.",
       "source_ids": [
-        "S3"
+        "S1"
       ]
     }
   ],
   "excluded": [
     {
-      "item": "Reading the full API reference and error guides",
-      "reason": "Documentation reading is not a counted developer action.",
+      "item": "Partner OAuth integration",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
-      "item": "Funding transfers and balance-statement automation beyond personal-token limits",
-      "reason": "Personal-token docs exclude most funding and statement operations except listed regions.",
+      "item": "Creating quotes or transfers",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
-        "S3"
+        "S1"
       ]
     },
     {
-      "item": "Production go-live checklist",
-      "reason": "Help Centre places going live after sandbox or token experimentation.",
+      "item": "Sandbox partner onboarding",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
-        "S5"
+        "S1"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Getting started with Wise API",
-      "url": "https://docs.wise.com/guides/developer",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Partner client credentials from Wise",
-        "Developer Hub access grant",
-        "Sandbox and production environments"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Wise Platform API reference",
-      "url": "https://docs.wise.com/api-reference",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "API reference entry",
-        "Credential and OAuth expectations"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Personal API tokens",
+      "title": "Call GET /v1/profiles",
       "url": "https://docs.wise.com/guides/developer/auth-and-security/personal-api-token",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Token creation steps",
-        "2-step verification",
-        "GET /v1/profiles example",
-        "Endpoint limitations"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Partner accounts authentication overview",
-      "url": "https://docs.wise.com/guides/product/kyc/partner-accounts",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Personal token versus OAuth 2.0 split",
-        "Partner credential issuance"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Getting started with the API (Help Centre)",
-      "url": "https://wise.com/help/articles/2958107/getting-started-with-the-api",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Sandbox account signup mention",
-        "Personal token from Settings",
-        "Going-live checklist pointer"
+        "Wise accepts a Business personal API token and returns the authenticated account's profiles from GET /v1/profiles.",
+        "The API returns HTTP 200 with a JSON array of Wise profiles."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Wise access relationship should represent Platform first success: SMB personal token or partner OAuth?",
-      "impact": "The routes have different entitlement gates, credential creators, endpoint coverage, and whether self-serve account creation alone is enough.",
-      "evidence_needed": "A corpus policy choice of one access model, then a fresh walkthrough of that model's account creation through first successful API response."
-    },
-    {
-      "question": "If the personal-token route is selected, which profiles operation version is current first success?",
-      "impact": "The personal-token guide still shows GET /v1/profiles while profile reference also documents /v2/profiles.",
-      "evidence_needed": "Confirm the currently recommended profiles list operation against official docs and a live token response."
+      "question": "Does fresh-account UI wording differ from the documented Call GET /v1/profiles path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null
