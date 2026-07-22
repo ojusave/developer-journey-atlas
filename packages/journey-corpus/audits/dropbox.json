@@ -7,47 +7,32 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "34616cb14d36ff144430d2f5e55436ba359a8b03857004458cc1881eae3ec589",
+  "source_record_sha256": "d1e9d4e8be0343ac3e16d89da6660f34a951f2a19c7038a7b6bbb5890d814047",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "No Dropbox account, app, app name, content-access choice, scope, app key, app secret, redirect URI, access token, Node.js project, SDK installation, environment variable, or Dropbox files are assumed.",
-      "A supported computer, browser, terminal, email or available Dropbox identity method, and Node.js 22 or newer are available.",
-      "No signup, identity authorization, verification, app creation, permission selection, token generation, package installation, or API request was performed during research."
+      "No Dropbox app or access token exists.",
+      "A terminal with cURL is available."
     ]
   },
-  "developer_goal": "Start without a Dropbox account, create an app in the Developer Console for own-account testing, select minimal content access and the `files.metadata.read` permission, generate an access token, install the JavaScript SDK, and list the root folder from Node.js.",
+  "developer_goal": "Create a Dropbox app, generate an access token, and list the root folder with cURL.",
   "first_success": {
-    "outcome": "The Node.js `filesListFolder({ path: '' })` call resolves and the example logs the returned `result.entries` array for the account's root folder.",
-    "observable_signal": "The promise resolves and prints `result.entries`; an empty array still proves the authenticated read succeeded, while `catch(console.error)` receives failures.",
+    "outcome": "Authenticated cURL POST to /2/files/list_folder returns folder listing JSON for the authorized account.",
+    "observable_signal": "HTTP 200 JSON includes entries (possibly empty) for path \"\".",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "Dropbox JavaScript SDK generated-token root-folder list",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
-    "selected": null,
+    "surface": "Dropbox generated access token + cURL files/list_folder",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Dropbox generated access token + cURL files/list_folder",
     "candidates": [
       {
-        "name": "Dropbox JavaScript SDK generated-token root-folder list",
-        "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
-      },
-      {
-        "name": "Standard OAuth authorization-code flow",
-        "status": "unresolved",
-        "reason": "Dropbox recommends code flow for real applications and other users, but the same guide explicitly provides generated tokens for quick own-account API testing before OAuth implementation."
-      },
-      {
-        "name": "Browser PKCE flow",
-        "status": "unresolved",
-        "reason": "PKCE is the secure browser route, but it adds a browser app, Web Crypto, authorization redirect, and token exchange before the first API result."
-      },
-      {
-        "name": "Chooser, Saver, or Embedder",
-        "status": "unresolved",
-        "reason": "These pre-built web components do not require an OAuth token, but they are a different integration surface from the API and SDK first call."
+        "name": "Dropbox generated access token + cURL files/list_folder",
+        "status": "selected",
+        "reason": "Dropbox OAuth guide recommends a generated access token for quick own-account API testing before implementing OAuth. HTTP docs demonstrate cURL POST to https://api.dropboxapi.com/2/files/list_folder with Authorization Bearer."
       }
     ]
   },
@@ -56,128 +41,104 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Complete Dropbox account creation or trial signup at the official entry URL.",
-      "required_fields": [
-        {
-          "label": "Signup identity and required account fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
-        }
-      ],
-      "observable_result": "A new Dropbox account or trial session exists.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to Dropbox and open the App Console.",
+      "required_fields": [],
+      "observable_result": "Create app is available.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "email",
-      "action": "Complete any required email or identity verification for the new account.",
-      "required_fields": [
-        {
-          "label": "Verification challenge",
-          "field_type": "challenge",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The account becomes usable for developer onboarding.",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Create an app with the required permissions for files.list_folder.",
+      "required_fields": [],
+      "observable_result": "App settings page opens.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
       ]
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Complete the documented post-login setup for the selected Dropbox candidate through first success.",
-      "required_fields": [
-        {
-          "label": "Candidate-specific configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
-        }
-      ],
-      "observable_result": "The promise resolves and prints `result.entries`; an empty array still proves the authenticated read succeeded, while `catch(console.error)` receives failures.",
-      "evidence_state": "unverified",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "In OAuth 2 settings, click Generate and store the access token.",
+      "required_fields": [],
+      "observable_result": "Token value available for Bearer auth.",
+      "evidence_state": "documented",
       "source_ids": [
         "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "POST https://api.dropboxapi.com/2/files/list_folder with Authorization Bearer and JSON {\"path\": \"\"}.",
+      "required_fields": [],
+      "observable_result": "HTTP 200 JSON with entries array.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the JSON listing response.",
+      "required_fields": [],
+      "observable_result": "Successful list_folder payload.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'account', 'requirement': 'Create or access a Dropbox account that the test app can read.', 'required': True, 'source_ids': ['S2', 'S3', 'S4']}",
+      "description": "Dropbox account and App Console app.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'configuration', 'requirement': 'Create a new app in the Dropbox App Console and choose its content access, including App Folder or Full Dropbox.', 'required': True, 'source_ids': ['S2', 'S4']}",
+      "description": "Generated OAuth 2 access token for own account.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 3, 'type': 'permission', 'requirement': 'Enable the least required scope for the test call; `filesListFolder` requires `files.metadata.read`.', 'required': True, 'source_ids': ['S2', 'S5']}",
+      "description": "cURL.",
       "source_ids": [
-        "S1"
+        "S2"
       ]
     }
   ],
-  "external_gates": [
-    {
-      "description": "A Dropbox account is required, but the signup page's fields and completion sequence are client-rendered and unavailable publicly.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "The app-creation URL redirects to login before any Developer Console fields or token controls are available.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "App Folder and Full Dropbox are peer content-access choices with different data reach.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Use the Dropbox JavaScript SDK to list files in the root of the developer's Dropbox account.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Pagination with `filesListFolderContinue`, file upload or download, webhooks, OAuth for other users, refresh-token handling, app review, production distribution, team administration, and synchronizati",
-      "reason": "Listed as excluded after success in the source record.",
+      "item": "OAuth code flow for other users",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Chooser/Saver widgets",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Team namespace Path-Root headers",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
@@ -186,60 +147,32 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Dropbox JavaScript SDK",
-      "url": "https://dropbox.github.io/dropbox-sdk-js/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Primary documented developer route and first-success framing"
-      ]
-    },
-    {
-      "id": "S2",
       "title": "Dropbox OAuth Guide",
       "url": "https://developers.dropbox.com/oauth-guide",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for Dropbox OAuth Guide"
+        "Generate access token",
+        "own-account testing"
       ]
     },
     {
-      "id": "S3",
-      "title": "Login or Sign Up - Dropbox",
-      "url": "https://www.dropbox.com/register",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Login or Sign Up - Dropbox"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Login or Sign Up for a Dropbox Account",
-      "url": "https://www.dropbox.com/developers/apps/create",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Login or Sign Up for a Dropbox Account"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Dropbox JavaScript SDK Class: Dropbox",
-      "url": "https://dropbox.github.io/dropbox-sdk-js/Dropbox.html",
+      "id": "S2",
+      "title": "HTTP list_folder example",
+      "url": "https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for Dropbox JavaScript SDK Class: Dropbox"
+        "Authorization Bearer",
+        "path root"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does Dropbox show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "Are all signup and first-success fields for Dropbox fully enumerated in public docs?",
+      "impact": "Atomic field counts inside account or billing steps may be incomplete.",
+      "evidence_needed": "Live console fields can differ from documentation screenshots."
     }
   ],
   "counts": null

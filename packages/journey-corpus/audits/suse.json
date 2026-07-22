@@ -7,45 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "dc375a8a8bb4b2ab96536d27eb777edc67101c4d28998e4336e7e1ea8ad2104f",
+  "source_record_sha256": "f5cfcd6c660c368b1908af2a37d0100b510c7d1fd2f7ca817328e1dd1eddb15a",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "No SUSE product choice, Rancher installation, Kubernetes cluster, kubeconfig, Helm repository, cert-manager installation, domain, or Rancher administrator password is assumed."
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Choose a SUSE developer product and reach the first terminal state that its official quick-start documentation names.",
+  "developer_goal": "K3s install completes; kubectl shows Ready node.",
   "first_success": {
-    "outcome": "The K3s install script starts a single-node Kubernetes cluster and installs a configured `kubectl`.",
-    "observable_signal": "`sudo k3s kubectl get nodes` shows the local node in Ready state.",
+    "outcome": "K3s install completes; kubectl shows Ready node.",
+    "observable_signal": "Node Ready",
     "source_ids": [
       "S1"
     ]
   },
   "route_selection": {
-    "surface": "K3s OSS Quick Start through a functional single-node cluster",
-    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "surface": "K3s Quick-Start Guide: single-node cluster",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists. Include documented gates (email verify, payment, credits, domain, approval). Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
     "selected": null,
     "candidates": [
       {
-        "name": "K3s OSS Quick Start through a functional single-node cluster",
+        "name": "K3s Quick-Start Guide: single-node cluster",
         "status": "unresolved",
-        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
-      },
-      {
-        "name": "SUSE Linux Enterprise Server",
-        "status": "unresolved",
-        "reason": "It is a peer operating-system product with installation and administration journeys rather than the declared company-wide developer default."
-      },
-      {
-        "name": "K3s",
-        "status": "unresolved",
-        "reason": "It is a peer cloud-native product and is also used as an implementation prerequisite inside the selected Rancher candidate."
-      },
-      {
-        "name": "Deploy Rancher on Amazon EKS",
-        "status": "unresolved",
-        "reason": "The Rancher deployment index presents EKS, Equinix Metal, manual Helm, and AWS SaaS as alternative routes without a universal provider choice."
+        "reason": "Machine-drafted primary path only; not confirmed as the lexicographic shortest required route."
       }
     ]
   },
@@ -54,19 +40,19 @@
       "step_number": 1,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Obtain and install the prerequisites required by the selected SUSE candidate route.",
+      "action": "Run documented K3s install.",
       "required_fields": [
         {
-          "label": "Install or download choices",
+          "label": "Documented required input",
           "field_type": "other",
           "evidence_state": "unverified",
           "source_ids": [
             "S1"
           ],
-          "notes": "Exact installer, OS, version, or package selectors are release-dependent or peer-branched."
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "The developer has a runnable environment for the selected candidate.",
+      "observable_result": "Service up",
       "evidence_state": "unverified",
       "source_ids": [
         "S1"
@@ -74,21 +60,44 @@
     },
     {
       "step_number": 2,
-      "kind": "implementation",
+      "kind": "product-interaction",
       "interface": "cli",
-      "action": "Follow the documented commands for the selected SUSE first-success candidate through its terminal verification.",
+      "action": "Point kubectl at K3s kubeconfig.",
       "required_fields": [
         {
-          "label": "Route-specific commands and inputs",
-          "field_type": "command",
-          "evidence_state": "documented",
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
           "source_ids": [
             "S1"
-          ]
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "`sudo k3s kubectl get nodes` shows the local node in Ready state.",
-      "evidence_state": "documented",
+      "observable_result": "API reachable",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Confirm node Ready.",
+      "required_fields": [
+        {
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Ready",
+      "evidence_state": "unverified",
       "source_ids": [
         "S1"
       ]
@@ -96,126 +105,54 @@
   ],
   "prerequisites": [
     {
-      "description": "{'order': 1, 'type': 'hardware', 'requirement': \"Provide a Linux virtual machine reachable from the workstation; the guide says not to install on localhost and requires saving the machine's IP address.\", 'required': True, 'source_ids': ['S4']}",
+      "description": "Supported Linux for K3s.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "description": "{'order': 2, 'type': 'software', 'requirement': 'Select a supported Kubernetes version and have kubectl and Helm installed on the local workstation.', 'required': True, 'source_ids': ['S4']}",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "{'order': 3, 'type': 'account', 'requirement': 'An authenticated SUSE Customer Center session is required to open the Prime-only documentation and retrieve the Rancher Prime Helm chart repository URL; the public guide does not enumerate account creation, access approval, or the hidden URL.', 'required': True, 'source_ids': ['S4']}",
+      "description": "No SUSE account for OSS quick start.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "external_gates": [
-    {
-      "description": "SUSE exposes many peer product families without a company-wide default developer path.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "Rancher itself offers multiple deployment quick starts with different provider and account requirements.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "description": "The required Rancher Prime chart repository URL is available only through Prime-only documentation that redirects to SUSE identity authentication.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Package download, image pull, or local service startup time for the selected install route.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Launch a fully functional single-node K3s cluster",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "excluded": [
-    {
-      "item": "Logging in, changing the bootstrap password, importing downstream clusters, deploying workloads, production certificates, backups, high availability, monitoring, and production hardening occur after t",
-      "reason": "Listed as excluded after success in the source record.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
+  "excluded": [],
   "sources": [
     {
       "id": "S1",
-      "title": "SUSE Documentation",
-      "url": "https://documentation.suse.com/",
+      "title": "K3s Quick-Start",
+      "url": "https://documentation.suse.com/cloudnative/k3s/latest/en/quick-start.html",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Primary documented developer route and first-success framing"
+        "K3s Quick-Start"
       ]
     },
     {
       "id": "S2",
-      "title": "SUSE Rancher Prime Deployment Quick Start Guides",
-      "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/quick-start.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for SUSE Rancher Prime Deployment Quick Start Guides"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Deploying SUSE Rancher Prime Server",
+      "title": "Deploy Rancher",
       "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/deploy-rancher/deploy-rancher.html",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Supporting official evidence for Deploying SUSE Rancher Prime Server"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Helm CLI Quick Start",
-      "url": "https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/quick-start/deploy-rancher/helm-cli.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Helm CLI Quick Start"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Quick-Start Guide | K3s",
-      "url": "https://docs.k3s.io/quick-start",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Supporting official evidence for Quick-Start Guide | K3s"
+        "Deploy Rancher"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact current required signup, identity, legal, and entitlement fields does SUSE show for a new developer, and which peer route is the lexicographic shortest path?",
-      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
-      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+      "question": "Stable Rancher for AWS SaaS quick start URL?",
+      "impact": "May change required actions or first-success definition.",
+      "evidence_needed": "Independent shortest-path review of current official docs."
+    },
+    {
+      "question": "Has the machine-drafted SUSE route been independently shortest-path audited?",
+      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
+      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
     }
   ],
   "counts": null

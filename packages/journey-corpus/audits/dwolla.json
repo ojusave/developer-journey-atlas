@@ -7,40 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "12bfd9b359239101e3d81a774de661084de41782f2a0b3dbbf61f09a3fe75cdf",
+  "source_record_sha256": "75d692a8c03dfde16604c50c073d215c297b6ed75439a01502dbd43cb5ac1301",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and a valid email address they can verify.",
-      "No Dwolla Sandbox account, application, or OAuth access token exists yet.",
-      "Sandbox-only work is in scope; production approval and live money movement are out of scope."
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create a Dwolla Sandbox account and complete the earliest official first authenticated sandbox API success.",
+  "developer_goal": "GET api-sandbox Root with Bearer token returns _links.account.href.",
   "first_success": {
-    "outcome": "Authenticated Root response from the Dwolla sandbox API, including Platform Account links, after token exchange.",
-    "observable_signal": "GET https://api-sandbox.dwolla.com/ returns `_links.account.href` (and related HAL links), matching the Quickstart You did it terminal.",
-    "source_ids": ["S1"]
+    "outcome": "GET api-sandbox Root with Bearer token returns _links.account.href.",
+    "observable_signal": "account.href present",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Dwolla Developer Portal Quickstart plus Sandbox Dashboard credentials",
-    "rule": "Select the shortest complete sandbox account-to-Root path only after the implementation tab (cURL versus SDK language) is fixed.",
+    "surface": "Dwolla Sandbox Quickstart cURL token + Root",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists. Include documented gates (email verify, payment, credits, domain, approval). Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
     "selected": null,
     "candidates": [
       {
-        "name": "Quickstart cURL: client credentials token then Root GET",
+        "name": "Dwolla Sandbox Quickstart cURL token + Root",
         "status": "unresolved",
-        "reason": "Docs show an explicit Basic-auth token POST plus Root GET, but peer TypeScript, Python, PHP, and Ruby tabs are presented without naming cURL as the sole default."
-      },
-      {
-        "name": "Quickstart SDK tab (TypeScript, Python, PHP, or Ruby)",
-        "status": "unresolved",
-        "reason": "SDK tabs change install, env var names, and whether token exchange is a separate developer action versus automatic client caching."
-      },
-      {
-        "name": "Funds-flow guides after You did it",
-        "status": "not-selected",
-        "reason": "The Quickstart explicitly ends at the authenticated Root response and then directs the developer to pick a separate funds flow."
+        "reason": "Machine-drafted primary path only; not confirmed as the lexicographic shortest required route."
       }
     ]
   },
@@ -49,181 +40,137 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Dwolla Balance sandbox account from the official sandbox signup form.",
+      "action": "Create sandbox account, verify email.",
       "required_fields": [
         {
-          "label": "First Name",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Last Name",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Business Name",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Job Title",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Email Address",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S2", "S3"]
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Country",
-          "field_type": "select",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Dwolla Developer Terms of Service and Privacy Policy",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S2", "S3"]
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "Dwolla sends a sandbox email verification message.",
-      "evidence_state": "documented",
-      "source_ids": ["S1", "S2", "S3"]
+      "observable_result": "Apps reachable",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
       "kind": "account",
-      "interface": "email",
-      "action": "Open the Dwolla verification email and verify the address.",
+      "interface": "web-ui",
+      "action": "Copy client_id and client_secret.",
       "required_fields": [
         {
-          "label": "Email verification",
+          "label": "Documented required input",
           "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1", "S2"],
-          "notes": "Unverified accounts receive 401 InvalidAccountStatus on API calls."
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "The developer is redirected to the Sandbox Dashboard.",
-      "evidence_state": "documented",
-      "source_ids": ["S1", "S2"]
+      "observable_result": "Available",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Open Applications in the Sandbox Dashboard and copy the client_id and client_secret.",
+      "kind": "implementation",
+      "interface": "api",
+      "action": "POST /token client_credentials via cURL.",
       "required_fields": [
         {
-          "label": "client_id",
+          "label": "Documented required input",
           "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1", "S2"]
-        },
-        {
-          "label": "client_secret",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1", "S2"]
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "Sandbox application credentials are available for token exchange.",
-      "evidence_state": "documented",
-      "source_ids": ["S1", "S2"]
+      "observable_result": "Token JSON",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
       "kind": "implementation",
       "interface": "api",
-      "action": "Complete the selected Quickstart implementation tab through access-token acquisition and the Root request.",
+      "action": "GET Root with Bearer via cURL.",
       "required_fields": [
         {
-          "label": "Implementation tab (cURL or SDK language)",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "cURL shows an explicit token POST; several SDK tabs obtain and cache tokens inside the client."
-        },
-        {
-          "label": "Sandbox client credentials",
+          "label": "Documented required input",
           "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
         }
       ],
-      "observable_result": "The Root response includes `_links.account.href` and related HAL links.",
-      "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "observable_result": "account.href",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm account link.",
+      "required_fields": [
+        {
+          "label": "Documented required input",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "account.href",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "A local environment able to send HTTPS requests to api-sandbox.dwolla.com, or an installed official SDK for the chosen tab.",
-      "source_ids": ["S1"]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Email verification is required before sandbox API calls succeed.",
-      "source_ids": ["S2"]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Dwolla must deliver the sandbox signup verification email before dashboard access and API calls work.",
-      "source_ids": ["S1", "S2"]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "After verification, Dwolla creates the sandbox account, an application, Superhero Savings Bank funding source, and a $5,000 test balance.",
-      "source_ids": ["S2"]
+      "description": "Sandbox account + email verify.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "description": "A successful client-credentials exchange returns a Bearer access_token.",
-      "source_ids": ["S1"]
+      "description": "client_id/secret.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "description": "The Root endpoint returns HAL links including the Platform Account URL.",
-      "source_ids": ["S1"]
+      "description": "cURL.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
-  "excluded": [
-    {
-      "item": "Reading documentation as a counted action",
-      "reason": "Documentation is evidence for the path, not a product interaction.",
-      "source_ids": ["S1"]
-    },
-    {
-      "item": "Optional marketing email checkbox on signup",
-      "reason": "The public signup form presents keep-me-informed as optional.",
-      "source_ids": ["S3"]
-    },
-    {
-      "item": "Funds-flow guides after You did it",
-      "reason": "The Quickstart terminal is the authenticated Root response; funds flows are next steps.",
-      "source_ids": ["S1"]
-    },
-    {
-      "item": "Production Dwolla account approval",
-      "reason": "Sandbox signup states it does not guarantee production Platform access.",
-      "source_ids": ["S3"]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
+  "excluded": [],
   "sources": [
     {
       "id": "S1",
@@ -232,52 +179,15 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Sandbox account creation entry",
-        "Applications client_id and client_secret",
-        "Client credentials token exchange",
-        "Root first API call",
-        "You did it terminal",
-        "cURL and multi-language SDK tabs"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Testing in the Sandbox",
-      "url": "https://developers.dwolla.com/docs/testing",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Email verification requirement",
-        "InvalidAccountStatus without verification",
-        "Automatic application and test funding source provisioning"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Dwolla Sandbox sign up",
-      "url": "https://accounts-sandbox.dwolla.com/sign-up",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "First and last name",
-        "Business name and job title",
-        "Email and password",
-        "Country",
-        "Developer Terms and Privacy agreement",
-        "Sandbox versus production disclaimer"
+        "Quickstart"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Quickstart implementation tab (cURL versus TypeScript, Python, PHP, or Ruby) is the canonical shortest first-request route?",
-      "impact": "Tabs change whether token exchange is a separate developer action, which env vars are required, and whether an SDK install is required.",
-      "evidence_needed": "An official single default tab or recommendation for the shortest account-to-Root path."
-    },
-    {
-      "question": "Should signup field burden follow the public multi-field form or the Testing guide claim that only a valid email is needed?",
-      "impact": "Observed signup fields exceed the email-only description and change required_fields counts if verified.",
-      "evidence_needed": "Confirm whether all observed signup controls remain required on a fresh sandbox registration."
+      "question": "Has the machine-drafted Dwolla route been independently shortest-path audited?",
+      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
+      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
     }
   ],
   "counts": null

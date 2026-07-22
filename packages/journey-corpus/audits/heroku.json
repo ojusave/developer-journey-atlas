@@ -7,247 +7,174 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "a1ae9f52bd0f4f3cb153c233701228ab91f03ca860bd450557180edb3ad281c8",
+  "source_record_sha256": "607aacf585d73be14de998eec8501d04a8fc2f0dc4f1f9726a00dcfe30f62231",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser, email address, and an accepted payment card for account verification.",
-      "Git and a local runtime toolchain may be installed after a language guide is selected.",
-      "No Heroku app, runtime language, or Cedar versus Fir choice exists yet."
+      "No Heroku app exists.",
+      "Git and Heroku CLI can be installed."
     ]
   },
-  "developer_goal": "Create a verified Heroku account and deploy an official getting-started sample so its herokuapp.com URL loads.",
+  "developer_goal": "Create a Heroku account, deploy the official Node.js sample, and open the app URL.",
   "first_success": {
-    "outcome": "Unresolved among nine language getting-started guides that can each deploy a sample to a herokuapp.com URL.",
-    "observable_signal": "A candidate signal is the official sample site loading at its herokuapp.com URL after git push, once a language route is fixed.",
-    "source_ids": ["S1", "S2"]
+    "outcome": "The Node.js sample is running on a Heroku dyno and loads at its herokuapp.com URL.",
+    "observable_signal": "Browser shows the sample app content after heroku open or visiting the app URL.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Heroku Dev Center Getting Started language router and Dashboard signup",
-    "rule": "Do not invent a default language among coequal Getting Started guides; Cedar Node.js is a complete candidate, not a platform-selected universal path.",
-    "selected": null,
+    "surface": "Getting Started on Heroku with Node.js sample deploy",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Getting Started on Heroku with Node.js sample deploy",
     "candidates": [
       {
-        "name": "Node.js Cedar sample deployment",
-        "status": "unresolved",
-        "reason": "Complete official sample path, listed beside other language guides without a universal default."
-      },
-      {
-        "name": "Other language Getting Started guides",
-        "status": "unresolved",
-        "reason": "Dev Center start page presents multiple language routes as peer entry points."
-      },
-      {
-        "name": "Heroku Fir with Node.js",
-        "status": "not-selected",
-        "reason": "Fir availability depends on Private Spaces and adds an enterprise entitlement choice."
-      },
-      {
-        "name": "Deploy an existing application",
-        "status": "not-selected",
-        "reason": "Adds framework-specific preparation instead of a vendor sample path."
+        "name": "Getting Started on Heroku with Node.js sample deploy",
+        "status": "selected",
+        "reason": "Heroku Dev Center Getting Started with Node.js is the general Cedar sample deploy: CLI login, clone official sample, heroku create, git push heroku main, open the herokuapp.com URL. Language peers exist; Node.js is a complete official path."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Submit the Heroku sign-up form.",
-      "required_fields": [
-        {"label": "First name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S3"]},
-        {"label": "Last name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S3"]},
-        {"label": "Email address", "field_type": "email", "evidence_state": "observed-public-ui", "source_ids": ["S3"]},
-        {"label": "Company name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S3"], "notes": "Form states that developers without a company may re-enter their email."},
-        {"label": "Country/Region", "field_type": "select", "evidence_state": "observed-public-ui", "source_ids": ["S3"]},
-        {"label": "State", "field_type": "select", "evidence_state": "observed-public-ui", "source_ids": ["S3"], "notes": "Observed when Country/Region is United States; other countries may alter subdivision fields."},
-        {"label": "Privacy Statement and related consent", "field_type": "agreement", "evidence_state": "observed-public-ui", "source_ids": ["S3"]},
-        {"label": "reCAPTCHA", "field_type": "challenge", "evidence_state": "observed-public-ui", "source_ids": ["S3"]}
-      ],
-      "observable_result": "Heroku accepts the registration submission and continues account provisioning.",
-      "evidence_state": "observed-public-ui",
-      "source_ids": ["S3"]
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install the Heroku CLI and Git.",
+      "required_fields": [],
+      "observable_result": "heroku version works.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
       "kind": "account",
-      "interface": "web-ui",
-      "action": "Verify the account by adding an accepted credit card under Account Settings Billing.",
-      "required_fields": [
-        {
-          "label": "Credit card",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S4"]
-        }
-      ],
-      "observable_result": "The account can create apps, deploy code, and use dynos.",
+      "interface": "cli",
+      "action": "Run heroku login and complete browser authentication.",
+      "required_fields": [],
+      "observable_result": "Logged in as email shown.",
       "evidence_state": "documented",
-      "source_ids": ["S4"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
       "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Choose one Getting Started language guide and whether to use its vendor sample.",
-      "required_fields": [
-        {
-          "label": "Runtime language guide",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "One Heroku first-success language route is fixed.",
+      "interface": "cli",
+      "action": "Clone https://github.com/heroku/nodejs-getting-started.git and cd into it.",
+      "required_fields": [],
+      "observable_result": "package.json is present.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Run heroku create --stack heroku-26 to create the app and git remote.",
+      "required_fields": [],
+      "observable_result": "App URL and git.heroku.com remote printed.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
       "kind": "implementation",
       "interface": "cli",
-      "action": "If the Node.js Cedar candidate is later selected, install the Heroku CLI, log in, clone the sample, create the app, and deploy with git.",
-      "required_fields": [
-        {
-          "label": "heroku login",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        },
-        {
-          "label": "heroku create stack and git remote",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        },
-        {
-          "label": "git push heroku main",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        }
-      ],
-      "observable_result": "The sample app is released and its herokuapp.com URL can be opened.",
+      "action": "Deploy with git push heroku main (or master as documented).",
+      "required_fields": [],
+      "observable_result": "Deploy completes with dyno running.",
       "evidence_state": "documented",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open the app with heroku open and confirm the sample site.",
+      "required_fields": [],
+      "observable_result": "Sample content loads at herokuapp.com.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Git and the Heroku CLI for CLI-based getting-started guides.",
-      "source_ids": ["S2"]
+      "description": "Heroku account.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "description": "Language-specific runtime and package tooling required by the selected guide.",
-      "source_ids": ["S1", "S2"]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Account verification via accepted payment card before creating apps, deploying code, or using dynos.",
-      "source_ids": ["S4"]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Card verification can place a temporary preauthorization that may remain visible for up to seven days.",
-      "source_ids": ["S4"]
+      "description": "Git and Heroku CLI.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "description": "Build and release after git push before the sample URL serves traffic on the Node.js candidate route.",
-      "source_ids": ["S2"]
+      "description": "Dyno usage may incur charges; tutorial recommends low-cost plans.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
-  "platform_outcomes": [
-    {
-      "description": "heroku create provisions an app name, stack, public URL, and Git remote on the Node.js candidate route.",
-      "source_ids": ["S2"]
-    },
-    {
-      "description": "A successful deploy serves the sample at the app's herokuapp.com URL.",
-      "source_ids": ["S2"]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Reading Getting Started on Heroku documentation",
-      "reason": "Documentation identifies peer language routes; reading is not a counted action.",
-      "source_ids": ["S1"]
+      "item": "Add-ons beyond sample",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "item": "Marketing communications checkbox on signup",
-      "reason": "Observed as optional marketing preference, not required to submit registration.",
-      "source_ids": ["S3"]
+      "item": "Scaling",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "item": "Fir Private Spaces Node.js guide",
-      "reason": "Adds entitlement constraints beyond the Cedar sample candidate.",
-      "source_ids": ["S2"]
+      "item": "Fir Private Spaces",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Getting Started on Heroku",
-      "url": "https://devcenter.heroku.com/start",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Multiple language getting-started routes",
-        "No universal language default"
-      ]
-    },
-    {
-      "id": "S2",
       "title": "Getting Started on Heroku with Node.js",
       "url": "https://devcenter.heroku.com/articles/getting-started-with-nodejs",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Cedar sample candidate",
-        "CLI login, create, deploy",
-        "herokuapp.com verification",
-        "Fir alternative note"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Heroku Sign up",
-      "url": "https://signup.heroku.com/",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "First and last name",
-        "Email and company",
-        "Country and state",
-        "Privacy consents",
-        "reCAPTCHA"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Account Verification",
-      "url": "https://devcenter.heroku.com/articles/account-verification",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Credit card verification required for apps and dynos",
-        "Billing tab Add Credit Card steps",
-        "Accepted card brands"
+        "heroku login",
+        "nodejs-getting-started",
+        "heroku create",
+        "git push heroku"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which language Getting Started guide is the selected Heroku shortest path?",
-      "impact": "Runtime prerequisites, sample clone steps, and build behavior differ across language guides.",
-      "evidence_needed": "Human selection of one language sample route, then a verified walkthrough from signup through the herokuapp.com terminal."
-    },
-    {
-      "question": "What exact password, email-verification, or post-submit screens follow the observed signup.heroku.com form today?",
-      "impact": "Account path after form submit may add unverified fields or waits before Billing card verification.",
-      "evidence_needed": "Dated screenshots of a fresh signup completion through first Dashboard access."
+      "question": "Are all signup and first-success fields for Heroku fully enumerated in public docs?",
+      "impact": "Atomic field counts inside account or billing steps may be incomplete.",
+      "evidence_needed": "Live console fields can differ from documentation screenshots."
     }
   ],
   "counts": null

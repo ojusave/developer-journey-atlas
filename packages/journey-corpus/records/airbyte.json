@@ -6,66 +6,57 @@
   },
   "category": "Data pipelines and workflow automation",
   "surface": {
-    "name": "PyAirbyte source-faker first local read",
-    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: PyAirbyte source-faker first local read. The Core quickstart explicitly identifies PyAirbyte as a fit for Python and notebook prototypes without a server, and the PyAirbyte page publishes one complete account-free Usage example. Prior surface before policy commit: Airbyte documentation, with the PyAirbyte source-faker first local read as one candidate.",
+    "name": "Airbyte Cloud Sample Data source to first successful sync",
+    "selection_basis": "Airbyte Cloud is the hosted onboarding path. Official docs direct developers who do not want to self-manage to cloud.airbyte.com/signup, and the getting-started source guide uses Marketplace Sample Data as the popular test source before destination and connection setup. PyAirbyte and local Core are local/self-managed alternatives, not the Cloud onboarding path.",
     "alternatives_considered": [
       {
-        "name": "Airbyte Agents",
-        "url": "https://docs.airbyte.com/",
-        "reason_not_primary": "The current documentation home presents Agents as a separate cloud or embedded-agent product with web app, MCP, Python SDK, and HTTP API interfaces."
-      },
-      {
-        "name": "Airbyte Core local instance",
+        "name": "PyAirbyte local read",
         "url": "https://docs.airbyte.com/platform/using-airbyte/getting-started/oss-quickstart",
-        "reason_not_primary": "The self-managed platform route requires Docker, local Kubernetes deployment, organization details, generated credentials, a source, a destination, and connection setup before data moves."
+        "reason_not_primary": "Local Python toolkit without Cloud account onboarding."
       },
       {
-        "name": "Airbyte Cloud",
-        "url": "https://cloud.airbyte.com/",
-        "reason_not_primary": "The cloud route adds account creation and authenticated workspace onboarding, while the official Core quickstart directs Python prototyping to PyAirbyte."
-      },
-      {
-        "name": "PyAirbyte Basic Demo notebook",
-        "url": "https://github.com/airbytehq/quickstarts/blob/main/pyairbyte_notebooks/PyAirbyte_Basic_Features_Demo.ipynb",
-        "reason_not_primary": "The notebook demonstrates more PyAirbyte features; the documentation page contains the shorter complete first read."
+        "name": "Airbyte Core abctl local",
+        "url": "https://docs.airbyte.com/platform/using-airbyte/getting-started/oss-quickstart",
+        "reason_not_primary": "Self-managed Docker/Kubernetes path; quickstart says skip it and sign up for Cloud to start syncing now."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Choose an Airbyte product and interface, then reach the first documented success for that surface; the retained candidate installs PyAirbyte locally, reads generated sample data, and conditionally prints one record-count line for each returned stream.",
-    "starting_url": "https://docs.airbyte.com/",
+    "developer_intent": "Create an Airbyte Cloud trial workspace, configure Sample Data, add a destination, and complete a first successful sync.",
+    "starting_url": "https://cloud.airbyte.com/signup",
     "assumed_prior_state": [
-      "No Airbyte product choice, account, cloud workspace, Core deployment, PyAirbyte package, installed connector, source credential, destination, cache, or connection is assumed.",
-      "A local Python environment with pip, a code runner or notebook, network access for package and connector installation, and permission to install Python packages are available.",
-      "No package installation, connector check, data read, or API call was performed during research."
+      "No Airbyte Cloud account or workspace exists.",
+      "A browser is available; no local Docker or Python SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Use PyAirbyte to extract data from a source and print the returned streams' record counts.",
-    "normalized_outcome": "PyAirbyte installs the missing Faker source connector, validates it, reads all selected generated-data streams into the result, and iterates over the returned records.",
-    "observable_completion_signal": "The published loop prints one `Stream {name}: {count} records` line for each stream present in `result.streams`.",
+    "official_milestone": "First successful sync",
+    "normalized_outcome": "An Airbyte Cloud connection completes a successful sync from Sample Data into a configured destination.",
+    "observable_completion_signal": "The connection page shows a successful sync status after Set up connection and initiating a sync.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "The official PyAirbyte Usage example ends by iterating through `result.streams` and printing each stream name and the length of its records list.",
+      "official_label_or_terminal_state": "Cloud trial begins after first successful sync; add-source and add-connection guides end at initiating syncs from the connection page.",
       "source_ids": [
         "S1",
-        "S2"
+        "S2",
+        "S3"
       ]
     },
-    "why_this_is_the_boundary": "The printed stream counts are the example's first observable evidence that an Airbyte connector was installed, checked, selected, and read. A persistent destination, Airbyte server, scheduled connection, and production source are later choices.",
+    "why_this_is_the_boundary": "Cloud onboarding is complete when data moves: trial credits start after the first successful sync. Credential visibility alone is not first success.",
     "source_ids": [
       "S1",
-      "S2"
+      "S2",
+      "S3"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
-      "type": "software",
-      "requirement": "Use a Python environment that provides the `pip` command required by the official installation line.",
+      "type": "account",
+      "requirement": "Airbyte Cloud account via cloud.airbyte.com/signup.",
       "required": true,
       "source_ids": [
         "S1"
@@ -73,237 +64,121 @@
     },
     {
       "order": 2,
-      "type": "permission",
-      "requirement": "Allow package and connector installation in the selected Python environment.",
+      "type": "software",
+      "requirement": "Supported browser to use the Cloud UI.",
       "required": true,
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "order": 3,
-      "type": "network",
-      "requirement": "Provide network access for `pip install airbyte` and `install_if_missing=True` to retrieve PyAirbyte and the Faker connector.",
-      "required": true,
-      "source_ids": [
-        "S1"
+        "S2"
       ]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "arrive",
+      "phase": "account",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Open Airbyte documentation and review its Agents, Data Replication, Platform, Connectors, and Developers entry surfaces.",
-      "details": [
-        "The home page does not identify one company-wide developer path or terminal."
-      ],
-      "input": "https://docs.airbyte.com/",
-      "output": "The product and interface families are visible.",
-      "success_signal": "The developer can identify a product-specific getting-started or developer route.",
-      "failure_or_wait": "The surface choice changes accounts, servers, credentials, setup actions, and first-success evidence.",
+      "interface": "browser",
+      "action": "Sign up for Airbyte Cloud and open the workspace.",
+      "details": [],
+      "input": "Email and organization details",
+      "output": "Authenticated Cloud workspace",
+      "success_signal": "Sources and Destinations navigation is reachable.",
+      "failure_or_wait": "",
       "required": true,
       "source_ids": [
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 2,
-      "phase": "prepare",
+      "phase": "configure",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose the Airbyte product and interface that matches the intended job.",
+      "interface": "console",
+      "action": "Add a Sample Data source from Marketplace and complete Set up source so the connection test succeeds.",
       "details": [
-        "The retained candidate follows PyAirbyte because the Core quickstart identifies it for Python, Jupyter Notebook, and early prototypes that do not need a server."
+        "Docs recommend Sample Data when unsure which source to pick."
       ],
-      "input": "Managed cloud, self-managed replication, agent, connector, API, or embedded Python intent",
-      "output": "One product-specific path is selected.",
-      "success_signal": "For the retained candidate, the PyAirbyte page's Installation and Usage sections are open.",
-      "failure_or_wait": "The official sources do not designate PyAirbyte, Core, Cloud, or Agents as one universal route.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "step_number": 3,
-      "phase": "arrive",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Open Airbyte documentation and follow the PyAirbyte route for a Python prototype that does not require a running server.",
-      "details": [
-        "The Airbyte Core quickstart explicitly presents PyAirbyte as a fit for Jupyter Notebook and early prototypes."
-      ],
-      "input": "https://docs.airbyte.com/",
-      "output": "The PyAirbyte installation and Usage example are selected.",
-      "success_signal": "The page displays `pip install airbyte` and the source-faker example.",
+      "input": "Empty workspace",
+      "output": "Validated Sample Data source",
+      "success_signal": "Source test succeeds and New Connection is offered.",
       "failure_or_wait": "",
       "required": true,
       "source_ids": [
-        "S1",
         "S2"
       ]
     },
     {
-      "step_number": 4,
-      "phase": "install",
+      "step_number": 3,
+      "phase": "configure",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Run `pip install airbyte` in the selected Python environment.",
+      "interface": "console",
+      "action": "Add a destination connector and complete its setup test.",
       "details": [],
-      "input": "A Python environment with pip",
-      "output": "The PyAirbyte library is installed.",
-      "success_signal": "Python can import `airbyte` as `ab`.",
+      "input": "Validated source",
+      "output": "Validated destination",
+      "success_signal": "Destination connection test succeeds.",
       "failure_or_wait": "",
       "required": true,
       "source_ids": [
-        "S1"
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create a connection linking the source and destination, configure schema, and click Set up connection.",
+      "details": [],
+      "input": "Source and destination",
+      "output": "Configured connection",
+      "success_signal": "Connection detail page is open.",
+      "failure_or_wait": "",
+      "required": true,
+      "source_ids": [
+        "S3"
       ]
     },
     {
       "step_number": 5,
-      "phase": "configure",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "code",
-      "action": "Import `airbyte` and call `ab.get_source` with `source-faker`, `config={\"count\": 5_000}`, and `install_if_missing=True`.",
-      "details": [
-        "The source requires no external account or production credential in the published example."
-      ],
-      "input": "The exact source name and configuration shown in the Usage code",
-      "output": "A PyAirbyte source object is created and its connector is installed when absent.",
-      "success_signal": "The code advances to the source check.",
+      "interface": "console",
+      "action": "Initiate a sync from the connection page.",
+      "details": [],
+      "input": "Configured connection",
+      "output": "Sync job",
+      "success_signal": "Sync starts.",
       "failure_or_wait": "",
       "required": true,
       "source_ids": [
-        "S1"
+        "S3"
       ]
     },
     {
       "step_number": 6,
       "phase": "verify",
       "actor": "developer",
-      "interface": "sdk",
-      "action": "Call `source.check()`.",
+      "interface": "console",
+      "action": "Confirm the sync completes successfully.",
       "details": [],
-      "input": "The configured Faker source",
-      "output": "PyAirbyte checks the source configuration.",
-      "success_signal": "The check returns without stopping the example.",
+      "input": "Sync job",
+      "output": "Verified first Cloud sync",
+      "success_signal": "Connection shows successful sync status.",
       "failure_or_wait": "",
       "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 7,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "sdk",
-      "action": "Call `source.select_all_streams()`.",
-      "details": [],
-      "input": "The checked source",
-      "output": "Every discoverable Faker stream is selected for the read.",
-      "success_signal": "The example proceeds to `source.read()`.",
-      "failure_or_wait": "",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 8,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "sdk",
-      "action": "Call `result = source.read()`.",
-      "details": [],
-      "input": "The checked source with all streams selected",
-      "output": "The source read returns a result containing its streams.",
-      "success_signal": "`result.streams.items()` is available to iterate.",
-      "failure_or_wait": "",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "verify",
-      "actor": "developer",
-      "interface": "code",
-      "action": "Iterate over `result.streams.items()` and print each stream name plus `len(list(records))`.",
-      "details": [
-        "The exact format is `Stream {name}: {len(list(records))} records`."
-      ],
-      "input": "The returned result streams",
-      "output": "For each stream present in the result, the program prints its name and computed record count.",
-      "success_signal": "The published loop completes and any returned stream is represented by the documented record-count line.",
-      "failure_or_wait": "",
-      "required": true,
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "candidate_paths": [],
-  "candidate_path_gap": null,
-  "branches": [
-    {
-      "at_step": 1,
-      "condition": "The developer needs a managed or scheduled replication platform",
-      "path": "Use Airbyte Cloud or deploy Airbyte Core, then configure a source, destination, and connection instead of the embedded PyAirbyte route.",
-      "effect_on_first_success": "Adds account or server, credential, destination, and connection setup before a sync.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "at_step": 1,
-      "condition": "The developer wants a notebook walkthrough",
-      "path": "Open the official Basic Demo notebook linked under PyAirbyte Quickstarts.",
-      "effect_on_first_success": "Uses a longer interactive example that extends beyond the compact Usage snippet.",
       "source_ids": [
         "S1",
         "S3"
       ]
-    },
-    {
-      "at_step": 2,
-      "condition": "The Faker connector is already installed",
-      "path": "`install_if_missing=True` reuses the available connector instead of installing it.",
-      "effect_on_first_success": "Removes the connector-download portion while preserving the same code and output.",
-      "source_ids": [
-        "S1"
-      ]
     }
   ],
+  "branches": [],
   "friction_gates": [
     {
-      "at_step": 2,
-      "type": "installation",
-      "description": "The Python environment must permit installation of the `airbyte` package.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "download",
-      "description": "The selected example asks PyAirbyte to install `source-faker` when it is missing.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "environment",
-      "description": "The example materializes each stream's records into a list to compute its printed length.",
+      "at_step": 1,
+      "type": "account",
+      "description": "Cloud signup is required before connectors and syncs.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
@@ -318,104 +193,71 @@
   "sources": [
     {
       "id": "S1",
-      "title": "PyAirbyte | Airbyte Docs",
-      "url": "https://docs.airbyte.com/developers/pyairbyte",
+      "title": "Manage billing and credits (Start a trial)",
+      "url": "https://docs.airbyte.com/platform/cloud/managing-airbyte-cloud/manage-credits",
       "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-19",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Installation",
-        "Quickstarts",
-        "Usage"
+        "Start a trial"
       ],
       "evidence_supported": [
-        "pip installation command",
-        "Official Basic Demo link",
-        "source-faker selection",
-        "Fixed count configuration",
-        "Install-if-missing behavior",
-        "Source check",
-        "All-stream selection",
-        "Source read",
-        "Result-stream iteration",
-        "Printed stream and record-count format"
+        "cloud.airbyte.com/signup",
+        "Trial begins after first successful sync"
       ]
     },
     {
       "id": "S2",
-      "title": "Quickstart | Airbyte Docs",
-      "url": "https://docs.airbyte.com/platform/using-airbyte/getting-started/oss-quickstart",
+      "title": "Add and manage sources",
+      "url": "https://docs.airbyte.com/platform/using-airbyte/getting-started/add-a-source",
       "official_domain": true,
-      "source_type": "quickstart",
-      "accessed_at": "2026-07-19",
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Overview"
+        "Add a source connector",
+        "Sample Data"
       ],
       "evidence_supported": [
-        "Airbyte Core self-managed route",
-        "Cloud alternative",
-        "PyAirbyte positioning for Python, notebooks, and early prototypes without a server"
+        "Marketplace Sample Data",
+        "Set up source connection test"
       ]
     },
     {
       "id": "S3",
-      "title": "PyAirbyte_Basic_Features_Demo.ipynb | airbytehq/quickstarts",
-      "url": "https://github.com/airbytehq/quickstarts/blob/main/pyairbyte_notebooks/PyAirbyte_Basic_Features_Demo.ipynb",
-      "official_domain": true,
-      "source_type": "official-example-repository",
-      "accessed_at": "2026-07-19",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Repository file metadata"
-      ],
-      "evidence_supported": [
-        "The linked Basic Demo is maintained in Airbyte's official quickstarts repository"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Airbyte documentation",
-      "url": "https://docs.airbyte.com/",
+      "title": "Add a connection",
+      "url": "https://docs.airbyte.com/platform/move-data/add-connection",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-19",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Agents",
-        "Data Replication",
-        "Platform",
-        "Developers"
+        "Create an ELT connection",
+        "Set up connection"
       ],
       "evidence_supported": [
-        "Broad current product surface",
-        "Separate agent and replication families",
-        "Platform and developer entry points",
-        "Absence of one company-wide developer route"
+        "New connection",
+        "Initiate syncs"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Airbyte product and interface should define the platform-wide first mile?",
-      "impact": "The answer changes account, server, deployment, credential, connection, code, and terminal requirements.",
-      "reason_unresolved": "The current documentation home presents Agents and Data Replication families plus Platform and Developers surfaces, and the Core quickstart treats Cloud and PyAirbyte as purpose-dependent alternatives.",
+      "question": "Which destination does Cloud onboarding recommend first for Sample Data on a brand-new trial?",
+      "impact": "Destination choice adds connector-specific fields.",
+      "reason_unresolved": "Add-connection docs require a destination but do not mandate one specific first destination for Sample Data.",
       "checked_source_ids": [
         "S2",
-        "S4"
-      ]
-    },
-    {
-      "question": "What exact stream names and counts appear for the current `source-faker` connector?",
-      "impact": "The terminal can be expressed as the documented print format but not as a guaranteed fixed list of output lines.",
-      "reason_unresolved": "The official Usage page shows the loop and the input count but does not publish a captured output block.",
-      "checked_source_ids": [
-        "S1"
+        "S3"
       ]
     }
   ],
   "excluded_after_success": [
-    "Persistent caches and destinations, production source credentials, Airbyte Core deployment, Airbyte Cloud signup, workspaces, scheduled connections, incremental syncs, schema management, normalization, connector development, and orchestration occur after the first local read."
-  ]
+    "PyAirbyte",
+    "abctl local Core",
+    "Custom connector builder"
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null
 }

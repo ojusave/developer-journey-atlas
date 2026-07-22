@@ -6,53 +6,63 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Pinecone Python SDK semantic-search quickstart",
-    "selection_basis": "Pinecone's official general Quickstart explicitly offers several equivalent approaches and says each achieves the same sample semantic-search result. The direct SDK section provides a complete manual Python path with visible ranked hits, so the boundary is vendor-established even though tooling alternatives exist.",
+    "name": "Integrated embedding index via cURL (API key + Starter plan)",
+    "selection_basis": "Pinecone documents REST cURL for create-for-model, upsert text, and search with text. The general Quickstart requires an account/API key and offers Starter (free) among plans. An SDK install is not required when using the documented HTTP paths.",
     "alternatives_considered": [
       {
-        "name": "Pinecone AI coding-tool plugin",
+        "name": "Python SDK quickstart path",
         "url": "https://docs.pinecone.io/guides/get-started/quickstart",
-        "reason_not_primary": "The page labels this fastest, but generated implementation can vary and requires another vendor's coding tool; the SDK path is deterministic and fully shown."
+        "reason_not_primary": "SDK convenience for the same create/upsert/search flow; REST cURL is documented for each operation."
       },
       {
-        "name": "Pinecone no-code n8n",
+        "name": "AI coding-tool plugin quickstart",
         "url": "https://docs.pinecone.io/guides/get-started/quickstart",
-        "reason_not_primary": "This parallel route requires n8n and an OpenAI API key in addition to Pinecone."
+        "reason_not_primary": "Requires another vendor's coding tool; not a deterministic cURL path."
+      },
+      {
+        "name": "n8n no-code path",
+        "url": "https://docs.pinecone.io/guides/get-started/quickstart",
+        "reason_not_primary": "Adds n8n and often a second LLM vendor key."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-18",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Build the official sample semantic search with the Pinecone Python SDK and see ranked results.",
+    "developer_intent": "Create a Pinecone account and API key on Starter (or equivalent), create an integrated embedding index, upsert sample text, and receive search hits over HTTPS.",
     "starting_url": "https://docs.pinecone.io/guides/get-started/quickstart",
     "assumed_prior_state": [
-      "The developer has arrived at the general Pinecone Quickstart.",
-      "The developer has no account, API key, SDK installation, index, or indexed sample records yet."
+      "No Pinecone account, API key, index, or records are assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Search and rerank",
-    "normalized_outcome": "The sample records are indexed in Pinecone, a semantic text query returns hits, and the same query is reranked with Pinecone's hosted `bge-reranker-v2-m3` model.",
-    "observable_completion_signal": "The first search prints hits, then `reranked_results['result']['hits']` prints the reranked IDs, scores, text, and categories with the most relevant historical structures and monuments ranked highest.",
+    "official_milestone": "Search with text returns hits",
+    "normalized_outcome": "After cURL create-for-model and upsert text, a cURL search with text against the index host returns result.hits.",
+    "observable_completion_signal": "POST .../records/namespaces/{namespace}/search returns JSON with result.hits containing matching record ids and fields.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "The current direct SDK path creates an index, upserts sample data, waits for visibility, performs semantic search, reranks the results, and shows the most relevant historical structures and monuments ranked highest before Improve results and cleanup.",
+      "official_label_or_terminal_state": "API reference documents cURL for POST /indexes/create-for-model, upsert text to /records/namespaces/{namespace}/upsert, and search with text to /records/namespaces/{namespace}/search returning hits.",
       "source_ids": [
-        "S1"
+        "S2",
+        "S3",
+        "S4"
       ]
     },
-    "why_this_is_the_boundary": "It is the complete data-in, search, and rerank result demonstrated by the current official general quickstart before optional result-improvement techniques and cleanup.",
+    "why_this_is_the_boundary": "The first meaningful vector-DB success is authenticated search hits over indexed text. Official REST docs cover create, upsert, and search with cURL, so an SDK is optional. Starter is free with limits; paid Builder/Standard are alternatives, not required for the Starter first path. Optional rerank is excluded from the required first success.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2",
+      "S3",
+      "S4"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
       "type": "account",
-      "requirement": "A Pinecone account and selected plan are required.",
+      "requirement": "A Pinecone account that can open the console and create API keys.",
       "required": true,
       "source_ids": [
         "S1"
@@ -60,8 +70,8 @@
     },
     {
       "order": 2,
-      "type": "credential",
-      "requirement": "Create or receive a Pinecone API key from the console and save it for request authentication.",
+      "type": "billing",
+      "requirement": "A selected plan with capacity for a serverless integrated index. Starter is free with limits; Builder and Standard trial are paid/credit alternatives documented on the Quickstart.",
       "required": true,
       "source_ids": [
         "S1"
@@ -69,29 +79,40 @@
     },
     {
       "order": 3,
-      "type": "software",
-      "requirement": "The selected route requires Python and the Pinecone SDK; a browser Colab alternative is linked.",
+      "type": "credential",
+      "requirement": "A Pinecone API key sent as Api-Key on control-plane and data-plane requests.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 4,
+      "type": "software",
+      "requirement": "A terminal with cURL (or any HTTP client). No language SDK is required.",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
       ]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "access",
+      "phase": "account",
       "actor": "developer",
-      "interface": "console",
-      "action": "Sign up for Pinecone, choose Starter, Builder, or a Standard trial, and obtain an API key.",
+      "interface": "browser",
+      "action": "Sign up for Pinecone at app.pinecone.io and choose a plan (Starter free, or Builder / Standard trial).",
       "details": [
-        "Starter is free with limits; Builder has a monthly price; Standard trial is time- and credit-limited.",
-        "Save the generated key for authentication."
+        "Quickstart: after signup you receive an API key in the console."
       ],
-      "input": "Account details and plan choice.",
-      "output": "Pinecone account and API key.",
-      "success_signal": "The console displays the generated key.",
-      "failure_or_wait": "Plan limits and available regions differ.",
+      "input": "Intent to use Pinecone Database",
+      "output": "Authenticated Pinecone organization on a selected plan",
+      "success_signal": "Console shows the account and plan.",
+      "failure_or_wait": "Plan limits and available regions differ by plan.",
       "required": true,
       "source_ids": [
         "S1"
@@ -99,17 +120,18 @@
     },
     {
       "step_number": 2,
-      "phase": "install",
+      "phase": "billing",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Install the Python SDK with `pip install pinecone`.",
+      "interface": "console",
+      "action": "Confirm Starter (free) capacity is sufficient, or activate Builder / Standard trial credits if choosing a paid path.",
       "details": [
-        "The page also gives JavaScript, Java, Go, and browser Colab alternatives."
+        "Starter is free with limits and one cloud region.",
+        "Standard trial documents time- and credit-limited access."
       ],
-      "input": "Python environment.",
-      "output": "Pinecone SDK installed.",
-      "success_signal": "The `pinecone` package can be imported.",
-      "failure_or_wait": "Package installation requires network access.",
+      "input": "Authenticated account",
+      "output": "Plan eligible to create a serverless index",
+      "success_signal": "Console shows an active plan that can create indexes.",
+      "failure_or_wait": "Quota or region limits may require upgrade.",
       "required": true,
       "source_ids": [
         "S1"
@@ -117,18 +139,17 @@
     },
     {
       "step_number": 3,
-      "phase": "configure",
+      "phase": "authenticate",
       "actor": "developer",
-      "interface": "sdk",
-      "action": "Initialize `Pinecone` with the API key and create the quickstart index for the hosted embedding model if it does not exist.",
+      "interface": "console",
+      "action": "Create or copy a Pinecone API key and store it securely.",
       "details": [
-        "Use AWS us-east-1, `llama-text-embed-v2`, and map the text field to `chunk_text`.",
-        "The integrated embedding lets the developer upsert and search with text."
+        "Export as PINECONE_API_KEY."
       ],
-      "input": "API key, index name, cloud, region, model, and field map.",
-      "output": "Dense index with integrated embedding.",
-      "success_signal": "The index exists and can be targeted with `pc.Index(index_name)`.",
-      "failure_or_wait": "Plan region limits can constrain the cloud region.",
+      "input": "Account on an eligible plan",
+      "output": "API key",
+      "success_signal": "The key value is available locally.",
+      "failure_or_wait": "No manual approval wait is documented for key creation.",
       "required": true,
       "source_ids": [
         "S1"
@@ -136,136 +157,95 @@
     },
     {
       "step_number": 4,
-      "phase": "execute",
+      "phase": "configure",
       "actor": "developer",
-      "interface": "sdk",
-      "action": "Create the documented sample records and upsert them into `example-namespace`.",
-      "details": [
-        "Each record has an ID, text field, and category.",
-        "Pinecone converts text into dense vectors through the integrated model."
-      ],
-      "input": "Sample records and namespace.",
-      "output": "Accepted record upsert.",
-      "success_signal": "The upsert call completes.",
-      "failure_or_wait": "Pinecone is eventually consistent, so records may not be immediately queryable.",
+      "interface": "cli",
+      "action": "Export PINECONE_API_KEY in the terminal.",
+      "details": [],
+      "input": "Generated API key",
+      "output": "Key available to HTTP clients in the shell",
+      "success_signal": "The environment variable is set for the current shell.",
+      "failure_or_wait": "Shell persistence depends on the OS.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S2"
       ]
     },
     {
       "step_number": 5,
-      "phase": "verify",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "sdk",
-      "action": "Wait for indexing, call `describe_index_stats`, and confirm the namespace vector count.",
+      "interface": "api",
+      "action": "Create an integrated embedding index with cURL POST to https://api.pinecone.io/indexes/create-for-model.",
       "details": [
-        "The documented Python example sleeps 10 seconds before reading stats.",
-        "The example response shows 50 vectors."
+        "Include Api-Key and X-Pinecone-Api-Version headers.",
+        "Use embed.model llama-text-embed-v2 and field_map text→chunk_text as in the create-for-model cURL example.",
+        "Capture the returned host for data-plane calls; wait until the index is ready."
       ],
-      "input": "Completed upsert.",
-      "output": "Index statistics.",
-      "success_signal": "The namespace and total vector counts match the upserted sample set.",
-      "failure_or_wait": "A slight eventual-consistency delay is expected.",
+      "input": "PINECONE_API_KEY",
+      "output": "Index host URL",
+      "success_signal": "create-for-model returns index metadata including host.",
+      "failure_or_wait": "Index may report Initializing before ready; region/plan limits can reject create.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S2"
       ]
     },
     {
       "step_number": 6,
       "phase": "execute",
       "actor": "developer",
-      "interface": "sdk",
-      "action": "Search the namespace for records semantically similar to the documented historical-structures query.",
+      "interface": "api",
+      "action": "Upsert sample text with cURL to https://$INDEX_HOST/records/namespaces/$NAMESPACE/upsert.",
       "details": [
-        "Provide the query as text because the index uses integrated embedding.",
-        "Request the documented number of top results."
+        "Content-Type: application/x-ndjson with records containing _id and chunk_text.",
+        "Allow a short wait for records to become searchable."
       ],
-      "input": "Query text and top-k value.",
-      "output": "Search result hits with scores and fields.",
-      "success_signal": "The `results` object contains ranked hits.",
-      "failure_or_wait": "Searching too soon may omit recently upserted records.",
+      "input": "Index host and PINECONE_API_KEY",
+      "output": "Upserted records in the namespace",
+      "success_signal": "Upsert returns success (201).",
+      "failure_or_wait": "Invalid field_map mismatch or auth errors fail the upsert.",
       "required": true,
       "source_ids": [
-        "S1"
+        "S3"
       ]
     },
     {
       "step_number": 7,
       "phase": "verify",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Print each returned hit's ID, score, category, and text.",
+      "interface": "api",
+      "action": "Search with text via cURL POST to https://$INDEX_HOST/records/namespaces/$NAMESPACE/search and confirm hits.",
       "details": [
-        "The output makes the semantic ranking directly observable."
+        "Send query.inputs.text and top_k; rerank is optional and not required for first success."
       ],
-      "input": "Search result hits.",
-      "output": "Human-readable ranked result rows.",
-      "success_signal": "Relevant sample records print with similarity scores and metadata.",
-      "failure_or_wait": "An empty result indicates index, namespace, consistency, or authentication problems not diagnosed on the quickstart page.",
+      "input": "Upserted namespace",
+      "output": "Search hits JSON",
+      "success_signal": "result.hits contains matching records.",
+      "failure_or_wait": "Empty hits may mean records are not yet visible; wait briefly and retry.",
       "required": true,
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 8,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "sdk",
-      "action": "Search the same namespace again and add integrated reranking with the hosted `bge-reranker-v2-m3` model.",
-      "details": [
-        "Use the quickstart's `top_k` of 10, `top_n` of 10, and `rank_fields` set to `[\"chunk_text\"]`.",
-        "The model supports one rerank field, at most 100 documents, and 1,024 tokens per query-document pair."
-      ],
-      "input": "Historical-structures query, original search candidates, reranker model, top_n, and rank field.",
-      "output": "`reranked_results` with relevance-rescored hits.",
-      "success_signal": "The reranked result object contains hits returned by the hosted reranking model.",
-      "failure_or_wait": "The `bge-reranker-v2-m3` limits the request to one rank field, 100 documents, and 1,024 tokens per query-document pair.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "verify",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Print every reranked hit's ID, rerank score, text, and category and compare the ordering with the initial search.",
-      "details": [
-        "The quickstart states that the most relevant historical structures and monuments are now ranked highest."
-      ],
-      "input": "Reranked result hits.",
-      "output": "Human-readable reranked rows.",
-      "success_signal": "The documented relevant monument records appear at the top of the printed reranked list.",
-      "failure_or_wait": "An error or empty list requires checking the index, namespace, query, model, field, and request limits.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
+        "S4"
       ]
     }
   ],
   "branches": [
     {
-      "at_step": 2,
-      "condition": "The developer selects JavaScript, Java, or Go.",
-      "path": "Install the corresponding SDK and use the parallel create-index, upsert, wait, search, and print examples.",
-      "effect_on_first_success": "The same ranked semantic-search result is reached with language-specific syntax.",
+      "at_step": 5,
+      "condition": "The developer prefers the official SDK.",
+      "path": "pip install pinecone and use create_index_for_model, upsert_records, and search as on the Quickstart.",
+      "effect_on_first_success": "Adds package install; same index and search boundary.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "at_step": 2,
-      "condition": "The developer chooses an AI coding tool or n8n.",
-      "path": "Follow the tool-specific plugin or workflow instructions; the n8n path additionally requires OpenAI credentials.",
-      "effect_on_first_success": "The implementation becomes tool-generated or no-code but retains a sample retrieval result.",
+      "at_step": 7,
+      "condition": "The developer wants reranked hits.",
+      "path": "Include rerank.model bge-reranker-v2-m3 in the search body as shown in the search-with-text docs.",
+      "effect_on_first_success": "Optional after basic hits; not required for first success.",
       "source_ids": [
-        "S1"
+        "S4"
       ]
     }
   ],
@@ -273,52 +253,27 @@
     {
       "at_step": 1,
       "type": "account",
-      "description": "Account creation and plan selection precede API use.",
+      "description": "Signup and plan selection are required before API key and index creation.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
       ]
     },
     {
-      "at_step": 1,
+      "at_step": 3,
       "type": "credential",
-      "description": "The API key must be generated and saved.",
+      "description": "Api-Key header is required on control-plane and data-plane calls.",
       "documented_requirement": true,
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 1,
-      "type": "choice",
-      "description": "Starter, Builder, and Standard-trial plans have different cost, quota, and region constraints.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "installation",
-      "description": "The selected language SDK must be installed.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
+        "S2",
+        "S3",
+        "S4"
       ]
     },
     {
       "at_step": 5,
       "type": "wait",
-      "description": "Eventual consistency requires a delay before newly upserted records are reliably visible to search; the Python example waits 10 seconds.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 8,
-      "type": "configuration",
-      "description": "Integrated reranking requires a hosted model, `top_n`, and a compatible `rank_fields` field. `bge-reranker-v2-m3` accepts only one rerank field and has document and token limits.",
+      "description": "New indexes may initialize before ready; upserted records may take a few seconds to become searchable.",
       "documented_requirement": true,
       "source_ids": [
         "S1",
@@ -327,74 +282,100 @@
     }
   ],
   "time_to_first_success": {
-    "vendor_claim": false,
-    "value": "not documented",
-    "source_ids": []
+    "vendor_claim": true,
+    "value": "minutes",
+    "source_ids": [
+      "S1"
+    ]
   },
   "sources": [
     {
       "id": "S1",
-      "title": "Pinecone Quickstart",
+      "title": "Quickstart",
       "url": "https://docs.pinecone.io/guides/get-started/quickstart",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
         "Get set up",
-        "Choose your path",
-        "Integrate the SDK directly",
-        "Install an SDK",
-        "Create an index",
-        "Upsert data",
-        "Search and rerank",
-        "Clean up",
-        "Next steps"
+        "Create a Pinecone account",
+        "Plan choices",
+        "SDK integrate path"
       ],
       "evidence_supported": [
-        "Account, plan, and API-key setup",
-        "Parallel approaches and common result",
-        "Complete Python SDK semantic-search path",
-        "Eventual-consistency wait and statistics signal",
-        "Printed ranked-hit boundary"
+        "Account and API key",
+        "Starter free plan",
+        "Integrated embedding create/upsert/search pattern"
       ]
     },
     {
       "id": "S2",
-      "title": "Rerank Results",
-      "url": "https://docs.pinecone.io/guides/search/rerank-results",
+      "title": "Create an index with integrated embedding",
+      "url": "https://docs.pinecone.io/reference/api/2025-10/control-plane/create_for_model",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Integrated reranking",
-        "Reranking models",
-        "bge-reranker-v2-m3"
+        "cURL create-for-model example"
       ],
       "evidence_supported": [
-        "Integrated search rerank parameters",
-        "Reranked score behavior",
-        "Single-field limit",
-        "100-document and 1,024-token limits"
+        "cURL POST /indexes/create-for-model",
+        "Api-Key and version headers",
+        "Returned host"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Upsert text",
+      "url": "https://docs.pinecone.io/reference/api/2025-10/data-plane/upsert_records",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "cURL upsert NDJSON example"
+      ],
+      "evidence_supported": [
+        "cURL upsert to index host",
+        "chunk_text field mapping"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Search with text",
+      "url": "https://docs.pinecone.io/reference/api/2025-10/data-plane/search_records",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "cURL search with text",
+        "Example hits response"
+      ],
+      "evidence_supported": [
+        "cURL search endpoint",
+        "result.hits terminal",
+        "Optional rerank"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "How long does index creation itself take before the SDK can target the index?",
-      "impact": "A workshop timer cannot distinguish expected provisioning from a stuck create call.",
-      "reason_unresolved": "The quickstart documents a 10-second post-upsert wait but no explicit index-creation duration.",
+      "question": "Whether every Starter signup still auto-surfaces an API key without a separate key-creation screen.",
+      "impact": "Credential step may be one or two console clicks.",
+      "reason_unresolved": "Quickstart says you receive a key after signup and also documents creating a new key in console.",
       "checked_source_ids": [
         "S1"
       ]
     }
   ],
   "excluded_after_success": [
-    "Knowledge-retrieval agent and RAG chatbot",
-    "Full-text and hybrid search",
-    "Production data modeling, throughput, cost optimization, and deletion protection",
-    "Deleting the example index"
+    "SDK installation",
+    "Rerank as a required step",
+    "n8n and coding-agent plugin paths",
+    "Builder/Standard paid upgrades beyond Starter first success"
   ],
   "candidate_paths": [],
   "candidate_path_gap": null

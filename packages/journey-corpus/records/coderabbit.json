@@ -2,291 +2,151 @@
   "platform": {
     "name": "CodeRabbit",
     "slug": "coderabbit",
-    "organization": "CodeRabbit, Inc."
+    "organization": "CodeRabbit"
   },
   "category": "API infrastructure and developer tooling",
   "surface": {
-    "name": "CodeRabbit hosted pull-request Quickstart",
-    "selection_basis": "CodeRabbit's official Quickstart defines the common hosted route across supported Git platforms: sign up with an existing provider account, grant repository access, reach `You're all set`, open a pull request, and receive actionable review feedback. Provider-specific mechanics and the CLI remain branches.",
+    "name": "CodeRabbit hosted Quickstart: connect Git provider and first PR review",
+    "selection_basis": "Quickstart: signup with Git provider, add repos, You're all set, open PR for AI feedback. No credit card.",
     "alternatives_considered": [
       {
-        "name": "GitHub hands-on first pull-request review",
-        "url": "https://docs.coderabbit.ai/guide",
-        "reason_not_primary": "The tutorial explicitly focuses on GitHub while stating that other Git platforms are supported."
-      },
-      {
-        "name": "CodeRabbit CLI first local review",
-        "url": "https://docs.coderabbit.ai/cli",
-        "reason_not_primary": "CLI is a separate open-beta surface and does not require repository-host installation."
-      },
-      {
-        "name": "Other Git platform integration",
-        "url": "https://docs.coderabbit.ai/platforms/overview",
-        "reason_not_primary": "Each platform has materially different owner, service-account, token, webhook, network, and repository-permission requirements."
+        "name": "CLI/IDE reviews",
+        "url": "https://docs.coderabbit.ai/getting-started/quickstart",
+        "reason_not_primary": "Listed after hosted setup."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-18",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Receive the first CodeRabbit code-review result without a preselected review surface or Git platform.",
+    "developer_intent": "Connect provider and receive first PR review.",
     "starting_url": "https://docs.coderabbit.ai/getting-started/quickstart",
     "assumed_prior_state": [
-      "The developer has arrived after discovery.",
-      "The developer has an existing supported Git-provider account and a repository where they can grant CodeRabbit access and open a pull request."
+      "Existing Git provider account.",
+      "No CodeRabbit install yet."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Actionable pull-request review after `You're all set`",
-    "normalized_outcome": "CodeRabbit is connected to at least one hosted repository and posts actionable review feedback on a newly opened pull request.",
-    "observable_completion_signal": "Setup displays `You're all set`; after the developer opens a pull request and waits a few minutes, CodeRabbit posts a review containing actionable findings on the pull request.",
+    "official_milestone": "PR Reviews after You're all set",
+    "normalized_outcome": "Connected repos yield actionable AI review feedback on an opened PR.",
+    "observable_completion_signal": "Review feedback on PR",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "The Quickstart names the setup terminal state `You're all set`, and its next Pull Request Reviews route says to open a pull request and receive a review in minutes.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "You're all set then open a PR for feedback within minutes.",
       "source_ids": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
+        "S1"
       ]
     },
-    "why_this_is_the_boundary": "The first actionable hosted review is the documented product result immediately after the common setup path. Provider-specific installation details do not change that common boundary.",
+    "why_this_is_the_boundary": "Hosted PR review is first product value.",
     "source_ids": [
-      "S1",
-      "S2",
-      "S3",
-      "S4"
+      "S1"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
       "type": "account",
-      "requirement": "An existing account on a supported Git provider is required for hosted signup; the quickstart does not require a payment card.",
+      "requirement": "Existing GitHub/GitLab/Azure DevOps/Bitbucket account.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
       "order": 2,
-      "type": "permission",
-      "requirement": "Hosted integration requires ownership-level permissions for the selected organization and repositories; provider-specific guides can add service accounts, access tokens, webhooks, or network access.",
+      "type": "access",
+      "requirement": "Permission to add repos.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "order": 3,
-      "type": "other",
-      "requirement": "A repository and a reviewable pull request are required after hosted setup; CLI installation is only required for the alternative local-review branch.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2",
-        "S3"
+        "S1"
       ]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "access",
+      "phase": "account",
       "actor": "developer",
-      "interface": "console",
-      "action": "Open CodeRabbit and sign up with the existing supported Git-provider account that owns or can administer the target repositories.",
-      "details": [
-        "Supported hosted providers include GitHub, GitLab, Azure DevOps, Bitbucket Cloud, and Bitbucket Data Center.",
-        "The hosted quickstart states that no credit card is required."
-      ],
-      "input": "Existing Git-provider identity and provider authorization.",
-      "output": "Authenticated CodeRabbit account linked to the provider.",
-      "success_signal": "CodeRabbit advances to repository access selection.",
-      "failure_or_wait": "A provider account without the required organization or repository permissions cannot complete installation.",
+      "interface": "browser",
+      "action": "Sign up with Git provider (no credit card).",
+      "details": [],
+      "input": "Git identity",
+      "output": "CodeRabbit account",
+      "success_signal": "Onboarding continues",
+      "failure_or_wait": "OAuth failure",
       "required": true,
       "source_ids": [
-        "S1",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "phase": "configure",
       "actor": "developer",
-      "interface": "console",
-      "action": "Choose the organization or personal account and grant CodeRabbit access to all repositories or selected repositories.",
-      "details": [
-        "Review the requested read and write permissions before installing or authorizing CodeRabbit.",
-        "Provider-specific setup may use an app installation, service account, token, or webhook."
-      ],
-      "input": "Organization or account selection and repository permissions.",
-      "output": "CodeRabbit installation with repository access.",
-      "success_signal": "The setup page displays `You're all set`.",
-      "failure_or_wait": "Insufficient owner permissions, denied provider authorization, or missing repository selection blocks setup.",
+      "interface": "browser",
+      "action": "Add repositories to review.",
+      "details": [],
+      "input": "Account",
+      "output": "Repos authorized",
+      "success_signal": "You're all set",
+      "failure_or_wait": "Admin perms",
       "required": true,
       "source_ids": [
-        "S1",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 3,
-      "phase": "configure",
+      "phase": "execute",
       "actor": "developer",
-      "interface": "other",
-      "action": "Create a reviewable change in an authorized repository and open a pull request against the intended base branch.",
-      "details": [
-        "An existing pull request can be selected for an optional first review where the provider flow offers it."
-      ],
-      "input": "Authorized repository, source branch, code change, and base branch.",
-      "output": "Open pull request visible to CodeRabbit.",
-      "success_signal": "The pull request is open in the connected provider.",
-      "failure_or_wait": "A repository outside the granted selection or a non-reviewable pull request will not enter the documented review path.",
+      "interface": "browser",
+      "action": "Open a pull request on a connected repo.",
+      "details": [],
+      "input": "Repo",
+      "output": "Open PR",
+      "success_signal": "PR open",
+      "failure_or_wait": "None",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
       "step_number": 4,
-      "phase": "execute",
-      "actor": "platform",
-      "interface": "other",
-      "action": "Wait a few minutes while CodeRabbit analyzes the pull request and posts its review.",
-      "details": [
-        "The hands-on guide describes the review as asynchronous."
-      ],
-      "input": "Open pull request in an authorized repository.",
-      "output": "CodeRabbit pull-request review.",
-      "success_signal": "A CodeRabbit review appears on the pull request.",
-      "failure_or_wait": "Review duration varies; permission, provider, or webhook problems can prevent the review from appearing.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "step_number": 5,
       "phase": "verify",
       "actor": "developer",
-      "interface": "other",
-      "action": "Open the CodeRabbit review and confirm it contains actionable findings or suggested improvements tied to the pull-request changes.",
-      "details": [
-        "Discussion with CodeRabbit and applying improvements occur after this first-review boundary."
-      ],
-      "input": "Posted CodeRabbit review.",
-      "output": "Actionable code-review feedback.",
-      "success_signal": "At least one concrete review finding, suggestion, or explicit clean review result is visible on the pull request.",
-      "failure_or_wait": "Setup completion alone is not the first review result; the pull-request review must appear.",
+      "interface": "browser",
+      "action": "Confirm CodeRabbit posts review feedback.",
+      "details": [],
+      "input": "PR",
+      "output": "First review",
+      "success_signal": "Feedback visible",
+      "failure_or_wait": "Minutes wait",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     }
   ],
-  "branches": [
-    {
-      "at_step": 2,
-      "condition": "GitHub hosted review is selected.",
-      "path": "Use a GitHub account with repository-owner permission, log into CodeRabbit with GitHub, authorize account data, select an organization or personal account, choose all or selected repositories, review read and write permissions, install and authorize the app, select an existing pull request for the optional first review or open a new pull request, then wait for CodeRabbit to post actionable feedback.",
-      "effect_on_first_success": "CodeRabbit's first review appears on the selected GitHub pull request; installation without triggering a review only reaches the Quickstart's setup-complete state.",
-      "source_ids": [
-        "S1",
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Local CLI review is selected.",
-      "path": "Install with the script or Homebrew, reload the shell, run `cr auth login`, complete browser sign-in, enter an initialized Git repository with reviewable changes, run `cr` or supply the actual base branch, wait for analysis, and inspect the returned findings and suggested fixes. Applying a suggestion is after the first review result.",
-      "effect_on_first_success": "The terminal displays a completed local review with specific feedback and fixes.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "A hosted platform other than GitHub.com is selected.",
-      "path": "Follow that provider's guide for organization ownership, service accounts where required, tokens, scopes, repository selection, webhook installation, network access, and pull-request trigger.",
-      "effect_on_first_success": "The same general review result is reached through provider-specific setup and failure modes.",
-      "source_ids": [
-        "S4"
-      ]
-    }
-  ],
+  "branches": [],
   "friction_gates": [
-    {
-      "at_step": 1,
-      "type": "choice",
-      "description": "A supported Git provider and owning organization or account must be selected for the hosted path.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S4"
-      ]
-    },
     {
       "at_step": 2,
       "type": "permission",
-      "description": "Hosted onboarding requires owner-level organization and repository permissions and grants CodeRabbit read and write capabilities.",
+      "description": "Repo/org admin may be required.",
       "documented_requirement": true,
       "source_ids": [
-        "S2",
-        "S4"
-      ]
-    },
-    {
-      "at_step": 1,
-      "type": "installation",
-      "description": "CLI route requires installing the open-beta CLI and reloading the shell.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 1,
-      "type": "credential",
-      "description": "CLI authenticates through browser sign-in; hosted providers use provider authorization and can require service-account tokens.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S2",
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "at_step": 1,
-      "type": "environment",
-      "description": "CLI must run inside an initialized Git repository and may need an explicit non-main base branch.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 4,
-      "type": "wait",
-      "description": "Review analysis is asynchronous; CLI agent guidance documents review durations that can exceed several minutes, though the basic Quickstart only claims setup in two minutes.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     }
   ],
   "time_to_first_success": {
-    "vendor_claim": false,
-    "value": "not documented",
-    "source_ids": []
+    "vendor_claim": true,
+    "value": "2 minutes setup; PR feedback within minutes",
+    "source_ids": [
+      "S1"
+    ]
   },
   "sources": [
     {
@@ -295,110 +155,23 @@
       "url": "https://docs.coderabbit.ai/getting-started/quickstart",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
         "Initial Setup",
-        "Sign up with your Git platform",
-        "Add your repositories",
-        "What's Next",
-        "Pull Request Reviews",
-        "IDE & CLI Reviews",
-        "CodeRabbit Plan"
+        "What's Next"
       ],
       "evidence_supported": [
-        "Two-minute setup claim",
-        "Provider chooser",
-        "Multiple first-use surfaces",
-        "Setup-complete state"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Hands-on guide",
-      "url": "https://docs.coderabbit.ai/guide",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "What you'll learn",
-        "Overview",
-        "What you'll need",
-        "What happens next"
-      ],
-      "evidence_supported": [
-        "GitHub-specific full review tutorial",
-        "5-to-10-minute claim for that tutorial",
-        "Review, conversation, and generated-improvement outcomes"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Command-Line Review Tool",
-      "url": "https://docs.coderabbit.ai/cli",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Getting started",
-        "Install CLI",
-        "Authenticate",
-        "Review your code",
-        "Apply suggestions",
-        "Review modes",
-        "Pricing and capabilities"
-      ],
-      "evidence_supported": [
-        "Installation alternatives",
-        "Browser authentication",
-        "Git and base-branch requirements",
-        "Review execution and findings",
-        "Rate limits and duration guidance"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Git platform integration overview",
-      "url": "https://docs.coderabbit.ai/platforms/overview",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Integration process",
-        "Supported Git platforms"
-      ],
-      "evidence_supported": [
-        "Common hosted integration phases",
-        "Ownership permission",
-        "Service-account conditional",
-        "Provider alternatives"
+        "signup",
+        "repos",
+        "PR review"
       ]
     }
   ],
-  "uncertainties": [
-    {
-      "question": "How long should a newly opened hosted pull request take to receive the first review across every supported provider?",
-      "impact": "The workshop can identify an expected wait of minutes but cannot use one timeout to distinguish normal review latency from failed provider setup.",
-      "reason_unresolved": "The official material says the review arrives in minutes but does not give one provider-independent maximum.",
-      "checked_source_ids": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
-      ]
-    }
-  ],
+  "uncertainties": [],
   "excluded_after_success": [
-    "Applying or generating fixes",
-    "Review conversations",
-    "Coding Plans",
-    "Configuration tuning and `.coderabbit.yaml`",
-    "Organization metrics",
-    "Paid usage-based add-on",
-    "Second-pass review loops"
+    "CLI/IDE",
+    "Coding Plans"
   ],
   "candidate_paths": [],
   "candidate_path_gap": null

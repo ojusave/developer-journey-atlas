@@ -1,81 +1,181 @@
 {
-  "platform": {"name": "Better Stack", "slug": "better-stack", "organization": "Better Stack, Inc."},
+  "platform": {
+    "name": "Better Stack",
+    "slug": "better-stack",
+    "organization": "Better Stack"
+  },
   "category": "Observability, testing, and release engineering",
   "surface": {
-    "name": "Better Stack Uptime first HTTP monitor",
-    "selection_basis": "Under the workshop policy, Uptime is the fastest commonly used documented route among peer product surfaces: the official guide explicitly names `Creating your first monitor` and ends with a running HTTP monitor.",
+    "name": "Uptime dashboard: first HTTP monitor",
+    "selection_basis": "The hosted dashboard path creates a working HTTP monitor without installing an agent or writing code.",
     "alternatives_considered": [
-      {"name": "Tracing", "url": "https://betterstack.com/docs/tracing/", "reason_not_primary": "This is a separate product surface with application instrumentation and language-specific setup."},
-      {"name": "Log management", "url": "https://betterstack.com/docs/logs/", "reason_not_primary": "This requires selecting and configuring a log source rather than following the named first-monitor path."},
-      {"name": "Infrastructure monitoring", "url": "https://betterstack.com/docs/infrastructure-monitoring/", "reason_not_primary": "This requires host or cluster instrumentation and is not the selected first-monitor guide."},
-      {"name": "Incident management and on-call", "url": "https://betterstack.com/docs/uptime/getting-started-with-oncall/", "reason_not_primary": "This is a peer product surface for alert routing and incident response, not a universal first-use route."},
-      {"name": "Status pages", "url": "https://betterstack.com/docs/uptime/getting-started-with-status-pages/", "reason_not_primary": "This is a peer communication surface whose setup and terminal differ from a running monitor."},
-      {"name": "Error tracking and real user monitoring", "url": "https://betterstack.com/docs/errors/start/", "reason_not_primary": "This is a peer application-instrumentation surface with framework-specific setup."},
-      {"name": "AI SRE", "url": "https://betterstack.com/docs/ai-sre/welcome/", "reason_not_primary": "This is a peer investigation and incident-response surface, not the named first-monitor task."}
+      {
+        "name": "Heartbeat monitor",
+        "url": "https://betterstack.com/docs/uptime/cron-and-heartbeat-monitoring/",
+        "reason_not_primary": "A heartbeat requires an external job to call Better Stack; an HTTP monitor can check an existing URL directly."
+      }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Start without a Better Stack account, create the first HTTP status monitor for a URL, retain the basic single-user escalation behavior where applicable, and verify that the monitor is running and continuously checking the URL.",
-    "starting_url": "https://betterstack.com/docs/",
+    "developer_intent": "Create a Better Stack account and monitor a public HTTP endpoint.",
+    "starting_url": "https://betterstack.com/docs/uptime/monitoring-start/",
     "assumed_prior_state": [
-      "No Better Stack account, team membership, monitor, alert channel, escalation policy, or prior configuration is assumed.",
-      "A browser, email address, reachable URL or IP address, and network connection are available.",
-      "No email was submitted, magic link was requested or opened, account or team was created or joined, or monitor was created during research."
+      "The developer begins before account creation with no platform resources or credentials.",
+      "A supported browser and internet connection are available."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Create the first HTTP status monitor.",
-    "normalized_outcome": "A Better Stack Uptime monitor is running and continuously checking the supplied URL or IP address for an HTTP 2XX success response.",
-    "observable_completion_signal": "After Create monitor is clicked, the official guide states that the monitor is up and running and continuously checking the URL.",
-    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "The guide states `The monitor is now up and running, continuously checking the URL.`", "source_ids": ["S1"]},
-    "why_this_is_the_boundary": "The first running monitor is the earliest explicit functioning Uptime result; bulk imports and advanced monitors are next steps.",
-    "source_ids": ["S1", "S2", "S3"]
+    "official_milestone": "Create the first uptime monitor",
+    "normalized_outcome": "A hosted HTTP monitor checks the supplied URL and reports its current status.",
+    "observable_completion_signal": "The monitor detail page shows a completed check and an Up status for the endpoint.",
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The monitor detail page shows a completed check and an Up status for the endpoint.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    "why_this_is_the_boundary": "This is the first observable end-to-end result on the selected official surface; later production configuration and expansion follow it.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "identity", "requirement": "Provide an email address and receive a Better Stack magic link.", "required": true, "source_ids": ["S2"]},
-    {"order": 2, "type": "account", "requirement": "Join an existing team associated with the email domain or create a new account when that branch is offered.", "required": true, "source_ids": ["S2"]},
-    {"order": 3, "type": "environment", "requirement": "Have a URL or IP address that Better Stack can check for an HTTP 2XX response.", "required": true, "source_ids": ["S1"]}
+    {
+      "order": 1,
+      "type": "account",
+      "requirement": "A Better Stack account.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "network",
+      "requirement": "A publicly reachable HTTP or HTTPS URL to monitor.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open Better Stack's `Creating your first monitor` guide.", "details": [], "input": "https://betterstack.com/docs/uptime/monitoring-start/", "output": "The four-step monitor route is visible.", "success_signal": "The HTTP status monitor instructions open.", "failure_or_wait": "None documented.", "required": true, "source_ids": ["S1", "S3"]},
-    {"step_number": 2, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign up for Better Stack at the official signup URL and enter Uptime.", "details": ["Treat signup, magic-link verification, and initial team creation as one opaque prerequisite under the workshop policy."], "input": "https://betterstack.com/users/sign-up", "output": "An authenticated Better Stack team is available.", "success_signal": "The Uptime Monitors page can be opened.", "failure_or_wait": "A domain match can route the user to an existing team.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Go to Monitors, select Create monitor, and enter a reachable URL or IP address.", "details": [], "input": "A URL expected to return HTTP 2XX", "output": "The monitor target is configured.", "success_signal": "The target appears in the URL to monitor field.", "failure_or_wait": "A non-2XX result creates an incident after monitoring begins.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "Choose an alerting option.", "details": ["Documented choices include phone, SMS, email, mobile push, Slack, and Microsoft Teams."], "input": "Preferred alert destination", "output": "Alert delivery is configured.", "success_signal": "An alerting option is selected.", "failure_or_wait": "Some channels require their own integration setup.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 5, "phase": "configure", "actor": "developer", "interface": "web-ui", "action": "For a single-user team, leave the default escalation option selected.", "details": [], "input": "Default escalation", "output": "Escalation is configured.", "success_signal": "The default remains selected.", "failure_or_wait": "Multi-user teams can require an on-call schedule and escalation policy.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "web-ui", "action": "Click Create monitor.", "details": [], "input": "Configured monitor", "output": "The HTTP monitor starts.", "success_signal": "The monitor is up and running and continuously checking the URL.", "failure_or_wait": "Investigate target reachability if checks do not return 2XX.", "required": true, "source_ids": ["S1"]}
+    {
+      "step_number": 1,
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create or sign in to a Better Stack account and open Uptime.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The Uptime dashboard is available.",
+      "success_signal": "The Uptime dashboard is available.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Choose to create a monitor and select HTTP monitoring.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The monitor form is open.",
+      "success_signal": "The monitor form is open.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Enter the endpoint URL and save the monitor.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The monitor is listed and checks begin.",
+      "success_signal": "The monitor is listed and checks begin.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open the monitor and confirm the first completed check.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The endpoint is reported Up.",
+      "success_signal": "The endpoint is reported Up.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "candidate_paths": [],
   "candidate_path_gap": null,
-  "branches": [
-    {"at_step": 1, "condition": "The intended first value belongs to a Better Stack surface other than Uptime", "path": "Choose that product guide instead of the Uptime first-monitor candidate.", "effect_on_first_success": "Changes prerequisites, actions, and the terminal outcome.", "source_ids": ["S3"]},
-    {"at_step": 3, "condition": "An existing team is associated with the submitted email domain", "path": "Join that team or choose Sign up for a new account instead.", "effect_on_first_success": "Changes the account and team context before the same first-monitor form.", "source_ids": ["S2"]},
-    {"at_step": 3, "condition": "The user is on a single-user team", "path": "Leave the default escalation option selected.", "effect_on_first_success": "Avoids additional on-call scheduling configuration.", "source_ids": ["S1"]},
-    {"at_step": 3, "condition": "Multiple users or teams use Uptime", "path": "Explore on-call scheduling and alerting and configure an escalation policy appropriate to the team.", "effect_on_first_success": "Adds organization-specific alert routing choices before monitor creation.", "source_ids": ["S1"]},
-    {"at_step": 3, "condition": "A different alert delivery channel is required", "path": "Choose phone, SMS, email, mobile push, Slack, Microsoft Teams, or another documented integration.", "effect_on_first_success": "Changes alert-channel setup while preserving the same running-monitor terminal.", "source_ids": ["S1"]}
-  ],
+  "branches": [],
   "friction_gates": [
-    {"at_step": 1, "type": "choice", "description": "The documentation home presents multiple peer product surfaces without selecting one universal first value outcome.", "documented_requirement": true, "source_ids": ["S3"]},
-    {"at_step": 3, "type": "account", "description": "A Better Stack account or existing-team membership is required before the monitor form can be used.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
-    {"at_step": 3, "type": "verification", "description": "Signup uses an email magic link, but its post-submit and verification states are not publicly documented.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 3, "type": "choice", "description": "A domain match can introduce an existing-team versus new-account choice.", "documented_requirement": true, "source_ids": ["S2"]},
-    {"at_step": 3, "type": "configuration", "description": "The monitor requires a URL or IP address and an alerting choice.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 3, "type": "choice", "description": "Escalation setup differs for single-user and multi-user teams.", "documented_requirement": true, "source_ids": ["S1"]}
+    {
+      "at_step": 3,
+      "type": "access",
+      "description": "The monitored URL must be reachable from Better Stack.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Get started with monitoring | Better Stack Documentation", "url": "https://betterstack.com/docs/uptime/monitoring-start/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Creating your first monitor", "Step 1: Choosing the URL to monitor", "Step 2: Choosing the alerting options", "Step 3: Choosing the escalation options", "Step 4: Creating a monitor", "Next steps"], "evidence_supported": ["Recommended monitoring route", "First-monitor milestone", "URL or IP input", "HTTP 2XX behavior", "Incident behavior", "Alert channels", "Single-user default", "Multi-user escalation", "Create action", "Running-monitor terminal", "After-success scope", "Better Stack, Inc. organization name"]},
-    {"id": "S2", "title": "Sign up | Better Stack", "url": "https://betterstack.com/users/sign-up", "official_domain": true, "source_type": "account-setup", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Sign up for free", "Join your team", "Email", "Send me a magic link", "Existing-team branch", "Terms acknowledgment"], "evidence_supported": ["Email entry", "Magic-link submission", "Existing-team detection", "Join-team or new-account branch", "Terms and privacy acknowledgment", "Public account boundary"]},
-    {"id": "S3", "title": "Getting started | Better Stack Documentation", "url": "https://betterstack.com/docs/getting-started/welcome/", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-19", "last_updated_if_shown": null, "sections_used": ["Getting started", "What is Better Stack?", "Exploring Better Stack?"], "evidence_supported": ["General documentation entry", "Peer product surfaces", "No universal first-success route"]}
+    {
+      "id": "S1",
+      "title": "Get started with uptime monitoring",
+      "url": "https://betterstack.com/docs/uptime/monitoring-start/",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [],
+      "evidence_supported": [
+        "surface selection",
+        "required path",
+        "first-success boundary"
+      ]
+    }
   ],
   "uncertainties": [
-    {"question": "Which Better Stack product surface should define platform-wide first success?", "impact": "The prerequisites, route, and completion signal differ across Uptime, incidents and on-call, status pages, infrastructure monitoring, logs, tracing, error tracking, and AI SRE.", "reason_unresolved": "The official documentation home presents these as peer surfaces and does not select one universal first task.", "checked_source_ids": ["S3"]},
-    {"question": "What exact states follow Send me a magic link for a new user?", "impact": "The mandatory signup and product-entry segment cannot be recorded atomically.", "reason_unresolved": "The public signup page shows the initial controls but the official docs do not enumerate delivery, verification, profile, team, and Uptime convergence states.", "checked_source_ids": ["S1", "S2"]},
-    {"question": "Which alert method is preselected for a new single-user account?", "impact": "The exact monitor-form click path may vary.", "reason_unresolved": "The guide lists alerting options and a default escalation behavior but does not identify a universal alert-channel default.", "checked_source_ids": ["S1"]}
+    {
+      "question": "The docs do not fully expose every fresh-account signup or verification screen.",
+      "impact": "The exact number or ordering of required onboarding actions may vary for a fresh account.",
+      "reason_unresolved": "Public official documentation does not fully expose every authenticated or account-dependent state.",
+      "checked_source_ids": [
+        "S1"
+      ]
+    }
   ],
   "excluded_after_success": [
-    "Bulk importing monitors, adding advanced monitor types, configuring status pages, instrumenting traces or logs, and broader incident-management work occur after the first monitor is running."
+    "Production hardening, scale configuration, and ongoing operations after the first successful result."
   ]
 }

@@ -7,35 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "214c63b94d2c96987b813f96f776ccf18f5d1e8ee77b61a1723795d76cdb944d",
+  "source_record_sha256": "6f7f0a2d2d01204a5220107602b94769422b4ee84d13df172dca70e53290e6bf",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and Node.js 18 or later.",
-      "The developer has a local application project directory ready to deploy.",
-      "No Vercel account, project link, or deployment exists yet."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create a Vercel account and deploy a local project so the CLI returns a deployment URL.",
+  "developer_goal": "Create a Vercel account, import a Git repository, and open the first hosted deployment.",
   "first_success": {
-    "outcome": "The local project is built and deployed to Vercel and the CLI writes a deployment URL to standard output.",
-    "observable_signal": "The vercel command finishes successfully and prints the Deployment URL.",
-    "source_ids": ["S2", "S4"]
+    "outcome": "Vercel builds the imported repository and serves a production deployment URL.",
+    "observable_signal": "The deployment shows Ready and its generated URL loads the application.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Vercel Getting Started CLI path",
-    "rule": "Getting started states every Vercel workflow starts with the CLI; Dashboard Git deploy remains a documented alternative whose account and Git gates still need equal-route judgment for signup identity.",
-    "selected": null,
+    "surface": "Dashboard Git deployment",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Dashboard Git deployment",
     "candidates": [
       {
-        "name": "CLI install, login, and vercel deploy",
-        "status": "unresolved",
-        "reason": "Vendor getting-started core path, but signup identity options and vercel login prompts are not fully enumerated for a verified field count."
+        "name": "Dashboard Git deployment",
+        "status": "selected",
+        "reason": "The dashboard imports and deploys a Git repository without requiring the Vercel CLI or a local deployment command."
       },
       {
-        "name": "Dashboard New Project Git deploy",
-        "status": "unresolved",
-        "reason": "Presented as deploy without the CLI; requires Git provider connection and is a consequential alternate surface after account creation."
+        "name": "Vercel CLI deployment",
+        "status": "not-selected",
+        "reason": "It requires local CLI installation and authentication; the dashboard Git path is fully hosted."
       }
     ]
   },
@@ -44,193 +45,147 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Vercel account from the public sign-up page.",
-      "required_fields": [
-        {
-          "label": "Sign-up identity provider choice",
-          "field_type": "select",
-          "evidence_state": "unverified",
-          "source_ids": ["S1"],
-          "notes": "Public signup shows Terms agreement and Show other options; exact required identity buttons were not fully enumerated in the fetched UI."
-        },
-        {
-          "label": "Terms of Service and Privacy Policy agreement",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The developer has a Vercel account that can authenticate for CLI login.",
-      "evidence_state": "unverified",
-      "source_ids": ["S1", "S2"]
+      "action": "Create or sign in to Vercel.",
+      "required_fields": [],
+      "observable_result": "The Vercel dashboard is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
-      "kind": "product-interaction",
-      "interface": "cli",
-      "action": "Install the Vercel CLI.",
-      "required_fields": [
-        {
-          "label": "Package manager install command for vercel",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": ["S2"]
-        }
-      ],
-      "observable_result": "The vercel command is available locally.",
+      "kind": "external-authorization",
+      "interface": "web-ui",
+      "action": "Authorize the Git provider and choose Add New Project.",
+      "required_fields": [],
+      "observable_result": "Vercel can list accessible repositories.",
       "evidence_state": "documented",
-      "source_ids": ["S2"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
-      "kind": "account",
-      "interface": "cli",
-      "action": "Run vercel login and complete the authentication prompts.",
-      "required_fields": [
-        {
-          "label": "CLI login method and prompts",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": ["S2", "S3"],
-          "notes": "Docs say follow the prompts; email, GitHub, and other methods exist in CLI reference without a single observed required field set."
-        }
-      ],
-      "observable_result": "The CLI session is authenticated to the Vercel account.",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Import the repository and review the detected framework and project settings.",
+      "required_fields": [],
+      "observable_result": "The project is ready to deploy.",
       "evidence_state": "documented",
-      "source_ids": ["S2", "S3"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "product-interaction",
-      "interface": "cli",
-      "action": "From the project directory, run vercel and complete any first-time project linking prompts.",
-      "required_fields": [
-        {
-          "label": "First-time project linking prompts",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": ["S2", "S5"],
-          "notes": "Linking docs describe interactive team and project prompts; exact required prompts for a brand-new account were not freshly observed."
-        }
-      ],
-      "observable_result": "Vercel builds and deploys the project and prints a deployment URL.",
+      "kind": "implementation",
+      "interface": "web-ui",
+      "action": "Select Deploy.",
+      "required_fields": [],
+      "observable_result": "Vercel starts the build and deployment.",
       "evidence_state": "documented",
-      "source_ids": ["S2", "S4"]
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Wait for the deployment to reach Ready.",
+      "required_fields": [],
+      "observable_result": "A production deployment URL is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open the generated deployment URL.",
+      "required_fields": [],
+      "observable_result": "The deployed application loads.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Node.js 18 or later.",
-      "source_ids": ["S2"]
+      "description": "A Vercel account.",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
-      "description": "A local application project directory.",
-      "source_ids": ["S2"]
+      "description": "A supported Git provider account with a deployable repository.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Permission for Vercel to access the selected repository.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "external_gates": [
     {
-      "description": "Identity-provider authorization if signup or login uses GitHub or another external IdP.",
-      "source_ids": ["S1", "S3"]
+      "description": "The Git provider must authorize Vercel to read the repository.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "unavoidable_waits": [
     {
-      "description": "Vercel must build the project before the deployment URL is available.",
-      "source_ids": ["S2", "S4"]
+      "description": "The build and deployment must complete before the URL is ready.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "platform_outcomes": [
     {
-      "description": "The vercel command detects the framework, builds the project, and writes the Deployment URL to stdout.",
-      "source_ids": ["S2", "S4"]
+      "description": "Vercel builds the imported repository and serves a production deployment URL.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "excluded": [
     {
-      "item": "Vercel Plugin or Agent Skills installation",
-      "reason": "Getting started presents these after the core CLI deploy sequence for AI coding agents.",
-      "source_ids": ["S2"]
-    },
-    {
-      "item": "vercel --prod and Marketplace storage installs",
-      "reason": "Optional extensions beyond the first getting-started deploy.",
-      "source_ids": ["S2"]
-    },
-    {
-      "item": "Reading Vercel documentation",
-      "reason": "Documentation is evidence, not a counted action.",
-      "source_ids": ["S2"]
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Vercel Sign Up",
-      "url": "https://vercel.com/signup",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Public signup page",
-        "Terms of Service and Privacy Policy agreement",
-        "Show other options identity affordance"
-      ]
-    },
-    {
-      "id": "S2",
       "title": "Getting started with Vercel",
       "url": "https://vercel.com/docs/getting-started-with-vercel",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Account and Node.js prerequisites",
-        "CLI-first workflow statement",
-        "Install, login, and deploy steps",
-        "Dashboard Git alternative"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Vercel CLI Overview",
-      "url": "https://vercel.com/docs/cli",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "vercel login variants",
-        "CLI authentication requirement"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "vercel deploy",
-      "url": "https://vercel.com/docs/cli/deploy",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Deployment URL on stdout"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Linking Projects with Vercel CLI",
-      "url": "https://vercel.com/docs/cli/project-linking",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Interactive project linking prompts"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which signup identity path is required or shortest on vercel.com/signup, and which vercel login method is the default for a new account?",
-      "impact": "Required fields and external IdP gates for account creation and CLI auth remain unverified.",
-      "evidence_needed": "Dated screenshots of signup options and a fresh-account vercel login transcript."
-    },
-    {
-      "question": "For a brand-new account, which interactive vercel project-linking prompts are mandatory before the first deployment URL appears?",
-      "impact": "Field and action counts for a verified CLI path cannot be finalized.",
-      "evidence_needed": "Fresh-account CLI walkthrough from an empty Vercel team through first vercel deploy."
+      "question": "Git-provider authorization screens and build configuration vary by repository and framework.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

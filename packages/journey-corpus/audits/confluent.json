@@ -7,39 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "de6ff19dbb764b064498a22ce1f3e73a4d162a5b9f9b980f85f62c19ed65374a",
+  "source_record_sha256": "0ca245aeb6959b38a482fba4fbaa8b647c917c183fd6a57b16eb8d78e9c124b9",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and an email address or Google or GitHub identity.",
-      "No Confluent Cloud account, environment, cluster, topic, or connector exists yet."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create a Confluent Cloud account, launch a Basic Kafka cluster, stream sample data, and view the messages.",
+  "developer_goal": "Create a Confluent Cloud account, create Kafka resources, and produce and view a first message.",
   "first_success": {
-    "outcome": "A Basic cluster is running, a users topic exists, a Datagen connector produces sample records, and those records are visible.",
-    "observable_signal": "The connector status becomes Running and the users topic Messages tab displays produced records.",
-    "source_ids": ["S1"]
+    "outcome": "A message produced to a Cloud topic is visible when consuming or viewing messages from that topic.",
+    "observable_signal": "The topic message viewer shows the produced record and its value.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "Confluent Cloud Console quick start, Section 1",
-    "rule": "Prefer the Cloud Console Basic-cluster quick start over CLI or API twins once signup identity and payment timing are fixed.",
-    "selected": null,
+    "surface": "Confluent Cloud Console quick start: cluster, topic, and message",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Confluent Cloud Console quick start: cluster, topic, and message",
     "candidates": [
       {
-        "name": "Email/password local user signup then Console Basic cluster quick start",
-        "status": "unresolved",
-        "reason": "Local-user docs enumerate profile and password steps, but marketing tryfree and cloud signup surfaces differ and payment may interrupt cluster creation."
+        "name": "Confluent Cloud Console quick start: cluster, topic, and message",
+        "status": "selected",
+        "reason": "The Cloud Console provides a hosted path to create Kafka resources, produce a message, and view it without a local Kafka installation."
       },
       {
-        "name": "Sign in with Google or GitHub then Console Basic cluster quick start",
-        "status": "unresolved",
-        "reason": "Official local-user docs present Google and GitHub as peer signup methods with different profile completion screens."
-      },
-      {
-        "name": "Confluent CLI or REST API cluster and connector path",
+        "name": "Local Confluent CLI quick start",
         "status": "not-selected",
-        "reason": "Quick start documents CLI and API as alternate interfaces to the same Console Section 1 outcome."
+        "reason": "It adds CLI installation and local credential setup while the Cloud Console supports the same first hosted message journey."
       }
     ]
   },
@@ -48,281 +45,147 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Confluent Cloud account using local email/password, Google, or GitHub and complete verification.",
-      "required_fields": [
-        {
-          "label": "Full name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S3"],
-          "notes": "Documented for local-user and social finish-account flows; marketing tryfree form fields differ."
-        },
-        {
-          "label": "Organization",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Email address",
-          "field_type": "email",
-          "evidence_state": "documented",
-          "source_ids": ["S3", "S6"]
-        },
-        {
-          "label": "Country",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S3", "S6"]
-        },
-        {
-          "label": "Terms of Service agreement",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S6"]
-        },
-        {
-          "label": "Email verification",
-          "field_type": "challenge",
-          "evidence_state": "documented",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "documented",
-          "source_ids": ["S3"],
-          "notes": "Required on the local-user password setup page after email verification."
-        }
-      ],
-      "observable_result": "The developer is signed in to Confluent Cloud Console.",
-      "evidence_state": "unverified",
-      "source_ids": ["S3", "S6"]
+      "action": "Create or sign in to Confluent Cloud and open the Cloud Console.",
+      "required_fields": [],
+      "observable_result": "The Cloud Console is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Click Add cluster, begin Basic configuration, choose provider, region, and single zone, then launch the cluster.",
-      "required_fields": [
-        {
-          "label": "Cloud provider",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Region",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Single availability zone",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Cluster name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Payment method when none exists",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S1", "S4"],
-          "notes": "Quick start shows Set payment before Review when no payment method exists, even though free trial credit is granted at signup."
-        }
-      ],
-      "observable_result": "Cluster Overview is available after provisioning.",
+      "action": "Activate the trial or add payment information if the account requires billing setup.",
+      "required_fields": [],
+      "observable_result": "The account can create Cloud resources.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Create the users topic with defaults.",
-      "required_fields": [
-        {
-          "label": "Topic name users",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The users topic exists on the cluster.",
+      "action": "Create or select an environment and create a basic Kafka cluster.",
+      "required_fields": [],
+      "observable_result": "The cluster is provisioned.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Configure and launch the Datagen Source connector for the users topic.",
-      "required_fields": [
-        {
-          "label": "Datagen connector configuration",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": ["S1"],
-          "notes": "Quick start covers searching Datagen and launching with a users template; exact required controls can vary with Stream Governance and tutorial tiles."
-        }
-      ],
-      "observable_result": "Connector status moves from Provisioning to Running.",
+      "action": "Create a topic in the cluster.",
+      "required_fields": [],
+      "observable_result": "The topic is ready.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 5,
+      "kind": "implementation",
+      "interface": "web-ui",
+      "action": "Use the Console producer to send a test message to the topic.",
+      "required_fields": [],
+      "observable_result": "Confluent accepts the record.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
       "kind": "verification",
       "interface": "web-ui",
-      "action": "Open Topics, select users, and open the Messages tab.",
+      "action": "Open the topic messages view and inspect the produced record.",
       "required_fields": [],
-      "observable_result": "Produced sample records are visible in the Messages tab.",
+      "observable_result": "The test message is visible.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Internet access and a Confluent Cloud environment that includes a Stream Governance package, as assumed by the quick start.",
-      "source_ids": ["S1"]
+      "description": "A Confluent Cloud account.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A payment method or trial entitlement if the account requires it.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Permission to create an environment, cluster, and topic.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "external_gates": [
     {
-      "description": "Payment method may be required during cluster creation when none is on file.",
-      "source_ids": ["S1", "S4"]
-    },
-    {
-      "description": "Google or GitHub authorization when those signup methods are chosen.",
-      "source_ids": ["S3"]
+      "description": "Some account states may require payment information before cluster creation.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "unavoidable_waits": [
     {
-      "description": "Email delivery and click-through for local-user email verification.",
-      "source_ids": ["S3"]
-    },
-    {
-      "description": "Cluster provisioning can take a few minutes after Launch cluster.",
-      "source_ids": ["S1"]
-    },
-    {
-      "description": "Datagen connector remains in Provisioning briefly before Running.",
-      "source_ids": ["S1"]
+      "description": "Cluster provisioning may take time before topic operations are available.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "platform_outcomes": [
     {
-      "description": "Signup grants the organization free trial credit for a limited period.",
-      "source_ids": ["S4"]
-    },
-    {
-      "description": "Launch cluster provisions a Basic Kafka cluster and opens Cluster Overview.",
-      "source_ids": ["S1"]
-    },
-    {
-      "description": "Running Datagen connector produces sample records into the users topic.",
-      "source_ids": ["S1"]
+      "description": "A message produced to a Cloud topic is visible when consuming or viewing messages from that topic.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "excluded": [
     {
-      "item": "Section 2 Flink SQL queries on the sample data",
-      "reason": "Quick start Section 1 ends at viewing messages; Flink is a later section.",
-      "source_ids": ["S1"]
-    },
-    {
-      "item": "Reading glossary and Confluent versus Apache Kafka comparison pages",
-      "reason": "Documentation reading is not a counted product action.",
-      "source_ids": ["S1"]
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Quick Start for Confluent Cloud",
+      "title": "Confluent Cloud quick start",
       "url": "https://docs.confluent.io/cloud/current/get-started/index.html",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Basic cluster create fields",
-        "Payment page when missing",
-        "users topic",
-        "Datagen connector",
-        "Messages tab terminal",
-        "Stream Governance package assumption"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Overview of Confluent Cloud Tutorials",
-      "url": "https://docs.confluent.io/cloud/current/get-started/tutorials/index.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": ["Tutorial catalog pointing to Cloud quick start"]
-    },
-    {
-      "id": "S3",
-      "title": "Manage Local User Accounts on Confluent Cloud",
-      "url": "https://docs.confluent.io/cloud/current/security/authenticate/user-identities/user-accounts/manage-local-user-accounts.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Local email/password signup steps",
-        "Email verification",
-        "Password requirements",
-        "Google and GitHub signup alternatives"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Confluent Cloud Free Trial",
-      "url": "https://docs.confluent.io/cloud/current/get-started/free-trial.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Automatic free credit at signup",
-        "Payment method guidance during and after trial"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "FAQ for Confluent Cloud Billing",
-      "url": "https://docs.confluent.io/cloud/current/billing/billing-faq.html",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": ["Billing and payment method context for Cloud usage"]
-    },
-    {
-      "id": "S6",
-      "title": "Start for free on Confluent Cloud",
-      "url": "https://www.confluent.io/confluent-cloud/tryfree/",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Google and GitHub sign-in",
-        "Email and Country fields",
-        "Terms of Service agreement",
-        "Start Free CTA"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Does every new Confluent Cloud account receive a default environment with an eligible Stream Governance package before Section 1?",
-      "impact": "A missing package adds environment configuration before cluster, topic, or connector steps.",
-      "evidence_needed": "Fresh-account Console walkthrough confirming environment and Stream Governance state immediately after signup."
-    },
-    {
-      "question": "Which current signup URL and identity path is canonical, and is payment always required before Launch cluster despite trial credit?",
-      "impact": "Signup field sets and a payment gate change required actions and external gates before first messages appear.",
-      "evidence_needed": "Dated capture of confluent.cloud/signup versus tryfree, plus a cluster-create attempt on a brand-new trial org with no card on file."
+      "question": "Trial eligibility and whether payment is required vary by account and region.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

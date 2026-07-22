@@ -2,424 +2,189 @@
   "platform": {
     "name": "PostHog",
     "slug": "posthog",
-    "organization": "PostHog, Inc."
+    "organization": "PostHog"
   },
   "category": "Observability, testing, and release engineering",
   "surface": {
-    "name": "PostHog AI wizard default integration",
-    "selection_basis": "PostHog's current official documentation index calls the AI wizard the fastest integration method, and the wizard page calls it the recommended and default method for installing PostHog and getting started. It auto-detects supported frameworks and documents the project-onboarded terminal state after authentication, SDK installation, scanning, event instrumentation, credential configuration, and generated insights and dashboards.",
+    "name": "PostHog Cloud Capture API via cURL",
+    "selection_basis": "A direct capture request needs only a hosted project token and cURL, making it shorter than installing an SDK.",
     "alternatives_considered": [
       {
-        "name": "Manual SDK installation",
-        "url": "https://posthog.com/docs/product-analytics/installation",
-        "reason_not_primary": "PostHog routes unsupported frameworks here and explicitly recommends the wizard as default."
-      },
-      {
-        "name": "Existing account wizard",
-        "url": "https://posthog.com/docs/ai-engineering/ai-wizard",
-        "reason_not_primary": "This is a branch of the same default wizard that authenticates instead of provisioning a new account."
-      },
-      {
-        "name": "Self-hosted PostHog",
-        "url": "https://posthog.com/docs/self-host",
-        "reason_not_primary": "This adds deployment and infrastructure gates not selected by the default Cloud wizard."
+        "name": "JavaScript SDK installation",
+        "url": "https://posthog.com/docs/libraries/js",
+        "reason_not_primary": "It adds package or snippet setup; cURL reaches the event ingestion boundary directly."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-18",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Use PostHog's recommended default wizard to create or authenticate an account and automatically instrument a supported application.",
-    "starting_url": "https://posthog.com/docs/ai-engineering/ai-wizard",
+    "developer_intent": "Create a PostHog Cloud project and capture a first event through the HTTP API.",
+    "starting_url": "https://posthog.com/docs/api/capture",
     "assumed_prior_state": [
-      "The developer has arrived at the official wizard documentation.",
-      "The target codebase is not yet instrumented with PostHog."
+      "The developer begins before account creation with no platform resources or credentials.",
+      "A supported browser and internet connection are available."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "When it's done, your project is onboarded",
-    "normalized_outcome": "The PostHog wizard authenticates or provisions the developer, detects the application, installs relevant SDKs, writes project credentials, instruments real product flows and events, and creates PostHog insights and dashboards.",
-    "observable_completion_signal": "The interactive command finishes and the documentation states that the project is onboarded with the supported PostHog products; generated SDK and configuration changes exist in the codebase and generated project assets exist in PostHog.",
+    "official_milestone": "Capture the first event",
+    "normalized_outcome": "PostHog accepts an event sent with the project token and associates it with a distinct ID.",
+    "observable_completion_signal": "The capture endpoint succeeds and the named event appears in the project's activity or events view.",
     "boundary_evidence": {
-      "type": "explicitly-named",
-      "official_label_or_terminal_state": "The wizard page says `When it's done, your project is onboarded with` its product list and enumerates the automatic actions that reach that state.",
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "The capture endpoint succeeds and the named event appears in the project's activity or events view.",
       "source_ids": [
-        "S1",
-        "S2",
-        "S3"
+        "S1"
       ]
     },
-    "why_this_is_the_boundary": "It is the official completion state for PostHog's recommended and default first-install route; testing event flow and optional enhancements follow after wizard completion.",
+    "why_this_is_the_boundary": "This is the first observable end-to-end result on the selected official surface; later production configuration and expansion follow it.",
     "source_ids": [
-      "S1",
-      "S2",
-      "S3"
+      "S1"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
-      "type": "software",
-      "requirement": "A local application in one of the wizard's supported frameworks or languages plus a working Node.js `npx` environment is required.",
+      "type": "account",
+      "requirement": "A PostHog Cloud account and project.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
       "order": 2,
-      "type": "account",
-      "requirement": "Use an existing PostHog account or select the documented `--signup` route to provision a new Cloud account.",
+      "type": "credential",
+      "requirement": "The project's public project token and regional ingestion host.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "order": 3,
-      "type": "region",
-      "requirement": "New signup requires an irreversible choice of `us` or `eu` data region.",
+      "type": "software",
+      "requirement": "A terminal with cURL.",
       "required": true,
       "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "order": 4,
-      "type": "permission",
-      "requirement": "The interactive wizard must be allowed to inspect and modify the target codebase, install dependencies, write environment configuration, and create project assets.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "access",
+      "phase": "account",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Open a terminal in the target project directory and choose existing-account authentication or new-account signup.",
-      "details": [
-        "For a new account, choose the final data region before running because US and EU data cannot be moved between regions later.",
-        "The published wizard supports interactive mode; documented CI mode is disabled."
-      ],
-      "input": "Supported local codebase, email, account state, and region decision.",
-      "output": "Chosen wizard authentication branch.",
-      "success_signal": "The developer has the correct wizard command and project directory.",
-      "failure_or_wait": "An unsupported framework leaves the wizard route and requires a manual SDK guide.",
+      "interface": "browser",
+      "action": "Create or sign in to PostHog Cloud and open a project.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The project dashboard is available.",
+      "success_signal": "The project dashboard is available.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S2",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 2,
-      "phase": "execute",
+      "phase": "credential",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Run `npx -y @posthog/wizard@latest` for an existing account, or the documented signup command with `--signup`, email, and `us` or `eu` region.",
-      "details": [
-        "The signup example is `npx @posthog/wizard@latest --signup --email you@example.com --region us`.",
-        "The default command starts the integration flow."
-      ],
-      "input": "Project directory and selected account branch.",
-      "output": "Interactive PostHog wizard session.",
-      "success_signal": "The wizard begins authentication and codebase analysis.",
-      "failure_or_wait": "Package download, network, or incompatible-project failure prevents the wizard from proceeding; the docs route feedback and failures to its GitHub issues.",
+      "interface": "web-ui",
+      "action": "Copy the project token and identify the project's ingestion host.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "Capture request credentials are available.",
+      "success_signal": "Capture request credentials are available.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 3,
-      "phase": "authenticate",
-      "actor": "platform",
+      "phase": "execute",
+      "actor": "developer",
       "interface": "api",
-      "action": "Authenticate the existing account or provision the new account and project.",
-      "details": [
-        "Signup sends email and region for a short-lived authorization code, exchanges it through OAuth 2.0 with PKCE, then creates the project and receives its API key and host.",
-        "No personal API key is minted by default."
-      ],
-      "input": "Existing account authorization or signup email and region.",
-      "output": "Short-lived wizard session, PostHog project, project API key, and host.",
-      "success_signal": "The wizard has credentials for the created or selected PostHog project.",
-      "failure_or_wait": "Signup or OAuth exchange failure blocks project provisioning; the docs do not prescribe a detailed retry beyond rerunning or reporting an issue.",
+      "action": "Use cURL to POST a named event, distinct ID, and project token to the Capture API.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The ingestion endpoint accepts the event.",
+      "success_signal": "The ingestion endpoint accepts the event.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
       "required": true,
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 4,
-      "phase": "install",
-      "actor": "platform",
-      "interface": "cli",
-      "action": "Let the wizard detect the framework and install the relevant PostHog SDKs.",
-      "details": [
-        "The wizard supports the current frameworks listed by the documentation and marks several others as coming soon."
-      ],
-      "input": "Scannable supported codebase and package manager.",
-      "output": "Installed PostHog client-side and server-side dependencies appropriate to the project.",
-      "success_signal": "Required SDK packages are present in the codebase.",
-      "failure_or_wait": "Unsupported or incorrectly detected frameworks require the manual SDK path or issue reporting.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "step_number": 5,
-      "phase": "configure",
-      "actor": "platform",
-      "interface": "ide",
-      "action": "Let the wizard scan the app architecture, write project host and API key to environment configuration, instrument client and server SDKs, and add custom events based on real product flows.",
-      "details": [
-        "The wizard modifies code rather than only printing instructions.",
-        "Project credentials are written into `.env` configuration."
-      ],
-      "input": "Project credentials and detected application architecture.",
-      "output": "Instrumented code and configured environment.",
-      "success_signal": "The application contains SDK initialization and generated event instrumentation tied to the PostHog project.",
-      "failure_or_wait": "Conflicting architecture, unwritable files, dependency issues, or failed code changes can interrupt completion; exact interactive recovery prompts are not published.",
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open the project activity or events view and find the event.",
+      "details": [],
+      "input": "Prior step output",
+      "output": "The captured event is visible.",
+      "success_signal": "The captured event is visible.",
+      "failure_or_wait": "Correct the documented configuration or prerequisite before continuing.",
       "required": true,
       "source_ids": [
         "S1"
       ]
-    },
-    {
-      "step_number": 6,
-      "phase": "verify",
-      "actor": "platform",
-      "interface": "console",
-      "action": "Allow the wizard to generate PostHog insights and dashboards, wait for it to finish, and review its completion state.",
-      "details": [
-        "Optional MCP server installation is not required for the default completion.",
-        "The product-analytics page instructs the developer to test the setup once the wizard is complete."
-      ],
-      "input": "Instrumented project and active PostHog session.",
-      "output": "Onboarded PostHog project with code instrumentation, insights, and dashboards.",
-      "success_signal": "The wizard exits successfully and reports completion; the documentation's project-onboarded state is reached.",
-      "failure_or_wait": "If the wizard does not finish or generated assets are absent, first success is not established; use the project-specific manual guide or report a wizard issue.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
     }
   ],
-  "branches": [
-    {
-      "at_step": 1,
-      "condition": "The developer has no PostHog account.",
-      "path": "Run the signup command with required email and region; the wizard provisions the account and project over OAuth 2.0 with PKCE, then installs and instruments the SDK. After completion, use the welcome email to set a password before later browser login.",
-      "effect_on_first_success": "Account and project creation are folded into the CLI; password creation is after the wizard's onboarded-project boundary.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 1,
-      "condition": "The developer already has a PostHog account.",
-      "path": "Run the wizard without `--signup` and authenticate against the existing account, then select or use the target project as prompted.",
-      "effect_on_first_success": "Account provisioning and region selection are skipped, but code scanning and instrumentation remain.",
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "at_step": 4,
-      "condition": "The project framework is unsupported by the wizard.",
-      "path": "Leave the wizard route and follow the corresponding manual SDK or library installation guide.",
-      "effect_on_first_success": "The entire atomic path changes to framework-specific package, initialization, capture, execution, and event verification steps.",
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    }
-  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [],
   "friction_gates": [
     {
-      "at_step": 1,
-      "type": "choice",
-      "description": "Existing account versus signup, fixed Cloud region, and a supported project framework must be determined.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S2",
-        "S3"
-      ]
-    },
-    {
       "at_step": 2,
-      "type": "installation",
-      "description": "The first command uses npx to download and run the current interactive wizard.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "at_step": 3,
       "type": "credential",
-      "description": "The wizard uses short-lived OAuth authorization and project credentials; it does not create a personal API key by default.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "at_step": 5,
-      "type": "permission",
-      "description": "The agentic wizard requires permission to scan and modify code, install packages, and write `.env` credentials.",
+      "description": "The request must use the correct project token and regional host.",
       "documented_requirement": true,
       "source_ids": [
         "S1"
-      ]
-    },
-    {
-      "at_step": 6,
-      "type": "wait",
-      "description": "The developer must wait for scanning, dependency installation, instrumentation, and remote asset generation to finish.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "at_step": 6,
-      "type": "verification",
-      "description": "Successful wizard completion is the documented boundary; the docs then instruct testing the resulting setup but do not enumerate a universal test because generated events depend on the app.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S1",
-        "S2"
       ]
     }
   ],
   "time_to_first_success": {
-    "vendor_claim": true,
-    "value": "in minutes",
-    "source_ids": [
-      "S1",
-      "S2"
-    ]
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
   },
   "sources": [
     {
       "id": "S1",
-      "title": "AI wizard",
-      "url": "https://posthog.com/docs/ai-engineering/ai-wizard",
+      "title": "Capture API",
+      "url": "https://posthog.com/docs/api/capture",
       "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "source_type": "api-reference",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
-      "sections_used": [
-        "AI wizard",
-        "How it works",
-        "AI wizard installation",
-        "Frameworks and languages",
-        "Commands",
-        "Feedback"
-      ],
+      "sections_used": [],
       "evidence_supported": [
-        "Recommended default selection",
-        "Single command",
-        "Eight automatic actions",
-        "Supported frameworks",
-        "Explicit project-onboarded terminal state",
-        "In-minutes claim"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "AI wizard product analytics installation",
-      "url": "https://posthog.com/docs/product-analytics/installation/ai-wizard",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Installation command",
-        "Frameworks and languages",
-        "Recommended setup after installation"
-      ],
-      "evidence_supported": [
-        "Wizard installation command",
-        "Wait-for-finish instruction",
-        "Test-after-completion instruction",
-        "Manual route for unsupported frameworks"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Sign up with the wizard",
-      "url": "https://posthog.com/docs/ai-engineering/wizard-signup",
-      "official_domain": true,
-      "source_type": "account-setup",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Run it",
-        "Flags",
-        "What happens when you sign up",
-        "Set your password to log in later",
-        "Things to know"
-      ],
-      "evidence_supported": [
-        "Fastest zero-to-events positioning",
-        "Signup command and inputs",
-        "OAuth and provisioning sequence",
-        "Fixed region",
-        "No personal API key",
-        "Interactive-only limitation",
-        "Post-completion password step"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact prompts and generated code changes will a participant see for their specific repository?",
-      "impact": "Framework detection and codebase architecture cause variable CLI pages and file edits that cannot be listed ahead of running the wizard.",
-      "reason_unresolved": "The official documentation enumerates the wizard's operations and supported frameworks but does not publish a stable prompt-by-prompt transcript; live execution is prohibited for this research task.",
+      "question": "Event visibility can be briefly delayed after the ingestion response.",
+      "impact": "The exact number or ordering of required onboarding actions may vary for a fresh account.",
+      "reason_unresolved": "Public official documentation does not fully expose every authenticated or account-dependent state.",
       "checked_source_ids": [
-        "S1",
-        "S2",
-        "S3"
-      ]
-    },
-    {
-      "question": "What project-specific action proves the first generated event after wizard completion?",
-      "impact": "An end-to-end event verification can require running and interacting with the participant's application.",
-      "reason_unresolved": "The docs say to test after completion but do not prescribe one universal app action; the official first boundary is the wizard's project-onboarded state.",
-      "checked_source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     }
   ],
   "excluded_after_success": [
-    "Setting a password and browser login for signup users",
-    "Project-specific event testing after wizard completion",
-    "Recommended reverse proxy and WAF allowlist",
-    "Multiple-product grouping",
-    "MCP server installation",
-    "Self-driving setup",
-    "Audits, migrations, source maps, Revenue Analytics, and production instrumentation review"
-  ],
-  "candidate_paths": [],
-  "candidate_path_gap": null
+    "Production hardening, scale configuration, and ongoing operations after the first successful result."
+  ]
 }

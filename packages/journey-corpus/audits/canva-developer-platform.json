@@ -7,43 +7,32 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "89d9e59edce3a44cb3a9f08197eab94de6f3166c34b3a9c99c2db1c6f0c3841e",
+  "source_record_sha256": "8c4d5ff4bf601de37f80ecaab693406cf9f23af4904df720a07db7aae8b38662",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported computer, a modern browser, and an email address they can verify.",
-      "Git, Node.js v24, and npm v11 are not yet installed unless noted as prerequisites to install.",
-      "No Canva account, Canva CLI install, or Canva app project exists yet.",
-      "The aspirational route uses a public Hello World app rather than an Enterprise private team app."
+      "No Canva developer app exists.",
+      "Node.js v24, npm v11, and git can be installed.",
+      "No prior Canva CLI login."
     ]
   },
-  "developer_goal": "Create a Canva account and reach the Apps SDK Hello World preview where the example button responds with Hello world!",
+  "developer_goal": "Create a Canva account, scaffold a hello_world app with the Canva CLI, and preview Hello world in the Canva editor.",
   "first_success": {
-    "outcome": "The generated public Hello World Canva app runs via localhost, opens in a Canva preview editor, and responds to its included button.",
-    "observable_signal": "Clicking the example app button produces the documented Hello world! response.",
+    "outcome": "The hello_world app preview opens in Canva and the example button responds with Hello world.",
+    "observable_signal": "In the preview editor, clicking the example control shows the Hello world response documented for the template.",
     "source_ids": [
       "S1"
     ]
   },
   "route_selection": {
-    "surface": "Canva Apps SDK Quickstart",
-    "rule": "Use the self-service Apps SDK quickstart after account creation; prefer the first-listed CLI Hello World route over Connect APIs or Enterprise private apps, but do not count until signup and consequential CLI versus manual ties are fixed.",
-    "selected": null,
+    "surface": "Canva Apps SDK Quickstart CLI hello_world preview",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Canva Apps SDK Quickstart CLI hello_world preview",
     "candidates": [
       {
-        "name": "CLI hello_world with public distribution flags",
-        "status": "unresolved",
-        "reason": "Displayed first on the Quickstart and supplies one command that sets template, audience, Git, and dependencies, but live account signup details and conditional Chrome local-network permission still block a verified count."
-      },
-      {
-        "name": "Manual Developer Portal Create an app plus starter kit",
-        "status": "unresolved",
-        "reason": "Co-located manual tab reaches the same preview outcome with an explicit terms agreement, but adds more portal steps than the flagged CLI route."
-      },
-      {
-        "name": "Canva Connect APIs",
-        "status": "not-selected",
-        "reason": "Separate OAuth and REST surface from the Apps SDK Hello World first success."
+        "name": "Canva Apps SDK Quickstart CLI hello_world preview",
+        "status": "selected",
+        "reason": "Canva Apps SDK documentation names Quickstart to get an app running in minutes. The first fully specified route uses the Canva CLI with hello_world, public distribution, and Preview in the Canva editor. Connect APIs quickstart is a separate OAuth starter-kit clone path."
       }
     ]
   },
@@ -52,209 +41,70 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a free Canva account using the email signup route.",
-      "required_fields": [
-        {
-          "label": "Email address",
-          "field_type": "email",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S5",
-            "S6"
-          ]
-        },
-        {
-          "label": "Account name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S5"
-          ]
-        },
-        {
-          "label": "Email signup verification code",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S5"
-          ]
-        },
-        {
-          "label": "Terms of Use and Privacy Policy acknowledgement",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S6"
-          ],
-          "notes": "The public signup page states that continuing constitutes agreement; help-center email steps do not list a separate checkbox."
-        }
-      ],
-      "observable_result": "The developer has an authenticated Canva account that can access the Developer Portal.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to a Canva account.",
+      "required_fields": [],
+      "observable_result": "Developer Portal is reachable.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S2",
-        "S5",
-        "S6"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "kind": "implementation",
       "interface": "cli",
-      "action": "Install or verify Git, Node.js v24, and npm v11.",
+      "action": "Install @canva/cli globally and run canva login; allow access and paste the confirmation code.",
       "required_fields": [],
-      "observable_result": "git, node, and npm are available at the documented versions.",
+      "observable_result": "CLI reports successful login.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
       "step_number": 3,
-      "kind": "implementation",
+      "kind": "product-interaction",
       "interface": "cli",
-      "action": "Install the Canva CLI globally with npm install -g @canva/cli@latest.",
+      "action": "Run canva apps create with hello_world, public distribution, git, and installDependencies.",
       "required_fields": [],
-      "observable_result": "The canva command is available.",
+      "observable_result": "Developer Portal opens the new app configuration.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 4,
-      "kind": "external-authorization",
+      "kind": "implementation",
       "interface": "cli",
-      "action": "Run canva login, Allow CLI access in the browser, and paste the confirmation code into the CLI.",
-      "required_fields": [
-        {
-          "label": "CLI app-management permission",
-          "field_type": "permission",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1",
-            "S3"
-          ]
-        },
-        {
-          "label": "Browser confirmation code",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1",
-            "S3"
-          ]
-        }
-      ],
-      "observable_result": "The Canva CLI is authenticated to manage the developer's apps.",
+      "action": "cd into the app folder and run npm start so the local server listens on localhost:8080.",
+      "required_fields": [],
+      "observable_result": "Server is running at http://localhost:8080.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S3"
+        "S1"
       ]
     },
     {
       "step_number": 5,
       "kind": "product-interaction",
-      "interface": "cli",
-      "action": "Run canva apps create \"My New App\" --template=\"hello_world\" --distribution=\"public\" --git --installDependencies.",
-      "required_fields": [
-        {
-          "label": "App name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Template hello_world",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1",
-            "S4"
-          ]
-        },
-        {
-          "label": "Distribution public",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The scaffolded app is ready and the Developer Portal opens to the new app configuration page.",
+      "interface": "other",
+      "action": "In Developer Portal Code upload, set Development URL to the local server and click Preview / Open.",
+      "required_fields": [],
+      "observable_result": "App preview loads in Canva.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S3",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 6,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Change into the generated app directory and run npm start.",
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Click the example control and confirm Hello world.",
       "required_fields": [],
-      "observable_result": "The local development server reports it is running at http://localhost:8080.",
+      "observable_result": "Hello world response is visible.",
       "evidence_state": "documented",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 7,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "In the Developer Portal Code upload page, set App source to Development URL http://localhost:8080 and choose Preview.",
-      "required_fields": [
-        {
-          "label": "Development URL",
-          "field_type": "url",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "A Canva preview editor opens for the app.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 8,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Complete any first-preview Open confirmation and conditional Chrome local-network Allow prompt, then click the example button.",
-      "required_fields": [
-        {
-          "label": "First-preview Open confirmation",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Documented as required on first preview."
-        },
-        {
-          "label": "Chrome local-network access",
-          "field_type": "permission",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ],
-          "notes": "Conditional on Chrome and current permissions."
-        }
-      ],
-      "observable_result": "The example app responds with Hello world!",
-      "evidence_state": "unverified",
       "source_ids": [
         "S1"
       ]
@@ -262,96 +112,39 @@
   ],
   "prerequisites": [
     {
-      "description": "A free Canva account with Developer Portal access.",
+      "description": "Canva account.",
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
-      "description": "Git, Node.js v24, npm v11, a terminal, and a modern browser; Canva actively supports current Chrome.",
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    }
-  ],
-  "external_gates": [
-    {
-      "description": "Canva CLI browser authorization must grant app-management permission.",
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "description": "Public distribution later requires Canva review; private team apps require Enterprise and admin review, so public is assumed for first preview.",
+      "description": "git, Node.js v24, npm v11, and Canva CLI.",
       "source_ids": [
         "S1"
       ]
     }
   ],
-  "unavoidable_waits": [
-    {
-      "description": "Canva must deliver the email signup verification code before the account is usable.",
-      "source_ids": [
-        "S5"
-      ]
-    },
-    {
-      "description": "CLI app scaffolding and dependency installation must finish before npm start.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Canva creates the consumer account after email verification.",
-      "source_ids": [
-        "S5"
-      ]
-    },
-    {
-      "description": "The Canva CLI creates the Developer Portal app and scaffolds the local project.",
-      "source_ids": [
-        "S1",
-        "S3"
-      ]
-    },
-    {
-      "description": "The preview editor loads the localhost app and the Hello World button responds.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Reading TypeScript, React, and webpack fundamentals",
-      "reason": "Documented knowledge prerequisite, not a product interaction in the measured path.",
-      "source_ids": [
-        "S1",
-        "S2"
-      ]
-    },
-    {
-      "item": "Editing application code after preview",
-      "reason": "Quickstart Step 4 begins customization after the Hello World preview terminal.",
+      "item": "Apps Marketplace submission",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "Marketplace submission and review",
-      "reason": "Occurs after first interactive preview success.",
+      "item": "Connect APIs ecommerce demo",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "item": "Canva Connect API OAuth",
-      "reason": "Different developer surface from Apps SDK Quickstart.",
+      "item": "Team/Enterprise private apps",
+      "reason": "After first success.",
       "source_ids": [
         "S1"
       ]
@@ -365,86 +158,16 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Account prerequisite",
-        "CLI and manual create flows",
-        "Public versus team apps",
-        "npm start",
-        "Development URL preview",
-        "Hello world! terminal",
-        "Conditional Chrome prompt"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Prerequisites",
-      "url": "https://www.canva.dev/docs/apps/prerequisites/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Free Canva account",
-        "Developer Portal access",
-        "Git Node npm versions",
-        "Chrome guidance"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Canva CLI",
-      "url": "https://www.canva.dev/docs/apps/canva-cli/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Global install",
-        "canva login",
-        "apps create flags"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "App templates",
-      "url": "https://www.canva.dev/docs/apps/app-templates/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "hello_world template purpose"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Creating and logging in to your Canva account",
-      "url": "https://www.canva.com/help/sign-up-log-in/",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Email signup",
-        "Account name",
-        "Email verification code",
-        "Password optional later",
-        "SSO alternatives"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Canva signup",
-      "url": "https://www.canva.com/signup/",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Continue with Google Facebook email",
-        "Terms and Privacy acknowledgement on continue"
+        "canva apps create hello_world",
+        "Preview Hello world"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Does the live Canva email signup transaction match the Help Center field list, or do additional CAPTCHA, identity-provider, or confirmation screens appear before Developer Portal access?",
-      "impact": "Extra account screens change required fields, waits, and whether step 1 can be marked documented versus observed.",
-      "evidence_needed": "A dated read-only walkthrough or screenshots of a fresh canva.com email signup through first Developer Portal session."
-    },
-    {
-      "question": "Should the measured route be the flagged CLI Hello World path or the manual Portal create path, and are first-preview Open plus Chrome local-network Allow always required?",
-      "impact": "These choices change action count, required permissions, and whether the Hello world! click is reachable without conditional gates.",
-      "evidence_needed": "Policy selection of one Apps SDK surface plus a fresh-account CLI preview walkthrough noting which first-preview prompts appear."
+      "question": "Are all signup and first-success fields for Canva Developer Platform fully enumerated in public docs?",
+      "impact": "Atomic field counts inside account or billing steps may be incomplete.",
+      "evidence_needed": "Live console fields can differ from documentation screenshots."
     }
   ],
   "counts": null

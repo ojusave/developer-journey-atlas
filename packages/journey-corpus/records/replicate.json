@@ -6,514 +6,247 @@
   },
   "category": "AI, ML, and agents",
   "surface": {
-    "name": "Manual Node.js FLUX.1 Schnell run",
-    "selection_basis": "Workshop selection policy (2026-07-19): when official docs present peer routes, commit to the fastest and most commonly used documented route. Prefer the vendor's first-listed or recommended quickstart, dashboard/console over CLI when both are peers, and the route with an explicit vendor time claim or fewest documented steps when tied. Selected route: Manual Node.js FLUX.1 Schnell run. The Node.js slowstart exposes every local action and ends with two explicit console messages plus output.png. It is chosen as a transparent complete candidate, not as a platform-wide default over scaffold, Python, Colab, fine-tuning, or custom deployment routes. Prior surface before policy commit: Replicate Get started route selector.",
+    "name": "HTTP predictions API via cURL (API token + prepaid credit)",
+    "selection_basis": "Replicate's Create a prediction guide documents cURL examples with Prefer: wait against https://api.replicate.com/v1/predictions and Authorization: Bearer $REPLICATE_API_TOKEN. Prepaid credit docs state you must first purchase credit upfront before usage. An SDK install is not required.",
     "alternatives_considered": [
       {
-        "name": "Run a model from Node.js",
+        "name": "Node.js get-started scaffold",
         "url": "https://replicate.com/docs/get-started/nodejs",
-        "reason_not_primary": "One of three top-level run-model routes; it offers both a one-command scaffold and a manual slowstart but is not labeled the universal default."
+        "reason_not_primary": "Local Node.js package and project setup; the HTTP API documents the same predictions call with cURL."
       },
       {
-        "name": "Run a model from Google Colab",
-        "url": "https://replicate.com/docs/get-started/google-colab",
-        "reason_not_primary": "A browser notebook route with no local setup, but the docs home gives it the same Get started level as Node.js and Python."
-      },
-      {
-        "name": "Run a model from Python",
+        "name": "Python get-started",
         "url": "https://replicate.com/docs/get-started/python",
-        "reason_not_primary": "A full local Python route, presented alongside Node.js and Colab without a default label."
+        "reason_not_primary": "Peer SDK route; not required when official HTTP docs show cURL."
       },
       {
-        "name": "Fine-tune an image model",
-        "url": "https://replicate.com/docs/get-started/fine-tune-with-flux",
-        "reason_not_primary": "A different first intent that trains a custom model rather than running a published one."
-      },
-      {
-        "name": "Deploy a custom model",
-        "url": "https://replicate.com/docs/get-started/deploy-a-custom-model",
-        "reason_not_primary": "A different first intent with model-building and deployment prerequisites."
+        "name": "Google Colab get-started",
+        "url": "https://replicate.com/docs/get-started/google-colab",
+        "reason_not_primary": "Notebook path with additional Google Colab prerequisites."
       }
     ]
   },
   "research_status": "complete",
-  "researched_at": "2026-07-19",
+  "researched_at": "2026-07-22",
   "official_docs_only": true,
   "entry_point": {
-    "developer_intent": "Run a public AI model on Replicate after selecting the platform.",
-    "starting_url": "https://replicate.com/docs",
+    "developer_intent": "Create a Replicate account, purchase prepaid credit, create an API token, and receive a successful prediction JSON result over HTTPS.",
+    "starting_url": "https://replicate.com/docs/topics/predictions/create-a-prediction",
     "assumed_prior_state": [
-      "Discovery is complete and the developer has selected Replicate.",
-      "No runtime, language, or notebook route has been selected."
+      "No Replicate account, API token, prepaid credit, or prediction is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
   "documented_first_success": {
-    "official_milestone": "Both the exact success message and output.png are present.",
-    "normalized_outcome": "For the selected Manual Node.js FLUX.1 Schnell run, run the Node.js script so the terminal prints Image saved as output.png and output.png exists in the app directory.",
-    "observable_completion_signal": "Node.js shows Running the model followed by Image saved as output.png and reports the developer is up and running, and output.png exists in the app directory.",
+    "official_milestone": "Sync-mode prediction with populated output",
+    "normalized_outcome": "An authenticated cURL POST to https://api.replicate.com/v1/predictions with Prefer: wait returns a prediction whose status is successful and whose output field is populated.",
+    "observable_completion_signal": "The prediction JSON includes status successful (or equivalent terminal success) and a non-null output for the requested model input.",
     "boundary_evidence": {
       "type": "demonstrated-terminal-state",
-      "official_label_or_terminal_state": "Both the exact success message and output.png are present.",
+      "official_label_or_terminal_state": "Create a prediction documents Prefer: wait cURL to /v1/predictions and shows a response with output populated and status successful for replicate/hello-world.",
       "source_ids": [
-        "S1",
-        "S2",
-        "S3",
-        "S4"
+        "S1"
       ]
     },
-    "why_this_is_the_boundary": "The selected Node.js route ends when the script writes output.png and prints the success message. Replicate documents peer Node.js, Python, and Colab routes; the workshop policy commits to the Node.js run and the platform-level route ambiguity is preserved in uncertainties.",
+    "why_this_is_the_boundary": "The first meaningful hosted model success is a completed prediction with output. cURL is the documented HTTP path. Prepaid credit must be purchased upfront per billing docs before usage can proceed.",
     "source_ids": [
       "S1",
       "S2",
-      "S3",
-      "S4"
+      "S3"
     ]
   },
   "prerequisites": [
     {
       "order": 1,
       "type": "account",
-      "requirement": "A Replicate account is required to receive the default API token created with the account and to configure billing when the selected model or account requires it.",
+      "requirement": "A Replicate account that can open billing settings and API tokens.",
       "required": true,
       "source_ids": [
-        "S5",
-        "S6"
+        "S3",
+        "S4"
       ]
     },
     {
       "order": 2,
       "type": "billing",
-      "requirement": "Billing is conditional for the first request: Replicate allows select models to run free for a limited amount of use, while other usage requires the account's documented prepaid-credit or payment-in-arrears billing model.",
-      "required": false,
+      "requirement": "Prepaid credit purchased with a payment method. Prepaid credit docs state you must first purchase credit upfront; usage deducts from the balance.",
+      "required": true,
       "source_ids": [
-        "S6",
-        "S7"
+        "S2",
+        "S3"
       ]
     },
     {
       "order": 3,
       "type": "credential",
-      "requirement": "A 40-character API token beginning r8_ must be copied from the API tokens page and stored as REPLICATE_API_TOKEN.",
+      "requirement": "An API token from the account API tokens page, used as Authorization: Bearer.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S4",
-        "S5"
+        "S1",
+        "S4"
       ]
     },
     {
       "order": 4,
       "type": "software",
-      "requirement": "Node.js requires Node 16 or greater; local Python requires Python and pip; Colab requires a browser and access to Google Colab instead of local installation.",
+      "requirement": "A terminal with cURL (or any HTTP client). No language SDK is required.",
       "required": true,
       "source_ids": [
-        "S2",
-        "S3",
-        "S4"
+        "S1"
       ]
     }
   ],
   "primary_path": [
     {
       "step_number": 1,
-      "phase": "arrive",
+      "phase": "account",
       "actor": "developer",
-      "interface": "documentation",
-      "action": "Open Replicate Documentation and locate the Get started cards.",
+      "interface": "browser",
+      "action": "Create or sign in to a Replicate account.",
       "details": [
-        "The page presents Run a model from Node.js, Run a model from Google Colab, Run a model from Python, Fine-tune an image model, and Deploy a custom model."
+        "API tokens and billing require an authenticated session (GitHub sign-in is documented on the tokens page)."
       ],
-      "input": "Intent to start using Replicate",
-      "output": "Official route selector",
-      "success_signal": "All five Get started surfaces are visible.",
-      "failure_or_wait": "No wait is documented.",
+      "input": "Intent to run models on Replicate",
+      "output": "Authenticated Replicate session",
+      "success_signal": "Billing settings and API tokens are reachable.",
+      "failure_or_wait": "Account recovery follows the sign-in flow.",
       "required": true,
       "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "step_number": 2,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "documentation",
-      "action": "Choose the intended first outcome and runtime route before continuing.",
-      "details": [
-        "For running a published model, choose Node.js, Google Colab, or Python.",
-        "Fine-tuning and deploying a custom model are different outcomes with larger journeys."
-      ],
-      "input": "Outcome plus runtime preference",
-      "output": "One atomic getting-started guide",
-      "success_signal": "A human selects the canonical route for the workshop record.",
-      "failure_or_wait": "No official default resolves this choice.",
-      "required": true,
-      "source_ids": [
-        "S1",
-        "S2",
         "S3",
         "S4"
       ]
     },
     {
-      "step_number": 3,
-      "phase": "verify",
+      "step_number": 2,
+      "phase": "billing",
       "actor": "developer",
-      "interface": "cli",
-      "action": "Install or verify Node.js 16 or later.",
-      "details": [],
-      "input": "Local development environment",
-      "output": "Supported Node.js runtime",
-      "success_signal": "node reports version 16 or greater.",
-      "failure_or_wait": "An older or unavailable Node.js runtime must be upgraded before the quickstart.",
+      "interface": "console",
+      "action": "Add a payment method and purchase prepaid credit.",
+      "details": [
+        "Prepaid credit docs: add a payment method in billing settings, then Add credit.",
+        "Purchased credit is valid for 1 year and is not refundable.",
+        "When the balance hits zero, new work is prevented."
+      ],
+      "input": "Authenticated account",
+      "output": "Positive prepaid credit balance",
+      "success_signal": "Billing shows a usable credit balance.",
+      "failure_or_wait": "Without prepaid credit, predictions cannot start under the prepaid model.",
       "required": true,
       "source_ids": [
-        "S2"
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "console",
+      "action": "Create or copy an API token and store it securely.",
+      "details": [
+        "Export as REPLICATE_API_TOKEN for the documented cURL Authorization header."
+      ],
+      "input": "Funded account",
+      "output": "API token",
+      "success_signal": "The token value is available locally.",
+      "failure_or_wait": "No manual approval wait is documented for token creation.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4"
       ]
     },
     {
       "step_number": 4,
-      "phase": "access",
-      "actor": "developer",
-      "interface": "console",
-      "action": "Create a Replicate account or log in.",
-      "details": [
-        "Account creation produces a default API token."
-      ],
-      "input": "Replicate identity",
-      "output": "Authenticated Replicate account",
-      "success_signal": "Account settings and the API tokens page are accessible.",
-      "failure_or_wait": "Identity or login recovery must complete before a token can be copied.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S5"
-      ]
-    },
-    {
-      "step_number": 5,
-      "phase": "access",
-      "actor": "developer",
-      "interface": "console",
-      "action": "If Replicate prompts for billing for this model or account, complete the assigned billing setup before running the prediction.",
-      "details": [
-        "Some models allow limited free use. Prepaid accounts add a payment method and credit; payment-in-arrears accounts retain a payment method and are charged for usage later."
-      ],
-      "input": "Billing prompt, if any",
-      "output": "Account permitted to run the selected model",
-      "success_signal": "The account can submit black-forest-labs/flux-schnell predictions.",
-      "failure_or_wait": "A prepaid account with zero balance cannot start new work. Add credit and confirm the balance updates before retrying.",
-      "required": false,
-      "source_ids": [
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "step_number": 6,
-      "phase": "authenticate",
-      "actor": "developer",
-      "interface": "console",
-      "action": "Open the API tokens page and copy the default token or create and copy a dedicated token.",
-      "details": [
-        "Replicate tokens are 40 characters and begin with r8_. A dedicated token should be named for its application or environment."
-      ],
-      "input": "Authenticated account",
-      "output": "Replicate API token",
-      "success_signal": "The full token has been copied and stored securely.",
-      "failure_or_wait": "A token that has been exposed must be disabled and replaced before use.",
-      "required": true,
-      "source_ids": [
-        "S5"
-      ]
-    },
-    {
-      "step_number": 7,
-      "phase": "authenticate",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Export the copied value as REPLICATE_API_TOKEN in the shell.",
-      "details": [],
-      "input": "Replicate API token",
-      "output": "Authenticated shell environment",
-      "success_signal": "REPLICATE_API_TOKEN is set for the Node.js process.",
-      "failure_or_wait": "A missing, malformed, disabled, or wrong-account token causes authentication failure and must be replaced or re-exported.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S5"
-      ]
-    },
-    {
-      "step_number": 8,
       "phase": "configure",
       "actor": "developer",
       "interface": "cli",
-      "action": "Create my-replicate-app and change into it.",
+      "action": "Export REPLICATE_API_TOKEN in the terminal.",
       "details": [],
-      "input": "Writable local directory",
-      "output": "Empty project directory",
-      "success_signal": "The shell is inside my-replicate-app.",
-      "failure_or_wait": "Filesystem or permission errors must be corrected.",
+      "input": "Generated token",
+      "output": "Token available to HTTP clients in the shell",
+      "success_signal": "The environment variable is set for the current shell.",
+      "failure_or_wait": "Shell persistence depends on the OS.",
       "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 9,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run npm init -y, then npm pkg set type=module.",
-      "details": [],
-      "input": "Empty project directory",
-      "output": "ES module Node.js project",
-      "success_signal": "package.json exists and declares type module.",
-      "failure_or_wait": "npm or filesystem errors block package initialization.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 10,
-      "phase": "install",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run npm install replicate.",
-      "details": [],
-      "input": "Initialized Node.js project",
-      "output": "Installed Replicate client library",
-      "success_signal": "replicate is present in package.json and node_modules.",
-      "failure_or_wait": "Package, network, lockfile, or permission errors must be corrected before code execution.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 11,
-      "phase": "configure",
-      "actor": "developer",
-      "interface": "other",
-      "action": "Create index.js with the quickstart code that imports Replicate and fs, initializes Replicate, prints Running the model..., calls black-forest-labs/flux-schnell with the astronaut riding a rainbow unicorn prompt, writes the returned image to output.png, and prints Image saved as output.png.",
-      "details": [],
-      "input": "Official Node.js quickstart code",
-      "output": "Executable prediction script",
-      "success_signal": "index.js contains the model call, output stream handling, file write, and both log statements.",
-      "failure_or_wait": "Syntax, model identifier, prompt, or file-write errors must be corrected before execution.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 12,
-      "phase": "execute",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Run node index.js.",
-      "details": [],
-      "input": "Configured shell and prediction script",
-      "output": "Submitted FLUX.1 Schnell prediction",
-      "success_signal": "The terminal prints Running the model....",
-      "failure_or_wait": "Authentication, billing, model, network, API, or JavaScript errors stop the run. Correct the reported issue and rerun; failed-run charges depend on the model and deployment type.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S6"
-      ]
-    },
-    {
-      "step_number": 13,
-      "phase": "execute",
-      "actor": "platform",
-      "interface": "api",
-      "action": "Wait for Replicate to run the model and return its image output.",
-      "details": [],
-      "input": "Accepted prediction",
-      "output": "Generated image stream",
-      "success_signal": "The script receives output and completes the file write.",
-      "failure_or_wait": "Prediction execution is an external wait. A failed or canceled prediction requires reviewing its error and retrying after the underlying problem is fixed.",
-      "required": true,
-      "source_ids": [
-        "S2",
-        "S6"
-      ]
-    },
-    {
-      "step_number": 14,
-      "phase": "verify",
-      "actor": "developer",
-      "interface": "cli",
-      "action": "Verify the terminal prints Image saved as output.png and that output.png exists in my-replicate-app.",
-      "details": [
-        "The quickstart says this means the developer is up and running."
-      ],
-      "input": "Completed prediction and file write",
-      "output": "First locally saved Replicate image",
-      "success_signal": "Both the exact success message and output.png are present.",
-      "failure_or_wait": "If the model completed but no file exists, inspect stream handling and filesystem errors, correct index.js, and rerun.",
-      "required": true,
-      "source_ids": [
-        "S2"
-      ]
-    }
-  ],
-  "branches": [
-    {
-      "at_step": 2,
-      "condition": "Node.js quickstart scaffold is selected.",
-      "path": "Install Node.js 16 or greater; create or log in to Replicate; configure billing only if the selected model or account asks for it; obtain the default or another API token; run npx create-replicate. The package creates a project directory, writes starter code, installs dependencies, and runs it. Verify the resulting working project generates images with FLUX.1 Schnell. Optionally pass --model to choose another model.",
-      "effect_on_first_success": "Produces a working generated-image Node project through a one-command scaffold, but hides the manual project actions.",
-      "source_ids": [
-        "S2",
-        "S5",
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Node.js slowstart is selected.",
-      "path": "Install Node.js 16 or greater; complete account and token setup, configuring billing only if prompted for the selected model or account; export REPLICATE_API_TOKEN; create and enter my-replicate-app; run npm init -y and npm pkg set type=module; install replicate; create index.js; initialize Replicate; call black-forest-labs/flux-schnell with the astronaut-on-rainbow-unicorn prompt; write the returned output to output.png; run node index.js; verify Running the model and Image saved as output.png; then stop before Next steps.",
-      "effect_on_first_success": "Makes every local project action visible and ends at the same generated-image result.",
-      "source_ids": [
-        "S2",
-        "S5",
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Local Python is selected.",
-      "path": "Complete account and token setup, configuring billing only if prompted for the selected model or account; install the replicate package with pip; copy the generated token from the API token page and export REPLICATE_API_TOKEN; write Python that imports replicate, runs black-forest-labs/flux-schnell with the iguana-on-the-beach pointillism prompt, saves output[0] to output.png, and prints Image saved as output.png; execute the code and verify the file message. Stop before local-file, URL-input, streaming-output, and other handling examples.",
-      "effect_on_first_success": "Produces a generated FLUX image through Python rather than a Node project.",
-      "source_ids": [
-        "S4",
-        "S5",
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Google Colab is selected.",
-      "path": "Open the linked official Replicate Python notebook in Google Colab, complete Replicate account and API-token setup, configure billing only if the selected model or account requires it, run the notebook cells, and verify the selected public model's output. The Replicate documentation page explains Colab and links the notebook but does not enumerate those notebook cells or show a terminal output itself.",
-      "effect_on_first_success": "Avoids local Python installation but introduces Google Colab access and an external notebook sequence that needs separate capture.",
-      "source_ids": [
-        "S3",
-        "S5",
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "Fine-tune or custom deployment is the intended first outcome.",
-      "path": "Use the corresponding Get started card and reconstruct its separate training or deployment journey instead of any published-model run route.",
-      "effect_on_first_success": "Changes the developer intent, prerequisites, cost, duration, and terminal result.",
       "source_ids": [
         "S1"
       ]
     },
     {
-      "at_step": 2,
-      "condition": "An additional API token is desired instead of the account's default token.",
-      "path": "Open account API tokens, create a token with a descriptive name for the application or environment, copy it, and store it in an environment variable or secrets manager. If exposed, disable it from the same page and replace it.",
-      "effect_on_first_success": "Adds token naming and creation but improves separation from other environments.",
+      "step_number": 5,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "api",
+      "action": "POST a sync prediction with cURL to https://api.replicate.com/v1/predictions.",
+      "details": [
+        "Include Prefer: wait, Authorization: Bearer $REPLICATE_API_TOKEN, and Content-Type: application/json.",
+        "Send version and input as in the Create a prediction cURL example (for example replicate/hello-world)."
+      ],
+      "input": "REPLICATE_API_TOKEN and prepaid credit",
+      "output": "Prediction HTTP response",
+      "success_signal": "The response includes a prediction object with populated output.",
+      "failure_or_wait": "Zero credit, invalid token, or long-running models may return incomplete status requiring poll via urls.get.",
+      "required": true,
       "source_ids": [
-        "S5"
+        "S1"
       ]
     },
     {
-      "at_step": 2,
-      "condition": "The selected model is one of Replicate's free-to-run models and the account remains within its initial free allowance.",
-      "path": "Run the selected model without first adding a payment method or purchasing credit. Continue until Replicate asks the account to set up billing after some free use; features that require billing remain unavailable.",
-      "effect_on_first_success": "Allows a selected first new-account request to succeed without treating payment or prepaid credit as universal.",
+      "step_number": 6,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "api",
+      "action": "Confirm the prediction JSON shows successful status and non-null output.",
+      "details": [],
+      "input": "Prediction response body",
+      "output": "Verified first prediction success",
+      "success_signal": "output is populated and status is successful.",
+      "failure_or_wait": "error status or null output means the first call did not succeed.",
+      "required": true,
       "source_ids": [
-        "S6"
+        "S1"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "at_step": 5,
+      "condition": "The developer prefers an official client SDK.",
+      "path": "Use the JavaScript or Python client to create the same prediction; token and prepaid credit requirements stay the same.",
+      "effect_on_first_success": "Adds optional package installation without changing the prediction boundary.",
+      "source_ids": [
+        "S1"
       ]
     },
     {
-      "at_step": 2,
-      "condition": "The account is assigned prepaid-credit billing or billing is requested after the free allowance.",
-      "path": "Open Billing settings, add a payment method, select Add credit, choose a purchase amount, and complete the immediate charge; confirm the credit balance updates. Optionally configure auto reload, whose minimum threshold is $5 and minimum reload balance is $15. When the balance reaches zero, Replicate prevents new work and shuts down infrastructure it is running for the account. If a prediction rarely runs beyond the remaining balance, Replicate charges the default payment method at month end for the outstanding amount.",
-      "effect_on_first_success": "Adds a payment method, an upfront charge, balance checks, optional auto reload, and a hard zero-balance execution gate.",
+      "at_step": 5,
+      "condition": "Sync wait times out before completion.",
+      "path": "Poll GET urls.get until status is successful or failed.",
+      "effect_on_first_success": "Adds polling wait without changing credentials or billing gates.",
       "source_ids": [
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "The account is assigned payment-in-arrears billing.",
-      "path": "Add or retain the configured payment method; use the model during the month; at the beginning of the following month, Replicate charges the previous month's usage. If usage crosses certain limits for the first time, Replicate may charge early and email a receipt, with that amount appearing as a credit on the next invoice.",
-      "effect_on_first_success": "Removes the upfront credit purchase but retains usage billing and a possible early fraud-prevention charge.",
-      "source_ids": [
-        "S6"
-      ]
-    },
-    {
-      "at_step": 2,
-      "condition": "The prediction fails or is canceled.",
-      "path": "For an ordinary public or official model, a failed run is not charged; canceling an official model may still be charged, and time-priced models are charged for runtime before cancellation. For private models and deployments, failed and canceled runs are billed for instance active time as normal. A model that calls downstream models can incur downstream-model costs before a root-model failure.",
-      "effect_on_first_success": "A failed first run can require a retry and may still create cost depending on model ownership, deployment type, downstream calls, and whether cancellation happened after compute started.",
-      "source_ids": [
-        "S6"
+        "S1"
       ]
     }
   ],
   "friction_gates": [
     {
       "at_step": 2,
-      "type": "choice",
-      "description": "The official docs require an outcome and Node.js, Colab, or Python route choice without naming a universal default.",
+      "type": "payment",
+      "description": "Prepaid credit must be purchased with a payment method before usage under the prepaid model.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "type": "credential",
+      "description": "A Bearer API token is required on every predictions request.",
       "documented_requirement": true,
       "source_ids": [
         "S1",
-        "S2",
-        "S3",
         "S4"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "account",
-      "description": "The API token and billing flow require a Replicate account; public docs do not enumerate signup screens.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S5",
-        "S6"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "billing",
-      "description": "Billing is conditional: selected models have limited free use; prepaid accounts require a payment method and upfront credit; arrears accounts are charged after use. Zero prepaid balance prevents new work and shuts down running infrastructure.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S6",
-        "S7"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "credential",
-      "description": "The secret API token must be copied and set in the selected environment; automatically detected exposed tokens are disabled.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S5"
-      ]
-    },
-    {
-      "at_step": 2,
-      "type": "wait",
-      "description": "Public-model requests can encounter cold boots, shared queues, and scaling limits; setup can take a few seconds while weights are downloaded.",
-      "documented_requirement": true,
-      "source_ids": [
-        "S6"
       ]
     }
   ],
@@ -525,187 +258,91 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Replicate Documentation",
-      "url": "https://replicate.com/docs",
+      "title": "Create a prediction",
+      "url": "https://replicate.com/docs/topics/predictions/create-a-prediction",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
-        "Get started",
-        "Topics",
-        "Guides"
+        "Sync mode",
+        "cURL Prefer: wait example",
+        "Successful response with output"
       ],
       "evidence_supported": [
-        "Five co-equal route cards",
-        "Run, fine-tune, and deploy outcome distinction",
-        "Absence of universal default"
+        "cURL POST to /v1/predictions",
+        "Prefer: wait sync mode",
+        "Bearer REPLICATE_API_TOKEN"
       ]
     },
     {
       "id": "S2",
-      "title": "Run a model from Node.js",
-      "url": "https://replicate.com/docs/get-started/nodejs",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Prerequisites",
-        "Quickstart",
-        "Slowstart",
-        "Authenticate",
-        "Create project",
-        "Install client",
-        "Write code",
-        "Run code",
-        "Next steps"
-      ],
-      "evidence_supported": [
-        "Complete scaffold and manual Node paths",
-        "Generated-image terminal verification"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Run a model from Google Colab",
-      "url": "https://replicate.com/docs/get-started/google-colab",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "What is Google Colab?",
-        "What are notebooks?",
-        "Running Replicate models on Colab"
-      ],
-      "evidence_supported": [
-        "Browser notebook route",
-        "No local install",
-        "External notebook transition"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Run a model from Python",
-      "url": "https://replicate.com/docs/get-started/python",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Install the Python library",
-        "Authenticate",
-        "Run a model",
-        "Using local files",
-        "Using URLs",
-        "Handling output",
-        "Next steps"
-      ],
-      "evidence_supported": [
-        "Complete first generated-image Python path",
-        "Terminal output",
-        "Post-success exclusion boundary"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "API tokens",
-      "url": "https://replicate.com/docs/topics/security/api-tokens",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Using API tokens",
-        "Creating API tokens",
-        "Disabling API tokens",
-        "Keeping tokens secure",
-        "Automated token scanning"
-      ],
-      "evidence_supported": [
-        "Default token creation",
-        "Additional token and naming",
-        "Bearer authentication",
-        "Security and disable behavior"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Billing",
-      "url": "https://replicate.com/docs/topics/billing",
-      "official_domain": true,
-      "source_type": "documentation",
-      "accessed_at": "2026-07-18",
-      "last_updated_if_shown": null,
-      "sections_used": [
-        "Billing",
-        "Lifecycle of an instance",
-        "Public models",
-        "Failed and canceled runs",
-        "Free limits"
-      ],
-      "evidence_supported": [
-        "Conditional select-model free use",
-        "Prepaid versus arrears branches",
-        "Failed and canceled run billing",
-        "Downstream-model failure costs",
-        "Cold boot, queue, and setup waits"
-      ]
-    },
-    {
-      "id": "S7",
       "title": "Prepaid credit",
       "url": "https://replicate.com/docs/topics/billing/prepaid-credit",
       "official_domain": true,
       "source_type": "documentation",
-      "accessed_at": "2026-07-18",
+      "accessed_at": "2026-07-22",
       "last_updated_if_shown": null,
       "sections_used": [
         "Purchasing credit",
-        "Auto reload",
         "What happens when you run out of credit"
       ],
       "evidence_supported": [
-        "Prepaid-account upfront credit",
-        "Payment method and Add credit actions",
-        "Immediate balance update",
-        "Auto-reload limits",
-        "Zero-balance block",
-        "Rare outstanding-balance charge"
+        "Must purchase credit upfront",
+        "Payment method then Add credit",
+        "Zero balance blocks new work"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Billing",
+      "url": "https://replicate.com/docs/topics/billing",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Prepaid credit overview",
+        "Free limits"
+      ],
+      "evidence_supported": [
+        "Prepaid vs arrears billing models",
+        "Select models free briefly then billing setup"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "HTTP API authentication",
+      "url": "https://replicate.com/docs/reference/http",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-22",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Authorization Bearer token",
+        "Create a prediction"
+      ],
+      "evidence_supported": [
+        "API tokens at account/api-tokens",
+        "Bearer prefix required"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which official Replicate Get started route should define the canonical workshop journey?",
-      "impact": "The answer changes runtime, installation, project setup, external account dependencies, and the exact output signal.",
-      "reason_unresolved": "Node.js, Google Colab, and Python are separate top-level run-model routes, while fine-tune and deploy cover other plausible first outcomes; no universal default is named.",
+      "question": "Whether any remaining free-limit or legacy arrears accounts can complete a first prediction without prepaid purchase.",
+      "impact": "Billing step ordering could differ for rare account states.",
+      "reason_unresolved": "Billing still mentions free limits and arrears accounts while prepaid credit says purchase is required to use Replicate.",
       "checked_source_ids": [
-        "S1",
         "S2",
-        "S3",
-        "S4"
-      ]
-    },
-    {
-      "question": "What are the exact Replicate account signup screens and Google Colab notebook cells?",
-      "impact": "These can add identity, verification, notebook authorization, secret-entry, execution, and output steps.",
-      "reason_unresolved": "The official public documentation references account creation and an external notebook but does not enumerate either interactive sequence.",
-      "checked_source_ids": [
-        "S3",
-        "S5",
-        "S6",
-        "S7"
+        "S3"
       ]
     }
   ],
   "excluded_after_success": [
-    "Choosing a canonical route without human direction",
-    "Node next-step model substitution and web app guides",
-    "Python local-file, URL-input, streaming, and file-output examples after the first saved image",
-    "Fine-tuning and custom deployment unless selected as the intended first outcome",
-    "Production token rotation and auto-reload configuration"
+    "Node.js/Python client install",
+    "Fine-tuning and custom deployments",
+    "Webhook-driven async workflows"
   ],
   "candidate_paths": [],
   "candidate_path_gap": null

@@ -7,88 +7,58 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "b916be6a52900691045729b5d9948746db431e62435d9cee6a68359aca2b9d0e",
+  "source_record_sha256": "f74f65e291af90965f69452b285d35ec303c165b8466da16b3a2c4aac4791ac1",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser.",
-      "No Hugging Face account or Hub repository exist yet.",
-      "No product among Hub, Transformers, Datasets, Spaces, or Inference has been preselected."
+      "No Hugging Face account, User Access Token, or Inference Providers request is assumed.",
+      "A terminal with cURL is available; no language SDK is assumed."
     ]
   },
-  "developer_goal": "Create a Hugging Face account and reach one official first developer-platform outcome after selecting a product and artifact type.",
+  "developer_goal": "Create a Hugging Face account and fine-grained token, confirm usable Inference Providers credits, and receive a chat completions JSON result over HTTPS.",
   "first_success": {
-    "outcome": "Depends on the unresolved product choice; for the Hub model-repository guide, a new repository page is visible under the selected namespace.",
-    "observable_signal": "For the documented Hub model route, the repository page is visible and prompts to add a Model Card.",
+    "outcome": "An authenticated cURL POST to https://router.huggingface.co/v1/chat/completions returns model message JSON.",
+    "observable_signal": "The chat completions response includes choices with assistant message content for the requested prompt.",
     "source_ids": [
       "S1",
-      "S2"
+      "S2",
+      "S3"
     ]
   },
   "route_selection": {
-    "surface": "Hugging Face Hub web documentation and repository UI",
-    "rule": "Official docs organize distinct products without naming one cross-product first-success boundary; do not invent a winner.",
-    "selected": null,
+    "surface": "Inference Providers chat completions via cURL (HF token + monthly credits)",
+    "rule": "Measure documented developer onboarding: account creation through first success. Prefer the vendor quickstart or hosted API/console path when one exists.",
+    "selected": "Inference Providers chat completions via cURL (HF token + monthly credits)",
     "candidates": [
       {
-        "name": "Hub model repository via huggingface.co/new",
-        "status": "unresolved",
-        "reason": "Documented beginner Hub path, but not named as the universal Hugging Face first success."
-      },
-      {
-        "name": "Dataset or Space repository creation",
-        "status": "unresolved",
-        "reason": "Same Hub surface with different artifact types and success pages."
-      },
-      {
-        "name": "Local Transformers, Inference API, or other library/hosted routes",
-        "status": "unresolved",
-        "reason": "Reach incomparable outcomes versus repository creation."
+        "name": "Inference Providers chat completions via cURL (HF token + monthly credits)",
+        "status": "selected",
+        "reason": "Hugging Face Inference Providers docs document direct HTTP/cURL to https://router.huggingface.co/v1/chat/completions with Authorization: Bearer $HF_TOKEN. Pricing docs state every user receives monthly credits for routed requests, and pay-as-you-go credit purchase is required after free monthly credits are exhausted. An SDK install is not required."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
-      "kind": "product-interaction",
-      "interface": "browser",
-      "action": "Choose the Hugging Face product and artifact type that define first success.",
-      "required_fields": [
-        {
-          "label": "Product and artifact choice",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1",
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "One product-scoped official route is selected.",
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or sign in to a Hugging Face account.",
+      "required_fields": [],
+      "observable_result": "Token settings and billing settings are reachable.",
       "evidence_state": "documented",
       "source_ids": [
         "S1",
-        "S2"
+        "S3"
       ]
     },
     {
       "step_number": 2,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Create a Hugging Face account or sign in.",
-      "required_fields": [
-        {
-          "label": "Account signup or sign-in inputs",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3"
-          ],
-          "notes": "huggingface.co/join required JavaScript bot checks and did not expose a stable public field list."
-        }
-      ],
-      "observable_result": "The developer is authenticated on the Hub.",
-      "evidence_state": "unverified",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Confirm usable Inference Providers monthly credits, or add a payment method and purchase credits if monthly credits are exhausted.",
+      "required_fields": [],
+      "observable_result": "Billing shows remaining monthly credits or purchased credits for Inference Providers.",
+      "evidence_state": "documented",
       "source_ids": [
         "S2",
         "S3"
@@ -96,145 +66,155 @@
     },
     {
       "step_number": 3,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "If measuring Hub model repos: open huggingface.co/new, choose Model, owner, name, visibility, optional license, and create the repository.",
-      "required_fields": [
-        {
-          "label": "Repository owner",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "label": "Model repository name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "label": "Public or private visibility",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "label": "License",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Guide says the license may be left blank."
-        }
-      ],
-      "observable_result": "The new repository page opens and prompts for a Model Card.",
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Create a fine-grained token with Make calls to Inference Providers and store it securely.",
+      "required_fields": [],
+      "observable_result": "The token is generated and available locally.",
       "evidence_state": "documented",
       "source_ids": [
-        "S2"
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Export HF_TOKEN in the terminal.",
+      "required_fields": [],
+      "observable_result": "The environment variable is set for the current shell.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "POST a chat completions request with cURL to https://router.huggingface.co/v1/chat/completions.",
+      "required_fields": [],
+      "observable_result": "The API returns successful JSON with assistant message content.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the chat completions JSON includes the model message content.",
+      "required_fields": [],
+      "observable_result": "Assistant message content is present in choices.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "No Git tooling is required for the Hub web UI repository path.",
+      "description": "A Hugging Face account that can open token settings and billing.",
       "source_ids": [
-        "S2"
+        "S1",
+        "S3"
       ]
-    }
-  ],
-  "external_gates": [
+    },
     {
-      "description": "A Hugging Face account is required before creating repositories on the Hub.",
+      "description": "Usable Inference Providers credits for HF-routed requests. Free users receive monthly credits ($0.10 subject to change); after exhaustion, purchase additional credits (payment method via billing settings) for pay-as-you-go.",
       "source_ids": [
-        "S2"
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "description": "A fine-grained User Access Token with Make calls to Inference Providers permission.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A terminal with cURL (or any HTTP client). No language SDK is required.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
+  "external_gates": [],
   "unavoidable_waits": [],
-  "platform_outcomes": [
-    {
-      "description": "The Hub creates the repository under the selected namespace and shows the Model Card prompt.",
-      "source_ids": [
-        "S2"
-      ]
-    }
-  ],
+  "platform_outcomes": [],
   "excluded": [
     {
-      "item": "Adding a Model Card immediately after repo creation",
-      "reason": "The getting-started guide calls the Model Card best practice and skips it for a test repo.",
+      "item": "Custom provider keys",
+      "reason": "After first success.",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
-      "item": "Git clone, Git Xet, and hf auth login terminal flows",
-      "reason": "Optional relative to the web UI repository creation path.",
+      "item": "Organization X-HF-Bill-To billing",
+      "reason": "After first success.",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     },
     {
-      "item": "Uploading model weights or dataset files",
-      "reason": "Occurs after the repository page first-success signal in the selected Hub guide.",
+      "item": "Inference Endpoints dedicated deployments",
+      "reason": "After first success.",
       "source_ids": [
-        "S2"
+        "S1"
+      ]
+    },
+    {
+      "item": "SDK installation",
+      "reason": "After first success.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Hugging Face Hub documentation",
-      "url": "https://huggingface.co/docs/hub/index",
+      "title": "Inference Providers",
+      "url": "https://huggingface.co/docs/inference-providers/en/index",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Hub as one product surface among broader HF docs"
+        "Fine-grained token with Inference Providers permission",
+        "cURL POST to router.huggingface.co/v1/chat/completions",
+        "SDK tabs optional"
       ]
     },
     {
       "id": "S2",
-      "title": "Getting Started with Repositories",
-      "url": "https://huggingface.co/docs/hub/repositories-getting-started",
+      "title": "Pricing and Billing",
+      "url": "https://huggingface.co/docs/inference-providers/en/pricing",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "huggingface.co/new model repo fields",
-        "Model Card prompt",
-        "Optional license",
-        "Web UI vs git paths"
+        "Monthly free credits for Free/PRO/Team",
+        "Credit purchase required after monthly credits for continued usage"
       ]
     },
     {
       "id": "S3",
-      "title": "Hugging Face join",
-      "url": "https://huggingface.co/join",
-      "source_type": "observed-public-ui",
+      "title": "Billing",
+      "url": "https://huggingface.co/docs/hub/main/billing",
+      "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Public join entry exists",
-        "JS bot check blocked complete field observation"
+        "Credit cards for compute billing",
+        "Credits cover Inference Providers among other compute services"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which Hugging Face product and developer outcome should represent the platform-level slug?",
-      "impact": "Repository, local model output, Space, dataset, or inference responses produce incomparable paths.",
-      "evidence_needed": "An explicit workshop choice of one product and one first-success signal before recounting actions."
-    },
-    {
-      "question": "What exact signup fields and verifications does a fresh huggingface.co/join flow require?",
-      "impact": "Account-creation fields remain unverified behind JS bot protection.",
-      "evidence_needed": "A dated authenticated or assisted signup walkthrough capturing required join fields."
+      "question": "Whether every brand-new Free account still has non-zero monthly Inference Providers credits at signup versus needing an immediate credit purchase.",
+      "impact": "Billing purchase may precede or follow the first successful chat completions call.",
+      "evidence_needed": "Pricing states monthly credits exist but eligibility timing for brand-new accounts is not fully enumerated on these pages."
     }
   ],
   "counts": null

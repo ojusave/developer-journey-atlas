@@ -7,47 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "985addf9a3e1c1d1aa78e6f2bf16a793971c38f275c10d68a37c3bd8833c6e6a",
+  "source_record_sha256": "bd5c3a05bb22ff4e9a75a31e2a8f1637910c6f048006843d18e7447b93216839",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has Node.js 20.19 or later and a local command line.",
-      "The developer does not yet have an Algolia account, application, or index.",
-      "The developer can run a local Vite development server and open localhost:5173."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create an Algolia account, index the sample product dataset, and reach a working React InstantSearch experience.",
+  "developer_goal": "Create an Algolia account and use REST calls to add one object and retrieve it in search results.",
   "first_success": {
-    "outcome": "A local React InstantSearch app queries the quickstart-products index and shows live product search results.",
-    "observable_signal": "At http://localhost:5173 the product grid updates while typing, and the guide states you now have a working end-to-end search.",
+    "outcome": "An authenticated REST write stores an object and a search request returns that object as a hit.",
+    "observable_signal": "The save-object response succeeds and the subsequent search JSON contains the object in hits.",
     "source_ids": [
       "S1"
     ]
   },
   "route_selection": {
-    "surface": "Algolia dashboard plus Build your first search experience quickstart",
-    "rule": "Start at Algolia account creation, then follow the Get started page's Start building React InstantSearch quickstart rather than AI-agent, CLI, or Shopify peers.",
-    "selected": null,
+    "surface": "Search REST API via cURL: save an object, then search",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Search REST API via cURL: save an object, then search",
     "candidates": [
       {
-        "name": "Work Email signup then React InstantSearch quickstart",
-        "status": "unresolved",
-        "reason": "Public signup exposes Work Email, password minimum, and terms gates, but post-submit verification and whether an application is auto-created remain undocumented."
+        "name": "Search REST API via cURL: save an object, then search",
+        "status": "selected",
+        "reason": "The official REST API reaches indexed and searchable data with cURL and no local SDK or frontend project."
       },
       {
-        "name": "Google, GitHub, or Vercel signup then React InstantSearch quickstart",
-        "status": "unresolved",
-        "reason": "These are peer identity choices on the signup page with undocumented return states into the dashboard."
-      },
-      {
-        "name": "Build with AI agents",
+        "name": "React InstantSearch quickstart",
         "status": "not-selected",
-        "reason": "Get started separates this from the Start building InstantSearch quickstart."
-      },
-      {
-        "name": "Algolia CLI or Shopify quickstart",
-        "status": "not-selected",
-        "reason": "Different surfaces from the general first search-experience route."
+        "reason": "It adds Node.js, packages, source files, and a local UI after the core write-and-search API boundary."
       }
     ]
   },
@@ -56,155 +45,33 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create an Algolia account from the free signup page using Work Email or a supported social identity.",
-      "required_fields": [
-        {
-          "label": "Signup method",
-          "field_type": "select",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Google, GitHub, Vercel, and Work Email are peer options."
-        },
-        {
-          "label": "Work email",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Applies to Work Email route."
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Public UI indicates at least eight characters on Work Email."
-        },
-        {
-          "label": "Terms of Service, Build Plan Terms, and Privacy Policy acceptance",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "The developer can open the Algolia dashboard for a new account.",
-      "evidence_state": "unverified",
+      "action": "Create an Algolia account and open an application in the dashboard.",
+      "required_fields": [],
+      "observable_result": "The application dashboard is available.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S2"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Open or create the Algolia application whose API keys will be used, then copy Application ID, Write API key, and Search API key.",
-      "required_fields": [
-        {
-          "label": "Application selection or creation fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S1",
-            "S4"
-          ],
-          "notes": "Quickstart assumes an application; help docs describe manual creation without saying when new accounts need it."
-        },
-        {
-          "label": "Application ID",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Write API key",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Search API key",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The three credential values are available to paste into .env.local.",
-      "evidence_state": "unverified",
+      "action": "Copy the application ID and the API keys needed to write and search.",
+      "required_fields": [],
+      "observable_result": "Credentials are available for the REST headers.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S1",
-        "S4"
+        "S1"
       ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "cli",
-      "action": "Create the Vite React TypeScript app, install dependencies, add credentials, and run the indexing script.",
-      "required_fields": [
-        {
-          "label": "npm create vite command",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Dependency install command",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "VITE_ALGOLIA_APPLICATION_ID",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "ALGOLIA_WRITE_API_KEY",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "VITE_ALGOLIA_SEARCH_API_KEY",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "npm run index:products",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "The terminal reports Successfully indexed products and the quickstart-products index exists.",
+      "interface": "api",
+      "action": "Use cURL to call the Save object endpoint for a test index and object ID.",
+      "required_fields": [],
+      "observable_result": "Algolia acknowledges the indexing operation.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -212,44 +79,23 @@
     },
     {
       "step_number": 4,
-      "kind": "implementation",
-      "interface": "code",
-      "action": "Replace App.tsx and App.css with the quickstart InstantSearch UI, start the dev server, and search in the browser.",
-      "required_fields": [
-        {
-          "label": "App.tsx InstantSearch implementation",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "App.css styles",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "npm run dev",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        },
-        {
-          "label": "Search query in the UI",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "localhost:5173 shows a working product search grid with filters and highlighting.",
+      "kind": "verification",
+      "interface": "api",
+      "action": "Wait for the indexing task to complete when the response identifies an asynchronous task.",
+      "required_fields": [],
+      "observable_result": "The object is searchable.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Use cURL to search the test index for the saved object.",
+      "required_fields": [],
+      "observable_result": "The search response includes the saved object in hits.",
       "evidence_state": "documented",
       "source_ids": [
         "S1"
@@ -258,7 +104,19 @@
   ],
   "prerequisites": [
     {
-      "description": "Node.js 20.19 or later is required before the Vite and indexing commands.",
+      "description": "An Algolia account and application.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The application ID, a write-capable API key, and a search-capable API key.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A terminal with cURL.",
       "source_ids": [
         "S1"
       ]
@@ -266,15 +124,15 @@
   ],
   "external_gates": [
     {
-      "description": "Account creation requires accepting Algolia's published terms and privacy notice on Work Email signup.",
+      "description": "REST requests require the application ID and API key headers.",
       "source_ids": [
-        "S2"
+        "S1"
       ]
     }
   ],
   "unavoidable_waits": [
     {
-      "description": "Indexing uses asynchronous Algolia tasks; the script waits with waitForTasks before succeeding.",
+      "description": "Indexing can be asynchronous before the object appears in search.",
       "source_ids": [
         "S1"
       ]
@@ -282,7 +140,7 @@
   ],
   "platform_outcomes": [
     {
-      "description": "Algolia stores the uploaded sample products in quickstart-products and applies the product_type facet setting.",
+      "description": "An authenticated REST write stores an object and a search request returns that object as a hit.",
       "source_ids": [
         "S1"
       ]
@@ -290,15 +148,8 @@
   ],
   "excluded": [
     {
-      "item": "Relevance tuning and insights instrumentation after first success",
-      "reason": "Presented after the working end-to-end search declaration.",
-      "source_ids": [
-        "S1"
-      ]
-    },
-    {
-      "item": "Downloading the complete demo from GitHub instead of building it",
-      "reason": "Optional exploration parallel to the step-by-step path.",
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
       "source_ids": [
         "S1"
       ]
@@ -307,61 +158,46 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Build your first search experience",
-      "url": "https://www.algolia.com/doc/guides/get-started/quickstart",
+      "title": "Search REST API",
+      "url": "https://www.algolia.com/doc/rest-api/search",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Account prerequisite",
-        "API key fields",
-        "Vite and indexing commands",
-        "InstantSearch UI steps",
-        "Working end-to-end search terminal"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     },
     {
       "id": "S2",
-      "title": "Algolia get started for free signup",
-      "url": "https://dashboard.algolia.com/users/sign_up",
-      "source_type": "observed-public-ui",
+      "title": "Save object",
+      "url": "https://www.algolia.com/doc/rest-api/search/save-object",
+      "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Work Email and social signup choices",
-        "Password and terms gates visible publicly"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     },
     {
       "id": "S3",
-      "title": "Get started with Algolia",
-      "url": "https://www.algolia.com/doc/guides/get-started",
+      "title": "Algolia dashboard signup",
+      "url": "https://dashboard.algolia.com/users/sign_up",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Start building points to the InstantSearch quickstart"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "How do I create an application?",
-      "url": "https://support.algolia.com/hc/en-us/articles/4406975239441-How-do-I-create-an-application",
-      "source_type": "official-support",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Manual application creation exists",
-        "Does not state when a brand-new account already has an app"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Does a newly created Algolia account automatically receive its first application, or must the developer create one before API Keys are available?",
-      "impact": "Application creation may add name, plan, billing, and region fields before credentials can be copied.",
-      "evidence_needed": "A fresh-account dashboard walkthrough from signup submit through the first API Keys page."
-    },
-    {
-      "question": "What verification or onboarding screens follow Work Email versus Google, GitHub, and Vercel signup?",
-      "impact": "Additional account actions or waits may precede dashboard access and change the required_path length.",
-      "evidence_needed": "Dated captures of each signup method through first authenticated dashboard view."
+      "question": "The authenticated dashboard may create an initial application automatically or require the developer to create one.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null

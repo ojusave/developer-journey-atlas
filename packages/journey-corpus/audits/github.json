@@ -7,39 +7,36 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "712ae90a93b7c5f240f517ff08785d05ff5476427287b6603316c9b74d37d51c",
+  "source_record_sha256": "fc5869c0e4366cecbd38b623821754e3ee2c225a16d8f4bfa586b4c0019e664f",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and an email address they can verify.",
-      "No GitHub personal account, hello-world repository, branch, commit, or pull request exists yet."
+      "The developer has a supported browser and internet access.",
+      "No platform account, credentials, or product resources exist yet."
     ]
   },
-  "developer_goal": "Create a GitHub account and complete the Hello World browser workflow through a merged pull request that publishes a README change on main.",
+  "developer_goal": "Create a GitHub account and complete the Hello World repository and pull-request workflow in the web UI.",
   "first_success": {
-    "outcome": "The hello-world repository main branch shows the committed README change after the pull request is merged.",
-    "observable_signal": "GitHub reports the pull request successfully merged and closed, and the hello-world Code tab shows the README change on main.",
-    "source_ids": ["S1"]
+    "outcome": "A README change created on a branch is merged into the main branch through a pull request.",
+    "observable_signal": "The pull request shows Merged and the main branch README contains the committed change.",
+    "source_ids": [
+      "S1"
+    ]
   },
   "route_selection": {
-    "surface": "GitHub.com personal signup plus Hello World web tutorial",
-    "rule": "Prefer the documented Hello World browser path over CLI or REST API first miles, and resolve signup method only when post-submit verification and anti-abuse screens are established.",
-    "selected": null,
+    "surface": "Hello World web tutorial",
+    "rule": "Prefer a hosted or direct API route over local installation, and prefer documented cURL when it reaches the same first success.",
+    "selected": "Hello World web tutorial",
     "candidates": [
       {
-        "name": "Email and password personal signup, then Hello World",
-        "status": "unresolved",
-        "reason": "Public signup shows Email, Password, Username, and Country/Region, and Hello World is fully documented, but current docs only say follow the prompts and verify email without fixing anti-abuse or verification UI."
+        "name": "Hello World web tutorial",
+        "status": "selected",
+        "reason": "The browser tutorial teaches the core repository and pull-request workflow without Git, a local checkout, or CLI installation."
       },
       {
-        "name": "Continue with Google or Continue with Apple, then Hello World",
-        "status": "unresolved",
-        "reason": "Peer social buttons sit on the signup page; provider consent screens and whether they change email verification are not established as shorter or equivalent."
-      },
-      {
-        "name": "GitHub CLI quickstart or REST API getting started",
+        "name": "Git command-line workflow",
         "status": "not-selected",
-        "reason": "Official start-your-journey materials present Hello World as the browser essentials path; CLI and REST API are different surfaces and outcomes."
+        "reason": "It requires a local Git installation; Hello World explicitly completes the workflow in the browser."
       }
     ]
   },
@@ -48,208 +45,100 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a free personal GitHub account from github.com/signup.",
-      "required_fields": [
-        {
-          "label": "Email",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Username",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Country/Region",
-          "field_type": "select",
-          "evidence_state": "observed-public-ui",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Email verification and any anti-abuse challenge",
-          "field_type": "challenge",
-          "evidence_state": "unverified",
-          "source_ids": ["S2"],
-          "notes": "Docs require email verification before some basic tasks such as creating a repository, but do not document the exact verification control or whether a CAPTCHA or puzzle appears."
-        }
-      ],
-      "observable_result": "The developer has a verified personal GitHub account that can create repositories.",
-      "evidence_state": "unverified",
-      "source_ids": ["S2", "S3"]
+      "action": "Create or sign in to GitHub.",
+      "required_fields": [],
+      "observable_result": "The GitHub web UI is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Create the hello-world repository with a README.",
-      "required_fields": [
-        {
-          "label": "Repository name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "Tutorial sets the name to hello-world."
-        },
-        {
-          "label": "Description",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Public or Private visibility",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Add a README file",
-          "field_type": "checkbox",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "The hello-world repository exists with a README on main.",
+      "action": "Create a hello-world repository with a README.",
+      "required_fields": [],
+      "observable_result": "The repository and main branch exist.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Create the readme-edits branch from main.",
-      "required_fields": [
-        {
-          "label": "Branch name",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"],
-          "notes": "Tutorial uses readme-edits."
-        }
-      ],
-      "observable_result": "The readme-edits branch is available in the repository.",
+      "action": "Create a readme-edits branch.",
+      "required_fields": [],
+      "observable_result": "The new branch is selected.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 4,
-      "kind": "product-interaction",
+      "kind": "implementation",
       "interface": "web-ui",
-      "action": "Edit README.md on readme-edits and commit the change.",
-      "required_fields": [
-        {
-          "label": "README content",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Commit message",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "A commit with the README edit exists on readme-edits.",
+      "action": "Edit README.md and commit the change to readme-edits.",
+      "required_fields": [],
+      "observable_result": "The branch contains the new commit.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 5,
-      "kind": "product-interaction",
+      "kind": "implementation",
       "interface": "web-ui",
-      "action": "Open a pull request from readme-edits into main and create it.",
-      "required_fields": [
-        {
-          "label": "Pull request title",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        },
-        {
-          "label": "Pull request description",
-          "field_type": "text",
-          "evidence_state": "documented",
-          "source_ids": ["S1"]
-        }
-      ],
-      "observable_result": "An open pull request compares readme-edits with main.",
+      "action": "Open a pull request from readme-edits to main.",
+      "required_fields": [],
+      "observable_result": "The pull request displays the diff.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     },
     {
       "step_number": 6,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Merge the pull request and confirm the merge.",
-      "required_fields": [],
-      "observable_result": "GitHub reports the pull request successfully merged and closed.",
-      "evidence_state": "documented",
-      "source_ids": ["S1"]
-    },
-    {
-      "step_number": 7,
       "kind": "verification",
       "interface": "web-ui",
-      "action": "Open the hello-world Code tab and confirm the README change is on main.",
+      "action": "Merge the pull request and confirm the change on main.",
       "required_fields": [],
-      "observable_result": "The Code tab shows the committed README change on main.",
+      "observable_result": "The pull request is merged and README is updated.",
       "evidence_state": "documented",
-      "source_ids": ["S1"]
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "A reachable email address is required so GitHub can complete account verification.",
-      "source_ids": ["S2"]
+      "description": "A GitHub account and supported browser.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
-  "external_gates": [
-    {
-      "description": "Email verification must succeed before the account can complete some basic tasks such as creating a repository.",
-      "source_ids": ["S2"]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "GitHub must deliver the signup email verification before the developer can finish verification.",
-      "source_ids": ["S2"]
-    }
-  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "GitHub creates the personal account after signup prompts are completed.",
-      "source_ids": ["S2"]
-    },
-    {
-      "description": "Merging the pull request updates main with the README commit.",
-      "source_ids": ["S1"]
+      "description": "A README change created on a branch is merged into the main branch through a pull request.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "excluded": [
     {
-      "item": "Deleting the readme-edits branch after merge",
-      "reason": "The first-success signal is the merged README on main; branch deletion is cleanup after that signal is available.",
-      "source_ids": ["S1"]
-    },
-    {
-      "item": "Configuring two-factor authentication",
-      "reason": "Official account docs recommend 2FA but present it as a next step after account creation, not a Hello World prerequisite.",
-      "source_ids": ["S2"]
-    },
-    {
-      "item": "GitHub CLI or REST API quickstarts",
-      "reason": "Different interaction surfaces from the selected Hello World browser workflow.",
-      "source_ids": ["S4", "S5"]
+      "item": "Production hardening and post-success expansion",
+      "reason": "These occur after the first observable end-to-end result.",
+      "source_ids": [
+        "S1"
+      ]
     }
   ],
   "sources": [
@@ -260,64 +149,17 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Repository, branch, commit, pull request, and merge steps",
-        "README verification on main"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Creating an account on GitHub",
-      "url": "https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Personal account signup",
-        "Email verification requirement",
-        "Google and Apple social login alternatives"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "GitHub signup",
-      "url": "https://github.com/signup",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Email, Password, Username, and Country/Region fields",
-        "Continue with Google and Continue with Apple"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "GitHub CLI quickstart",
-      "url": "https://docs.github.com/en/github-cli/github-cli/quickstart",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "CLI as an alternate surface"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Getting started with the REST API",
-      "url": "https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "REST API as an alternate developer surface"
+        "surface selection",
+        "required path",
+        "first-success boundary"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which signup method and post-submit verification or anti-abuse screens does a fresh personal account currently hit before Hello World can start?",
-      "impact": "Email versus social signup and any CAPTCHA, code, or puzzle steps change required fields and whether the account action can be marked verified.",
-      "evidence_needed": "A dated fresh-account walkthrough from github.com/signup through verified email and first repository creation, capturing every required control."
-    },
-    {
-      "question": "Should the corpus first mile be Hello World collaboration basics or a developer REST API path?",
-      "impact": "API credentials and first request work are a different goal and action sequence from the browser pull-request tutorial.",
-      "evidence_needed": "An explicit workshop goal choice between Hello World and the REST API getting-started route."
+      "question": "Account creation can require email verification or anti-abuse checks not enumerated in the tutorial.",
+      "impact": "The required path may differ for some fresh accounts.",
+      "evidence_needed": "A dated fresh-account walkthrough through the authenticated first-success state."
     }
   ],
   "counts": null
