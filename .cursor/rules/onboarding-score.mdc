@@ -1,0 +1,60 @@
+---
+description: Documented Onboarding Load score design for Developer Journey Atlas
+globs: packages/journey-corpus/**/*.{ts,mjs,js,css}
+alwaysApply: false
+---
+
+# Documented Onboarding Load score
+
+Use this when adding, changing, or explaining onboarding scores in Developer Journey Atlas.
+
+## Agent prompt (copyable)
+
+```
+Design and maintain the Atlas Documented Onboarding Load score.
+
+Goal: for any platform, show (1) where it sits overall and (2) where it sits among peers.
+
+Rules:
+- Score = documented load to first success on the selected route. Not UX, drop-off, time, or conversion.
+- Higher score = heavier documented load (harder path), not "worse product".
+- Never publish ordinal rankings (#3 easiest) or leaderboards.
+- ranking_allowed stays false on heuristic artifacts.
+- Peer math only against same first_success_type (finish line). Different finish lines are not comparable.
+- Overall peer set: corpus ∩ same finish line ∩ not not-comparable.
+- Category peer set: category ∩ same finish line ∩ not not-comparable.
+- Require at least 3 peers; otherwise mark placement unavailable.
+- Underlying meter: existing heuristic_effort_score (actions + weighted friction gates).
+- Public score: percentile of effort within the peer set (0 = lightest, 100 = heaviest).
+- Bands: Light 0–24, Moderate 25–74, Heavy 75–100.
+- Always show inspectable breakdown: effort, required actions, gates, waits.
+- Version the model (onboarding-load-1.0). Bump when weights or peer rules change.
+- Do not invent payment/install requirements; only use documented quality/friction fields.
+```
+
+## Locked decisions
+
+| Decision | Choice |
+|---|---|
+| Name | Documented Onboarding Load |
+| Direction | Higher = heavier load |
+| Overall peers | Same `first_success_type` across corpus |
+| Category peers | Same category ∩ same `first_success_type` |
+| Meter | `heuristic_effort_score` from selected-path-heuristic |
+| Public number | Percentile 0–100 within peer set |
+| Bands | Light / Moderate / Heavy |
+| Min peers | 3 |
+| Rankings | Forbidden |
+
+## Implementation home
+
+- Core: `packages/journey-corpus/src/core/onboardingScore.ts`
+- Exposed on journey payload as `onboardingScore`
+- UI: journey card shows overall + peer placements with breakdown
+- Tests: `packages/journey-corpus/tests/app/onboardingScore.test.mjs`
+
+## Honesty copy (required)
+
+Always pair the score with language like:
+
+> Documentation-derived route load only. Not observed time, drop-off, or usability.
