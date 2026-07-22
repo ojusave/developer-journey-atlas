@@ -2,7 +2,6 @@ const el = {
   form: document.querySelector("#search-form"),
   input: document.querySelector("#search"),
   suggestions: document.querySelector("#suggestions"),
-  platformCount: document.querySelector("#platform-count"),
   result: document.querySelector("#result"),
 };
 
@@ -487,12 +486,6 @@ el.form.addEventListener("submit", (e) => {
 });
 
 async function init() {
-  try {
-    const { data } = await api("/api/meta");
-    el.platformCount.textContent = num(data.count);
-  } catch {
-    /* leave the static fallback count */
-  }
   resumeFromUrl();
 }
 
