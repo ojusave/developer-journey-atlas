@@ -1,7 +1,7 @@
 // One command to validate records and regenerate every derived artifact
 // deterministically, then validate again.
 //
-//   node build-all.mjs           regenerate coverage.json, catalog.md,
+//   node build-all.mjs           regenerate coverage.json, catalog.txt,
 //                                ds-quality.json, selected-path-heuristic.json
 //   node build-all.mjs --check   same, then fail if regeneration left a dirty
 //                                git diff (used in CI to catch stale artifacts)
@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const check = process.argv.includes("--check");
 
-const GENERATED = ["coverage.json", "catalog.md", "ds-quality.json", "selected-path-heuristic.json", "audit-status.json"];
+const GENERATED = ["coverage.json", "catalog.txt", "ds-quality.json", "selected-path-heuristic.json", "audit-status.json"];
 
 const KNOWN_DETECTORS = new Set(["starting-state", "opaque-signup", "contradictory-success-label", "non-atomic-step"]);
 const COMPARABILITY_ENUM = new Set(["comparable", "conditional", "not-comparable", "unreviewed"]);

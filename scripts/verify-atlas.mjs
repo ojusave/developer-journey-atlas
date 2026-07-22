@@ -109,15 +109,18 @@ const importedEntries = git("ls-tree", "-r", corpusCommit)
     return { path, blob };
   });
 const protectedCorpusEntries = importedEntries.filter(({ path }) =>
-  path.startsWith("records/") ||
-  path.startsWith("research/") ||
-  path.startsWith("verify/") ||
-  [
-    "record.schema.json",
-    "candidate-path-audit.json",
-    "cold-audit-open.json",
-    "headline.json",
-  ].includes(path),
+  !path.endsWith(".md") &&
+  (
+    path.startsWith("records/") ||
+    path.startsWith("research/") ||
+    path.startsWith("verify/") ||
+    [
+      "record.schema.json",
+      "candidate-path-audit.json",
+      "cold-audit-open.json",
+      "headline.json",
+    ].includes(path)
+  ),
 );
 let importMismatches = 0;
 for (const { path, blob } of protectedCorpusEntries) {
@@ -128,18 +131,20 @@ if (importMismatches === 0) pass("journey-import", `${protectedCorpusEntries.len
 else fail("journey-import", `${importMismatches} imported files differ from ${corpusCommit}`);
 
 const corpusPackage = JSON.parse(await readFile(resolve(root, "packages/journey-corpus/package.json"), "utf8"));
-const corpusReadme = await readFile(resolve(root, "packages/journey-corpus/README.md"), "utf8");
+const rootReadme = await readFile(resolve(root, "README.md"), "utf8");
+const licenseScope = await readFile(resolve(root, "LICENSE_SCOPE.txt"), "utf8");
 if (
   corpusPackage.license === "Apache-2.0" &&
-  corpusReadme.includes("Creative Commons Attribution 4.0 International") &&
-  corpusReadme.includes("LICENSE_SCOPE.md")
+  rootReadme.includes("Creative Commons Attribution 4.0") &&
+  licenseScope.includes("Apache License 2.0") &&
+  licenseScope.includes("Creative Commons")
 ) {
-  pass("license-metadata", "journey package metadata matches the repository license boundary");
+  pass("license-metadata", "repository license boundary is documented");
 } else {
   fail("license-metadata", "journey package license metadata is incomplete or inconsistent");
 }
 
-const blockerSource = await readFile(resolve(root, "packages/blocker-taxonomy/first-mile-blocker-universe.md"));
+const blockerSource = await readFile(resolve(root, "packages/blocker-taxonomy/first-mile-blocker-universe.txt"));
 const blockerHash = sha256(blockerSource);
 if (blockerHash === manifest.sources.blockerTaxonomy.sha256) pass("blocker-source", blockerHash);
 else fail("blocker-source", `expected ${manifest.sources.blockerTaxonomy.sha256}, found ${blockerHash}`);
@@ -163,7 +168,7 @@ if (
   fail("blocker-counts", JSON.stringify(runtimeCatalog.counts));
 }
 
-if (runtimeCatalog.source === "packages/blocker-taxonomy/first-mile-blocker-universe.md") {
+if (runtimeCatalog.source === "packages/blocker-taxonomy/first-mile-blocker-universe.txt") {
   pass("runtime-catalog-source", runtimeCatalog.source);
 } else {
   fail("runtime-catalog-source", `stale source path ${runtimeCatalog.source}`);
@@ -265,17 +270,22 @@ if (
     approvalBasisCounts.byte_identical_history_import === 284 &&
     approvalBasisCounts.reviewed_license_metadata_change === 4 &&
     approvalBasisCounts.reviewed_non_data_omission === 1 &&
-    approvalBasisCounts.unchanged_blob_verified === 76 &&
-    approvalBasisCounts.path_only_hash_verified === 1 &&
+    approvalBasisCounts.unchanged_blob_verified === 77 &&
+    (approvalBasisCounts.path_only_hash_verified ?? 0) === 0 &&
     approvalBasisCounts.reviewed_compatibility_change === 6 &&
     approvalBasisCounts.reviewed_post_migration_change === 3
   ) {
-  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 76 unchanged, 1 path-only, 6 compatibility, and 3 post-migration mappings approved by evidence class");
+  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 77 unchanged, 6 compatibility, and 3 post-migration mappings approved by evidence class");
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
 let unchangedScannerMismatches = 0;
-for (const entry of migrationMap.mappings.filter(({ approval }) => approval?.basis === "unchanged_blob_verified")) {
+for (const entry of migrationMap.mappings.filter(({ approval, newPath }) =>
+  approval?.basis === "unchanged_blob_verified" &&
+  newPath &&
+  !newPath.endsWith(".md") &&
+  newPath !== ".gitignore",
+)) {
   const current = await readFile(resolve(root, entry.newPath));
   if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
 }

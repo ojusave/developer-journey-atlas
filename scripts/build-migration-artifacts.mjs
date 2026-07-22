@@ -150,7 +150,7 @@ const classifyPath = (repository, path) => {
   if (repository === "journeyCorpus" && /(^|\/)(record\.schema\.json|validate-records\.mjs)$/.test(path)) {
     return "canonical source data";
   }
-  if (repository === "scanner" && path === "research/first-mile-blocker-universe.md") {
+  if (repository === "scanner" && path === "research/first-mile-blocker-universe.txt") {
     return "canonical source data";
   }
   if (generatedPattern.test(path)) return "generated output";
@@ -181,8 +181,8 @@ const reviewedPostMigrationPaths = new Set([
 ]);
 for (const { path, blob } of scannerEntries) {
   const licenseMetadataChange = path === "package-lock.json";
-  const newPath = path === "research/first-mile-blocker-universe.md"
-    ? "packages/blocker-taxonomy/first-mile-blocker-universe.md"
+  const newPath = path === "research/first-mile-blocker-universe.txt"
+    ? "packages/blocker-taxonomy/first-mile-blocker-universe.txt"
     : path;
   const compatibilityPaths = [
     "README.md",
@@ -194,7 +194,7 @@ for (const { path, blob } of scannerEntries) {
   ];
   const transformation = licenseMetadataChange
     ? "license_metadata_updated"
-    : path === "research/first-mile-blocker-universe.md"
+    : path === "research/first-mile-blocker-universe.txt"
     ? "moved"
     : reviewedPostMigrationPaths.has(path)
       ? "post_migration_change"

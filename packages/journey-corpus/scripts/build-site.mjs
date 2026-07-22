@@ -132,16 +132,17 @@ await writeFile(
   "utf8",
 );
 
-const readme = await readFile(path.join(projectRoot, "README.md"), "utf8");
-const selectionPolicy = await readFile(path.join(projectRoot, "SELECTION-POLICY.md"), "utf8");
-const measurementContract = await readFile(path.join(projectRoot, "MEASUREMENT-CONTRACT.md"), "utf8");
+const repoRoot = path.resolve(projectRoot, "../..");
+const readme = await readFile(path.join(repoRoot, "README.md"), "utf8");
+const selectionPolicy = await readFile(path.join(projectRoot, "SELECTION-POLICY.txt"), "utf8");
+const measurementContract = await readFile(path.join(projectRoot, "MEASUREMENT-CONTRACT.txt"), "utf8");
 const schema = await readFile(path.join(projectRoot, "record.schema.json"), "utf8");
 const auditSchema = await readFile(path.join(projectRoot, "shortest-path-audit.schema.json"), "utf8");
 const auditStatusText = await readFile(path.join(projectRoot, "audit-status.json"), "utf8");
 const platformCount = JSON.parse(auditStatusText).total;
 const renderAudit = await readFile(path.join(projectRoot, "audits/render.json"), "utf8");
 const zoomAudit = await readFile(path.join(projectRoot, "audits/zoom.json"), "utf8");
-const catalog = (await readFile(path.join(projectRoot, "catalog.md"), "utf8"))
+const catalog = (await readFile(path.join(projectRoot, "catalog.txt"), "utf8"))
   .replaceAll("](records/", "](data/records/")
   .replaceAll("](audits/", "](data/audits/");
 
