@@ -1,0 +1,440 @@
+{
+  "branches": [],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "ai-agent-integration",
+      "name": "AI Agent Integration Path",
+      "relationship_to_primary_path": "Alternative path targeting AI agents rather than general developers; shares steps like API key setup and sending messages but includes agent-specific tooling installation.",
+      "selection_basis": "Documented onboarding for AI coding agents using Courier's MCP server and CLI tooling.",
+      "source_ids": [
+        "S5"
+      ],
+      "steps": [
+        {
+          "action": "Sign up or log in to Courier dashboard.",
+          "actor": "developer",
+          "details": [
+            "Access https://app.courier.com/signup or https://app.courier.com/login."
+          ],
+          "failure_or_wait": "Authentication failure.",
+          "input": "User credentials.",
+          "interface": "web-ui",
+          "output": "Authenticated user session.",
+          "phase": "account",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 1,
+          "success_signal": "Access to Courier dashboard."
+        },
+        {
+          "action": "Copy API key from Settings > API Keys.",
+          "actor": "developer",
+          "details": [
+            "Locate API key in dashboard settings."
+          ],
+          "failure_or_wait": "API key not found.",
+          "input": "Authenticated dashboard access.",
+          "interface": "web-ui",
+          "output": "API key string.",
+          "phase": "credential",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 2,
+          "success_signal": "API key copied."
+        },
+        {
+          "action": "Set environment variable COURIER_API_KEY with the API key.",
+          "actor": "developer",
+          "details": [
+            "Export environment variable."
+          ],
+          "failure_or_wait": "Variable not set.",
+          "input": "API key string.",
+          "interface": "cli",
+          "output": "Environment variable set.",
+          "phase": "prepare",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 3,
+          "success_signal": "Environment variable accessible."
+        },
+        {
+          "action": "Install AI agent tooling such as Courier CLI and configure MCP server.",
+          "actor": "developer",
+          "details": [
+            "Run npm install -g @trycourier/cli.",
+            "Add MCP server configuration with API key."
+          ],
+          "failure_or_wait": "Installation or configuration errors.",
+          "input": "API key and CLI tooling.",
+          "interface": "cli",
+          "output": "Configured MCP server for AI agent.",
+          "phase": "install",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 4,
+          "success_signal": "Agent tooling ready to send messages."
+        },
+        {
+          "action": "Send first message using CLI or curl with AI agent tooling.",
+          "actor": "developer",
+          "details": [
+            "Use example commands to send message with routing method single."
+          ],
+          "failure_or_wait": "API errors.",
+          "input": "API key, message content.",
+          "interface": "cli",
+          "output": "API response with requestId.",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 5,
+          "success_signal": "Message accepted by Courier."
+        }
+      ]
+    }
+  ],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Message delivered as shown in Message Logs timeline",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "A notification message is successfully sent using the API key and appears as delivered in the Courier dashboard logs.",
+    "observable_completion_signal": "Message appears in Message Logs with timeline stages: accepted, routed, rendered, sent, and delivered.",
+    "official_milestone": "Send a notification message via the Courier API and verify its delivery in the dashboard logs.",
+    "source_ids": [
+      "S1"
+    ],
+    "why_this_is_the_boundary": "The documentation explicitly defines sending a message and seeing it delivered in the dashboard logs as the first success milestone for developers integrating Courier."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has internet access and a modern development environment.",
+      "Developer can sign up for a Courier account.",
+      "Developer can access Courier dashboard to retrieve API key."
+    ],
+    "developer_intent": "Send a notification using Courier's API to verify integration and delivery.",
+    "starting_url": "https://www.courier.com/docs/getting-started/quickstart"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "User must create a Courier account to obtain API key.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 2,
+      "description": "API key is required to authenticate API calls.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ],
+      "type": "credential"
+    },
+    {
+      "at_step": 4,
+      "description": "Correctly format and send API request with valid recipient and message content.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "configuration"
+    },
+    {
+      "at_step": 5,
+      "description": "Access to Courier dashboard Message Logs to verify delivery.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "access"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Courier",
+    "organization": "Courier",
+    "slug": "courier"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Sign up for a Courier account at https://app.courier.com/signup.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Obtain an API key from the Courier dashboard under Settings > API Keys.",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ],
+      "type": "credential"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Have a development environment capable of making HTTP requests or running SDKs/CLI (e.g., curl, Node.js, Python).",
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "type": "software"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Sign up or log in to Courier dashboard.",
+      "actor": "developer",
+      "details": [
+        "Access https://app.courier.com/signup or https://app.courier.com/login."
+      ],
+      "failure_or_wait": "Authentication failure or account creation errors.",
+      "input": "User credentials (email, password, or SSO).",
+      "interface": "web-ui",
+      "output": "Authenticated user session.",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "step_number": 1,
+      "success_signal": "Access to Courier dashboard."
+    },
+    {
+      "action": "Copy API key from Settings > API Keys in the dashboard.",
+      "actor": "developer",
+      "details": [
+        "Locate API key in dashboard settings.",
+        "Copy key for use in API calls."
+      ],
+      "failure_or_wait": "API key not found or permission denied.",
+      "input": "Authenticated dashboard access.",
+      "interface": "web-ui",
+      "output": "API key string.",
+      "phase": "credential",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ],
+      "step_number": 2,
+      "success_signal": "API key copied successfully."
+    },
+    {
+      "action": "Set environment variable COURIER_API_KEY with the copied API key.",
+      "actor": "developer",
+      "details": [
+        "Export environment variable in shell or set in development environment."
+      ],
+      "failure_or_wait": "Environment variable not set or inaccessible.",
+      "input": "API key string.",
+      "interface": "cli",
+      "output": "Environment variable set.",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "step_number": 3,
+      "success_signal": "Environment variable accessible to SDK or CLI."
+    },
+    {
+      "action": "Send a notification message using curl, CLI, or SDK with the API key.",
+      "actor": "developer",
+      "details": [
+        "Use provided example payload with recipient email, message content, and routing method.",
+        "Replace placeholders YOUR_API_KEY and you@example.com appropriately."
+      ],
+      "failure_or_wait": "API errors such as authentication failure or malformed request.",
+      "input": "API key, recipient email, message content JSON.",
+      "interface": "cli",
+      "output": "API response JSON including requestId.",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 4,
+      "success_signal": "Response includes a requestId indicating message accepted."
+    },
+    {
+      "action": "Open Message Logs in Courier dashboard to verify message delivery status.",
+      "actor": "developer",
+      "details": [
+        "Navigate to https://app.courier.com/logs.",
+        "Check timeline stages: accepted, routed, rendered, sent, delivered."
+      ],
+      "failure_or_wait": "Message not found or delivery failed.",
+      "input": "RequestId from API response.",
+      "interface": "web-ui",
+      "output": "Message delivery timeline visible in dashboard.",
+      "phase": "verify",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 5,
+      "success_signal": "Message shows delivered status in logs."
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path",
+        "documented_first_success",
+        "friction_gates",
+        "time_to_first_success",
+        "prerequisites"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "For Developers",
+        "Get your API key",
+        "Send a message",
+        "Verify delivery"
+      ],
+      "source_type": "quickstart",
+      "title": "Quickstart - Courier",
+      "url": "https://www.courier.com/docs/getting-started/quickstart"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "category",
+        "surface",
+        "prerequisites"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "How Courier Works",
+        "Start Building",
+        "Send your first notification"
+      ],
+      "source_type": "documentation",
+      "title": "What is Courier? - Courier",
+      "url": "https://www.courier.com/docs/welcome"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "surface",
+        "prerequisites"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Get started",
+        "How Courier works",
+        "Developer tools"
+      ],
+      "source_type": "documentation",
+      "title": "Developer Docs: Multichannel Notification API - Courier",
+      "url": "https://docs.courier.com/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "prerequisites",
+        "friction_gates"
+      ],
+      "id": "S4",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "API Keys",
+        "SDKs",
+        "Rate Limiting",
+        "Payload Limits",
+        "Idempotency"
+      ],
+      "source_type": "api-reference",
+      "title": "API Reference - Courier",
+      "url": "https://www.courier.com/docs/reference/get-started"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "prerequisites",
+        "candidate_paths",
+        "friction_gates"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "What you need before writing any code",
+        "Core concepts",
+        "Quick Reference: Copy for Cursor / Claude"
+      ],
+      "source_type": "quickstart",
+      "title": "Agent Quickstart - Courier",
+      "url": "https://www.courier.com/docs/tools/agent-quickstart"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Visual Dashboard and Design Studio",
+        "reason_not_primary": "While the visual dashboard and Design Studio are important for content design and lifecycle marketing, the documented first success for developers is sending a notification via the API.",
+        "url": "https://www.courier.com/docs/platform/content/design-studio/design-studio-overview"
+      },
+      {
+        "name": "AI Agent Integration via MCP Server and CLI",
+        "reason_not_primary": "Targeted at AI coding agents, this is a specialized integration path rather than the primary onboarding for general developers.",
+        "url": "https://www.courier.com/docs/tools/agent-quickstart"
+      }
+    ],
+    "name": "REST API with SDKs and CLI",
+    "selection_basis": "The official documentation emphasizes sending notifications via a single REST API call, supported by multiple server SDKs (Node.js, Python, Ruby, Go) and a CLI tool, making this the primary developer surface for first-mile onboarding."
+  },
+  "time_to_first_success": {
+    "source_ids": [
+      "S1"
+    ],
+    "value": "under two minutes",
+    "vendor_claim": true
+  },
+  "uncertainties": []
+}

@@ -55,6 +55,7 @@ if (records.length !== manifest.sources.journeyCorpus.canonicalPlatformRecords) 
     );
   }
   manifest.sources.journeyCorpus.canonicalPlatformRecords = records.length;
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 if (blockerCatalog.counts.reasons !== manifest.sources.blockerTaxonomy.blockerReasons) {
   throw new Error(`Blocker reason count changed: ${blockerCatalog.counts.reasons}`);

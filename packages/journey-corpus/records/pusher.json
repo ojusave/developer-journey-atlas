@@ -1,0 +1,505 @@
+{
+  "branches": [],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "android-client",
+      "name": "Pusher Channels Android Client Quick Start",
+      "relationship_to_primary_path": "Alternative platform-specific client onboarding path for Android apps instead of JavaScript web client.",
+      "selection_basis": "Official Android quick start guide provides a native mobile onboarding path with similar steps adapted for Android environment.",
+      "source_ids": [
+        "S3"
+      ],
+      "steps": [
+        {
+          "action": "Create a Pusher account and Channels app to get API keys.",
+          "actor": "developer",
+          "details": [
+            "Sign up at Pusher dashboard.",
+            "Create a Channels app.",
+            "Copy app_id, key, secret, and cluster from App Keys."
+          ],
+          "failure_or_wait": "Account creation or app creation errors or delays.",
+          "input": "Account registration data and app creation inputs.",
+          "interface": "web-ui",
+          "output": "API keys (app_id, key, secret, cluster).",
+          "phase": "account",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 1,
+          "success_signal": "API keys are available in dashboard."
+        },
+        {
+          "action": "Add Pusher Java client library dependency via Gradle or Maven.",
+          "actor": "developer",
+          "details": [
+            "Add 'com.pusher:pusher-java-client:2.2.1' to build.gradle or pom.xml."
+          ],
+          "failure_or_wait": "Dependency resolution errors.",
+          "input": "Build configuration files.",
+          "interface": "code",
+          "output": "Pusher Java client library available in project.",
+          "phase": "install",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 2,
+          "success_signal": "Library resolves and builds successfully."
+        },
+        {
+          "action": "Create a Pusher connection with key and cluster and connect.",
+          "actor": "developer",
+          "details": [
+            "Instantiate Pusher with key and options, call connect()."
+          ],
+          "failure_or_wait": "Connection errors or misconfiguration.",
+          "input": "API key and cluster string.",
+          "interface": "code",
+          "output": "Connected Pusher client instance.",
+          "phase": "connect",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 3,
+          "success_signal": "Connection established without error."
+        },
+        {
+          "action": "Subscribe to a public channel.",
+          "actor": "developer",
+          "details": [
+            "Call pusher.subscribe('my-channel')."
+          ],
+          "failure_or_wait": "Subscription errors or invalid channel name.",
+          "input": "Channel name string.",
+          "interface": "code",
+          "output": "Channel subscription object.",
+          "phase": "connect",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 4,
+          "success_signal": "Subscription object returned."
+        },
+        {
+          "action": "Bind an event listener to an event name.",
+          "actor": "developer",
+          "details": [
+            "Use channel.bind('my-event', SubscriptionEventListener) to listen for events."
+          ],
+          "failure_or_wait": "Binding errors or event not received.",
+          "input": "Event name string and listener implementation.",
+          "interface": "code",
+          "output": "Event listener registered.",
+          "phase": "connect",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 5,
+          "success_signal": "Listener callback executes when event received."
+        },
+        {
+          "action": "Trigger an event from the server using server SDK with app credentials.",
+          "actor": "developer",
+          "details": [
+            "Use server library to trigger 'my-event' on 'my-channel'."
+          ],
+          "failure_or_wait": "API errors or invalid credentials.",
+          "input": "API keys, channel name, event name, and event data.",
+          "interface": "api",
+          "output": "Event sent to Pusher Channels.",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 6,
+          "success_signal": "Server SDK call returns success."
+        },
+        {
+          "action": "Observe the event listener executing in the Android app upon receiving the triggered event.",
+          "actor": "developer",
+          "details": [
+            "Listener callback runs, e.g., logs event data."
+          ],
+          "failure_or_wait": "No event received or listener errors.",
+          "input": "Triggered event from server.",
+          "interface": "code",
+          "output": "Client-side reaction to event.",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S3"
+          ],
+          "step_number": 7,
+          "success_signal": "Visible or logged event data in client app."
+        }
+      ]
+    }
+  ],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "If you published an event and it triggered your alert(...) call, well done!",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Developer successfully receives and handles a real-time event in their web application using Pusher Channels.",
+    "observable_completion_signal": "The bound event handler function executes in the web app, e.g., an alert or console log triggered by the received event.",
+    "official_milestone": "Receiving a triggered event in the web app after subscribing and binding to a channel and event.",
+    "source_ids": [
+      "S2"
+    ],
+    "why_this_is_the_boundary": "The documentation explicitly states that triggering an event and having it received and handled in the client app is the first success milestone."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has a web application environment ready to integrate JavaScript.",
+      "Developer has basic knowledge of JavaScript and web development.",
+      "Developer has internet access to load external scripts."
+    ],
+    "developer_intent": "Send and receive real-time events in a web application using Pusher Channels.",
+    "starting_url": "https://pusher.com/docs/channels/getting_started/javascript/"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Developer must create a Pusher account and Channels app to obtain API keys.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 2,
+      "description": "Developer must include the Pusher client library in their app (JavaScript or Android).",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "configuration"
+    },
+    {
+      "at_step": 6,
+      "description": "Server SDK requires valid app credentials (app_id, key, secret, cluster) to trigger events.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "credential"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Pusher",
+    "organization": "Pusher",
+    "slug": "pusher"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a free Pusher account and create a Channels app to obtain API keys (app_id, key, secret, cluster).",
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Have a web application environment capable of including JavaScript and running client-side code.",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "software"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Create a Pusher account and Channels app to get API keys.",
+      "actor": "developer",
+      "details": [
+        "Sign up at Pusher dashboard.",
+        "Create a Channels app.",
+        "Copy app_id, key, secret, and cluster from App Keys."
+      ],
+      "failure_or_wait": "Account creation or app creation errors or delays.",
+      "input": "Account registration data and app creation inputs.",
+      "interface": "web-ui",
+      "output": "API keys (app_id, key, secret, cluster).",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 1,
+      "success_signal": "API keys are available in dashboard."
+    },
+    {
+      "action": "Include the Pusher JavaScript client library in the web app.",
+      "actor": "developer",
+      "details": [
+        "Add <script src=\"https://js.pusher.com/8.3.0/pusher.min.js\"></script> to HTML."
+      ],
+      "failure_or_wait": "Script loading errors or network issues.",
+      "input": "Web app HTML or template files.",
+      "interface": "code",
+      "output": "Pusher JS client library loaded in the web app.",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 2,
+      "success_signal": "Pusher object available in JavaScript runtime."
+    },
+    {
+      "action": "Open a connection to Pusher Channels using the key and cluster.",
+      "actor": "developer",
+      "details": [
+        "Instantiate Pusher with key and cluster parameters."
+      ],
+      "failure_or_wait": "Connection errors or misconfiguration.",
+      "input": "API key and cluster string.",
+      "interface": "code",
+      "output": "Pusher connection object.",
+      "phase": "connect",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 3,
+      "success_signal": "Connection established without error."
+    },
+    {
+      "action": "Subscribe to a channel (e.g., 'my-channel').",
+      "actor": "developer",
+      "details": [
+        "Call pusher.subscribe('my-channel')."
+      ],
+      "failure_or_wait": "Subscription errors or invalid channel name.",
+      "input": "Channel name string.",
+      "interface": "code",
+      "output": "Channel subscription object.",
+      "phase": "connect",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 4,
+      "success_signal": "Subscription object returned."
+    },
+    {
+      "action": "Bind an event handler function to an event name (e.g., 'my-event').",
+      "actor": "developer",
+      "details": [
+        "Use channel.bind('my-event', callback) to listen for events."
+      ],
+      "failure_or_wait": "Binding errors or event not received.",
+      "input": "Event name string and callback function.",
+      "interface": "code",
+      "output": "Event handler registered.",
+      "phase": "connect",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 5,
+      "success_signal": "Callback executes when event received."
+    },
+    {
+      "action": "Trigger an event from the server using server SDK with app credentials.",
+      "actor": "developer",
+      "details": [
+        "Use server library (e.g., Node.js, Ruby, PHP) to trigger 'my-event' on 'my-channel'."
+      ],
+      "failure_or_wait": "API errors or invalid credentials.",
+      "input": "API keys, channel name, event name, and event data.",
+      "interface": "api",
+      "output": "Event sent to Pusher Channels.",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "step_number": 6,
+      "success_signal": "Server SDK call returns success."
+    },
+    {
+      "action": "Observe the event handler executing in the web app upon receiving the triggered event.",
+      "actor": "developer",
+      "details": [
+        "Event handler callback runs, e.g., alert or console log."
+      ],
+      "failure_or_wait": "No event received or handler errors.",
+      "input": "Triggered event from server.",
+      "interface": "code",
+      "output": "Client-side reaction to event.",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 7,
+      "success_signal": "Visible or logged event data in client app."
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Platform overview",
+        "Product context"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Welcome to Pusher",
+        "Overview of products"
+      ],
+      "source_type": "documentation",
+      "title": "Pusher Documentation",
+      "url": "https://pusher.com/docs/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary onboarding path",
+        "First success milestone",
+        "Prerequisites",
+        "Friction gates"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Get your free API keys",
+        "Include the Channels Client",
+        "Open a connection to Channels",
+        "Subscribe to a channel",
+        "Listen for events on your channel",
+        "Trigger events from your server",
+        "Where next?"
+      ],
+      "source_type": "quickstart",
+      "title": "Pusher Channels Docs - JavaScript Quick Start",
+      "url": "https://pusher.com/docs/channels/getting_started/javascript/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Alternative onboarding path",
+        "Prerequisites",
+        "Friction gates"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Get your free API keys",
+        "Install the library",
+        "Create a connection",
+        "Subscribe to a public channel",
+        "Listen for events",
+        "Trigger events from your server",
+        "Where next?"
+      ],
+      "source_type": "quickstart",
+      "title": "Pusher Channels Docs - Android Quick Start Guide",
+      "url": "https://pusher.com/docs/channels/getting_started/android/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Push notifications onboarding",
+        "Additional product onboarding"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Create a Pusher Beams instance",
+        "Upload Apple certificates",
+        "Use the dashboard",
+        "Send notifications"
+      ],
+      "source_type": "tutorial",
+      "title": "Getting started with Pusher Beams | Pusher tutorials",
+      "url": "https://pusher.com/tutorials/getting-started-pusher-beams/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supplementary learning resources"
+      ],
+      "id": "S6",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "General tutorials overview"
+      ],
+      "source_type": "tutorial",
+      "title": "Pusher tutorials",
+      "url": "https://pusher.com/tutorials/"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Pusher Channels Android Client",
+        "reason_not_primary": "Android quick start is platform-specific and less universal than the JavaScript client which runs in browsers and is the first documented example.",
+        "url": "https://pusher.com/docs/channels/getting_started/android/"
+      },
+      {
+        "name": "Pusher Beams Push Notifications",
+        "reason_not_primary": "Focused on push notifications setup and requires additional platform-specific setup (e.g., Apple developer account), thus more complex and not the primary first-mile onboarding for Channels.",
+        "url": "https://pusher.com/tutorials/getting-started-pusher-beams/"
+      }
+    ],
+    "name": "Pusher Channels JavaScript Client",
+    "selection_basis": "The JavaScript quick start guide is the primary documented onboarding surface for developers to achieve first success with Pusher Channels, as it is prominently featured in official docs and includes detailed step-by-step instructions."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S2",
+        "S3",
+        "S5"
+      ],
+      "impact": "Without a vendor-claimed time, we cannot report a precise time-to-first-success metric.",
+      "question": "Is there an explicitly documented time-to-first-success claim by Pusher for Channels or Beams?",
+      "reason_unresolved": "No explicit timing or duration claims found in official documentation or tutorials."
+    },
+    {
+      "checked_source_ids": [
+        "S5"
+      ],
+      "impact": "Different products may have different onboarding flows and first success definitions.",
+      "question": "Is the first success milestone the same for Pusher Beams as for Channels?",
+      "reason_unresolved": "Pusher Beams documentation focuses on instance creation and notification sending but does not clearly define a first success milestone comparable to Channels."
+    }
+  ]
+}
