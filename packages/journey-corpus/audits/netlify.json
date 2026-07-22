@@ -7,178 +7,237 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "e9f31d0caf3d201f069a68baec1fdbb27a3c4b059cf8726a5cddd7260ed09822",
+  "source_record_sha256": "5e17118be52e4673fb6ef9cf779a09e75a81697abaaf9f57f9ae3b5dca693897",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a local web project folder or can produce one.",
-      "No Netlify account, team project, or netlify.app site exists yet unless an anonymous drop path is selected.",
-      "The developer has a supported browser."
+      "The developer has an existing web project folder containing HTML, CSS, JavaScript, or framework source.",
+      "The developer has a supported browser and reliable network connection.",
+      "For the logged-in drag-and-drop candidate, the developer has a Netlify account and can access the intended team. An anonymous branch exists but behaves differently for unbuilt source.",
+      "If the folder is dropped anonymously, it must already be built because Netlify publishes anonymous files as-is."
     ]
   },
-  "developer_goal": "Publish a web project on Netlify and open its live preview URL.",
+  "developer_goal": "Publish an existing web project on Netlify and open its live preview URL.",
   "first_success": {
-    "outcome": "Netlify has published the project at a unique Preview URL ending in netlify.app.",
-    "observable_signal": "The project dashboard shows the Preview URL and opening it displays the published site.",
+    "outcome": "Dropped project is deployed and available at its live netlify.app URL.",
+    "observable_signal": "Opening the Preview/live URL ending in netlify.app serves the published site.",
     "source_ids": [
-      "S2",
-      "S7"
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "Netlify web app onboarding",
-    "rule": "Official Choose your path presents multiple peer entrants without ranking one universal first route.",
-    "selected": null,
+    "surface": "Publish an existing folder through logged-in Netlify Drop",
+    "rule": "Prefer the official first-deploy tutorial path without duplicating steps or splitting form fields into separate required path steps.",
+    "selected": "Publish an existing folder through logged-in Netlify Drop",
     "candidates": [
       {
-        "name": "Logged-in drag and drop / Netlify Drop",
-        "status": "unresolved",
-        "reason": "Documented file-based path to a Preview URL, but signup and team selection fields are not atomically public."
-      },
-      {
-        "name": "Import existing Git repository",
-        "status": "unresolved",
-        "reason": "Peer official path with Git provider authorization and build settings."
-      },
-      {
-        "name": "AI agent / template / CLI / anonymous deploy",
-        "status": "unresolved",
-        "reason": "Additional peer entrants that change credentials, plan, and terminal conditions."
+        "name": "Publish an existing folder through logged-in Netlify Drop",
+        "status": "selected",
+        "reason": "Netlify Start from files / Drop path publishes a local folder to a live netlify.app URL. Removed a duplicated copy of the same path that previously inflated step counts."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Open the Netlify documentation home and select Create a new project.",
+      "required_fields": [],
+      "observable_result": "The project-start choices are visible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Open Choose your path and select Start from files for a complete drag-and-drop candidate.",
+      "required_fields": [],
+      "observable_result": "The page explains the account, Drop publisher, folder, and preview URL sequence.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Prepare the local project folder to deploy.",
+      "required_fields": [],
+      "observable_result": "The folder is unzipped and includes the project files; for anonymous publishing it already contains built files.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
       "kind": "account",
-      "interface": "web-ui",
-      "action": "Create or sign in to a Netlify account and reach the intended team dashboard when the selected route requires authentication.",
-      "required_fields": [
-        {
-          "label": "Netlify signup or login fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S3"
-          ],
-          "notes": "Quickstarts say sign up or log in but do not enumerate current fields, verification, or team creation."
-        }
-      ],
-      "observable_result": "The developer can open Add new project or the Drop publisher for a team.",
-      "evidence_state": "unverified",
+      "interface": "browser",
+      "action": "Log in to the Netlify account and select the team that should manage the project.",
+      "required_fields": [],
+      "observable_result": "The team-owned Projects page or Netlify Drop publisher can be opened.",
+      "evidence_state": "documented",
       "source_ids": [
         "S2",
         "S3"
       ]
     },
     {
-      "step_number": 2,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Complete the selected publish flow (drag-and-drop folder, Git import, or alternate documented entrant).",
-      "required_fields": [
-        {
-          "label": "Route-specific publish inputs",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2",
-            "S3",
-            "S7"
-          ]
-        }
-      ],
-      "observable_result": "Netlify accepts the project and starts publish or build.",
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "browser",
+      "action": "Open the Netlify Drop publisher or scroll to the drag-and-drop section at the bottom of the team's Projects page.",
+      "required_fields": [],
+      "observable_result": "The folder drop target is ready.",
       "evidence_state": "documented",
       "source_ids": [
         "S2",
-        "S3",
-        "S7"
+        "S5"
       ]
     },
     {
-      "step_number": 3,
+      "step_number": 6,
       "kind": "verification",
       "interface": "browser",
-      "action": "Open the Preview URL or production URL shown after publish.",
+      "action": "Drag the project folder into the Deploy zone.",
       "required_fields": [],
-      "observable_result": "The browser displays the published web project.",
+      "observable_result": "The upload and deploy process begins.",
       "evidence_state": "documented",
       "source_ids": [
         "S2",
-        "S7"
+        "S5"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "other",
+      "action": "For a logged-in source folder, detect the framework, run the build if needed, and publish the result; for prebuilt output, publish the supplied files.",
+      "required_fields": [],
+      "observable_result": "The project dashboard shows a Preview URL ending in netlify.app.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S5",
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "step_number": 8,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open the Preview URL shown in the project dashboard.",
+      "required_fields": [],
+      "observable_result": "The intended project is visible at the Preview URL and the official guide says it is now published on the web.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S8"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "A local project folder or remote Git repository depending on the selected entrant.",
+      "description": "For the managed drag-and-drop route, a Netlify account authenticated into the team that should own the project. The public docs link to signup but do not reconstruct its current atomic screens or verification order.",
       "source_ids": [
         "S2",
         "S3"
       ]
     },
     {
-      "description": "Credit-based plan features may be required for some AI entrants.",
+      "description": "A current Chromium-based browser is recommended for drag-and-drop troubleshooting.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "A local web project folder. A ZIP archive must be unzipped first.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "If deploying anonymously or using manual deployment without a build, the folder must contain already built output. A logged-in drop can let Netlify detect a framework and run its build.",
       "source_ids": [
         "S2",
+        "S5"
+      ]
+    },
+    {
+      "description": "A current Free credit-based plan is sufficient for a first production deployment while credits remain. A production deployment consumes 15 credits.",
+      "source_ids": [
         "S6"
       ]
     }
   ],
   "external_gates": [
     {
-      "description": "Git provider authorization is required for repository import routes.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Account signup and team membership gate authenticated Drop and dashboard routes.",
-      "source_ids": [
-        "S2",
-        "S7"
-      ]
-    }
-  ],
-  "unavoidable_waits": [
-    {
-      "description": "Netlify may need to detect a framework, run a build, and publish before the Preview URL is ready.",
-      "source_ids": [
-        "S7"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Netlify publishes the project and assigns a netlify.app Preview URL.",
-      "source_ids": [
-        "S2",
-        "S7"
-      ]
-    }
-  ],
-  "excluded": [
-    {
-      "item": "Reading Choose your path and documentation home",
-      "reason": "Docs are evidence for unresolved route selection.",
+      "description": "Netlify presents several peer starting routes and does not select a universal default.",
       "source_ids": [
         "S1",
         "S2"
       ]
     },
     {
-      "item": "Custom domain purchase or attachment",
-      "reason": "Documented as optional after publish.",
+      "description": "The correct folder depends on whether the developer is logged in. Anonymous drops publish files as-is, while logged-in drops can detect and build a framework project.",
       "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "The managed route requires login, but the linked signup flow is not atomically documented on the public Start pages.",
+      "source_ids": [
+        "S2",
         "S3"
       ]
     },
     {
-      "item": "Anonymous CLI deploy claim flow",
-      "reason": "Peer surface; not established as the universal shortest authenticated web path.",
+      "description": "The docs say deploys under 50 MB work best and that individual files over 10 MB can cause a stuck deploy.",
       "source_ids": [
-        "S7"
+        "S2"
+      ]
+    },
+    {
+      "description": "Network reliability, browser version, and local free memory can block upload. The troubleshooting baseline suggests roughly four times the uncompressed project size in free memory.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Netlify may need to detect, build, and publish the project before the Preview URL is available. No typical duration is documented for this route.",
+      "source_ids": [
+        "S2",
+        "S8"
+      ]
+    },
+    {
+      "description": "A production deployment consumes 15 credits. The Free plan includes 300 monthly credits with a hard limit.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Dropped project is deployed and available at its live netlify.app URL.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Inflated duplicate or over-split steps",
+      "reason": "Path compacted to the official first-success tutorial structure.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
@@ -188,9 +247,10 @@
       "title": "Netlify Documentation",
       "url": "https://docs.netlify.com/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Multiple create-project entrants"
+        "Official entry surface",
+        "Peer AI, Git and drag-and-drop routes"
       ]
     },
     {
@@ -198,10 +258,13 @@
       "title": "Choose your path",
       "url": "https://docs.netlify.com/start/choose-your-path/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Peer AI, template, framework, Git, and files routes",
-        "Drop Preview URL success"
+        "Route plurality",
+        "Complete drag-and-drop path",
+        "Preview URL terminal",
+        "Build-state branches",
+        "Upload limits and troubleshooting"
       ]
     },
     {
@@ -209,11 +272,39 @@
       "title": "Deploy from your repository",
       "url": "https://docs.netlify.com/start/quickstarts/deploy-from-repository/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Signup prerequisite",
-        "Git provider auth",
-        "Publish settings"
+        "Git route steps",
+        "Account requirement",
+        "Provider authorization",
+        "Publish settings",
+        "Optional domain checkpoint"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Deploy from AI code generation tool",
+      "url": "https://docs.netlify.com/start/quickstarts/deploy-from-ai-code-generation-tool/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "Official drag-and-drop recommendation for AI-generated projects",
+        "Account optionality",
+        "Anonymous CLI path",
+        "One-hour claim deadline"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Create deploys",
+      "url": "https://docs.netlify.com/deploy/create-deploys/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "Manual deployment behavior",
+        "Anonymous live project",
+        "Drag-and-drop entry",
+        "No-build statement"
       ]
     },
     {
@@ -221,34 +312,52 @@
       "title": "Credit-based pricing plans",
       "url": "https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Plan constraints for some features"
+        "Free plan allowance",
+        "Production deployment credit cost",
+        "Failed deploy credit behavior"
       ]
     },
     {
       "id": "S7",
-      "title": "Add a new project",
-      "url": "https://docs.netlify.com/manage/projects/add-new-project/",
+      "title": "Netlify Website Terms of Use",
+      "url": "https://www.netlify.com/legal/terms-of-use/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Drag and drop",
-        "Import repository",
-        "CLI and anonymous deploy peers"
+        "Netlify, Inc. official organization name"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Netlify Glossary for Beginners",
+      "url": "https://docs.netlify.com/start/glossary/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "Instant and seconds-level Netlify Drop time claim",
+        "Build before publish model",
+        "Failed build produces no deploy",
+        "Deploy as live availability"
       ]
     }
   ],
   "uncertainties": [
     {
       "question": "Which of AI agent, Git repository, framework starter, template, drag and drop, or CLI is Netlify's single canonical first route?",
-      "impact": "Required actions, fields, external gates, and plan prerequisites change materially by entrant.",
-      "evidence_needed": "Human judgment selecting one bounded goal and verifying that route end-to-end against current docs and UI."
+      "impact": "Different entrants face materially different plans, credentials, authorization, local tooling, and first-success terminals.",
+      "evidence_needed": "The documentation home and Choose your path explicitly present multiple routes and do not rank one as universal."
     },
     {
-      "question": "What is the current atomic Netlify account signup and team-creation sequence?",
-      "impact": "Authenticated routes cannot expose verified account-segment counts.",
-      "evidence_needed": "Fresh-account signup walkthrough with dated screenshots of required fields and verification."
+      "question": "What is the current atomic Netlify account signup and verification sequence?",
+      "impact": "The logged-in route can contain additional fields, authentication choices, email verification, terms, or team creation before the first deploy.",
+      "evidence_needed": "The official quickstarts link to the application signup page but the public documentation inspected does not reconstruct its current steps."
+    },
+    {
+      "question": "Does the current logged-in Drop publisher always run a framework build for unbuilt source?",
+      "impact": "The required local preparation and wait or failure states differ between source and output folders.",
+      "evidence_needed": "Choose your path says logged-in drops can detect and build, while Create deploys states that manual deployment does not run a build command."
     }
   ],
   "counts": null

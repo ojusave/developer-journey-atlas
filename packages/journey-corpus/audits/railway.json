@@ -7,142 +7,85 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "c3037b658dbaeeaa0853095e720419a223fe113e08c86533381571286ba81b4f",
+  "source_record_sha256": "e52c231f50202707b01315d334182f1bc090317d5095823ac372103a17ebd692",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer can use a browser and accept Railway Terms of Service.",
-      "No Railway account or project exists yet.",
-      "A GitHub account is available if the GitHub deploy candidate is selected."
+      "The developer can use a web browser and is permitted to accept Railway's Terms of Service.",
+      "The developer has or can create one Railway account. Railway permits one account per person and uses email, GitHub, and payment-method verification to enforce that rule.",
+      "The developer has a valid GitHub account and can fork the Railway-provided NextJS repository.",
+      "The trial account has enough remaining credit to build and run the first service."
     ]
   },
-  "developer_goal": "Create a Railway account, deploy a first web application, and observe a running deployment.",
+  "developer_goal": "Deploy a first web application to Railway and observe its running deployment.",
   "first_success": {
-    "outcome": "Railway has built and started the selected service and the initial deployment is ready on the Project Canvas.",
-    "observable_signal": "The deployment reaches Active / ready state after the initial deploy completes.",
+    "outcome": "Forked NextJS deployment is Active on the Project Canvas with a reachable public URL.",
+    "observable_signal": "The Project Canvas shows an Active deployment and the service public URL opens the NextJS app.",
     "source_ids": [
       "S2",
       "S3"
     ]
   },
   "route_selection": {
-    "surface": "Railway Dashboard self-service web flow",
-    "rule": "Quick Start presents GitHub, CLI, Docker image, and template as peer deploy options; lexicographic winner is unresolved while signup fields remain unverified.",
-    "selected": null,
+    "surface": "Fork and deploy Railway's prepared NextJS app from GitHub",
+    "rule": "Prefer the official first-deploy tutorial path without duplicating steps or splitting form fields into separate required path steps.",
+    "selected": "Fork and deploy Railway's prepared NextJS app from GitHub",
     "candidates": [
       {
-        "name": "Dashboard deploy from GitHub (NextJS sample fork)",
-        "status": "unresolved",
-        "reason": "Recommended first-code path in Quick Start, but signup and verification order are not public."
-      },
-      {
-        "name": "Deploy a template",
-        "status": "unresolved",
-        "reason": "Peer Quick Start path that may avoid forking sample code but still needs account and any template variables."
-      },
-      {
-        "name": "CLI railway init + railway up",
-        "status": "not-selected",
-        "reason": "Different interaction surface from the Dashboard-first account journey unless CLI is chosen as the goal."
-      },
-      {
-        "name": "Docker image service",
-        "status": "unresolved",
-        "reason": "Peer Dashboard path with empty project plus image name."
+        "name": "Fork and deploy Railway's prepared NextJS app from GitHub",
+        "status": "selected",
+        "reason": "Railway Quick Start documents forking the prepared NextJS app and deploying from GitHub until the deployment is Active. Removed a duplicated second copy of the same path that previously inflated step counts."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Sign up or log in at Railway and accept Terms for a new account.",
-      "required_fields": [
-        {
-          "label": "GitHub or email login choice",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4",
-            "S5"
-          ]
-        },
-        {
-          "label": "New-account verification and Terms controls",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S4",
-            "S5",
-            "S8"
-          ]
-        }
-      ],
-      "observable_result": "The developer reaches an authenticated Railway dashboard or trial state.",
-      "evidence_state": "unverified",
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Open Railway Documentation and select Quick Start.",
+      "required_fields": [],
+      "observable_result": "The tutorial's GitHub, CLI, Docker image, and template routes are visible.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S4",
-        "S5"
+        "S1",
+        "S2"
       ]
     },
     {
       "step_number": 2,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Create a New Project and choose the selected deploy source (GitHub repo, template, or Docker image).",
-      "required_fields": [
-        {
-          "label": "Deploy source selection",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "Railway opens the project creation flow for that source.",
+      "kind": "account",
+      "interface": "browser",
+      "action": "Open Railway Login and choose Continue with GitHub or Log in using email. If no Railway account exists, complete the new-account continuation, whose atomic screens are not exposed by the public docs.",
+      "required_fields": [],
+      "observable_result": "The Railway dashboard is accessible.",
       "evidence_state": "documented",
       "source_ids": [
-        "S2"
+        "S4",
+        "S5",
+        "S8",
+        "S10"
       ]
     },
     {
       "step_number": 3,
-      "kind": "external-authorization",
-      "interface": "external-system",
-      "action": "If using GitHub, link and authorize the GitHub account and select the repository to deploy.",
-      "required_fields": [
-        {
-          "label": "GitHub account link and repository access",
-          "field_type": "permission",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        },
-        {
-          "label": "Repository",
-          "field_type": "repository",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "The repository is available to Railway for Deploy Now.",
+      "kind": "account",
+      "interface": "other",
+      "action": "For a newly created Free Trial account, assign a trial state and evaluate automated verification.",
+      "required_fields": [],
+      "observable_result": "The dashboard permits code deployment.",
       "evidence_state": "documented",
       "source_ids": [
-        "S2"
+        "S4"
       ]
     },
     {
       "step_number": 4,
-      "kind": "product-interaction",
-      "interface": "web-ui",
-      "action": "Choose Deploy Now (or Deploy for non-GitHub peers) to start the initial deployment.",
+      "kind": "implementation",
+      "interface": "browser",
+      "action": "Fork the basic NextJS repository linked by the Quick Start into the developer's GitHub account.",
       "required_fields": [],
-      "observable_result": "Railway creates the project and kicks off the first build and deploy.",
+      "observable_result": "The fork can be selected from Railway.",
       "evidence_state": "documented",
       "source_ids": [
         "S2"
@@ -150,11 +93,97 @@
     },
     {
       "step_number": 5,
+      "kind": "implementation",
+      "interface": "web-ui",
+      "action": "Open the Railway dashboard and click New Project.",
+      "required_fields": [],
+      "observable_result": "Deployment source options are displayed.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose the GitHub repo option.",
+      "required_fields": [],
+      "observable_result": "The GitHub repository search is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "account",
+      "interface": "browser",
+      "action": "If prompted, link and authorize the valid GitHub account for Railway.",
+      "required_fields": [],
+      "observable_result": "The forked NextJS repository appears in Railway search.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 8,
+      "kind": "implementation",
+      "interface": "web-ui",
+      "action": "Search for and select the forked NextJS repository.",
+      "required_fields": [],
+      "observable_result": "The selected repository is ready for its first deployment decision.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 9,
       "kind": "verification",
       "interface": "web-ui",
-      "action": "On the Project Canvas, confirm the initial deployment completed and is ready.",
+      "action": "Choose Deploy Now, as the tutorial directs for brevity.",
       "required_fields": [],
-      "observable_result": "The deployment view shows the service ready/Active after the initial deploy.",
+      "observable_result": "The Project Canvas opens and the first deployment begins.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 10,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Accept the deployment into the queue and transition it from Initializing to Building.",
+      "required_fields": [],
+      "observable_result": "The deployment state advances from `Initializing` to `Building` and, after a successful build, to `Deploying`.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 11,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Start the built service using the detected or configured Start Command.",
+      "required_fields": [],
+      "observable_result": "With no healthcheck, the deployment becomes `Active` after the container starts; with a healthcheck, Active waits for the healthcheck to succeed.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 12,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Verify the initial deployment on the Project Canvas and deployment view.",
+      "required_fields": [],
+      "observable_result": "The deployment is `Active`; the Quick Start says the app is ready once the initial deployment completes.",
       "evidence_state": "documented",
       "source_ids": [
         "S2",
@@ -164,14 +193,35 @@
   ],
   "prerequisites": [
     {
-      "description": "One Railway account per person; Free Trial provides a one-time credit grant.",
+      "description": "The user must be at least 16 and accept Railway's Terms of Service.",
+      "source_ids": [
+        "S6",
+        "S8"
+      ]
+    },
+    {
+      "description": "One Railway account per person, created from the Login flow or already existing. The public docs do not reconstruct every browser signup screen.",
       "source_ids": [
         "S4",
         "S5"
       ]
     },
     {
-      "description": "GitHub-linked path needs a fork or accessible repo such as the Quick Start NextJS sample.",
+      "description": "A Free Trial, Free, Hobby, Pro, or Enterprise entitlement with enough credit and deployment capacity. A new trial grants $5 for up to 30 days before reverting to Free.",
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "description": "A valid GitHub account linked to Railway for the recommended GitHub route.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "description": "Permission to fork the official NextJS quickstart repository into the developer's GitHub account and authorize Railway to find it.",
       "source_ids": [
         "S2"
       ]
@@ -179,62 +229,74 @@
   ],
   "external_gates": [
     {
-      "description": "GitHub authorization is required for the GitHub deploy option.",
+      "description": "The app path requires one Railway account per person; public docs do not reproduce the current browser signup sequence.",
       "source_ids": [
-        "S2"
+        "S4",
+        "S5",
+        "S10"
       ]
     },
     {
-      "description": "Trial verification based on GitHub account age and activity can limit features until verify completes.",
+      "description": "A user must accept Railway's Terms and meet the Terms' age requirement.",
+      "source_ids": [
+        "S8"
+      ]
+    },
+    {
+      "description": "GitHub-based automated verification determines Full versus Limited Trial and Railway does not manually review verification requests.",
       "source_ids": [
         "S4"
       ]
-    }
-  ],
-  "unavoidable_waits": [
+    },
     {
-      "description": "Railway must queue, build, and start the container before the initial deployment is ready.",
-      "source_ids": [
-        "S2",
-        "S3"
-      ]
-    }
-  ],
-  "platform_outcomes": [
-    {
-      "description": "Deploy Now creates the project and starts the first deployment.",
+      "description": "Railway requires a linked valid GitHub account; the OAuth and repository-access sequence is external and not atomically documented in the Quick Start.",
       "source_ids": [
         "S2"
       ]
     },
     {
-      "description": "A successful initial deployment becomes ready/Active on the Project Canvas.",
+      "description": "Deploy Now and Add Variables are peer actions. The tutorial chooses Deploy Now only for brevity.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "The initial deploy moves through queue, build, and deploy states. Free-plan deploys are rejected during each region's peak-hours window, and Free or sometimes Hobby work may separately queue during limited-access periods.",
+      "source_ids": [
+        "S3",
+        "S9"
+      ]
+    },
+    {
+      "description": "A trial has $5 for up to 30 days, limits projects to five services, and limits RAM and vCPU. Exhausted credit can block or stop workloads.",
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "description": "For failure, inspect the build or deploy logs and read the full log. The deployment reference also provides Restart and Redeploy actions for relevant later states.",
       "source_ids": [
         "S2",
         "S3"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Forked NextJS deployment is Active on the Project Canvas with a reachable public URL.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "excluded": [
     {
-      "item": "Reading Quick Start documentation",
-      "reason": "Documentation is evidence, not a product action.",
+      "item": "Inflated duplicate or over-split steps",
+      "reason": "Path compacted to the official first-success tutorial structure.",
       "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "item": "Add variables path instead of Deploy Now",
-      "reason": "Quick Start directs Deploy Now for brevity.",
-      "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "item": "Generating a public domain after Active",
-      "reason": "Quick Start marks the app ready when the initial deployment completes; domain may be extra for browser output.",
-      "source_ids": [
-        "S2"
+        "S1"
       ]
     }
   ],
@@ -244,9 +306,11 @@
       "title": "Railway Docs",
       "url": "https://docs.railway.com/",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Docs entry"
+        "Primary docs entry",
+        "First-app-running positioning",
+        "Deploy-in-minutes claim"
       ]
     },
     {
@@ -254,12 +318,13 @@
       "title": "Quick Start Tutorial",
       "url": "https://docs.railway.com/quick-start",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "GitHub CLI Docker template peers",
-        "New Project",
-        "Deploy Now",
-        "Project Canvas"
+        "Surface and candidate selection",
+        "Full GitHub sequence",
+        "Branches",
+        "Deployment-ready terminal",
+        "Failure log recovery"
       ]
     },
     {
@@ -267,9 +332,12 @@
       "title": "Deployments",
       "url": "https://docs.railway.com/deployments/reference",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Deployment lifecycle states"
+        "Build and start lifecycle",
+        "Initializing, Building, Deploying, Active, Failed and Crashed states",
+        "Healthcheck branch",
+        "Log and recovery actions"
       ]
     },
     {
@@ -277,10 +345,13 @@
       "title": "Free Trial",
       "url": "https://docs.railway.com/pricing/free-trial",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Trial credits",
-        "GitHub verification"
+        "Login signup entry",
+        "Trial credit and duration",
+        "Verification branch",
+        "Trial limits",
+        "No-card start"
       ]
     },
     {
@@ -288,33 +359,82 @@
       "title": "Accounts",
       "url": "https://docs.railway.com/access/accounts",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "One account per person",
-        "Identity verification classes"
+        "One-account rule",
+        "Email, GitHub and payment-method verification",
+        "Optional 2FA behavior"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "railway login",
+      "url": "https://docs.railway.com/cli/login",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "CLI browser and browserless authentication",
+        "Non-interactive token environment alternatives"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Pricing FAQs",
+      "url": "https://docs.railway.com/pricing/faqs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "No-card Free Trial",
+        "$5 new-user resource grant"
       ]
     },
     {
       "id": "S8",
-      "title": "Railway Terms of Service",
+      "title": "Terms of Service",
       "url": "https://railway.com/legal/terms",
       "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
+      "accessed_at": "2026-07-18",
       "evidence_supported": [
-        "Terms acceptance and age requirement"
+        "Railway Corporation official name",
+        "Terms requirement",
+        "Age requirement"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Deployments",
+      "url": "https://docs.railway.com/deployments/reference#deployments-paused-limited-access",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "Free-plan regional peak-hours rejection",
+        "Wait or Hobby-upgrade recovery for peak hours",
+        "Free and Hobby queue condition",
+        "Wait or Pro-upgrade recovery"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Login",
+      "url": "https://railway.com/login",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-18",
+      "evidence_supported": [
+        "Current Continue with GitHub option",
+        "Current Log in using email option"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What is the current browser signup, identity choice, Terms, and verification order for a new Railway user?",
-      "impact": "Account-segment action and field counts cannot be verified from public docs alone.",
-      "evidence_needed": "Fresh-account signup walkthrough with dated screenshots of Login and post-signup verification screens."
+      "question": "What is the current browser signup, identity choice, and verification order?",
+      "impact": "The number of account, legal, and verification steps before the dashboard cannot be counted precisely.",
+      "evidence_needed": "The public Login page exposes GitHub and email entry options, and official docs describe the one-account rule and verification classes, but they do not reproduce the new-account form fields or intermediate screens."
     },
     {
-      "question": "Among GitHub sample, template, and Docker image Dashboard peers, which is the lexicographic shortest route to first success?",
-      "impact": "External gates and required fields differ; template may avoid forking while GitHub is the documented first-code recommendation.",
-      "evidence_needed": "Human judgment applying SELECTION-POLICY to the Quick Start peer options with a fixed first-success definition (Active vs public URL)."
+      "question": "Does the prepared NextJS app currently require any project variables or a generated domain for the reader's intended success?",
+      "impact": "A developer seeking visible browser output may need additional actions after Active deployment.",
+      "evidence_needed": "The Quick Start directs Deploy Now for brevity and makes Generate Domain conditional, while it does not describe the app's rendered page as the required terminal."
     }
   ],
   "counts": null

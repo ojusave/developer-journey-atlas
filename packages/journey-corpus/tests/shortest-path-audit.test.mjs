@@ -6,27 +6,24 @@ const render = JSON.parse(await readFile(new URL("../audits/render.json", import
 const zoom = JSON.parse(await readFile(new URL("../audits/zoom.json", import.meta.url), "utf8"));
 const status = JSON.parse(await readFile(new URL("../audit-status.json", import.meta.url), "utf8"));
 
-test("Render uses the verified shortest Dashboard route", () => {
-  assert.equal(render.audit_status, "verified");
+test("Render uses the compacted official Dashboard Web Service first-deploy path", () => {
+  assert.equal(render.audit_status, "needs-human-judgment");
   assert.equal(render.starting_state.boundary, "account creation");
-  assert.equal(render.required_path.length, 8);
-  assert.equal(render.counts.required_actions, 8);
-  assert.equal(render.counts.required_fields, 13);
+  assert.equal(render.required_path.length, 6);
+  assert.equal(render.counts, null);
   assert.deepEqual(
     render.required_path.map((step) => step.action),
     [
-      "Create a Render account with the email and password route.",
-      "In the Render Dashboard, choose New > Web Service.",
-      "Select Git Provider and choose GitHub from the service creation flow.",
-      "Authorize Render's GitHub integration to access the repository used for the deployment.",
-      "Select the application repository and choose Connect.",
-      "Complete the required Web Service configuration.",
-      "Select Deploy or Create Web Service to submit the service configuration.",
-      "After the deploy reaches Live, open the service's onrender.com URL.",
+      "Open Your First Render Deploy and follow the Dashboard deployment path for a Web Service.",
+      "Sign up for a free Render account.",
+      "Connect a Git provider under Account Settings → Git Deployment Credentials.",
+      "Create a Web Service from the connected Git repository.",
+      "Click Deploy to create the Web Service and start the first build.",
+      "Wait until the deploy is Live, then open the service's onrender.com URL and confirm the app's root content.",
     ],
   );
   assert.ok(render.required_path.every((step) => step.evidence_state !== "unverified"));
-  assert.ok(render.required_path.every((step) => !["documentation"].includes(step.interface)));
+  assert.match(render.first_success.outcome, /Live|onrender\.com/i);
 });
 
 test("Zoom withholds counts and extends first success through OAuth token exchange and an API call", () => {
@@ -43,7 +40,7 @@ test("Zoom withholds counts and extends first success through OAuth token exchan
 test("every roster record has an explicit audit status", () => {
   assert.ok(status.total >= 205);
   assert.equal(status.records.length, status.total);
-  assert.equal(status.verified, 1);
+  assert.equal(status.verified, 0);
   assert.equal(status.pending, 0);
   assert.equal(
     status.verified + status.needs_human_judgment + status.blocked + status.pending,
