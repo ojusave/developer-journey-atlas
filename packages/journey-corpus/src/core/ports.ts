@@ -90,6 +90,11 @@ export interface PlatformRecord {
   platform: { name: string; slug: string; organization: string };
   category: string;
   researched_at?: string;
+  entry_point?: {
+    developer_intent?: string;
+    starting_url?: string;
+    assumed_prior_state?: string[];
+  };
   surface?: { name?: string; selection_basis?: string };
   documented_first_success?: {
     official_milestone?: string;

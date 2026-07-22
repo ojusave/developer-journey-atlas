@@ -13,6 +13,9 @@ test("buildJourneyOverlay highlights steps with gates and soft-maps families", (
     {
       platform: { name: "Resend", slug: "resend", organization: "Resend" },
       category: "Communications, media, and social",
+      entry_point: {
+        starting_url: "https://resend.com/docs/send-with-nodejs",
+      },
       primary_path: [
         { step_number: 1, action: "Open docs", required: true },
         { step_number: 2, action: "Create account", required: true },
@@ -32,5 +35,6 @@ test("buildJourneyOverlay highlights steps with gates and soft-maps families", (
   assert.equal(journey.highlightedStepCount, 1);
   assert.equal(journey.steps[1].hasFriction, true);
   assert.equal(journey.steps[1].frictionGates[0].blockerHypotheses[0].id, "U04");
+  assert.equal(journey.startingUrl, "https://resend.com/docs/send-with-nodejs");
   assert.match(journey.note, /hypotheses/);
 });
