@@ -11,8 +11,9 @@ export const config = {
   githubRepoUrl: "https://github.com/ojusave/developer-journey-atlas",
   // owner/repo slug derived from the URL; used by the PR writer.
   githubRepoSlug: "ojusave/developer-journey-atlas",
-  // Phase 2 kill switch. Off until the live-research pipeline is wired.
-  researchEnabled: process.env.RESEARCH_ENABLED !== "false",
+  // Live research is part of the normal product path. It is always on when
+  // the provider credentials are configured.
+  researchEnabled: true,
   // Phase 2 search provider (You.com Web Search API). YDC_API_KEY is the
   // canonical env var name across You.com's docs and SDKs.
   youApiKey: process.env.YDC_API_KEY ?? "",
