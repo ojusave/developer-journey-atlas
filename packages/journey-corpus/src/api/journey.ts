@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { DataStore } from "../core/ports.js";
 import { buildCurvePlacement } from "../core/curvePlacement.js";
+import { buildOnboardingScore } from "../core/onboardingScore.js";
 import { sendData, sendError } from "./http.js";
 import { ensureRow } from "./storeHelpers.js";
 
@@ -23,10 +24,11 @@ export function getPlatformJourney(store: DataStore) {
       return;
     }
     const curve = buildCurvePlacement(row, store);
-    sendData(res, { ...journey, curve }, {
+    const onboardingScore = buildOnboardingScore(row, store.listRows());
+    sendData(res, { ...journey, curve, onboardingScore }, {
       blockerReasonCount: store.blockerReasonCount?.() ?? null,
       honesty:
-        "Friction gates are documented requirements. Linked blockers are hypotheses, not confirmed drop-off causes. Curves use documentation counts only.",
+        "Friction gates are documented requirements. Linked blockers are hypotheses, not confirmed drop-off causes. Onboarding load and curves use documentation counts only.",
     });
   };
 }

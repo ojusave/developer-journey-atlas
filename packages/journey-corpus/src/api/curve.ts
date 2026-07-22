@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { DataStore } from "../core/ports.js";
 import { buildCurvePlacement } from "../core/curvePlacement.js";
+import { buildOnboardingScore } from "../core/onboardingScore.js";
 import { sendData, sendError } from "./http.js";
 import { ensureRow } from "./storeHelpers.js";
 
@@ -14,9 +15,10 @@ export function getPlatformCurve(store: DataStore) {
       return;
     }
     const curve = buildCurvePlacement(row, store);
-    sendData(res, curve, {
+    const onboardingScore = buildOnboardingScore(row, store.listRows());
+    sendData(res, { ...curve, onboardingScore }, {
       honesty:
-        "Documentation-derived counts only. Not drop-off. OpenRouter blocker links do not affect the curve.",
+        "Documentation-derived counts only. Not drop-off. OpenRouter blocker links do not affect the curve or onboarding load score.",
     });
   };
 }

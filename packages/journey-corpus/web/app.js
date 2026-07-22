@@ -145,6 +145,62 @@ function stepItem(s) {
     </li>`;
 }
 
+function bandLabel(band) {
+  if (band === "light") return "Light";
+  if (band === "moderate") return "Moderate";
+  if (band === "heavy") return "Heavy";
+  return "Unavailable";
+}
+
+function renderPlacement(placement, title) {
+  if (!placement) return "";
+  if (!placement.available) {
+    return `
+      <div class="score-placement">
+        <h4>${esc(title)}</h4>
+        <p class="score-unavailable">${esc(placement.summary)}</p>
+      </div>`;
+  }
+  const pos =
+    placement.position === "below"
+      ? "below peer median effort"
+      : placement.position === "above"
+        ? "above peer median effort"
+        : "at peer median effort";
+  return `
+    <div class="score-placement">
+      <h4>${esc(title)}</h4>
+      <p class="score-value">
+        <span class="score-number">${esc(placement.score)}</span>
+        <span class="score-band band-${esc(placement.band)}">${esc(bandLabel(placement.band))}</span>
+      </p>
+      <p class="score-meta">${esc(pos)} · ${num(placement.peerCount)} peers</p>
+      <p class="score-summary">${esc(placement.summary)}</p>
+    </div>`;
+}
+
+function renderOnboardingScore(score) {
+  if (!score) return "";
+  const b = score.breakdown || {};
+  return `
+    <section class="score-card" aria-label="Documented onboarding load">
+      <p class="section-kicker">${esc(score.name || "Documented Onboarding Load")}</p>
+      <p class="score-lede">Where this documented path sits overall and among category peers. Higher means a heavier path to first success.</p>
+      <div class="score-grid">
+        ${renderPlacement(score.overall, "Overall")}
+        ${renderPlacement(score.peers, "Among peers")}
+      </div>
+      <ul class="score-breakdown" aria-label="Score breakdown">
+        <li><span>Effort meter</span><strong>${esc(b.effort)}</strong></li>
+        <li><span>Required actions</span><strong>${num(b.requiredActions)}</strong></li>
+        <li><span>Friction gates</span><strong>${num(b.gates)}</strong></li>
+        <li><span>Waits</span><strong>${num(b.waits)}</strong></li>
+      </ul>
+      <p class="score-note">${esc(score.note)}</p>
+      <p class="score-finish">Finish line: ${esc(score.finishLine)}</p>
+    </section>`;
+}
+
 /** Journey-first view: platform name + numbered onboarding steps only. */
 function renderJourney(journey) {
   const stepList = journey.steps || [];
@@ -152,7 +208,7 @@ function renderJourney(journey) {
     ? `<ol class="steps-list">${stepList.map(stepItem).join("")}</ol>`
     : '<p class="lede">No documented onboarding steps are available for this platform yet.</p>';
   const frictionHint = journey.highlightedStepCount
-    ? `<p class="journey-hint">${num(journey.highlightedStepCount)} step${journey.highlightedStepCount === 1 ? "" : "s"} mark documented friction (hypothesis, not observed drop-off).</p>`
+    ? `<p class="journey-hint">${num(journey.highlightedStepCount)} step${journey.highlightedStepCount === 1 ? "" : "s"} mark documented friction (requirement gates, not errors or observed drop-off).</p>`
     : "";
 
   return `
@@ -162,6 +218,7 @@ function renderJourney(journey) {
         <span class="pill pill-cat">${esc(journey.category)}</span>
       </div>
       <p class="lede">Onboarding from account creation to first success, step by step.</p>
+      ${renderOnboardingScore(journey.onboardingScore)}
       ${frictionHint}
       <h3 class="steps-heading visually-hidden">Onboarding steps</h3>
       ${steps}
