@@ -1,12 +1,24 @@
 {
-  "platform": {"name": "Semgrep", "slug": "semgrep", "organization": "Semgrep, Inc."},
+  "platform": {
+    "name": "Semgrep",
+    "slug": "semgrep",
+    "organization": "Semgrep, Inc."
+  },
   "category": "Identity, security, and networking",
   "surface": {
     "name": "Semgrep Community Edition Python command-injection quickstart on Linux",
     "selection_basis": "The official Community Edition quickstart is a self-contained no-account path. It fixes the sample file, registry ruleset, command, finding, and successful scan summary. Linux with pipx is selected from the documented operating-system installation matrix to remove installation ambiguity.",
     "alternatives_considered": [
-      {"name": "Semgrep AppSec Platform Quickstart", "url": "https://docs.semgrep.dev/getting-started/quickstart", "reason_not_primary": "It requires GitHub or GitLab signup, organization creation, browser activation, and a repository, while the same official documentation offers Community Edition for a first local scan without an account."},
-      {"name": "macOS or Windows Community Edition installation", "url": "https://docs.semgrep.dev/getting-started/quickstart-ce", "reason_not_primary": "These are peer operating-system branches; Linux with pipx is explicitly selected as the reproducible candidate."}
+      {
+        "name": "Semgrep AppSec Platform Quickstart",
+        "url": "https://docs.semgrep.dev/getting-started/quickstart",
+        "reason_not_primary": "It requires GitHub or GitLab signup, organization creation, browser activation, and a repository, while the same official documentation offers Community Edition for a first local scan without an account."
+      },
+      {
+        "name": "macOS or Windows Community Edition installation",
+        "url": "https://docs.semgrep.dev/getting-started/quickstart-ce",
+        "reason_not_primary": "These are peer operating-system branches; Linux with pipx is explicitly selected as the reproducible candidate."
+      }
     ]
   },
   "research_status": "complete",
@@ -25,46 +37,356 @@
     "official_milestone": "Run your first Semgrep scan.",
     "normalized_outcome": "Semgrep Community Edition scans the official Python sample with the published Python command-injection ruleset and identifies the unsafe `os.system` call.",
     "observable_completion_signal": "The terminal prints `Scan completed successfully.`, reports one blocking finding from 24 rules on one file, and points to `os.system(\"ls \" + user_input)` under the documented command-injection rule.",
-    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "Scan completed successfully. Findings: 1 (1 blocking). Ran 24 rules on 1 file: 1 finding.", "source_ids": ["S1"]},
+    "boundary_evidence": {
+      "type": "demonstrated-terminal-state",
+      "official_label_or_terminal_state": "Scan completed successfully. Findings: 1 (1 blocking). Ran 24 rules on 1 file: 1 finding.",
+      "source_ids": [
+        "S1"
+      ]
+    },
     "why_this_is_the_boundary": "The Community Edition quickstart explicitly creates one vulnerable file, runs one scan, and shows the complete successful output before moving to rules, editors, CI, and additional learning.",
-    "source_ids": ["S1"]
+    "source_ids": [
+      "S1"
+    ]
   },
   "prerequisites": [
-    {"order": 1, "type": "environment", "requirement": "Use Linux for the selected installation branch.", "required": true, "source_ids": ["S1", "S2"]},
-    {"order": 2, "type": "software", "requirement": "Have Python 3.10 or later and pipx installed.", "required": true, "source_ids": ["S1", "S2"]},
-    {"order": 3, "type": "network", "requirement": "Allow package installation and retrieval of the published rules from the Semgrep Registry.", "required": true, "source_ids": ["S1"]},
-    {"order": 4, "type": "knowledge", "requirement": "Be able to create a text file and run shell commands in its directory.", "required": true, "source_ids": ["S1"]}
+    {
+      "order": 1,
+      "type": "environment",
+      "requirement": "Use Linux for the selected installation branch.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 2,
+      "type": "software",
+      "requirement": "Have Python 3.10 or later and pipx installed.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "order": 3,
+      "type": "network",
+      "requirement": "Allow package installation and retrieval of the published rules from the Semgrep Registry.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "primary_path": [
-    {"step_number": 1, "phase": "arrive", "actor": "developer", "interface": "documentation", "action": "Open the Semgrep Community Edition quickstart and use its Linux instructions.", "details": [], "input": "https://docs.semgrep.dev/getting-started/quickstart-ce", "output": "Linux installation, sample creation, scan command, and expected output are visible.", "success_signal": "The page identifies the Community Edition first-scan flow.", "failure_or_wait": "Another operating system requires a different documented installation branch.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 2, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install Semgrep with pipx.", "details": ["Run `pipx install semgrep`."], "input": "Python 3.10 or later, pipx, and package-network access.", "output": "The `semgrep` executable is installed in the pipx environment.", "success_signal": "pipx reports a completed installation.", "failure_or_wait": "Python-version, package-index, network, or local-environment errors must be resolved before scanning.", "required": true, "source_ids": ["S1", "S2"]},
-    {"step_number": 3, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Confirm the Semgrep CLI installation.", "details": ["Run `semgrep --version`."], "input": "The installed CLI.", "output": "Semgrep prints its installed version.", "success_signal": "A Semgrep version is displayed without a command-not-found error.", "failure_or_wait": "If the command is unavailable, fix the pipx path or installation before continuing.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 4, "phase": "prepare", "actor": "developer", "interface": "code", "action": "Create `app.py` with the exact vulnerable sample from the quickstart.", "details": ["Add `import os`.", "Add `user_input = input(\"Enter a Directory: \")`.", "Add `os.system(\"ls \" + user_input)`."], "input": "A writable working directory.", "output": "A Python file containing the documented command-injection example exists.", "success_signal": "`app.py` contains the three published lines.", "failure_or_wait": "A different filename or sample changes the documented command and expected finding.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 5, "phase": "prepare", "actor": "developer", "interface": "cli", "action": "Navigate to the directory containing `app.py`.", "details": [], "input": "The sample file location.", "output": "The shell working directory contains `app.py`.", "success_signal": "The scan command can address `app.py` by filename.", "failure_or_wait": "Running from another directory requires a different path.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 6, "phase": "execute", "actor": "developer", "interface": "cli", "action": "Run the published command-injection scan against the sample.", "details": ["Run `semgrep scan --config \"p/python-command-injection\" app.py`."], "input": "The installed CLI, sample file, and network access to Semgrep Registry.", "output": "Semgrep retrieves the ruleset and scans one target file.", "success_signal": "The scan reaches its summary rather than stopping on configuration or target errors.", "failure_or_wait": "Network, registry, rule-configuration, or file-path errors can stop the scan before completion.", "required": true, "source_ids": ["S1"]},
-    {"step_number": 7, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Verify the successful scan summary and the command-injection finding.", "details": ["Confirm `Scan completed successfully.`.", "Confirm one blocking finding, 24 rules, and one scanned target.", "Confirm the finding points to the `os.system` line under the documented Python command-injection rule."], "input": "The completed scan output.", "output": "The first Community Edition scan has succeeded and found the intended issue.", "success_signal": "The terminal matches the guide's successful summary and finding location.", "failure_or_wait": "If the output differs, verify the exact sample content, ruleset name, filename, and current CLI execution.", "required": true, "source_ids": ["S1"]}
+    {
+      "step_number": 1,
+      "phase": "arrive",
+      "actor": "developer",
+      "interface": "documentation",
+      "action": "Open the Semgrep Community Edition quickstart and use its Linux instructions.",
+      "details": [],
+      "input": "https://docs.semgrep.dev/getting-started/quickstart-ce",
+      "output": "Linux installation, sample creation, scan command, and expected output are visible.",
+      "success_signal": "The page identifies the Community Edition first-scan flow.",
+      "failure_or_wait": "Another operating system requires a different documented installation branch.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "phase": "install",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Install Semgrep with pipx.",
+      "details": [
+        "Run `pipx install semgrep`."
+      ],
+      "input": "Python 3.10 or later, pipx, and package-network access.",
+      "output": "The `semgrep` executable is installed in the pipx environment.",
+      "success_signal": "pipx reports a completed installation.",
+      "failure_or_wait": "Python-version, package-index, network, or local-environment errors must be resolved before scanning.",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Confirm the Semgrep CLI installation.",
+      "details": [
+        "Run `semgrep --version`."
+      ],
+      "input": "The installed CLI.",
+      "output": "Semgrep prints its installed version.",
+      "success_signal": "A Semgrep version is displayed without a command-not-found error.",
+      "failure_or_wait": "If the command is unavailable, fix the pipx path or installation before continuing.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "code",
+      "action": "Create `app.py` with the exact vulnerable sample from the quickstart.",
+      "details": [
+        "Add `import os`.",
+        "Add `user_input = input(\"Enter a Directory: \")`.",
+        "Add `os.system(\"ls \" + user_input)`."
+      ],
+      "input": "A writable working directory.",
+      "output": "A Python file containing the documented command-injection example exists.",
+      "success_signal": "`app.py` contains the three published lines.",
+      "failure_or_wait": "A different filename or sample changes the documented command and expected finding.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "phase": "prepare",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Navigate to the directory containing `app.py`.",
+      "details": [],
+      "input": "The sample file location.",
+      "output": "The shell working directory contains `app.py`.",
+      "success_signal": "The scan command can address `app.py` by filename.",
+      "failure_or_wait": "Running from another directory requires a different path.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Run the published command-injection scan against the sample.",
+      "details": [
+        "Run `semgrep scan --config \"p/python-command-injection\" app.py`."
+      ],
+      "input": "The installed CLI, sample file, and network access to Semgrep Registry.",
+      "output": "Semgrep retrieves the ruleset and scans one target file.",
+      "success_signal": "The scan reaches its summary rather than stopping on configuration or target errors.",
+      "failure_or_wait": "Network, registry, rule-configuration, or file-path errors can stop the scan before completion.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "cli",
+      "action": "Verify the successful scan summary and the command-injection finding.",
+      "details": [
+        "Confirm `Scan completed successfully.`.",
+        "Confirm one blocking finding, 24 rules, and one scanned target.",
+        "Confirm the finding points to the `os.system` line under the documented Python command-injection rule."
+      ],
+      "input": "The completed scan output.",
+      "output": "The first Community Edition scan has succeeded and found the intended issue.",
+      "success_signal": "The terminal matches the guide's successful summary and finding location.",
+      "failure_or_wait": "If the output differs, verify the exact sample content, ruleset name, filename, and current CLI execution.",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "candidate_paths": [],
   "candidate_path_gap": null,
   "branches": [
-    {"at_step": 1, "condition": "Use macOS", "path": "Install with Homebrew, pipx, or uv as listed in the Community Edition quickstart, then converge on version verification and the same sample scan.", "effect_on_first_success": "Changes installation only.", "source_ids": ["S1"]},
-    {"at_step": 1, "condition": "Use Windows", "path": "Follow the beta Windows Python instructions and UTF-8 guidance, then converge on the same sample scan.", "effect_on_first_success": "Adds Windows-specific prerequisites and support limitations.", "source_ids": ["S1", "S2"]},
-    {"at_step": 1, "condition": "Choose Semgrep AppSec Platform", "path": "Sign up with GitHub or GitLab, create an organization, choose Run on CLI, install Semgrep, run `semgrep login`, activate in the browser, run `semgrep ci`, and view findings in the platform.", "effect_on_first_success": "Changes the terminal from a local CLI finding to authenticated organization findings and adds account, permission, and browser steps.", "source_ids": ["S3"]},
-    {"at_step": 6, "condition": "Use another ruleset or local configuration", "path": "Replace `p/python-command-injection` with another documented registry, automatic, or local config.", "effect_on_first_success": "Changes rules run and expected findings, so it is outside the fixed quickstart candidate.", "source_ids": ["S1"]}
+    {
+      "at_step": 1,
+      "condition": "Use macOS",
+      "path": "Install with Homebrew, pipx, or uv as listed in the Community Edition quickstart, then converge on version verification and the same sample scan.",
+      "effect_on_first_success": "Changes installation only.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "Use Windows",
+      "path": "Follow the beta Windows Python instructions and UTF-8 guidance, then converge on the same sample scan.",
+      "effect_on_first_success": "Adds Windows-specific prerequisites and support limitations.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 1,
+      "condition": "Choose Semgrep AppSec Platform",
+      "path": "Sign up with GitHub or GitLab, create an organization, choose Run on CLI, install Semgrep, run `semgrep login`, activate in the browser, run `semgrep ci`, and view findings in the platform.",
+      "effect_on_first_success": "Changes the terminal from a local CLI finding to authenticated organization findings and adds account, permission, and browser steps.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 6,
+      "condition": "Use another ruleset or local configuration",
+      "path": "Replace `p/python-command-injection` with another documented registry, automatic, or local config.",
+      "effect_on_first_success": "Changes rules run and expected findings, so it is outside the fixed quickstart candidate.",
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
   "friction_gates": [
-    {"at_step": 1, "type": "choice", "description": "Installation commands vary by operating system and package manager; this candidate fixes Linux with pipx.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 2, "type": "environment", "description": "The Semgrep CLI requires Python 3.10 or later for this installation route.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
-    {"at_step": 2, "type": "installation", "description": "The CLI must be installed before the first scan.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 4, "type": "configuration", "description": "The deterministic quickstart result depends on creating the exact vulnerable Python sample.", "documented_requirement": true, "source_ids": ["S1"]},
-    {"at_step": 6, "type": "download", "description": "The scan pulls the named rules from Semgrep Registry.", "documented_requirement": true, "source_ids": ["S1"]}
+    {
+      "at_step": 1,
+      "type": "choice",
+      "description": "Installation commands vary by operating system and package manager; this candidate fixes Linux with pipx.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "environment",
+      "description": "The Semgrep CLI requires Python 3.10 or later for this installation route.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 2,
+      "type": "installation",
+      "description": "The CLI must be installed before the first scan.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 4,
+      "type": "configuration",
+      "description": "The deterministic quickstart result depends on creating the exact vulnerable Python sample.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 6,
+      "type": "download",
+      "description": "The scan pulls the named rules from Semgrep Registry.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ]
+    }
   ],
-  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
   "sources": [
-    {"id": "S1", "title": "Get started with Semgrep Community Edition - Semgrep", "url": "https://docs.semgrep.dev/getting-started/quickstart-ce", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Install Semgrep", "Confirm your installation", "Create a sample file", "Run your first scan", "Scan summary", "Next steps"], "evidence_supported": ["No-account Community Edition route", "Linux pipx command", "Version check", "Exact Python sample", "Exact scan command", "Successful scan summary", "Finding rule and line"]},
-    {"id": "S2", "title": "Prerequisites - Semgrep", "url": "https://docs.semgrep.dev/prerequisites", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Semgrep CLI", "Supported operating systems", "Python requirement"], "evidence_supported": ["Python 3.10 or later", "Linux support", "Windows beta status"]},
-    {"id": "S3", "title": "Quickstart - Semgrep", "url": "https://docs.semgrep.dev/getting-started/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Sign up", "Run on CLI", "Scan without GitHub or GitLab account"], "evidence_supported": ["AppSec Platform alternative", "GitHub or GitLab signup", "Organization and browser activation", "Local scan alternative"]},
-    {"id": "S4", "title": "Local scans with Semgrep - Semgrep", "url": "https://docs.semgrep.dev/getting-started/cli", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-18", "last_updated_if_shown": null, "sections_used": ["Install Semgrep", "Run local scans", "Exit codes"], "evidence_supported": ["`semgrep scan` recommendation for local no-account scanning", "Default successful-scan exit behavior"]}
+    {
+      "id": "S1",
+      "title": "Get started with Semgrep Community Edition - Semgrep",
+      "url": "https://docs.semgrep.dev/getting-started/quickstart-ce",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install Semgrep",
+        "Confirm your installation",
+        "Create a sample file",
+        "Run your first scan",
+        "Scan summary",
+        "Next steps"
+      ],
+      "evidence_supported": [
+        "No-account Community Edition route",
+        "Linux pipx command",
+        "Version check",
+        "Exact Python sample",
+        "Exact scan command",
+        "Successful scan summary",
+        "Finding rule and line"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Prerequisites - Semgrep",
+      "url": "https://docs.semgrep.dev/prerequisites",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Semgrep CLI",
+        "Supported operating systems",
+        "Python requirement"
+      ],
+      "evidence_supported": [
+        "Python 3.10 or later",
+        "Linux support",
+        "Windows beta status"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Quickstart - Semgrep",
+      "url": "https://docs.semgrep.dev/getting-started/quickstart",
+      "official_domain": true,
+      "source_type": "quickstart",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Sign up",
+        "Run on CLI",
+        "Scan without GitHub or GitLab account"
+      ],
+      "evidence_supported": [
+        "AppSec Platform alternative",
+        "GitHub or GitLab signup",
+        "Organization and browser activation",
+        "Local scan alternative"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Local scans with Semgrep - Semgrep",
+      "url": "https://docs.semgrep.dev/getting-started/cli",
+      "official_domain": true,
+      "source_type": "documentation",
+      "accessed_at": "2026-07-18",
+      "last_updated_if_shown": null,
+      "sections_used": [
+        "Install Semgrep",
+        "Run local scans",
+        "Exit codes"
+      ],
+      "evidence_supported": [
+        "`semgrep scan` recommendation for local no-account scanning",
+        "Default successful-scan exit behavior"
+      ]
+    }
   ],
   "uncertainties": [],
   "excluded_after_success": [
