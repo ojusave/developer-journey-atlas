@@ -5,8 +5,8 @@
 - Schema version: 1
 - Corpus commit: dd23053647944efefc1bec68d1897a369b495055
 - Blocker source commit: 5c6f8cf1c89abbc617f8113cd96d54311df2fcda
-- Source snapshot date: 2026-07-19
-- Platforms: 205
+- Source snapshot date: 2026-07-22
+- Platforms: 224
 - Blocker hypotheses: 790
 
 ## How to read this Atlas
@@ -32,6 +32,7 @@
 - [Android Developers](platforms/android-developers.md): Create the first Android app with Android Studio, Kotlin, and Jetpack Compose and verify its personalized greeting in Preview.
 - [Anthropic](platforms/anthropic.md): Make the first direct Messages API call to Claude after selecting Anthropic.
 - [Apple Developer](platforms/apple-developer.md): Reach a first Apple Developer result without a selected Apple platform, application type, technology, runtime target, or distribution goal.
+- [Appwrite](platforms/appwrite.md): Create an Appwrite account and project to build a backend for a web or mobile application.
 - [Arduino](platforms/arduino.md): Program a connected Arduino board for the first time with the current desktop Arduino IDE.
 - [Arize AI](platforms/arize-ai.md): Instrument an existing Python LLM application and see its first trace in Arize AX.
 - [Asana](platforms/asana.md): Create or access an Asana workspace, generate a personal access token, obtain the workspace GID, and complete the Quick start's task create, read, update, and delete sequence.
@@ -44,6 +45,7 @@
 - [Bird](platforms/bird.md): Create a Bird account and workspace, then use the official cURL quickstart until the sandbox message reaches delivered status.
 - [Boomi](platforms/boomi.md): Choose the relevant Boomi product surface and, for the Data Integration candidate, create the first source-to-target data flow and run it successfully.
 - [Box](platforms/box.md): Create a first Box Platform application and make a first authenticated API call without a preselected authentication method or tool.
+- [Braze](platforms/braze.md): Integrate Braze SDK into an application to enable user data collection and messaging capabilities.
 - [BrowserStack](platforms/browserstack.md): Choose one BrowserStack product and first result; the representative route runs the Cypress Kitchen Sink sample against its public URL and inspects the cloud result.
 - [Buildkite](platforms/buildkite.md): Create a free personal Buildkite account, run the vendor-provided Starter pipeline, and inspect its completed annotation.
 - [Camunda](platforms/camunda.md): Start without a Camunda account or local installation, download the official package, start Camunda 8 locally, deploy and run the supplied Rocket Launch BPMN model with the documented successful input, and verify the completed instance and result variables in Operate.
@@ -65,8 +67,11 @@
 - [Cohere](platforms/cohere.md): Use Cohere's native Python SDK and automatically issued trial key to send and print a hello-world Chat response.
 - [Coinbase Developer Platform](platforms/coinbase-developer-platform.md): Choose the CDP product and developer outcome whose first mile should be measured, then follow its account, credential, SDK or CLI, and first-success path.
 - [Confluent](platforms/confluent.md): Stream sample data through a first Confluent Cloud Kafka topic and see the messages.
+- [Coolify](platforms/coolify.md): Deploy an application or service on a self-hosted server using Coolify
 - [Coralogix](platforms/coralogix.md): Create a first Coralogix organization and team, send one log through the direct REST API, and find that log in Explore.
 - [Couchbase](platforms/couchbase.md): Create a no-cost Capella environment and execute the first query documented by Couchbase against included sample data.
+- [Courier](platforms/courier.md): Send a notification using Courier's API to verify integration and delivery.
+- [Customer.io](platforms/customer-io.md): Create a Customer.io account and workspace to start sending automated messages to people.
 - [CyberArk](platforms/cyberark.md): Run the CyberArk Conjur OSS Docker Compose demo, create its account and policy identities, store a generated secret, and retrieve it from the demo application.
 - [Dagster](platforms/dagster.md): Start without a Dagster account or project, install the local prerequisites, scaffold the official quickstart project, define its sample ETL asset, materialize it in the local Dagster UI, and verify the transformed CSV.
 - [Daily](platforms/daily.md): Create a Daily room URL and embed Daily Prebuilt in a minimal web page until the page joins the room and displays the working call UI.
@@ -86,6 +91,7 @@
 - [Dynatrace](platforms/dynatrace.md): Use the public Dynatrace Playground to explore and interact with live dashboards, notebooks, and sample observability data without installing software.
 - [Elastic](platforms/elastic.md): Get started with the Elastic platform, with no solution use case or deployment model supplied.
 - [ElevenLabs](platforms/elevenlabs.md): Create an ElevenLabs Free account and personal API key, then run the official Python Quickstart until the generated speech plays through the speakers.
+- [Encore](platforms/encore.md): Start building a backend application with Encore by installing the CLI and creating a new app.
 - [Esri Developer](platforms/esri-developer.md): Follow Esri's general developer getting-started guidance to create credentials and display the first documented map.
 - [Exa](platforms/exa.md): Make the first request to an Exa API endpoint after selecting Exa.
 - [F5 Distributed Cloud](platforms/f5-distributed-cloud.md): Create or obtain access to an F5 Distributed Cloud SaaS account, enter the tenant Console, set initial work-domain and skill-level preferences, and reach the populated Home page.
@@ -114,18 +120,23 @@
 - [imgix](platforms/imgix.md): Create an Imgix account, connect an existing asset store as a Source, deploy an imgix.net subdomain, and see the first source asset appear in a browser.
 - [incident.io](platforms/incident-io.md): Create an incident.io account through Slack, install the incident.io app, declare a first live incident, and observe the dedicated incident channel and main-channel announcement.
 - [InfluxDB](platforms/influxdb.md): Create a free InfluxDB Cloud Serverless account and use the official browser tutorial to write its published home-sensor line protocol sample successfully to the automatically created default bucket.
+- [Infobip](platforms/infobip.md): Integrate Infobip messaging capabilities into existing systems via API.
 - [Intercom](platforms/intercom.md): Choose whether the integration is public or private, obtain the corresponding Intercom workspace, create and pre-install an app, copy its access token, and make the guide's first contact-creation API call.
 - [Intuit QuickBooks](platforms/intuit-quickbooks.md): Create the minimum QuickBooks Online developer setup, obtain a temporary sandbox access token in the OAuth 2.0 Playground, call the Accounting API CompanyInfo entity, and inspect the sample-shaped response.
 - [JetBrains](platforms/jetbrains.md): Choose a JetBrains developer product and reach the first terminal state that its official getting-started material defines; for the retained candidate, run a generated IntelliJ Platform plugin locally.
 - [JFrog](platforms/jfrog.md): Start without a JFrog account, open the official cloud trial, provision a JFrog Platform deployment, create a Generic local repository, create an access token, upload a small file with the Artifactory REST API, and receive HTTP 201 Created.
 - [Keycloak](platforms/keycloak.md): Start Keycloak locally, create the first realm and user, register the first OpenID Connect client, and authenticate to the supplied test application.
 - [Klarna](platforms/klarna.md): Create a Klarna playground account, generate test API credentials, integrate the recommended web in-line widget, and complete one test payment until Klarna returns an order ID.
+- [Knock](platforms/knock.md): Send a first notification using Knock by integrating with the backend and creating a workflow.
 - [Kong](platforms/kong.md): Reach one observable first success on a declared Kong product, using the Kong Gateway route as the fully mapped representative candidate.
+- [Koyeb](platforms/koyeb.md): Create a free Koyeb account and deploy a simple application or sandbox environment to verify the platform's functionality.
 - [LangChain](platforms/langchain.md): Install LangChain and run the vendor's basic weather-tool agent until it calls the tool and returns printed content.
 - [LaunchDarkly](platforms/launchdarkly.md): Create, evaluate, and visibly toggle a first LaunchDarkly feature flag without a preselected SDK or application stack.
 - [LiveKit](platforms/livekit.md): Create a first LiveKit Cloud account and project, initialize the official Python starter, run it in development mode, and speak to it in Agent Console until a response appears.
+- [Mailgun](platforms/mailgun.md): Send an email using Mailgun's API
 - [Mapbox](platforms/mapbox.md): Reach a first Mapbox result without a selected product family or web, iOS, or Android application platform.
 - [Marqeta](platforms/marqeta.md): Follow Marqeta's promoted Core API Quick Start from no account through a simulated sandbox transaction.
+- [MessageBird](platforms/messagebird.md): Sign up for a MessageBird account and send a first message via the API.
 - [Microsoft Azure](platforms/microsoft-azure.md): Use Microsoft's general Azure developer onboarding to deploy and inspect a sample application with the core developer tools.
 - [Microsoft Dynamics 365](platforms/microsoft-dynamics-365.md): Select a Dynamics 365 application and, if Business Central is selected, deploy and run Microsoft's generated HelloWorld AL extension on an online sandbox.
 - [Microsoft Entra ID](platforms/microsoft-entra-id.md): Integrate Microsoft Entra ID and choose the identity outcome, application architecture, and runtime whose first mile should be measured.
@@ -139,8 +150,10 @@
 - [Netlify](platforms/netlify.md): Publish an existing web project on Netlify and open its live preview URL.
 - [New Relic](platforms/new-relic.md): For the Node.js candidate, instrument an existing server application and see its first traffic data in New Relic APM.
 - [Notion](platforms/notion.md): Create a Notion account and workspace, generate a personal access token, send the API quickstart page-creation request, and open the resulting private page.
+- [Novu](platforms/novu.md): Integrate Novu notification workflows into an existing Express.js application to send notifications.
 - [NVIDIA Developer](platforms/nvidia-developer.md): Install CUDA on Ubuntu with the Debian installer and verify by building and running the nbody sample.
 - [Okta](platforms/okta.md): Obtain an Okta Integrator Free Plan org and choose the app/runtime whose redirect-authentication or API-protection journey should be measured.
+- [OneSignal](platforms/onesignal.md): Create a OneSignal account and app to send notifications via a chosen messaging channel.
 - [OpenAI](platforms/openai.md): Create credentials and receive output from a first OpenAI API request.
 - [Oracle Cloud Infrastructure](platforms/oracle-cloud-infrastructure.md): Create a first OCI resource without a preselected service or interface.
 - [Ory](platforms/ory.md): Run the official Ory Kratos Docker quickstart locally, register a user, verify the address through MailSlurper, and inspect the active session.
@@ -153,10 +166,14 @@
 - [Pipedrive](platforms/pipedrive.md): Create a Pipedrive trial and company, retrieve the company-specific API token, and make the official direct cURL request to list deals.
 - [Plaid](platforms/plaid.md): Run Plaid locally in Sandbox, create the first Item through Link, exchange its token, and retrieve its accounts.
 - [PlanetScale](platforms/planetscale.md): Deploy a first PostgreSQL database on PlanetScale and obtain connection credentials.
+- [Porter](platforms/porter.md): Deploy their first application on Porter
 - [PostHog](platforms/posthog.md): Use PostHog's recommended default wizard to create or authenticate an account and automatically instrument a supported application.
 - [Postman](platforms/postman.md): Send a first API request in Postman, save it, and validate the response with a basic test.
+- [Postmark](platforms/postmark.md): Send transactional email using Postmark's API or SDKs to verify successful email delivery.
 - [Prefect](platforms/prefect.md): Follow Prefect's official Quickstart to create and successfully run the first tracked workflow.
+- [PubNub](platforms/pubnub.md): Start building a real-time messaging application using PubNub's JavaScript SDK.
 - [Pulumi](platforms/pulumi.md): Reach a first Pulumi result without a preselected Pulumi product, infrastructure provider, or programming language.
+- [Pusher](platforms/pusher.md): Send and receive real-time events in a web application using Pusher Channels.
 - [Qdrant Cloud](platforms/qdrant-cloud.md): Create a Qdrant Cloud account and free cluster, then use the official Python Cloud Quickstart to load the published menu dataset and perform the first semantic search.
 - [Qovery](platforms/qovery.md): Evaluate Qovery locally and deploy a first containerized web application to an observable live URL.
 - [Railway](platforms/railway.md): Deploy a first web application to Railway and observe its running deployment.
@@ -167,6 +184,7 @@
 - [Render](platforms/render.md): Deploy an existing server-side web application from a GitHub repository and verify it is publicly reachable on Render.
 - [Replicate](platforms/replicate.md): Run a public AI model on Replicate after selecting the platform.
 - [Resend](platforms/resend.md): Set up Resend and send the first transactional email after selecting the platform.
+- [RingCentral](platforms/ringcentral.md): To build an application or integration that uses RingCentral's communication APIs.
 - [Rollbar](platforms/rollbar.md): Start without a Rollbar account or project, choose the SDK matching an application, instrument it with the correct project access token, send a documented test occurrence, and verify that the occurrence appears in Rollbar.
 - [Rootly](platforms/rootly.md): Create a Rootly account, connect a standard Slack workspace, create a first test incident, and observe its dedicated incident channel and initial system message.
 - [Salesforce](platforms/salesforce.md): Use Salesforce's REST API Quick Start to authenticate a free Developer Edition org, inspect REST resources and Account metadata, query Accounts, update one Account's BillingCity, and verify the update.
@@ -204,6 +222,7 @@
 - [TiDB Cloud](platforms/tidb-cloud.md): Install TiUP, start a local TiDB test cluster, and connect with the bundled TiUP client.
 - [Tiger Data](platforms/tiger-data.md): Start a local TimescaleDB development instance from Tiger Data's pre-built Docker image and connect with psql.
 - [Together AI](platforms/together-ai.md): Create a Together AI account with an official OAuth provider, buy the minimum prepaid credits, create a default-project API key, and run the Python first query.
+- [Twilio SendGrid](platforms/twilio-sendgrid.md): Send an email programmatically using the SendGrid API.
 - [Twilio](platforms/twilio.md): Create the common Twilio trial account, reach the Console, then choose the communications product whose first success should be measured.
 - [Twingate](platforms/twingate.md): Protect and access a private network Resource with Twingate.
 - [UiPath](platforms/uipath.md): Start without a UiPath account or project, sign up for free, enter Studio Web, use its recommended template-guided experience, run the resulting workflow on the provisioned serverless robot, and verify that the run succeeded.

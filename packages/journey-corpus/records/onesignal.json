@@ -1,0 +1,477 @@
+{
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "Developer chooses a messaging channel that does not require SDK (e.g., email or SMS)",
+      "effect_on_first_success": "Faster onboarding by configuring channel without code integration",
+      "path": "Skip SDK integration step",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "Developer enables identity verification for user login",
+      "effect_on_first_success": "Improved security but added setup complexity",
+      "path": "Additional configuration and server-side JWT setup",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "api-only",
+      "name": "API-only onboarding path",
+      "relationship_to_primary_path": "Alternative to Dashboard UI message sending; requires prior app and channel setup",
+      "selection_basis": "For developers who prefer to use REST API directly after app and channel setup",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "steps": [
+        {
+          "action": "Create OneSignal account and app",
+          "actor": "developer",
+          "details": [
+            "Same as primary path step 1 and 2"
+          ],
+          "failure_or_wait": "Errors creating account or app",
+          "input": "Account and app creation data",
+          "interface": "web-ui",
+          "output": "App with App ID and API keys",
+          "phase": "account",
+          "required": true,
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "step_number": 1,
+          "success_signal": "App visible in Dashboard"
+        },
+        {
+          "action": "Obtain API keys from Dashboard",
+          "actor": "developer",
+          "details": [
+            "Navigate to Keys & IDs",
+            "Copy REST API key"
+          ],
+          "failure_or_wait": "Access or permission issues",
+          "input": "Dashboard access",
+          "interface": "web-ui",
+          "output": "API keys available for use",
+          "phase": "credential",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 2,
+          "success_signal": "API keys visible"
+        },
+        {
+          "action": "Send message via REST API",
+          "actor": "developer",
+          "details": [
+            "Construct API request with App ID and API key",
+            "Specify message content and target",
+            "Send POST request to messages endpoint"
+          ],
+          "failure_or_wait": "HTTP error responses",
+          "input": "API request payload and headers",
+          "interface": "api",
+          "output": "API response indicating success or failure",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S5"
+          ],
+          "step_number": 3,
+          "success_signal": "HTTP 200 response with message ID"
+        }
+      ]
+    }
+  ],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Send messages — compose campaigns, personalize content, and build automated Journeys",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Message sent and received by at least one user subscription",
+    "observable_completion_signal": "Message delivery confirmation in OneSignal Dashboard or API response indicating successful send",
+    "official_milestone": "Successfully send a message through a configured channel from the OneSignal Dashboard or API",
+    "source_ids": [
+      "S1"
+    ],
+    "why_this_is_the_boundary": "The documentation defines sending a message as the first major milestone after setup, marking the platform's core functionality being operational."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has internet access and a device to access the OneSignal Dashboard",
+      "Developer has an existing app or website to integrate messaging"
+    ],
+    "developer_intent": "Create a OneSignal account and app to send notifications via a chosen messaging channel.",
+    "starting_url": "https://documentation.onesignal.com/docs/en/quickstart-guide"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Creating a OneSignal account is required to access the Dashboard and create apps.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 3,
+      "description": "Configuring at least one messaging channel is required before sending messages.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "configuration"
+    },
+    {
+      "at_step": 4,
+      "description": "SDK integration is required for push and in-app messaging channels.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "installation"
+    },
+    {
+      "at_step": 5,
+      "description": "API keys must be secured and used properly to authenticate API requests.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S5"
+      ],
+      "type": "credential"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "OneSignal",
+    "organization": "OneSignal",
+    "slug": "onesignal"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a OneSignal account or be invited to an existing Organization",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Create a OneSignal App within the Organization to hold user and messaging data",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Choose and configure at least one messaging channel (e.g., mobile push, web push, email, SMS)",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "configuration"
+    },
+    {
+      "order": 4,
+      "required": false,
+      "requirement": "Integrate the OneSignal SDK for channels requiring SDK (mobile push, web push, in-app messages)",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "type": "software"
+    },
+    {
+      "order": 5,
+      "required": true,
+      "requirement": "Obtain and secure API keys and App ID for authentication and API usage",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S5"
+      ],
+      "type": "credential"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Create a OneSignal account or log in",
+      "actor": "developer",
+      "details": [
+        "Access OneSignal Dashboard",
+        "Sign up or authenticate"
+      ],
+      "failure_or_wait": "Login error or account creation failure",
+      "input": "Email and password or third-party login",
+      "interface": "web-ui",
+      "output": "Authenticated user session",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "step_number": 1,
+      "success_signal": "Access to OneSignal Dashboard"
+    },
+    {
+      "action": "Create a new OneSignal App in the Dashboard",
+      "actor": "developer",
+      "details": [
+        "Name the app",
+        "Select platform(s) for messaging"
+      ],
+      "failure_or_wait": "Validation errors or network issues",
+      "input": "App name and platform selection",
+      "interface": "web-ui",
+      "output": "New app created with unique App ID",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "step_number": 2,
+      "success_signal": "App visible in Dashboard with App ID"
+    },
+    {
+      "action": "Choose and configure at least one messaging channel",
+      "actor": "developer",
+      "details": [
+        "For push: follow SDK installation and platform-specific setup",
+        "For email/SMS: configure sender domains or phone numbers",
+        "Set up credentials and permissions as required"
+      ],
+      "failure_or_wait": "Configuration errors or missing credentials",
+      "input": "Channel-specific configuration data",
+      "interface": "web-ui",
+      "output": "Channel enabled and configured in the app",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "step_number": 3,
+      "success_signal": "Channel status shows as active or configured"
+    },
+    {
+      "action": "Integrate OneSignal SDK into app code for channels requiring SDK",
+      "actor": "developer",
+      "details": [
+        "Install SDK via package manager",
+        "Initialize SDK with App ID",
+        "Implement user subscription and permission prompts"
+      ],
+      "failure_or_wait": "Build errors or SDK initialization failures",
+      "input": "SDK installation commands and App ID",
+      "interface": "cli",
+      "output": "SDK integrated and initialized in app",
+      "phase": "install",
+      "required": false,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "step_number": 4,
+      "success_signal": "App registers subscriptions with OneSignal"
+    },
+    {
+      "action": "Send a test message or campaign from the Dashboard or API",
+      "actor": "developer",
+      "details": [
+        "Compose message content",
+        "Select target audience or test users",
+        "Send message"
+      ],
+      "failure_or_wait": "Send errors or validation failures",
+      "input": "Message content and targeting parameters",
+      "interface": "web-ui",
+      "output": "Message sent event",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "step_number": 5,
+      "success_signal": "Delivery confirmation or success response"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "prerequisites",
+        "primary_path",
+        "documented_first_success",
+        "friction_gates"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Set up your account and messaging channels",
+        "Add and organize your Users",
+        "Send messages",
+        "Messaging channels",
+        "Mobile push",
+        "Web push",
+        "In-app messages",
+        "SMS",
+        "RCS",
+        "Live Activities",
+        "Journeys"
+      ],
+      "source_type": "quickstart",
+      "title": "Getting started with OneSignal",
+      "url": "https://documentation.onesignal.com/docs/en/quickstart-guide"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "prerequisites",
+        "primary_path",
+        "candidate_paths",
+        "branches",
+        "friction_gates"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Get started",
+        "Apps, Organizations, and accounts",
+        "Keys and IDs",
+        "Set up messaging channels",
+        "Mobile SDK setup",
+        "Web push",
+        "Email channel configuration",
+        "SMS",
+        "RCS",
+        "Live Activities",
+        "SDK and API reference",
+        "Users and identity",
+        "Identity verification",
+        "Tutorials",
+        "Testing and debugging"
+      ],
+      "source_type": "documentation",
+      "title": "Developers",
+      "url": "https://documentation.onesignal.com/docs/en/developers"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "prerequisites",
+        "primary_path",
+        "documented_first_success"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Dashboard setup",
+        "SDK setup",
+        "API reference",
+        "Push",
+        "Email",
+        "SMS & RCS",
+        "In-app messages",
+        "Live Activities",
+        "Journeys",
+        "Analytics",
+        "Integrations",
+        "Essential Concepts",
+        "Users",
+        "Subscriptions",
+        "External ID",
+        "Personalization"
+      ],
+      "source_type": "documentation",
+      "title": "OneSignal Documentation Home",
+      "url": "https://documentation.onesignal.com/docs/en/home"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "prerequisites",
+        "candidate_paths",
+        "friction_gates"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Keys and identifiers",
+        "API key",
+        "Authentication"
+      ],
+      "source_type": "api-reference",
+      "title": "Quick start API guide - OneSignal",
+      "url": "https://documentation.onesignal.com/reference/quick-start-api-guide"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "REST API only",
+        "reason_not_primary": "The REST API requires prior app and channel setup in the Dashboard and is used after initial onboarding steps.",
+        "url": "https://documentation.onesignal.com/reference/quick-start-api-guide"
+      },
+      {
+        "name": "Third-party integrations",
+        "reason_not_primary": "Integrations are for extending functionality after initial setup, not for first-mile onboarding.",
+        "url": "https://documentation.onesignal.com/docs/en/integrations"
+      }
+    ],
+    "name": "Dashboard and SDK",
+    "selection_basis": "The official documentation emphasizes starting from the OneSignal Dashboard to create an app and configure messaging channels, then integrating the SDK for push and in-app messages or configuring email/SMS channels without SDK. This is the primary developer surface for onboarding."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "impact": "Without a vendor claim or explicit documentation, time estimates for onboarding duration remain unclear, affecting developer expectations.",
+      "question": "What is the typical or average time to first success (sending a message) claimed or expected by OneSignal?",
+      "reason_unresolved": "No explicit time-to-first-success or onboarding duration claim was found in the official documentation sources."
+    }
+  ]
+}

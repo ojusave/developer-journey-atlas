@@ -1,0 +1,492 @@
+{
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "Developer chooses to verify an existing phone number instead of purchasing a virtual mobile number.",
+      "effect_on_first_success": "Allows sending messages without purchasing a number, but requires phone verification.",
+      "path": "Primary path with verified own phone number",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 4,
+      "condition": "Developer uses test API key and test credits instead of live key and balance top-up.",
+      "effect_on_first_success": "Allows sending messages only to verified own numbers for testing purposes.",
+      "path": "Primary path with test mode",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "whatsapp-business-onboarding",
+      "name": "WhatsApp Business onboarding via MessageBird",
+      "relationship_to_primary_path": "Alternative onboarding path focused on WhatsApp Business channel setup rather than general messaging API.",
+      "selection_basis": "Official WhatsApp Business onboarding quickstart documented by MessageBird.",
+      "source_ids": [
+        "S6"
+      ],
+      "steps": [
+        {
+          "action": "Sign up for WhatsApp Business via MessageBird and submit application.",
+          "actor": "developer",
+          "details": [
+            "Provide Facebook Business ID or create Facebook Business account.",
+            "Submit application for WhatsApp Business approval."
+          ],
+          "failure_or_wait": "Waiting for Facebook and WhatsApp approval.",
+          "input": "Facebook Business ID and application data.",
+          "interface": "web-ui",
+          "output": "Application submitted for approval.",
+          "phase": "account",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 1,
+          "success_signal": "Application status visible in MessageBird Dashboard."
+        },
+        {
+          "action": "Wait for Facebook Business verification and WhatsApp approval.",
+          "actor": "platform",
+          "details": [
+            "Accept WhatsApp invitation in Facebook Business settings.",
+            "Complete Facebook Business verification."
+          ],
+          "failure_or_wait": "Verification pending or denied by Facebook.",
+          "input": "Verification documents and acceptance.",
+          "interface": "web-ui",
+          "output": "Verified Facebook Business profile.",
+          "phase": "wait",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 2,
+          "success_signal": "Approval email from MessageBird Service Delivery team."
+        },
+        {
+          "action": "Connect phone number for WhatsApp channel (use VMN or own number).",
+          "actor": "developer",
+          "details": [
+            "Select or purchase number for WhatsApp use.",
+            "Assign display name per Facebook guidelines."
+          ],
+          "failure_or_wait": "Number or display name issues.",
+          "input": "Phone number and display name.",
+          "interface": "web-console",
+          "output": "WhatsApp channel ready for activation.",
+          "phase": "access",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 3,
+          "success_signal": "Channel listed with 'Activate channel' button."
+        },
+        {
+          "action": "Activate WhatsApp channel by entering verification code sent via SMS or call.",
+          "actor": "developer",
+          "details": [
+            "Request verification code.",
+            "Enter code in Dashboard."
+          ],
+          "failure_or_wait": "Code not received or invalid.",
+          "input": "Verification code.",
+          "interface": "web-console",
+          "output": "Channel activated status.",
+          "phase": "verify",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 4,
+          "success_signal": "Channel status changes from Pending to Active."
+        },
+        {
+          "action": "Send WhatsApp messages using approved Message Templates via Conversations API.",
+          "actor": "developer",
+          "details": [
+            "Submit and get approval for Message Templates.",
+            "Use Conversations API to send messages."
+          ],
+          "failure_or_wait": "Template not approved or API errors.",
+          "input": "Approved templates and API credentials.",
+          "interface": "api",
+          "output": "WhatsApp messages sent.",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 5,
+          "success_signal": "Message delivery confirmed via API and Dashboard."
+        }
+      ]
+    }
+  ],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "First message sent via API",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Successfully send a message through the MessageBird API resulting in message delivery initiation.",
+    "observable_completion_signal": "API response confirms message accepted; message appears in MessageBird Dashboard logs.",
+    "official_milestone": "Send your first message using the MessageBird API with a valid API key and a verified phone number or virtual mobile number.",
+    "source_ids": [
+      "S3"
+    ],
+    "why_this_is_the_boundary": "The documentation explicitly guides users to create an account, obtain API keys, purchase or verify a number, and then send a first message as the initial success milestone."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has internet access and a web browser",
+      "Developer can receive email for account verification"
+    ],
+    "developer_intent": "Sign up for a MessageBird account and send a first message via the API.",
+    "starting_url": "https://developers.messagebird.com/tutorials/getting-started-101"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Must create and verify a MessageBird account via email confirmation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 2,
+      "description": "Must create an API access key in the Dashboard to authenticate API requests.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "credential"
+    },
+    {
+      "at_step": 3,
+      "description": "Must have test credits or top-up balance to send messages beyond own verified number.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "billing"
+    },
+    {
+      "at_step": 3,
+      "description": "Must have a verified phone number or purchase a virtual mobile number to send messages.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S3"
+      ],
+      "type": "access"
+    },
+    {
+      "at_step": 1,
+      "description": "For WhatsApp Business onboarding, Facebook Business verification is required.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "verification"
+    },
+    {
+      "at_step": 2,
+      "description": "WhatsApp Business application approval by WhatsApp is required before channel activation.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "approval"
+    },
+    {
+      "at_step": 4,
+      "description": "WhatsApp channel activation requires entering a verification code sent to the phone number.",
+      "documented_requirement": true,
+      "source_ids": [
+        "S6"
+      ],
+      "type": "verification"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "MessageBird",
+    "organization": "MessageBird",
+    "slug": "messagebird"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a free MessageBird account and verify email.",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Generate an API access key (live or test) from the MessageBird Dashboard.",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "credential"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Have sufficient test credits or top-up balance to send messages to numbers other than your own.",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "billing"
+    },
+    {
+      "order": 4,
+      "required": true,
+      "requirement": "Have a verified phone number or purchase a virtual mobile number from MessageBird.",
+      "source_ids": [
+        "S3"
+      ],
+      "type": "access"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Sign up for a free MessageBird account and verify email.",
+      "actor": "developer",
+      "details": [
+        "Complete required fields on signup form.",
+        "Check inbox for confirmation email and confirm account."
+      ],
+      "failure_or_wait": "Email not received or verification failed.",
+      "input": "User registration information and email confirmation.",
+      "interface": "web-ui",
+      "output": "Active MessageBird account.",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ],
+      "step_number": 1,
+      "success_signal": "Account active and accessible via Dashboard."
+    },
+    {
+      "action": "Create an API access key in the MessageBird Dashboard.",
+      "actor": "developer",
+      "details": [
+        "Navigate to Developers section > API access tab.",
+        "Create new API key (live or test)."
+      ],
+      "failure_or_wait": "Unable to create or view API key.",
+      "input": "Dashboard access and API key creation form.",
+      "interface": "web-console",
+      "output": "API key string.",
+      "phase": "credential",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ],
+      "step_number": 2,
+      "success_signal": "API key visible in Dashboard."
+    },
+    {
+      "action": "Purchase a virtual mobile number or verify an existing phone number.",
+      "actor": "developer",
+      "details": [
+        "Go to Numbers section in Dashboard.",
+        "Select country, capabilities (SMS, Voice), and number.",
+        "Confirm purchase."
+      ],
+      "failure_or_wait": "Payment or selection issues.",
+      "input": "Number selection and payment details.",
+      "interface": "web-console",
+      "output": "Virtual mobile number assigned to account.",
+      "phase": "access",
+      "required": true,
+      "source_ids": [
+        "S3"
+      ],
+      "step_number": 3,
+      "success_signal": "Number listed in Dashboard."
+    },
+    {
+      "action": "Send a message using the MessageBird API with the API key and verified number.",
+      "actor": "developer",
+      "details": [
+        "Use official SDK or direct API call to send message.",
+        "Provide required parameters: originator, recipient, message body."
+      ],
+      "failure_or_wait": "API error or message rejected.",
+      "input": "API key, phone numbers, message content.",
+      "interface": "api",
+      "output": "API response confirming message accepted.",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S3",
+        "S1"
+      ],
+      "step_number": 4,
+      "success_signal": "Message appears in Dashboard logs and API returns success."
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "General platform capabilities",
+        "API usage context"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Overview of messaging capabilities",
+        "API features"
+      ],
+      "source_type": "documentation",
+      "title": "MessageBird | Developers",
+      "url": "https://developers.messagebird.com/"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "API and SDK usage",
+        "Onboarding overview"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Quickstart overview",
+        "Documentation structure"
+      ],
+      "source_type": "documentation",
+      "title": "Get started with Bird — Bird",
+      "url": "https://messagebird.com/docs"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "Account creation",
+        "API key creation",
+        "Number purchase",
+        "Sending first message"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Sign up for free",
+        "Claim free test credits & API Key",
+        "Create your API key",
+        "Purchase a virtual mobile number",
+        "How to upgrade your MessageBird account",
+        "Start building"
+      ],
+      "source_type": "tutorial",
+      "title": "MessageBird | Tutorials Getting Started",
+      "url": "https://developers.messagebird.com/tutorials/getting-started-101"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "Platform context"
+      ],
+      "id": "S4",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Platform overview"
+      ],
+      "source_type": "documentation",
+      "title": "Bird",
+      "url": "https://bird.com/en-us/docs"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "SDK usage"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "SDK availability"
+      ],
+      "source_type": "documentation",
+      "title": "MessageBird | Libraries",
+      "url": "https://developers.messagebird.com/libraries"
+    },
+    {
+      "accessed_at": "2024-06-01",
+      "evidence_supported": [
+        "WhatsApp Business onboarding",
+        "Verification and approval process",
+        "Channel activation"
+      ],
+      "id": "S6",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "WhatsApp Business onboarding steps"
+      ],
+      "source_type": "tutorial",
+      "title": "MessageBird WhatsApp Business Getting Started",
+      "url": "https://developers.messagebird.com/docs/whatsapp/getting-started"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Bird CLI and SDKs",
+        "reason_not_primary": "While Bird CLI and SDKs are official interfaces, the primary documented onboarding path starts with the Dashboard and REST API usage.",
+        "url": "https://bird.com/en-us/docs"
+      }
+    ],
+    "name": "REST API and Dashboard",
+    "selection_basis": "The official documentation and tutorials emphasize starting with the MessageBird Dashboard to create an account, generate API keys, and send messages via the REST API."
+  },
+  "time_to_first_success": {
+    "source_ids": [
+      "S3"
+    ],
+    "value": "Under 15 minutes",
+    "vendor_claim": true
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S6"
+      ],
+      "impact": "Without this, time-to-first-success for WhatsApp onboarding cannot be precisely stated.",
+      "question": "Is there an officially documented time estimate for the WhatsApp Business onboarding process?",
+      "reason_unresolved": "The documentation provides detailed steps but does not specify expected duration."
+    },
+    {
+      "checked_source_ids": [
+        "S3",
+        "S1",
+        "S2"
+      ],
+      "impact": "Could affect the definition of first success boundary and onboarding completeness.",
+      "question": "Are there any additional mandatory configuration steps after sending the first message for general API usage?",
+      "reason_unresolved": "Documentation focuses on first message send but does not explicitly state if further steps are required immediately."
+    }
+  ]
+}

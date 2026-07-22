@@ -1,6 +1,8 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { DataStore, DatasetMeta, MetricRow, PlatformRecord, QualityRow, ShortestPathAudit } from "../core/ports.js";
+import { buildJourneyOverlay, type JourneyOverlay } from "../core/journeyOverlay.js";
+import { resolveCatalogPath } from "../db/catalogPath.js";
 
 interface HeuristicFile {
   score_model_version?: string;
@@ -26,6 +28,13 @@ interface AuditStatusFile {
   needs_human_judgment?: number;
 }
 
+interface CatalogNode {
+  id: string;
+  kind: string;
+  label: string;
+  diagnosticEligibility?: string | null;
+}
+
 function readJson<T>(file: string): T {
   return JSON.parse(readFileSync(file, "utf8")) as T;
 }
@@ -45,6 +54,8 @@ export class LocalDataStore implements DataStore {
   private readonly qualityBySlug: Map<string, QualityRow>;
   private readonly recordCache = new Map<string, PlatformRecord | undefined>();
   private readonly auditCache = new Map<string, ShortestPathAudit | undefined>();
+  private readonly families = new Map<string, { id: string; label: string; kind: string; diagnosticEligibility: string | null }>();
+  private readonly reasonCount: number;
 
   constructor(dataRoot: string) {
     const heuristic = readJson<HeuristicFile>(path.join(dataRoot, "selected-path-heuristic.json"));
@@ -68,6 +79,25 @@ export class LocalDataStore implements DataStore {
     } catch {
       auditStatus = {};
     }
+
+    let reasonCount = 0;
+    try {
+      const catalog = readJson<{ nodes: CatalogNode[] }>(resolveCatalogPath(dataRoot));
+      for (const node of catalog.nodes) {
+        if (node.kind === "universal_family") {
+          this.families.set(node.id, {
+            id: node.id,
+            label: node.label,
+            kind: node.kind,
+            diagnosticEligibility: node.diagnosticEligibility ?? "not_diagnosis_eligible",
+          });
+        }
+        if (node.kind === "reason") reasonCount += 1;
+      }
+    } catch {
+      reasonCount = 0;
+    }
+    this.reasonCount = reasonCount;
 
     this.metaValue = {
       count: this.rows.length,
@@ -126,5 +156,25 @@ export class LocalDataStore implements DataStore {
 
   getQuality(slug: string): QualityRow | undefined {
     return this.qualityBySlug.get(slug);
+  }
+
+  getJourney(slug: string): JourneyOverlay | undefined {
+    const record = this.getRecord(slug);
+    if (!record) return undefined;
+    return buildJourneyOverlay(record, {
+      familyLookup: (familyId) => this.families.get(familyId) ?? null,
+    });
+  }
+
+  blockerReasonCount(): number {
+    return this.reasonCount;
+  }
+}
+
+export function catalogExists(dataRoot: string): boolean {
+  try {
+    return existsSync(resolveCatalogPath(dataRoot));
+  } catch {
+    return false;
   }
 }

@@ -6,7 +6,7 @@ import type { WorkflowRunner } from "../workflows/contract.js";
 import { buildResearchInput, InvalidResearchInput } from "../workflows/input.js";
 
 const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
-const RESEARCH_LIMIT = 3;
+const RESEARCH_LIMIT = Math.max(1, Number(process.env.RESEARCH_HOURLY_LIMIT ?? 60));
 const attemptsByIp = new Map<string, number[]>();
 
 // Per-platform duplicate-submission guard: a recently started run for the same
@@ -72,7 +72,12 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
     }
 
     if (!takeResearchSlot(req.ip ?? "unknown")) {
-      sendError(res, 429, "rate_limited", "This connection has started three research jobs in the last hour. Try again later.");
+      sendError(
+        res,
+        429,
+        "rate_limited",
+        `This connection has started ${RESEARCH_LIMIT} research jobs in the last hour. Try again later.`,
+      );
       return;
     }
 

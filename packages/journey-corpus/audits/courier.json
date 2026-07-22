@@ -1,0 +1,308 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Courier",
+    "slug": "courier",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "83649d9dffb8bbcee8c0d9b81f3b1d5129de0d99bce74305b71fbdfa56c8c104",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet.",
+      "Developer has internet access and a modern development environment.",
+      "Developer can sign up for a Courier account."
+    ]
+  },
+  "developer_goal": "Send a notification using Courier's API to verify integration and delivery.",
+  "first_success": {
+    "outcome": "A notification message is successfully sent using the API key and appears as delivered in the Courier dashboard logs.",
+    "observable_signal": "Message appears in Message Logs with timeline stages: accepted, routed, rendered, sent, and delivered.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "REST API with SDKs and CLI",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "AI Agent Integration Path",
+        "status": "unresolved",
+        "reason": "Present in the machine draft; not selected by an independent shortest-path audit."
+      },
+      {
+        "name": "Visual Dashboard and Design Studio",
+        "status": "unresolved",
+        "reason": "While the visual dashboard and Design Studio are important for content design and lifecycle marketing, the documented first success for developers is sending a notification via the API."
+      },
+      {
+        "name": "AI Agent Integration via MCP Server and CLI",
+        "status": "unresolved",
+        "reason": "Targeted at AI coding agents, this is a specialized integration path rather than the primary onboarding for general developers."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up or log in to Courier dashboard.",
+      "required_fields": [
+        {
+          "label": "User credentials (email, password, or SSO).",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S5"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Access to Courier dashboard.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "web-ui",
+      "action": "Copy API key from Settings > API Keys in the dashboard.",
+      "required_fields": [
+        {
+          "label": "Authenticated dashboard access.",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S4",
+            "S5"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "API key copied successfully.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Set environment variable COURIER_API_KEY with the copied API key.",
+      "required_fields": [
+        {
+          "label": "API key string.",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S5"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Environment variable accessible to SDK or CLI.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Send a notification message using curl, CLI, or SDK with the API key.",
+      "required_fields": [
+        {
+          "label": "API key, recipient email, message content JSON.",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Response includes a requestId indicating message accepted.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open Message Logs in Courier dashboard to verify message delivery status.",
+      "required_fields": [
+        {
+          "label": "RequestId from API response.",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
+        }
+      ],
+      "observable_result": "Message shows delivered status in logs.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Sign up for a Courier account at https://app.courier.com/signup.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "description": "Obtain an API key from the Courier dashboard under Settings > API Keys.",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "description": "Have a development environment capable of making HTTP requests or running SDKs/CLI (e.g., curl, Node.js, Python).",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "User must create a Courier account to obtain API key.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "description": "API key is required to authenticate API calls.",
+      "source_ids": [
+        "S1",
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "description": "Correctly format and send API request with valid recipient and message content.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Access to Courier dashboard Message Logs to verify delivery.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Send a notification message via the Courier API and verify its delivery in the dashboard logs.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart - Courier",
+      "url": "https://www.courier.com/docs/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Quickstart - Courier",
+        "For Developers",
+        "Get your API key",
+        "Send a message"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "What is Courier? - Courier",
+      "url": "https://www.courier.com/docs/welcome",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "What is Courier? - Courier",
+        "How Courier Works",
+        "Start Building",
+        "Send your first notification"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Developer Docs: Multichannel Notification API - Courier",
+      "url": "https://docs.courier.com/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer Docs: Multichannel Notification API - Courier",
+        "Get started",
+        "How Courier works",
+        "Developer tools"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "API Reference - Courier",
+      "url": "https://www.courier.com/docs/reference/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API Reference - Courier",
+        "API Keys",
+        "SDKs",
+        "Rate Limiting"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Agent Quickstart - Courier",
+      "url": "https://www.courier.com/docs/tools/agent-quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Agent Quickstart - Courier",
+        "What you need before writing any code",
+        "Core concepts",
+        "Quick Reference: Copy for Cursor / Claude"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Has the machine-drafted Courier route been independently shortest-path audited?",
+      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
+      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
+    }
+  ],
+  "counts": null
+}

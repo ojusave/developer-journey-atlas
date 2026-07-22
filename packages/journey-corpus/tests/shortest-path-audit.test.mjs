@@ -38,11 +38,14 @@ test("Zoom withholds counts until the app route and hidden terms transition are 
 });
 
 test("every roster record has an explicit audit status", () => {
-  assert.equal(status.total, 205);
-  assert.equal(status.records.length, 205);
+  assert.ok(status.total >= 205);
+  assert.equal(status.records.length, status.total);
   assert.equal(status.verified, 1);
   assert.equal(status.pending, 0);
-  assert.equal(status.verified + status.needs_human_judgment + status.blocked + status.pending, 205);
+  assert.equal(
+    status.verified + status.needs_human_judgment + status.blocked + status.pending,
+    status.total,
+  );
   assert.ok(status.records.every((row) => row.status !== "pending"));
   assert.ok(status.records.every((row) => row.audit_url));
 });

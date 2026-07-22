@@ -1,0 +1,420 @@
+{
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "Cloud provider is AWS",
+      "effect_on_first_success": "Requires additional manual steps to create CloudFormation stack and grant permissions",
+      "path": "AWS-specific cluster setup with CloudFormation stack and IAM role",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "Cloud provider is GCP or Azure",
+      "effect_on_first_success": "Potential differences in provisioning steps and permissions required",
+      "path": "Cluster setup process varies; details not fully documented in quickstart",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [
+    {
+      "id": "cli-bundle-installation",
+      "name": "CLI-based bundle installation",
+      "relationship_to_primary_path": "Alternative to web dashboard deployment; focuses on installing pre-built bundles via CLI rather than deploying source code from GitHub.",
+      "selection_basis": "Official quickstart documentation includes a CLI-based path to install and manage bundles as an alternative to the web dashboard deployment flow.",
+      "source_ids": [
+        "S6"
+      ],
+      "steps": [
+        {
+          "action": "Install Porter CLI",
+          "actor": "developer",
+          "details": [
+            "Run platform-specific install script for MacOS, Linux, or Windows"
+          ],
+          "failure_or_wait": "Error if installation script fails",
+          "input": "None",
+          "interface": "cli",
+          "output": "Porter CLI installed",
+          "phase": "install",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 1,
+          "success_signal": "porter command available in terminal"
+        },
+        {
+          "action": "Install a bundle using porter install command",
+          "actor": "developer",
+          "details": [
+            "Run porter install with bundle reference, e.g. ghcr.io/getporter/examples/porter-hello:v0.2.0"
+          ],
+          "failure_or_wait": "Error if bundle not found or install fails",
+          "input": "Bundle reference",
+          "interface": "cli",
+          "output": "Bundle installed",
+          "phase": "execute",
+          "required": true,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 2,
+          "success_signal": "Execution completed successfully message"
+        },
+        {
+          "action": "List bundle installations",
+          "actor": "developer",
+          "details": [
+            "Run porter list to see installed bundles"
+          ],
+          "failure_or_wait": "Error if CLI not configured",
+          "input": "None",
+          "interface": "cli",
+          "output": "List of installed bundles",
+          "phase": "execute",
+          "required": false,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 3,
+          "success_signal": "porter list output with bundle metadata"
+        },
+        {
+          "action": "Show installation information",
+          "actor": "developer",
+          "details": [
+            "Run porter show with installation name"
+          ],
+          "failure_or_wait": "Error if installation name invalid",
+          "input": "Installation name",
+          "interface": "cli",
+          "output": "Installation details and history",
+          "phase": "execute",
+          "required": false,
+          "source_ids": [
+            "S6"
+          ],
+          "step_number": 4,
+          "success_signal": "porter show output with status and logs"
+        }
+      ]
+    }
+  ],
+  "category": "Cloud and application runtimes",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Your application is now live and will automatically redeploy whenever you push to your selected branch",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "Developer successfully deploys their application and accesses it live on a public URL",
+    "observable_completion_signal": "Application is live and accessible at *.onporter.run URL shown in the Porter dashboard",
+    "official_milestone": "Application is deployed and accessible via a public URL on Porter",
+    "source_ids": [
+      "S1"
+    ],
+    "why_this_is_the_boundary": "This milestone marks the first time the developer's application is running live on Porter and accessible publicly, indicating successful completion of the onboarding deployment flow."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has an active cloud provider account (AWS, GCP, or Azure) with admin or owner permissions",
+      "Developer has a deployable application with a start command or Dockerfile, pushed to GitHub or container registry"
+    ],
+    "developer_intent": "Deploy their first application on Porter",
+    "starting_url": "https://docs.porter.run/getting-started/quickstart"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Creating a Porter account and project requires valid project name and successful account creation",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 3,
+      "description": "Cloud provider account must have admin or owner permissions to create Kubernetes clusters and IAM roles",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "permission"
+    },
+    {
+      "at_step": 3,
+      "description": "For AWS, user must acknowledge IAM resource creation in CloudFormation and create the stack",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "approval"
+    },
+    {
+      "at_step": 3,
+      "description": "User must review and accept estimated monthly costs for infrastructure provisioning",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "billing"
+    },
+    {
+      "at_step": 4,
+      "description": "Connecting GitHub requires authorizing the Porter GitHub App and selecting repository access",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "permission"
+    },
+    {
+      "at_step": 5,
+      "description": "User must merge the GitHub Actions PR to trigger deployment",
+      "documented_requirement": true,
+      "source_ids": [
+        "S1"
+      ],
+      "type": "wait"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Porter",
+    "organization": "Porter",
+    "slug": "porter"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Active cloud provider account (AWS, GCP, or Azure) with admin or owner permissions to provision infrastructure",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Deployable application with a start command or Dockerfile, pushed to a GitHub repository or container registry",
+      "source_ids": [
+        "S1"
+      ],
+      "type": "software"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Create a Porter account and project",
+      "actor": "developer",
+      "details": [
+        "Navigate to dashboard.porter.run",
+        "Create an account",
+        "Click Create Project and enter a project name (1-25 chars, lowercase letters, numbers, hyphens)"
+      ],
+      "failure_or_wait": "Error if project name invalid or account creation fails",
+      "input": "Project name",
+      "interface": "web-ui",
+      "output": "New Porter project created",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 1,
+      "success_signal": "Project creation confirmation in dashboard"
+    },
+    {
+      "action": "Select cloud provider to provision infrastructure",
+      "actor": "developer",
+      "details": [
+        "Choose AWS, GCP, or Azure",
+        "Reuse previously connected cloud credentials if available"
+      ],
+      "failure_or_wait": "Error if credentials invalid or provider not supported",
+      "input": "Cloud provider selection",
+      "interface": "web-ui",
+      "output": "Cloud provider selected for provisioning",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 2,
+      "success_signal": "Cloud provider selection confirmed in UI"
+    },
+    {
+      "action": "Set up Kubernetes cluster in selected cloud account",
+      "actor": "developer",
+      "details": [
+        "For AWS, enter AWS Account ID",
+        "Create CloudFormation stack to provision IAM role",
+        "Review estimated monthly costs and accept",
+        "Customize or accept default cluster configuration",
+        "Provision cluster"
+      ],
+      "failure_or_wait": "Wait for provisioning; error if IAM role creation fails or quota limits exceeded",
+      "input": "AWS Account ID and cluster configuration",
+      "interface": "web-ui",
+      "output": "Kubernetes cluster provisioned and ready",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 3,
+      "success_signal": "Cluster ready notification in dashboard"
+    },
+    {
+      "action": "Create first application deployment",
+      "actor": "developer",
+      "details": [
+        "Click Create Application",
+        "Connect GitHub account by authorizing Porter GitHub App",
+        "Select repository and branch to deploy",
+        "Review detected applications and configure build/start command/port if needed",
+        "Click Deploy to create GitHub Actions PR"
+      ],
+      "failure_or_wait": "Wait for user to merge PR; error if GitHub authorization fails",
+      "input": "GitHub repository and branch selection",
+      "interface": "web-ui",
+      "output": "GitHub Actions workflow PR created",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 4,
+      "success_signal": "Toast notification with View PR button and warning banner with Merge PR link"
+    },
+    {
+      "action": "Merge GitHub Actions PR to trigger build and deployment",
+      "actor": "developer",
+      "details": [
+        "Merge the PR created by Porter in GitHub repository"
+      ],
+      "failure_or_wait": "Wait for build and deployment to complete; failure if build or deployment errors occur",
+      "input": "Merged PR",
+      "interface": "other",
+      "output": "GitHub Actions workflow runs to build and deploy application",
+      "phase": "wait",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 5,
+      "success_signal": "Build logs and deployment progress visible in Porter dashboard"
+    },
+    {
+      "action": "View running application and access public URL",
+      "actor": "developer",
+      "details": [
+        "Monitor deployment progress and logs in Porter dashboard",
+        "Click the automatically provisioned public URL (*.onporter.run) to access the live application"
+      ],
+      "failure_or_wait": "Wait if deployment is still in progress; error if deployment fails",
+      "input": "Deployed application",
+      "interface": "web-ui",
+      "output": "Live application accessible at public URL",
+      "phase": "run",
+      "required": true,
+      "source_ids": [
+        "S1"
+      ],
+      "step_number": 6,
+      "success_signal": "Application is live and accessible"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "primary_path",
+        "prerequisites",
+        "documented_first_success",
+        "friction_gates",
+        "branches",
+        "time_to_first_success"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Prerequisites",
+        "Step 1: Sign up and create a project",
+        "Step 2: Select your cloud provider",
+        "Step 3: Set up your cluster",
+        "Step 4: Create your first application",
+        "Step 5: View your running application",
+        "Access your application"
+      ],
+      "source_type": "quickstart",
+      "title": "Quickstart",
+      "url": "https://docs.porter.run/getting-started/quickstart"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "candidate_paths"
+      ],
+      "id": "S6",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Install Porter",
+        "Install a Bundle",
+        "List Bundle Installations",
+        "Show Installation Information"
+      ],
+      "source_type": "quickstart",
+      "title": "Quickstart – Porter CLI bundle installation",
+      "url": "https://porter.sh/docs/quickstart/"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "Porter CLI",
+        "reason_not_primary": "CLI is used mainly for bundle installation and management after initial setup; the first-mile onboarding focuses on the web dashboard for project creation and app deployment.",
+        "url": "https://porter.sh/docs/quickstart/"
+      }
+    ],
+    "name": "Porter Web Dashboard and CLI",
+    "selection_basis": "The official quickstart documentation primarily guides users through the web dashboard for initial setup and deployment, with CLI usage documented for bundle installation and management."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S1"
+      ],
+      "impact": "Potential differences in friction gates, permissions, and provisioning steps could affect onboarding experience and time to first success.",
+      "question": "What are the detailed cluster setup steps and requirements for GCP and Azure cloud providers?",
+      "reason_unresolved": "The official quickstart documentation details AWS cluster setup extensively but only mentions GCP and Azure without detailed steps."
+    },
+    {
+      "checked_source_ids": [
+        "S1"
+      ],
+      "impact": "Knowing exact time expectations helps set user expectations and measure onboarding efficiency.",
+      "question": "Is there an officially documented time estimate for time to first success from account creation to live application?",
+      "reason_unresolved": "The documentation states 'Deploy your first application to Porter in minutes' but does not provide a precise or vendor-claimed time."
+    }
+  ]
+}

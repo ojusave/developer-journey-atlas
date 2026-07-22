@@ -3,8 +3,11 @@ import type { DataStore } from "../core/ports.js";
 import type { WorkflowRunner } from "../workflows/contract.js";
 import { sendData } from "./http.js";
 import { getPlatform, listPlatforms } from "./platforms.js";
+import { getBlockerMeta, getPlatformJourney } from "./journey.js";
+import { getPlatformCurve } from "./curve.js";
 import { searchPlatforms } from "./search.js";
 import { getResearchStatus, startResearch } from "./research.js";
+import { getVerifyStatus, startVerify } from "./verify.js";
 
 // Note: the cross-platform comparison endpoint (src/api/compare.ts +
 // src/core/comparison.ts) is intentionally NOT mounted. It computes a
@@ -17,12 +20,17 @@ export function createApiRouter(store: DataStore, runner: WorkflowRunner | null)
   const router = Router();
 
   router.get("/meta", (_req, res) => sendData(res, store.meta()));
+  router.get("/blockers/meta", getBlockerMeta(store));
   router.get("/platforms", listPlatforms(store));
+  router.get("/platforms/:slug/journey", getPlatformJourney(store));
+  router.get("/platforms/:slug/curve", getPlatformCurve(store));
   router.get("/platforms/:slug", getPlatform(store));
   router.get("/search", searchPlatforms(store));
   // Async research: start a durable Workflow run, then poll its status by id.
   router.post("/research", startResearch(store, runner));
   router.get("/research/:runId", getResearchStatus(runner));
+  router.post("/verify", startVerify(store, runner));
+  router.get("/verify/:runId", getVerifyStatus(runner));
 
   return router;
 }

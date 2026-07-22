@@ -1,0 +1,162 @@
+// Prisma schema for Atlas runtime serving on Render Postgres.
+// Git JSON remains the import source; this database is the live read model.
+// Stable IDs: Platform.slug, CatalogNode.id (U00.01 / P01.05), step via (slug, stepNumber).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Platform {
+  slug           String   @id
+  name           String
+  organization   String?
+  category       String
+  researchedAt   String?
+  researchStatus String?
+  recordJson     Json
+  sourceSha256   String?
+  importedAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  metric Metric?
+  quality Quality?
+  audit   Audit?
+  steps   JourneyStep[]
+  gates   FrictionGate[]
+}
+
+model JourneyStep {
+  id             String  @id @default(cuid())
+  platformSlug   String
+  stepNumber     Int
+  phase          String?
+  actor          String?
+  interface      String?
+  action         String
+  details        Json?
+  successSignal  String?
+  required       Boolean @default(true)
+  sourceIds      Json?
+
+  platform Platform @relation(fields: [platformSlug], references: [slug], onDelete: Cascade)
+
+  @@unique([platformSlug, stepNumber])
+  @@index([platformSlug])
+}
+
+model FrictionGate {
+  id                    String  @id @default(cuid())
+  platformSlug          String
+  atStep                Int?
+  type                  String
+  description           String
+  documentedRequirement Boolean?
+  sourceIds             Json?
+
+  platform Platform          @relation(fields: [platformSlug], references: [slug], onDelete: Cascade)
+  links    GateBlockerLink[]
+
+  @@index([platformSlug, atStep])
+  @@index([type])
+}
+
+model Audit {
+  platformSlug         String  @id
+  auditStatus          String
+  auditedAt            String?
+  sourceRecordSha256   String?
+  countsJson           Json?
+  auditJson            Json
+
+  platform Platform @relation(fields: [platformSlug], references: [slug], onDelete: Cascade)
+}
+
+model Metric {
+  platformSlug String @id
+  metricJson   Json
+
+  platform Platform @relation(fields: [platformSlug], references: [slug], onDelete: Cascade)
+}
+
+model Quality {
+  platformSlug          String  @id
+  decisionCount         Int
+  reResearched          Boolean
+  comparabilityStatus   String
+
+  platform Platform @relation(fields: [platformSlug], references: [slug], onDelete: Cascade)
+}
+
+/// Catalog nodes: journeys, stages, families, archetypes, and the 790 reasons.
+/// Reason PKs keep source IDs (U00.01, P01.05). Never replace with random UUIDs.
+model CatalogNode {
+  id                     String  @id
+  kind                   String
+  label                  String
+  description            String?
+  parentId               String?
+  scope                  String?
+  catalogMaturity        String?
+  diagnosticEligibility  String?
+  sourceLine             Int?
+  payloadJson            Json?
+
+  @@index([kind])
+  @@index([parentId])
+}
+
+model CatalogEdge {
+  id          String  @id @default(cuid())
+  fromId      String
+  toId        String
+  type        String
+  provenance  String?
+  reviewState String?
+
+  @@unique([fromId, toId, type])
+  @@index([fromId])
+  @@index([toId])
+}
+
+/// Soft map: friction gate type string -> universal family id (e.g. account -> U04).
+model GateTypeFamilyMap {
+  gateType String @id
+  familyId String
+}
+
+model GateBlockerLink {
+  id              String  @id @default(cuid())
+  frictionGateId  String
+  blockerReasonId String
+  linkSource      String
+  confidence      String?
+  model           String?
+  similarity      Float?
+  rationale       String?
+
+  gate FrictionGate @relation(fields: [frictionGateId], references: [id], onDelete: Cascade)
+
+  @@unique([frictionGateId, blockerReasonId, linkSource])
+  @@index([blockerReasonId])
+}
+
+/// Cached embeddings for catalog reason nodes (790). Keyed by reason id.
+model CatalogEmbedding {
+  reasonId    String   @id
+  model       String
+  contentHash String
+  embedding   Json
+  updatedAt   DateTime @updatedAt
+
+  @@index([model])
+}
+
+model DatasetMeta {
+  id      String @id @default("singleton")
+  metaJson Json
+}

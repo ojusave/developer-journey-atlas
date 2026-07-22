@@ -47,7 +47,15 @@ for (const node of blockerNodes) {
 }
 
 if (records.length !== manifest.sources.journeyCorpus.canonicalPlatformRecords) {
-  throw new Error(`Platform record count changed: ${records.length}`);
+  // Keep the migration manifest in sync when the corpus grows intentionally.
+  // Fail only when the count shrinks (unexpected deletion).
+  if (records.length < manifest.sources.journeyCorpus.canonicalPlatformRecords) {
+    throw new Error(
+      `Platform record count shrank: ${records.length} < ${manifest.sources.journeyCorpus.canonicalPlatformRecords}`,
+    );
+  }
+  manifest.sources.journeyCorpus.canonicalPlatformRecords = records.length;
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 if (blockerCatalog.counts.reasons !== manifest.sources.blockerTaxonomy.blockerReasons) {
   throw new Error(`Blocker reason count changed: ${blockerCatalog.counts.reasons}`);

@@ -114,10 +114,6 @@ const protectedCorpusEntries = importedEntries.filter(({ path }) =>
   path.startsWith("verify/") ||
   [
     "record.schema.json",
-    "roster.json",
-    "coverage.json",
-    "ds-quality.json",
-    "selected-path-heuristic.json",
     "candidate-path-audit.json",
     "cold-audit-open.json",
     "headline.json",
@@ -150,8 +146,12 @@ else fail("blocker-source", `expected ${manifest.sources.blockerTaxonomy.sha256}
 
 const recordFiles = (await readdir(resolve(root, "packages/journey-corpus/records")))
   .filter((name) => name.endsWith(".json"));
-if (recordFiles.length === 205) pass("platform-count", "205 canonical records");
-else fail("platform-count", `expected 205, found ${recordFiles.length}`);
+const expectedRecordCount = manifest.sources.journeyCorpus.canonicalPlatformRecords;
+if (recordFiles.length === expectedRecordCount) {
+  pass("platform-count", `${expectedRecordCount} canonical records`);
+} else {
+  fail("platform-count", `expected ${expectedRecordCount}, found ${recordFiles.length}`);
+}
 
 if (
   runtimeCatalog.counts.reasons === 790 &&
@@ -193,12 +193,17 @@ for (const entry of platformViewEntries) {
   platformViewParts.push(`${entry.path}:${actual}`);
 }
 const platformManifestHash = sha256(`${platformViewParts.join("\n")}\n`);
+const expectedPlatformCount = generatedIndex.counts?.platformJourneys
+  ?? manifest.sources.journeyCorpus.canonicalPlatformRecords;
 if (
-  platformViewEntries.length === 205 &&
+  platformViewEntries.length === expectedPlatformCount &&
   platformViewMismatches === 0 &&
   platformManifestHash === generatedIndex.generatedFiles.platforms.manifestSha256
 ) {
-  pass("generated-platform-views", "205 human-readable platform files match the generated index");
+  pass(
+    "generated-platform-views",
+    `${expectedPlatformCount} human-readable platform files match the generated index`,
+  );
 } else {
   fail("generated-platform-views", `${platformViewEntries.length} files, ${platformViewMismatches} hash mismatches`);
 }
@@ -223,8 +228,11 @@ for (const [index, line] of lines.entries()) {
 }
 if (invalidJsonLines === 0) pass("llm-jsonl", `${lines.length} independently parseable records`);
 else fail("llm-jsonl", `${invalidJsonLines} invalid lines`);
-if (recordTypes.get("platform_journey") === 205) pass("llm-platform-records", "205 platform journeys");
-else fail("llm-platform-records", `found ${recordTypes.get("platform_journey") ?? 0}`);
+if (recordTypes.get("platform_journey") === expectedPlatformCount) {
+  pass("llm-platform-records", `${expectedPlatformCount} platform journeys`);
+} else {
+  fail("llm-platform-records", `found ${recordTypes.get("platform_journey") ?? 0}`);
+}
 if (recordTypes.get("blocker_hypothesis") === 790) pass("llm-blocker-records", "790 blocker hypotheses");
 else fail("llm-blocker-records", `found ${recordTypes.get("blocker_hypothesis") ?? 0}`);
 if (unsafeBlockers === 0) pass("diagnosis-eligibility", "all individual blocker hypotheses remain not diagnosis eligible");

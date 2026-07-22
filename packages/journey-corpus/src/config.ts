@@ -27,6 +27,8 @@ export const config = {
   // or reconstruction fails with "No models provided".
   openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
   openRouterModel: process.env.OPENROUTER_MODEL ?? "",
+  openRouterEmbeddingModel: process.env.OPENROUTER_EMBEDDING_MODEL ?? "openai/text-embedding-3-small",
+  blockerLinkingEnabled: process.env.BLOCKER_LINKING_ENABLED !== "false",
   // Auto-PR token. Optional: without it, research still runs and the drafted
   // record is offered for manual submission.
   githubToken: process.env.GITHUB_TOKEN ?? "",

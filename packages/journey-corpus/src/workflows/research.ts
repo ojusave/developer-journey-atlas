@@ -6,6 +6,23 @@ import { reconstructWithClassification, draftWithClassification } from "./classi
 import { parseResearchTaskInput } from "./input.js";
 import { buildRow, getLLMProvider, getRepoWriter, getSearchProvider, getStore } from "./deps.js";
 import type { ContributionResult, ReconstructResult, ResearchOutcome, ResearchSteps } from "./contract.js";
+import { linkPlatformBlockersTask } from "./linkBlockers.js";
+import {
+  verifyPlatformAudit,
+  verifyAuditBatch,
+  refreshAuditEvidence,
+  proposeAuditRevision,
+  draftAuditContribution,
+} from "./verifyAudit.js";
+
+export {
+  linkPlatformBlockersTask,
+  verifyPlatformAudit,
+  verifyAuditBatch,
+  refreshAuditEvidence,
+  proposeAuditRevision,
+  draftAuditContribution,
+};
 
 /**
  * Search official documentation for a platform. Independently retryable: a

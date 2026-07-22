@@ -1,0 +1,345 @@
+{
+  "branches": [
+    {
+      "at_step": 3,
+      "condition": "User is a developer and wants to integrate programmatically",
+      "effect_on_first_success": "Allows adding people and triggering messages via code instead of UI",
+      "path": "Integrate Customer.io SDKs or APIs to add people and track events",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "at_step": 3,
+      "condition": "User is not a developer",
+      "effect_on_first_success": "Enables non-developers to onboard and send messages without coding",
+      "path": "Add people manually via UI or CSV upload",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "candidate_path_gap": null,
+  "candidate_paths": [],
+  "category": "Communications, media, and social",
+  "documented_first_success": {
+    "boundary_evidence": {
+      "official_label_or_terminal_state": "Send your person a message (via campaign)",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "explicitly-named"
+    },
+    "normalized_outcome": "A message is successfully sent to a test person added to the workspace, triggered by a campaign",
+    "observable_completion_signal": "Test person receives the message sent from the campaign",
+    "official_milestone": "Send your first message to a test person via a campaign",
+    "source_ids": [
+      "S2"
+    ],
+    "why_this_is_the_boundary": "This milestone represents the first time the platform is used to send a personalized message to a person, demonstrating the core messaging functionality is operational."
+  },
+  "entry_point": {
+    "assumed_prior_state": [
+      "Developer has internet access and a supported modern browser",
+      "Developer has a domain to use for sending email messages",
+      "Developer has basic knowledge of messaging concepts"
+    ],
+    "developer_intent": "Create a Customer.io account and workspace to start sending automated messages to people.",
+    "starting_url": "https://docs.customer.io/get-started/quick-start-guide/"
+  },
+  "excluded_after_success": [],
+  "friction_gates": [
+    {
+      "at_step": 1,
+      "description": "Must create a Customer.io account and workspace to proceed",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "at_step": 2,
+      "description": "Must have a domain and verify ownership to send email messages",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ],
+      "type": "domain"
+    },
+    {
+      "at_step": 2,
+      "description": "Must configure email channel with domain and from address, including DNS records",
+      "documented_requirement": true,
+      "source_ids": [
+        "S2"
+      ],
+      "type": "configuration"
+    }
+  ],
+  "official_docs_only": true,
+  "platform": {
+    "name": "Customer.io",
+    "organization": "Customer.io",
+    "slug": "customer-io"
+  },
+  "prerequisites": [
+    {
+      "order": 1,
+      "required": true,
+      "requirement": "Create a Customer.io account and workspace",
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "account"
+    },
+    {
+      "order": 2,
+      "required": true,
+      "requirement": "Have a domain to configure for sending email messages",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "domain"
+    },
+    {
+      "order": 3,
+      "required": true,
+      "requirement": "Configure email channel with domain, from address, and verify domain ownership",
+      "source_ids": [
+        "S2"
+      ],
+      "type": "configuration"
+    },
+    {
+      "order": 4,
+      "required": true,
+      "requirement": "Understand basic messaging concepts and data model (people, attributes, events)",
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "type": "knowledge"
+    }
+  ],
+  "primary_path": [
+    {
+      "action": "Create a Customer.io account and workspace",
+      "actor": "developer",
+      "details": [
+        "Sign up for a Customer.io account",
+        "Create a workspace as a container for people, data, and messages"
+      ],
+      "failure_or_wait": "Account creation errors or email verification delays",
+      "input": "Account registration details",
+      "interface": "web-ui",
+      "output": "Active Customer.io workspace",
+      "phase": "account",
+      "required": true,
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "step_number": 1,
+      "success_signal": "Workspace is created and accessible in the dashboard"
+    },
+    {
+      "action": "Set up email channel by entering domain and from address, then verify domain ownership",
+      "actor": "developer",
+      "details": [
+        "Enter sending domain (e.g., example.com)",
+        "Enter 'From' email addresses",
+        "Add DNS records to domain host for verification and authentication",
+        "Optionally add CNAME for link tracking"
+      ],
+      "failure_or_wait": "Waiting for DNS propagation or verification failure",
+      "input": "Domain name, email addresses, DNS records",
+      "interface": "web-ui",
+      "output": "Email channel configured and verified",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 2,
+      "success_signal": "Domain verification success in UI"
+    },
+    {
+      "action": "Add a test person to the workspace",
+      "actor": "developer",
+      "details": [
+        "Go to People page",
+        "Add a person with ID and email address",
+        "Add attributes like first_name and last_name",
+        "Save the person"
+      ],
+      "failure_or_wait": "Validation errors or missing required fields",
+      "input": "Person identifier and attributes",
+      "interface": "web-ui",
+      "output": "Test person added to workspace",
+      "phase": "prepare",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 3,
+      "success_signal": "Person appears in People list"
+    },
+    {
+      "action": "Create a campaign to send a message to the test person",
+      "actor": "developer",
+      "details": [
+        "Go to Campaigns page",
+        "Create a new campaign and name it",
+        "Set trigger to 'Segment change'",
+        "Create a data-driven segment including the test person",
+        "Configure message content and channel",
+        "Activate campaign"
+      ],
+      "failure_or_wait": "Trigger misconfiguration or message delivery errors",
+      "input": "Campaign settings, segment criteria, message content",
+      "interface": "web-ui",
+      "output": "Campaign created and active",
+      "phase": "configure",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 4,
+      "success_signal": "Campaign triggers and sends message to test person"
+    },
+    {
+      "action": "Send message to test person triggered by campaign",
+      "actor": "platform",
+      "details": [
+        "Campaign evaluates segment membership",
+        "Message is sent via configured channel (email)"
+      ],
+      "failure_or_wait": "Delivery delays or bounces",
+      "input": "Active campaign and test person in segment",
+      "interface": "other",
+      "output": "Test person receives message",
+      "phase": "execute",
+      "required": true,
+      "source_ids": [
+        "S2"
+      ],
+      "step_number": 5,
+      "success_signal": "Message delivery confirmation or receipt by test person"
+    }
+  ],
+  "research_status": "complete",
+  "researched_at": "2026-07-22",
+  "sources": [
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Platform overview",
+        "General onboarding context"
+      ],
+      "id": "S1",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Get Started",
+        "Platform overview",
+        "Quick start guide",
+        "People"
+      ],
+      "source_type": "documentation",
+      "title": "Customer.io Docs",
+      "url": "https://docs.customer.io/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary documented onboarding path",
+        "First success milestone"
+      ],
+      "id": "S2",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Create your workspace",
+        "Set up your email channel",
+        "Add a test person to your workspace",
+        "Create a campaign and send your person a message"
+      ],
+      "source_type": "quickstart",
+      "title": "Quick start guide | Customer.io Docs",
+      "url": "https://docs.customer.io/get-started/quick-start-guide/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Setup order and options",
+        "Developer vs non-developer onboarding branches"
+      ],
+      "id": "S3",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "How Customer.io Works",
+        "Ready to get started?",
+        "Plan your setup path",
+        "Data Sources: getting people and data into Customer.io",
+        "Attributes and Events: understanding your people and data"
+      ],
+      "source_type": "documentation",
+      "title": "Welcome to Customer.io",
+      "url": "https://docs.customer.io/get-started/welcome/"
+    },
+    {
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer integration options",
+        "SDKs and APIs"
+      ],
+      "id": "S5",
+      "last_updated_if_shown": null,
+      "official_domain": true,
+      "sections_used": [
+        "Developer guides",
+        "Platform documentation",
+        "Integration options"
+      ],
+      "source_type": "documentation",
+      "title": "Customer.io for Developers",
+      "url": "https://customer.io/solutions/engineering"
+    }
+  ],
+  "surface": {
+    "alternatives_considered": [
+      {
+        "name": "API",
+        "reason_not_primary": "APIs are used for integration and data ingestion but initial onboarding and first success is documented via the web console.",
+        "url": "https://docs.customer.io/api/"
+      },
+      {
+        "name": "CLI or SDK",
+        "reason_not_primary": "SDKs and client libraries support integration but onboarding steps focus on web console usage.",
+        "url": "https://docs.customer.io/"
+      }
+    ],
+    "name": "Web Console",
+    "selection_basis": "Primary documented interface for onboarding and setup is the Customer.io web console and dashboard as shown in official quick start and getting started guides."
+  },
+  "time_to_first_success": {
+    "vendor_claim": false,
+    "value": "not documented",
+    "source_ids": []
+  },
+  "uncertainties": [
+    {
+      "checked_source_ids": [
+        "S2",
+        "S3"
+      ],
+      "impact": "Without this, time_to_first_success cannot include a vendor-claimed value, limiting benchmarking.",
+      "question": "What is the typical or average time to first success (sending first message) as claimed or measured by Customer.io?",
+      "reason_unresolved": "No explicit timing or duration claims found in official documentation or quick start guides."
+    }
+  ]
+}

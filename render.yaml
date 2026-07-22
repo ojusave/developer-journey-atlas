@@ -1,7 +1,14 @@
 # Blueprints do not yet create or manage Workflow services, so the
 # developer-journey-atlas-workflows service is created with the Render CLI or
 # Dashboard (see docs/migration/atlas-research-workflows.md). This Blueprint
-# manages only the public web service, which starts and reads Workflow runs.
+# manages the public web service and the Postgres read model for journeys + blockers.
+
+databases:
+  - name: developer-journey-atlas-db
+    plan: basic-256mb
+    region: oregon
+    postgresMajorVersion: "16"
+
 services:
   - type: web
     name: developer-journey-atlas
@@ -9,7 +16,9 @@ services:
     plan: free
     region: oregon
     rootDir: packages/journey-corpus
-    buildCommand: npm ci --include=dev && npm run build:data && npm run build:app
+    # Migrate + idempotent seed in build so free web services (no pre-deploy) still boot a seeded DB.
+    # Git JSON remains the import source; Prisma is the runtime read model when DATA_STORE=postgres.
+    buildCommand: npm ci --include=dev && npm run build:data && npm run build:app && npm run db:setup
     startCommand: npm start
     healthCheckPath: /healthz
     autoDeployTrigger: checksPass
@@ -18,6 +27,21 @@ services:
         value: production
       - key: NODE_VERSION
         value: 22.22.0
+      - key: DATA_STORE
+        value: postgres
+      - key: DATABASE_URL
+        fromDatabase:
+          name: developer-journey-atlas-db
+          property: connectionString
+      - key: OPENROUTER_EMBEDDING_MODEL
+        value: openai/text-embedding-3-small
+      # Optional on web; required on Workflow/CLI for linkPlatformBlockers.
+      - key: BLOCKER_LINKING_ENABLED
+        value: "true"
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        sync: false
       # Server-side Render API key used by @renderinc/sdk to start and read
       # Workflow runs. Secret, never exposed to the browser. Set in Render.
       - key: RENDER_API_KEY
@@ -25,3 +49,5 @@ services:
       # Registered task slug for the parent research task. Non-secret.
       - key: RENDER_WORKFLOW_TASK_SLUG
         value: developer-journey-atlas-workflows/researchPlatform
+      - key: RENDER_VERIFY_TASK_SLUG
+        value: developer-journey-atlas-workflows/verifyPlatformAudit
