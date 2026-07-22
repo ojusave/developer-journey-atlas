@@ -81,7 +81,12 @@ export const draftContribution = task(
 const steps: ResearchSteps = {
   searchDocs: async (input) => searchOfficialDocs(input),
   reconstructRecord: async (input) => reconstructRecord(input),
-  draftContribution: async (input) => draftContribution(input),
+  // GitHub draft PRs are not used for live research; keep a no-op so the
+  // ResearchSteps contract stays stable for tests and older callers.
+  draftContribution: async () => ({
+    status: "skipped",
+    reason: "Draft shown in the Atlas; no GitHub contribution step.",
+  }),
 };
 
 /**

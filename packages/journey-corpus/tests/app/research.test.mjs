@@ -47,7 +47,7 @@ async function run(platform, deps, context = ctx()) {
 
 const hits = [{ title: "Acme Docs", url: "https://acme.com/docs", content: "Getting started" }];
 
-test("happy path yields a completed outcome and opens a contribution", async () => {
+test("happy path yields a completed outcome without opening a GitHub contribution", async () => {
   const repo = new FakeRepoWriter({ url: "https://github.com/x/y/pull/9" });
   const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
@@ -56,9 +56,8 @@ test("happy path yields a completed outcome and opens a contribution", async () 
   });
   assert.equal(outcome.outcome, "completed");
   assert.equal(outcome.assessment.name, "Acme");
-  assert.equal(outcome.contribution.status, "opened");
-  assert.equal(outcome.contribution.url, "https://github.com/x/y/pull/9");
-  assert.equal(repo.calls, 1);
+  assert.equal(outcome.contribution.status, "skipped");
+  assert.equal(repo.calls, 0);
 });
 
 test("transient search failure yields search_failed and no result", async () => {
@@ -93,25 +92,12 @@ test("schema-repair exhaustion yields invalid_output (deterministic, not retried
   assert.equal(outcome.outcome, "invalid_output");
 });
 
-test("no repo configured completes with a skipped contribution", async () => {
+test("research completes without a repo writer", async () => {
   const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
     llm: new FakeLLMProvider(draftRecord()),
   });
   assert.equal(outcome.outcome, "completed");
-  assert.equal(outcome.contribution.status, "skipped");
-  assert.match(outcome.contribution.reason, /GITHUB_TOKEN/);
-});
-
-test("non-complete record is not contributed", async () => {
-  const repo = new FakeRepoWriter();
-  const outcome = await run("Acme", {
-    search: new FakeSearchProvider(hits),
-    llm: new FakeLLMProvider(draftRecord({ research_status: "needs-human-judgment" })),
-    repo,
-  });
-  assert.equal(outcome.outcome, "completed");
-  assert.equal(repo.calls, 0);
   assert.equal(outcome.contribution.status, "skipped");
 });
 
