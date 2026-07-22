@@ -7,46 +7,32 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "b83f0026a4c41976652b69d2f4df2479f20dc7f08326546f8f4d9aab98340762",
+  "source_record_sha256": "e6dd253b40ebff830138edb3eade1744f914a453ccb45d3aa15076013050b44d",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported local machine and administrator rights when the chosen installer requires them.",
-      "No Docker Desktop install, Docker Hub account, or welcome container exists yet."
+      "No prior Docker account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Reach Docker's documented first running container success from a fresh developer setup, including account creation if the selected route requires it.",
+  "developer_goal": "Docker Hub exchanges a username and PAT for a JWT, then returns the authenticated user's repository list.",
   "first_success": {
-    "outcome": "The official welcome container is running and its frontend is reachable on localhost:8080.",
-    "observable_signal": "http://localhost:8080 renders the welcome container landing page, and Docker Desktop Containers shows the running container.",
+    "outcome": "Docker Hub exchanges a username and PAT for a JWT, then returns the authenticated user's repository list.",
+    "observable_signal": "The repository-list request returns successful JSON for the Docker Hub namespace.",
     "source_ids": [
-      "S1"
+      "S1",
+      "S2"
     ]
   },
   "route_selection": {
-    "surface": "Docker Desktop Get Started introduction",
-    "rule": "Prefer Docker Desktop Get Started over Engine-only installs when Desktop is documented as the all-in-one package, but resolve OS installer path and whether Docker Hub signup is in the required path before counting.",
-    "selected": null,
+    "surface": "Docker Hub PAT + Hub API JWT auth + list repositories (cURL)",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Docker Hub PAT + Hub API JWT auth + list repositories (cURL)",
     "candidates": [
       {
-        "name": "Docker Desktop on Mac, then docker/welcome-to-docker",
-        "status": "unresolved",
-        "reason": "Fully documented install and first-container steps, but Mac Apple silicon versus Intel installers differ and Desktop sign-in is recommended rather than required for the welcome container."
-      },
-      {
-        "name": "Docker Desktop on Windows or Linux, then the same welcome container",
-        "status": "unresolved",
-        "reason": "Peer OS install guides change required system steps, privileges, and dependency setup such as Linux pass initialization for sign-in."
-      },
-      {
-        "name": "Docker Engine without Desktop",
-        "status": "unresolved",
-        "reason": "Relevant for server-oriented participants, but it is a different install surface from the Desktop Get Started series."
-      },
-      {
-        "name": "Create a Docker Hub account during or before Desktop use",
-        "status": "unresolved",
-        "reason": "Hub signup fields are publicly visible, yet the Get Started first-container path does not require sign-in; large-organization commercial use may require a paid subscription entitlement."
+        "name": "Docker Hub PAT + Hub API JWT auth + list repositories (cURL)",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -55,178 +41,132 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Docker Hub account if the selected route treats sign-in or Hub identity as required.",
-      "required_fields": [
-        {
-          "label": "Work or personal account type",
-          "field_type": "select",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "Email",
-          "field_type": "email",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "Username",
-          "field_type": "text",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "Password",
-          "field_type": "password",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "Subscription Service Agreement, Privacy Policy, and Data Processing Terms",
-          "field_type": "agreement",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        },
-        {
-          "label": "hCaptcha challenge",
-          "field_type": "challenge",
-          "evidence_state": "observed-public-ui",
-          "source_ids": [
-            "S9"
-          ]
-        }
-      ],
-      "observable_result": "The developer has a Docker ID that can sign in to Docker Desktop or Hub.",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to Docker Hub.",
+      "required_fields": [],
+      "observable_result": "Docker Hub account settings are accessible.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S8",
-        "S9"
+        "S1",
+        "S2"
       ]
     },
     {
       "step_number": 2,
-      "kind": "implementation",
-      "interface": "other",
-      "action": "Download and install Docker Desktop for the selected operating system and accept the Subscription Service Agreement.",
-      "required_fields": [
-        {
-          "label": "Operating system and architecture installer choice",
-          "field_type": "select",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4",
-            "S6",
-            "S7"
-          ]
-        },
-        {
-          "label": "Docker Subscription Service Agreement acceptance",
-          "field_type": "agreement",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S4"
-          ]
-        }
-      ],
-      "observable_result": "Docker Desktop is installed and finishes initialization.",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a personal access token and copy it securely.",
+      "required_fields": [],
+      "observable_result": "A Docker Hub PAT is available.",
       "evidence_state": "documented",
       "source_ids": [
         "S1",
-        "S4"
+        "S2"
       ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "cli",
-      "action": "Run the welcome container and open its frontend.",
-      "required_fields": [
-        {
-          "label": "docker run -d -p 8080:80 docker/welcome-to-docker",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S1"
-          ]
-        }
-      ],
-      "observable_result": "localhost:8080 serves the welcome page and Desktop lists the running container.",
+      "interface": "api",
+      "action": "Use cURL to exchange the Docker ID and PAT for a Docker Hub API JWT as documented.",
+      "required_fields": [],
+      "observable_result": "The authentication response contains a JWT.",
       "evidence_state": "documented",
       "source_ids": [
-        "S1"
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Send the documented authenticated request to list repositories for the Docker Hub namespace.",
+      "required_fields": [],
+      "observable_result": "Docker Hub returns repository-list JSON.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the list request succeeded and inspect the repositories array, including an empty list for a new namespace.",
+      "required_fields": [],
+      "observable_result": "A valid repository-list response is visible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "A supported OS release and enough local resources for Docker Desktop, such as at least 4 GB RAM on Mac.",
+      "description": "A Docker account with access to Docker Hub.",
       "source_ids": [
-        "S4"
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A Docker Hub personal access token with suitable permissions.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A terminal with cURL and a JSON-handling method for the returned JWT.",
+      "source_ids": [
+        "S1",
+        "S2"
       ]
     }
   ],
   "external_gates": [
     {
-      "description": "Commercial use in organizations above Docker's stated employee or revenue thresholds requires a paid Docker Desktop subscription.",
+      "description": "The PAT value is only available for secure use after creation and must carry the required permissions.",
       "source_ids": [
         "S1",
-        "S5"
+        "S2"
       ]
     }
   ],
-  "unavoidable_waits": [
-    {
-      "description": "Docker Desktop must finish initialization before docker run can succeed.",
-      "source_ids": [
-        "S1",
-        "S4"
-      ]
-    },
-    {
-      "description": "The first run must pull the docker/welcome-to-docker image before the container serves traffic.",
-      "source_ids": [
-        "S1"
-      ]
-    }
-  ],
+  "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Docker Desktop starts the Engine and reports ready after install.",
+      "description": "Docker Hub exchanges a username and PAT for a JWT, then returns the authenticated user's repository list.",
       "source_ids": [
         "S1",
-        "S4"
-      ]
-    },
-    {
-      "description": "The welcome container listens on port 8080 and appears in Desktop Containers.",
-      "source_ids": [
-        "S1"
+        "S2"
       ]
     }
   ],
   "excluded": [
     {
-      "item": "Optional Desktop sign-in after install",
-      "reason": "Sign-in docs present benefits and recommendations; the Get Started welcome-container path does not require it.",
+      "item": "Installing Docker Desktop",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
         "S1",
-        "S8"
+        "S2"
       ]
     },
     {
-      "item": "Building and publishing a custom image to Docker Hub",
-      "reason": "Later chapters in the introduction series, after run your first container.",
+      "item": "Building or pushing an image",
+      "reason": "This occurs after the selected first-success boundary.",
       "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "item": "Exporting repository images",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1",
         "S2"
       ]
     }
@@ -234,103 +174,32 @@
   "sources": [
     {
       "id": "S1",
-      "title": "Get Docker Desktop",
-      "url": "https://docs.docker.com/get-started/introduction/get-docker-desktop/",
+      "title": "Personal access tokens",
+      "url": "https://docs.docker.com/security/access-tokens/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Desktop as the get-started package",
-        "welcome-to-docker run command",
-        "localhost:8080 verification",
-        "Containers UI inspection"
+        "Docker Hub exchanges a username and PAT for a JWT, then returns the authenticated user's repository list.",
+        "The repository-list request returns successful JSON for the Docker Hub namespace."
       ]
     },
     {
       "id": "S2",
-      "title": "Introduction series",
-      "url": "https://docs.docker.com/get-started/introduction/",
+      "title": "Export repositories from Docker Hub",
+      "url": "https://docs.docker.com/docker-hub/repos/manage/export/",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Install, first container, build, and publish sequence"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Install Docker Desktop on Mac",
-      "url": "https://docs.docker.com/desktop/setup/install/mac-install/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Mac system requirements",
-        "Installer steps",
-        "Subscription Service Agreement acceptance"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Docker Desktop license agreement",
-      "url": "https://docs.docker.com/subscription/desktop-license/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Commercial subscription thresholds"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Install Docker Desktop on Windows",
-      "url": "https://docs.docker.com/desktop/setup/install/windows-install/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Windows as a peer Desktop install path"
-      ]
-    },
-    {
-      "id": "S7",
-      "title": "Install Docker Desktop on Linux",
-      "url": "https://docs.docker.com/desktop/setup/install/linux/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Linux as a peer Desktop install path"
-      ]
-    },
-    {
-      "id": "S8",
-      "title": "Sign in to Docker Desktop",
-      "url": "https://docs.docker.com/desktop/setup/sign-in/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Recommended sign-in benefits",
-        "Not required for the welcome-container command itself"
-      ]
-    },
-    {
-      "id": "S9",
-      "title": "Docker Hub signup",
-      "url": "https://hub.docker.com/signup",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Work versus Personal",
-        "Email, username, password",
-        "Agreement and hCaptcha"
+        "Docker Hub exchanges a username and PAT for a JWT, then returns the authenticated user's repository list.",
+        "The repository-list request returns successful JSON for the Docker Hub namespace."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which OS installer defines the Desktop path, and is Docker Hub account creation part of the required journey to first container?",
-      "impact": "OS choice changes install actions; including Hub signup adds fields the Get Started container path does not require, while excluding it conflicts with the account-creation audit boundary.",
-      "evidence_needed": "A workshop OS choice plus an explicit rule on whether Desktop sign-in or Hub signup is in-path before docker run."
-    },
-    {
-      "question": "Does the participant's organization require a paid Docker Desktop subscription before Accept and run are lawful?",
-      "impact": "A paid entitlement gate can block the otherwise free personal or small-business Desktop path.",
-      "evidence_needed": "Participant organization size and revenue relative to Docker's commercial-use thresholds."
+      "question": "Does fresh-account UI wording differ from the documented Authenticate and list Docker Hub repositories path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null

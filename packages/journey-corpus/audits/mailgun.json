@@ -7,38 +7,31 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "4c7ba10f09b0b6626964e8f8f19895806504fb0ba63346809b6c0ceb55f09ccf",
+  "source_record_sha256": "5bb634e1ef8324017d794e78ce60af6e183d867bb80d2b895e047e951a81e953",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and can receive email when the selected route requires it.",
-      "No platform account, tenant, credentials, or product resources exist yet.",
-      "Developer has internet access",
-      "Developer has an email sending use case"
+      "No prior Mailgun account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Send an email using Mailgun's API",
+  "developer_goal": "Mailgun accepts the sandbox-domain cURL request and delivers the first email to an authorized recipient.",
   "first_success": {
-    "outcome": "Email sent and accepted by Mailgun API",
-    "observable_signal": "HTTP API response indicates success and email is accepted for delivery",
+    "outcome": "Mailgun accepts the sandbox-domain cURL request and delivers the first email to an authorized recipient.",
+    "observable_signal": "The API returns a queued message response and the authorized recipient receives the email.",
     "source_ids": [
-      "S4"
+      "S1"
     ]
   },
   "route_selection": {
-    "surface": "HTTP API",
-    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
-    "selected": null,
+    "surface": "Quickstart: sandbox domain cURL send first email",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Quickstart: sandbox domain cURL send first email",
     "candidates": [
       {
-        "name": "Send email via SMTP",
-        "status": "unresolved",
-        "reason": "Present in the machine draft; not selected by an independent shortest-path audit."
-      },
-      {
-        "name": "SMTP",
-        "status": "unresolved",
-        "reason": "SMTP is supported as a legacy and flexible option but the HTTP API is preferred for programmatic scaling and ease of use."
+        "name": "Quickstart: sandbox domain cURL send first email",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -47,207 +40,141 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Sign up for a Mailgun account",
-      "required_fields": [
-        {
-          "label": "User registration details",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S6"
-          ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
-        }
-      ],
-      "observable_result": "Account created and accessible",
-      "evidence_state": "unverified",
+      "action": "Create or sign in to Mailgun and open the sandbox-domain quick start.",
+      "required_fields": [],
+      "observable_result": "The sandbox domain and sending credentials are visible.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Add and verify a sending domain",
-      "required_fields": [
-        {
-          "label": "Domain name and DNS provider access",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S6"
-          ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
-        }
-      ],
-      "observable_result": "Domain verification confirmed by Mailgun",
-      "evidence_state": "unverified",
+      "action": "Authorize and verify the intended sandbox recipient if it is not already authorized.",
+      "required_fields": [],
+      "observable_result": "The recipient is listed as authorized.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     },
     {
       "step_number": 3,
-      "kind": "account",
-      "interface": "web-ui",
-      "action": "Retrieve API key for authentication",
-      "required_fields": [
-        {
-          "label": "Authenticated Mailgun account",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S6"
-          ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
-        }
-      ],
-      "observable_result": "API key available for use",
-      "evidence_state": "unverified",
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Run the documented cURL message send against the sandbox domain using API authentication.",
+      "required_fields": [],
+      "observable_result": "Mailgun returns a successful queued response.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     },
     {
       "step_number": 4,
-      "kind": "implementation",
-      "interface": "api",
-      "action": "Send a test email via Mailgun HTTP API",
-      "required_fields": [
-        {
-          "label": "HTTP API request with email parameters and API key",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S4",
-            "S1"
-          ],
-          "notes": "Mapped from machine-drafted primary_path; field inventory not independently audited."
-        }
-      ],
-      "observable_result": "HTTP 200 OK with success message and accepted email",
-      "evidence_state": "unverified",
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Inspect the authorized recipient inbox and confirm delivery of the first message.",
+      "required_fields": [],
+      "observable_result": "The sent message is visible in the inbox.",
+      "evidence_state": "documented",
       "source_ids": [
-        "S4",
         "S1"
       ]
     }
   ],
   "prerequisites": [
     {
-      "description": "Create a Mailgun account to access the platform and API keys",
+      "description": "A Mailgun account with its sandbox domain.",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     },
     {
-      "description": "Add and verify a domain you own by setting up DNS records (SPF and DKIM) or use the sandbox domain for testing",
+      "description": "The Mailgun API key shown for the account.",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     },
     {
-      "description": "Obtain API key or SMTP credentials to authenticate API requests",
+      "description": "A recipient address authorized for the sandbox domain.",
       "source_ids": [
-        "S6"
+        "S1"
+      ]
+    },
+    {
+      "description": "A terminal with cURL.",
+      "source_ids": [
+        "S1"
       ]
     }
   ],
   "external_gates": [
     {
-      "description": "Domain ownership verification via DNS records (SPF and DKIM) setup is required to send email from that domain.",
+      "description": "Sandbox domains send only to authorized recipients, who may need to complete email verification.",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     },
     {
-      "description": "API key or SMTP credentials are required to authenticate and authorize sending email.",
+      "description": "Email delivery can be delayed or filtered by the recipient provider.",
       "source_ids": [
-        "S6"
+        "S1"
       ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Successfully send an email using the Mailgun HTTP API",
+      "description": "Mailgun accepts the sandbox-domain cURL request and delivers the first email to an authorized recipient.",
       "source_ids": [
-        "S4"
+        "S1"
       ]
     }
   ],
-  "excluded": [],
+  "excluded": [
+    {
+      "item": "Adding a custom sending domain",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "DNS verification for production",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "SMTP integration",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
   "sources": [
     {
       "id": "S1",
-      "title": "Developer Documentation",
-      "url": "https://documentation.mailgun.com/docs/mailgun",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Developer Documentation",
-        "Send API Documentation",
-        "User Manual"
-      ]
-    },
-    {
-      "id": "S2",
-      "title": "Getting started Sending Email",
-      "url": "https://documentation.mailgun.com/docs/mailgun/get-started",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Getting started Sending Email",
-        "SMTP vs API sending"
-      ]
-    },
-    {
-      "id": "S3",
-      "title": "Developer Documentation Home",
-      "url": "https://documentation.mailgun.com/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Developer Documentation Home",
-        "Overview of Send API"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Quickstart: Send Your First Email",
+      "title": "Send Your First Email",
       "url": "https://documentation.mailgun.com/docs/mailgun/quickstart",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Quickstart: Send Your First Email",
-        "Quickstart steps"
-      ]
-    },
-    {
-      "id": "S6",
-      "title": "Quickstart Guide",
-      "url": "https://mailgun-docs.redoc.ly/docs/mailgun/quickstart-guide/quickstart/",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Quickstart Guide",
-        "Sign Up",
-        "Add and verify your domain",
-        "Choose how to send"
+        "Mailgun accepts the sandbox-domain cURL request and delivers the first email to an authorized recipient.",
+        "The API returns a queued message response and the authorized recipient receives the email."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What is the typical or average time to first success (sending first email) claimed or expected by Mailgun?",
-      "impact": "Time to first success is unknown, limiting comparison to other platforms on onboarding speed.",
-      "evidence_needed": "No explicit time to first success or onboarding duration is stated in the official documentation or quickstart guides."
-    },
-    {
-      "question": "Has the machine-drafted Mailgun route been independently shortest-path audited?",
-      "impact": "Action counts and peer comparison must stay withheld until a human audit passes.",
-      "evidence_needed": "Complete a shortest-path audit against current official docs and mark verified only when evidence supports it."
+      "question": "Does fresh-account UI wording differ from the documented Send Your First Email path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null

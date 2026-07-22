@@ -7,40 +7,32 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "6e2e0d4de0c8fc878a65c7e45a8c3ed12c8153a2c1a1622bd24e1591587426dd",
+  "source_record_sha256": "5b4a3b75d4e4f4ddd67e15d1a54fd6c4459f9dc8e8f470e33d9d3f61756ff19f",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and an email address.",
-      "The developer has not yet created a Stripe account, API keys, or Checkout integration.",
-      "Sandbox or test-mode work is acceptable for first success; live-mode KYC activation is out of scope unless selected."
+      "No prior Stripe account configuration or successful use exists.",
+      "The developer has the browser and command-line tools listed by the selected path."
     ]
   },
-  "developer_goal": "Create a Stripe account and complete the earliest official first-success path to a working test checkout or authenticated API result.",
+  "developer_goal": "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
   "first_success": {
-    "outcome": "Unresolved among hosted Checkout test payment, first Customer API create, and CLI anonymous sandbox provisioning.",
-    "observable_signal": "Official docs name Congratulations for Checkout, a created Customer for the API-request guide, and working sandbox keys for the CLI route, without one corpus-wide winner.",
-    "source_ids": ["S1", "S2", "S3"]
+    "outcome": "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+    "observable_signal": "Stripe-hosted Checkout displays the successful completion flow after test card details are submitted.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
   },
   "route_selection": {
-    "surface": "Stripe Dashboard account creation plus official Get started / Checkout quickstart docs",
-    "rule": "Select the shortest complete account-to-first-success route only after the terminal outcome and implementation surface are fixed.",
-    "selected": null,
+    "surface": "Stripe-hosted Checkout via cURL Checkout Session",
+    "rule": "Prefer the official hosted quickstart and cURL when documented; stop at the first observable successful happy-path result.",
+    "selected": "Stripe-hosted Checkout via cURL Checkout Session",
     "candidates": [
       {
-        "name": "Hosted Checkout quickstart after Stripe account creation",
-        "status": "unresolved",
-        "reason": "Get started links Checkout for developers ready to build, but language and framework tabs change install, env, and run steps without naming one canonical tab."
-      },
-      {
-        "name": "Send your first Stripe API request (create Customer)",
-        "status": "unresolved",
-        "reason": "Reaches an authenticated API success with fewer integration steps than Checkout, but is a different first-success type than a payment."
-      },
-      {
-        "name": "Stripe CLI anonymous sandbox without account registration",
-        "status": "unresolved",
-        "reason": "Official Get started text offers sandbox keys with no account registration, which conflicts with an account-creation starting boundary."
+        "name": "Stripe-hosted Checkout via cURL Checkout Session",
+        "status": "selected",
+        "reason": "It is the specified official path to the first-success boundary."
       }
     ]
   },
@@ -49,172 +41,179 @@
       "step_number": 1,
       "kind": "account",
       "interface": "web-ui",
-      "action": "Create a Stripe account from the official registration entry linked by Get started.",
-      "required_fields": [
-        {
-          "label": "Account registration fields",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": ["S1", "S4"],
-          "notes": "Public docs confirm account creation is required for Dashboard keys, but the register page did not expose a field-level form in the fetch (browser-compatibility gate)."
-        }
-      ],
-      "observable_result": "The developer can open a Stripe Dashboard or sandbox context with test API keys.",
+      "action": "Create or sign in to Stripe and switch to test mode.",
+      "required_fields": [],
+      "observable_result": "Test-mode Developers and product settings are accessible.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S5"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "step_number": 2,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Retrieve test or sandbox publishable and secret API keys for the selected environment.",
-      "required_fields": [
-        {
-          "label": "Test publishable key",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S3"]
-        },
-        {
-          "label": "Test secret key",
-          "field_type": "other",
-          "evidence_state": "documented",
-          "source_ids": ["S3"]
-        }
-      ],
-      "observable_result": "Test API keys are available for server and client configuration.",
+      "action": "Create or select a test product price and copy its Price ID and test secret key.",
+      "required_fields": [],
+      "observable_result": "A test Price ID and secret key are available.",
       "evidence_state": "documented",
-      "source_ids": ["S1", "S3"]
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
       "step_number": 3,
       "kind": "implementation",
-      "interface": "other",
-      "action": "Complete the selected official first-success implementation branch (Checkout language tab, API Customer create, or CLI sandbox).",
-      "required_fields": [
-        {
-          "label": "Implementation branch selection",
-          "field_type": "select",
-          "evidence_state": "unverified",
-          "source_ids": ["S1", "S2", "S3"]
-        }
-      ],
-      "observable_result": "The selected official terminal signal is reached.",
-      "evidence_state": "unverified",
-      "source_ids": ["S1", "S2", "S3"]
+      "interface": "api",
+      "action": "Use cURL to create a Checkout Session with the Price ID, success URL, cancel URL, and test secret key.",
+      "required_fields": [],
+      "observable_result": "Stripe returns a Checkout Session with a hosted URL.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open the returned Checkout URL and submit Stripe's documented test payment details.",
+      "required_fields": [],
+      "observable_result": "Stripe accepts the test payment and completes Checkout.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Confirm the hosted completion flow or configured success redirect is reached.",
+      "required_fields": [],
+      "observable_result": "The test Checkout payment is complete.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
   "prerequisites": [
     {
-      "description": "A local runtime matching the chosen Checkout language or framework tab is required if the Checkout quickstart is selected.",
-      "source_ids": ["S2"]
+      "description": "A Stripe account with test mode available.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A Stripe test secret key.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A test-mode Price ID for the Checkout line item.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A terminal with cURL and a browser.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
   "external_gates": [
     {
-      "description": "Live-mode payments require business verification and KYC checklist completion; sandbox testing does not.",
-      "source_ids": ["S5"]
+      "description": "The secret key and Price ID must both be from test mode.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "Checkout Session creation requires valid success and cancel URLs for the selected mode.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "Stripe generates test and live API key pairs after account creation.",
-      "source_ids": ["S3"]
-    },
-    {
-      "description": "Sandbox environments allow simulated transactions without moving money.",
-      "source_ids": ["S5"]
+      "description": "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
   "excluded": [
     {
-      "item": "Live account activation and business verification checklist",
-      "reason": "Official docs place KYC after sandbox testing and require it only to leave sandbox for live services.",
-      "source_ids": ["S5"]
+      "item": "Building a server framework integration",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     },
     {
-      "item": "Reading all product quickstarts and use-case guides",
-      "reason": "Documentation reading is excluded from required developer actions.",
-      "source_ids": ["S1"]
+      "item": "Webhook fulfillment",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "item": "Live payments and account activation",
+      "reason": "This occurs after the selected first-success boundary.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Get started",
-      "url": "https://docs.stripe.com/get-started",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Account creation entry",
-        "Checkout quickstart link",
-        "CLI anonymous sandbox note",
-        "Start building steps"
-      ]
-    },
-    {
-      "id": "S2",
       "title": "Build a Stripe-hosted checkout page",
       "url": "https://docs.stripe.com/checkout/quickstart",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Multi-language Checkout sample",
-        "Library install branches",
-        "Checkout Session server setup"
+        "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+        "Stripe-hosted Checkout displays the successful completion flow after test card details are submitted."
       ]
     },
     {
-      "id": "S3",
-      "title": "Send your first Stripe API request",
-      "url": "https://docs.stripe.com/get-started/api-request",
+      "id": "S2",
+      "title": "Create a Checkout Session",
+      "url": "https://docs.stripe.com/api/checkout/sessions/create",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "API key pairs after account creation",
-        "Create Customer first request",
-        "Sandbox versus live key behavior"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "Stripe Dashboard register",
-      "url": "https://dashboard.stripe.com/register",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Register URL exists",
-        "Public fetch hit browser-compatibility gate without field inventory"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "Set up your account",
-      "url": "https://docs.stripe.com/get-started/account/set-up",
-      "source_type": "official-documentation",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Sandbox available immediately after create",
-        "Live KYC and business verification requirements"
+        "A cURL-created Checkout Session opens on Stripe's hosted page and completes a test-mode payment.",
+        "Stripe-hosted Checkout displays the successful completion flow after test card details are submitted."
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "Which first-success outcome is the corpus route: hosted Checkout test payment, first Customer API create, or CLI sandbox without registration?",
-      "impact": "The routes differ in required actions, fields, implementation surface, and whether account creation is even required.",
-      "evidence_needed": "A human selection of one bounded developer goal and terminal signal, then a fresh-account walkthrough of that single route."
-    },
-    {
-      "question": "If Checkout is selected, which language or framework tab is canonical?",
-      "impact": "Install commands, project files, env vars, and run steps change by tab.",
-      "evidence_needed": "Official designation of one default tab, or an explicit corpus policy choosing one."
-    },
-    {
-      "question": "What exact Stripe signup fields and verification challenges appear for a fresh account today?",
-      "impact": "Account-step field counts remain unverified behind the Dashboard registration UI.",
-      "evidence_needed": "Dated screenshots or a read-only walkthrough of dashboard.stripe.com/register from a fresh session."
+      "question": "Does fresh-account UI wording differ from the documented Complete a Stripe-hosted Checkout payment path?",
+      "impact": "A human should judge minor navigation differences without moving the first-success boundary.",
+      "evidence_needed": "A dated fresh-account walkthrough."
     }
   ],
   "counts": null
