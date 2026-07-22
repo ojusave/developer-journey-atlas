@@ -28,7 +28,7 @@ export function createApiRouter(store: DataStore, runner: WorkflowRunner | null)
   router.get("/search", searchPlatforms(store));
   // Async research: start a durable Workflow run, then poll its status by id.
   router.post("/research", startResearch(store, runner));
-  router.get("/research/:runId", getResearchStatus(runner));
+  router.get("/research/:runId", getResearchStatus(store, runner));
   router.post("/verify", startVerify(store, runner));
   router.get("/verify/:runId", getVerifyStatus(runner));
 

@@ -4,6 +4,14 @@ import { sendData, sendError } from "./http.js";
 import type { DataStore } from "../core/ports.js";
 import type { WorkflowRunner } from "../workflows/contract.js";
 import { buildResearchInput, InvalidResearchInput } from "../workflows/input.js";
+import { buildNhjAuditFromRecord } from "../db/nhjAuditFromDraft.js";
+import {
+  getPendingResearch,
+  persistResearchDraft,
+  rememberPendingResearch,
+} from "../db/persistResearchDraft.js";
+import type { PostgresDataStore } from "../adapters/postgresData.js";
+import { selectedPathRow } from "../../lib/measure.mjs";
 
 const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
 const RESEARCH_LIMIT = Math.max(1, Number(process.env.RESEARCH_HOURLY_LIMIT ?? 60));
@@ -11,8 +19,8 @@ const attemptsByIp = new Map<string, number[]>();
 
 // Per-platform duplicate-submission guard: a recently started run for the same
 // normalized slug is reused instead of starting a new one. Bounded in-memory,
-// which is enough because the Workflow itself is durable and the GitHub
-// contribution is idempotent even across web-service restarts.
+// which is enough because the Workflow itself is durable and pending runs are
+// also remembered in DatasetMeta for cross-restart resume.
 const DEDUPE_TTL_MS = 10 * 60 * 1_000;
 const recentRuns = new Map<string, { runId: string; at: number }>();
 
@@ -33,6 +41,26 @@ function recentRunFor(slug: string, now = Date.now()): string | null {
   if (hit && now - hit.at < DEDUPE_TTL_MS) return hit.runId;
   if (hit) recentRuns.delete(slug);
   return null;
+}
+
+function isPostgresStore(store: DataStore): store is PostgresDataStore {
+  return typeof (store as PostgresDataStore).ingestLive === "function"
+    && typeof (store as PostgresDataStore).getPrisma === "function";
+}
+
+async function persistCompletedResearch(store: DataStore, result: {
+  outcome: "completed";
+  slug: string;
+  record: import("../core/ports.js").PlatformRecord;
+  assessment: unknown;
+}): Promise<void> {
+  if (!isPostgresStore(store)) return;
+  if (store.getRow(result.slug) && store.getRecord(result.slug)) return;
+  const row = selectedPathRow(result.record);
+  const audit = buildNhjAuditFromRecord(result.record);
+  await persistResearchDraft(result.record, row, { prisma: store.getPrisma(), audit });
+  store.ingestLive(result.record, row, audit);
+  console.log(`Persisted research draft for ${result.slug} into Postgres.`);
 }
 
 /**
@@ -71,6 +99,26 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
       return;
     }
 
+    if (isPostgresStore(store)) {
+      try {
+        const pending = await getPendingResearch(input.slug, store.getPrisma());
+        if (pending?.runId) {
+          recentRuns.set(input.slug, { runId: pending.runId, at: Date.now() });
+          res.status(202);
+          sendData(res, {
+            runId: pending.runId,
+            phase: "running",
+            slug: input.slug,
+            deduplicated: true,
+            resumed: true,
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn("Could not read pending research:", err);
+      }
+    }
+
     if (!takeResearchSlot(req.ip ?? "unknown")) {
       sendError(
         res,
@@ -84,6 +132,17 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
     try {
       const { runId } = await runner.start(input);
       recentRuns.set(input.slug, { runId, at: Date.now() });
+      if (isPostgresStore(store)) {
+        try {
+          await rememberPendingResearch(
+            input.slug,
+            { runId, platform: input.platform, startedAt: new Date().toISOString() },
+            store.getPrisma(),
+          );
+        } catch (err) {
+          console.warn("Could not remember pending research:", err);
+        }
+      }
       res.status(202);
       sendData(res, { runId, phase: "queued", slug: input.slug });
     } catch (err) {
@@ -97,8 +156,9 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
  * Read the server-side status of a Workflow run and return a browser-safe
  * projection. Never returns Render or provider credentials, raw upstream errors,
  * or the run's raw task input. The browser can reload and resume with the run id.
+ * When a run completes, the draft is written to Postgres so the next visit finds it.
  */
-export function getResearchStatus(runner: WorkflowRunner | null) {
+export function getResearchStatus(store: DataStore, runner: WorkflowRunner | null) {
   return async (req: Request, res: Response): Promise<void> => {
     if (!runner) {
       sendError(res, 503, "research_unconfigured", "Live research is not configured on this deployment.");
@@ -111,6 +171,19 @@ export function getResearchStatus(runner: WorkflowRunner | null) {
     }
     try {
       const projection = await runner.status(runId);
+      if (
+        projection.phase === "completed" &&
+        projection.result &&
+        projection.result.outcome === "completed" &&
+        "record" in projection.result &&
+        projection.result.record
+      ) {
+        try {
+          await persistCompletedResearch(store, projection.result);
+        } catch (err) {
+          console.error("Failed to persist completed research:", err);
+        }
+      }
       sendData(res, projection);
     } catch (err) {
       console.error("Failed to read research run:", err);

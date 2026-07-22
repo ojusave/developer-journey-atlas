@@ -234,7 +234,7 @@ test("status returns only a safe projection and never the raw input", async () =
     { runId: "r", phase: "completed", result: { outcome: "no_docs" }, message: null },
   ]);
   const res = fakeRes();
-  await getResearchStatus(runner)(fakeReq({ params: { runId: "r" } }), res);
+  await getResearchStatus(storeWithPeer(), runner)(fakeReq({ params: { runId: "r" } }), res);
   assert.deepEqual(Object.keys(res.body.data).sort(), ["message", "phase", "result", "runId"]);
   assert.equal(res.body.data.result.outcome, "no_docs");
 });
@@ -242,13 +242,13 @@ test("status returns only a safe projection and never the raw input", async () =
 test("status maps a runner error to a safe 404", async () => {
   const runner = { status: async () => { throw new Error("secret api detail"); } };
   const res = fakeRes();
-  await getResearchStatus(runner)(fakeReq({ params: { runId: "r" } }), res);
+  await getResearchStatus(storeWithPeer(), runner)(fakeReq({ params: { runId: "r" } }), res);
   assert.equal(res.statusCode, 404);
   assert.ok(!/secret/i.test(JSON.stringify(res.body)));
 });
 
 test("status rejects malformed run ids", async () => {
   const res = fakeRes();
-  await getResearchStatus(new FakeWorkflowRunner())(fakeReq({ params: { runId: "bad id!!" } }), res);
+  await getResearchStatus(storeWithPeer(), new FakeWorkflowRunner())(fakeReq({ params: { runId: "bad id!!" } }), res);
   assert.equal(res.statusCode, 400);
 });
