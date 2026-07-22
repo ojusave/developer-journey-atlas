@@ -43,6 +43,82 @@ function docsBlock(docs: DocHit[]): string {
     .join("\n\n---\n\n");
 }
 
+const FRICTION_GATE_TYPES = new Set([
+  "account",
+  "verification",
+  "billing",
+  "approval",
+  "permission",
+  "installation",
+  "configuration",
+  "credential",
+  "choice",
+  "wait",
+  "environment",
+  "policy",
+  "access",
+  "dns",
+  "domain",
+  "download",
+  "form",
+  "hardware",
+  "knowledge",
+  "legal",
+  "limit",
+  "payment",
+  "rate-limit",
+  "terms",
+  "other",
+]);
+
+const FRICTION_GATE_ALIASES: Record<string, string> = {
+  "external gate": "other",
+  external: "other",
+  signup: "account",
+  "sign up": "account",
+  "sign-up": "account",
+  registration: "account",
+  "email verification": "verification",
+  "2fa": "verification",
+  mfa: "verification",
+  captcha: "verification",
+  phone: "verification",
+  sms: "verification",
+  "credit card": "billing",
+  card: "payment",
+  oauth: "credential",
+  "api key": "credential",
+  "api-key": "credential",
+  auth: "credential",
+  authentication: "credential",
+  sso: "access",
+  invite: "approval",
+  "manual review": "approval",
+};
+
+/**
+ * Coerce friction_gates[].type onto the schema enum before validation.
+ * Models often invent near-synonyms; map those or fall back to "other".
+ */
+export function normalizeFrictionGateTypes(parsed: unknown): unknown {
+  if (!parsed || typeof parsed !== "object") return parsed;
+  const record = parsed as Record<string, unknown>;
+  if (!Array.isArray(record.friction_gates)) return parsed;
+  record.friction_gates = record.friction_gates.map((gate) => {
+    if (!gate || typeof gate !== "object") return gate;
+    const g = { ...(gate as Record<string, unknown>) };
+    if (typeof g.type !== "string") return g;
+    const key = g.type.trim().toLowerCase().replace(/_/g, " ");
+    if (FRICTION_GATE_TYPES.has(key)) {
+      g.type = key;
+      return g;
+    }
+    g.type = FRICTION_GATE_ALIASES[key] ?? "other";
+    return g;
+  });
+  return record;
+}
+
 /**
  * Reconstructs a schema-valid first-mile record from official-docs search hits
  * using an OpenRouter-hosted model. Grounds strictly on the supplied documents,
@@ -80,8 +156,9 @@ export class OpenRouterProvider implements LLMProvider {
         continue;
       }
 
-      const { valid, errors } = this.validate(parsed);
-      if (valid) return parsed as PlatformRecord;
+      const normalized = normalizeFrictionGateTypes(parsed);
+      const { valid, errors } = this.validate(normalized);
+      if (valid) return normalized as PlatformRecord;
 
       lastErrors = errors;
       if (attempt < MAX_ATTEMPTS) {
@@ -148,6 +225,7 @@ export class OpenRouterProvider implements LLMProvider {
       "- If the docs do not establish a single first-success milestone, set research_status to",
       "  'needs-human-judgment' and record the ambiguity in `uncertainties` rather than guessing.",
       "- Prefer structured, atomic steps. Do not overstate; unknown fields become uncertainties.",
+      "- friction_gates[].type must be one of: account, verification, billing, approval, permission, installation, configuration, credential, choice, wait, environment, policy, access, dns, domain, download, form, hardware, knowledge, legal, limit, payment, rate-limit, terms, other. Use other when unsure.",
       `- Set researched_at to ${today()} (YYYY-MM-DD).`,
       "- Output ONLY the JSON object, no prose, no markdown fences.",
       "",

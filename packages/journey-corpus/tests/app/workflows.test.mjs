@@ -3,12 +3,28 @@ import assert from "node:assert/strict";
 
 import { buildResearchInput, parseResearchTaskInput, InvalidResearchInput } from "../../dist/workflows/input.js";
 import { reconstructWithClassification, draftWithClassification } from "../../dist/workflows/classify.js";
-import { SchemaRepairError } from "../../dist/adapters/openRouter.js";
+import { SchemaRepairError, normalizeFrictionGateTypes } from "../../dist/adapters/openRouter.js";
 import { GitHubApiError, GitHubPrWriter } from "../../dist/adapters/githubPr.js";
 import { projectRun, coerceOutcome } from "../../dist/adapters/renderWorkflows.js";
 import { startResearch, getResearchStatus } from "../../dist/api/research.js";
 import { InMemoryDataStore, FakeWorkflowRunner } from "../../dist/adapters/fakes.js";
 import { selectedPathRow } from "../../lib/measure.mjs";
+
+/* ---------- Draft normalization ---------- */
+
+test("normalizeFrictionGateTypes maps aliases and unknown values onto the schema enum", () => {
+  const normalized = normalizeFrictionGateTypes({
+    friction_gates: [
+      { type: "Account", description: "signup" },
+      { type: "external gate", description: "vendor review" },
+      { type: "totally-made-up", description: "x" },
+    ],
+  });
+  assert.deepEqual(
+    normalized.friction_gates.map((g) => g.type),
+    ["account", "other", "other"],
+  );
+});
 
 /* ---------- Task input validation ---------- */
 
