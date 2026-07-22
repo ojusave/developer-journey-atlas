@@ -137,6 +137,7 @@ const approvedCorpusDriftPaths = new Set([
   "records/together-ai.json",
   "records/mistral-ai.json",
   "records/perplexity.json",
+  "records/exa.json",
 ]);
 for (const { path, blob } of protectedCorpusEntries) {
   const current = await readFile(resolve(root, "packages/journey-corpus", path));

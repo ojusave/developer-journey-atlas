@@ -7,129 +7,86 @@
   },
   "audit_status": "needs-human-judgment",
   "audited_at": "2026-07-22",
-  "source_record_sha256": "e581e9aca38540d4cbe0216e01ba03e4a72d02d310511c9ca8444238d9f02ff4",
+  "source_record_sha256": "b19ff48ef9492874c031f1c342d21f67d0608390e7179d2b70bb41f4a0fff6cc",
   "starting_state": {
     "boundary": "account creation",
     "assumptions": [
-      "The developer has a supported browser and a terminal or editor for Python, JavaScript, or cURL.",
-      "No Exa account, team, onboarding completion, free credits, or API key exist yet."
+      "The developer has a supported browser and a terminal with cURL.",
+      "No Exa account, free credits, or API key exists yet.",
+      "No language SDK is required."
     ]
   },
-  "developer_goal": "Create an Exa account, obtain an API key, and execute one documented Exa API request until a search, answer, or chat completion result is returned.",
+  "developer_goal": "Create an Exa account, obtain free credits and an API key, and complete a Search API request over HTTPS without installing an SDK.",
   "first_success": {
-    "outcome": "An authenticated Exa Search, Answer, or Chat Completions request returns or prints its documented result.",
-    "observable_signal": "Python prints the result object, JavaScript logs a result item or streamed answer, or cURL returns JSON containing the endpoint response.",
+    "outcome": "POST https://api.exa.ai/search with x-api-key returns search results JSON after onboarding free credits and an API key.",
+    "observable_signal": "The Search API returns a successful JSON body containing search results for the requested query.",
     "source_ids": [
       "S2"
     ]
   },
   "route_selection": {
-    "surface": "Exa Dashboard plus official QuickStart",
-    "rule": "Select the shortest complete Dashboard-to-first-request route only after signup/onboarding fields and one language/use-case combination are fixed.",
-    "selected": null,
+    "surface": "Get started with Exa via cURL Search",
+    "rule": "Prefer the shortest complete path that reaches an authenticated Search API response without requiring an SDK when cURL is documented.",
+    "selected": "Get started with Exa via cURL Search",
     "candidates": [
       {
-        "name": "Search and crawl with Python SDK",
-        "status": "unresolved",
-        "reason": "Documented as one of three use cases with three clients; no default is named."
+        "name": "Get started with Exa via cURL Search",
+        "status": "selected",
+        "reason": "Exa's Get started guide states its outcome is making the first request to an Exa API endpoint. The same page documents a cURL POST to https://api.exa.ai/search with x-api-key and says cURL needs no installation. Search and crawl is the firs"
       },
       {
-        "name": "Answer or Chat Completions with Python, JavaScript, or cURL",
-        "status": "unresolved",
-        "reason": "Equal documented variants change packages, files, endpoints, and success signals."
-      },
-      {
-        "name": "API Playground-only exploration",
+        "name": "SDK-first Search tab",
         "status": "not-selected",
-        "reason": "Welcome links the playground, but the QuickStart defines first success as an SDK or cURL request."
+        "reason": "SDK install is optional; the quickstart says cURL needs no installation."
       }
     ]
   },
   "required_path": [
     {
       "step_number": 1,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Open Get started with Exa (QuickStart).",
+      "required_fields": [],
+      "observable_result": "The cURL Search example is visible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
       "kind": "account",
-      "interface": "web-ui",
-      "action": "Create an Exa account and complete new-account onboarding required for Dashboard access and free credits.",
-      "required_fields": [
-        {
-          "label": "Signup and onboarding controls",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2",
-            "S3"
-          ],
-          "notes": "Docs require an account and completed onboarding for $10 free credits but do not publish the interactive field sequence."
-        }
-      ],
-      "observable_result": "The developer can open the Exa Dashboard with onboarding complete.",
-      "evidence_state": "unverified",
+      "interface": "browser",
+      "action": "Create or sign in to an Exa account and open the Dashboard.",
+      "required_fields": [],
+      "observable_result": "API Keys and Billing are reachable.",
+      "evidence_state": "documented",
       "source_ids": [
         "S2",
         "S3"
       ]
     },
     {
-      "step_number": 2,
+      "step_number": 3,
       "kind": "product-interaction",
       "interface": "web-ui",
-      "action": "Get an Exa API key from the Dashboard API Keys area.",
-      "required_fields": [
-        {
-          "label": "API key creation or copy controls",
-          "field_type": "other",
-          "evidence_state": "unverified",
-          "source_ids": [
-            "S2",
-            "S4"
-          ]
-        }
-      ],
-      "observable_result": "A usable Exa API key value is available.",
+      "action": "Complete new-account onboarding to receive the documented $10 in free credits.",
+      "required_fields": [],
+      "observable_result": "Billing shows a positive credit balance from free credits.",
       "evidence_state": "documented",
       "source_ids": [
-        "S2"
-      ]
-    },
-    {
-      "step_number": 3,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Store EXA_API_KEY in a .env file or export it for cURL.",
-      "required_fields": [
-        {
-          "label": "EXA_API_KEY",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "The selected client can read the API key.",
-      "evidence_state": "documented",
-      "source_ids": [
-        "S2"
+        "S6"
       ]
     },
     {
       "step_number": 4,
-      "kind": "implementation",
-      "interface": "cli",
-      "action": "Install the documented SDK packages for the selected language route, or skip for cURL.",
-      "required_fields": [
-        {
-          "label": "Package install commands",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ],
-          "notes": "Python and JavaScript install different packages; Chat Completions also installs openai."
-        }
-      ],
-      "observable_result": "Required packages are available, or cURL proceeds without installation.",
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Get an Exa API key from the Dashboard and store it securely.",
+      "required_fields": [],
+      "observable_result": "The key value is available locally.",
       "evidence_state": "documented",
       "source_ids": [
         "S2"
@@ -138,19 +95,10 @@
     {
       "step_number": 5,
       "kind": "implementation",
-      "interface": "code",
-      "action": "Create the documented example for the selected use case, or prepare the cURL body.",
-      "required_fields": [
-        {
-          "label": "Example code or cURL payload",
-          "field_type": "code",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "The request artifact for the chosen endpoint is ready.",
+      "interface": "cli",
+      "action": "Export the key as EXA_API_KEY in the terminal.",
+      "required_fields": [],
+      "observable_result": "EXA_API_KEY is set for the current shell.",
       "evidence_state": "documented",
       "source_ids": [
         "S2"
@@ -159,19 +107,23 @@
     {
       "step_number": 6,
       "kind": "verification",
-      "interface": "cli",
-      "action": "Execute the selected file or cURL command and observe the returned output.",
-      "required_fields": [
-        {
-          "label": "Execution command",
-          "field_type": "command",
-          "evidence_state": "documented",
-          "source_ids": [
-            "S2"
-          ]
-        }
-      ],
-      "observable_result": "The client prints or returns the documented Search, Answer, or Chat Completions result.",
+      "interface": "api",
+      "action": "POST a Search request with cURL to https://api.exa.ai/search.",
+      "required_fields": [],
+      "observable_result": "The API returns a successful JSON body containing search results.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Confirm the Search JSON includes search results for the query.",
+      "required_fields": [],
+      "observable_result": "Search results are present in the successful response.",
       "evidence_state": "documented",
       "source_ids": [
         "S2"
@@ -180,36 +132,57 @@
   ],
   "prerequisites": [
     {
-      "description": "Completed Dashboard onboarding so the documented $10 free credits are available for API use.",
+      "description": "An Exa account that can open the Dashboard.",
       "source_ids": [
+        "S2",
         "S3"
       ]
-    }
-  ],
-  "external_gates": [
+    },
     {
-      "description": "An Exa account and Dashboard access are required before an API key can be obtained.",
+      "description": "A positive credit balance. New accounts receive $10 in free credits when onboarding is completed; requests are blocked when the balance runs out.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "description": "An Exa API key from the Dashboard, exported as EXA_API_KEY.",
       "source_ids": [
         "S2"
       ]
     },
     {
-      "description": "API requests are blocked when the credit balance is exhausted until credits are added or auto recharge is enabled.",
+      "description": "A terminal with cURL (or any HTTP client). No language SDK is required.",
       "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "An Exa account and Dashboard access are required before an API key can be created.",
+      "source_ids": [
+        "S2",
         "S3"
+      ]
+    },
+    {
+      "description": "New accounts must complete onboarding to receive the documented $10 free credits; requests fail when credits are exhausted.",
+      "source_ids": [
+        "S6",
+        "S4"
+      ]
+    },
+    {
+      "description": "A secret API key must be obtained and supplied as x-api-key on the Search request.",
+      "source_ids": [
+        "S2"
       ]
     }
   ],
   "unavoidable_waits": [],
   "platform_outcomes": [
     {
-      "description": "New accounts receive $10 in free credits when onboarding is completed.",
-      "source_ids": [
-        "S3"
-      ]
-    },
-    {
-      "description": "Exa returns search, answer, or chat-completion payloads for authenticated requests.",
+      "description": "POST https://api.exa.ai/search with x-api-key returns search results JSON after onboarding free credits and an API key.",
       "source_ids": [
         "S2"
       ]
@@ -217,29 +190,29 @@
   ],
   "excluded": [
     {
-      "item": "Tool calling and example tutorials beyond the QuickStart",
-      "reason": "Welcome links these as separate get-started cards after the first API request path.",
+      "item": "Installing a language SDK",
+      "reason": "The quickstart documents an equivalent cURL call and says cURL needs no installation.",
       "source_ids": [
-        "S1"
+        "S2"
       ]
     },
     {
-      "item": "Adding paid credits or configuring auto recharge",
-      "reason": "Needed only after free credits are exhausted, not for the documented first request while free credits remain.",
+      "item": "Payment method for first free-credit request",
+      "reason": "New accounts receive $10 free credits after onboarding.",
       "source_ids": [
-        "S3"
+        "S6"
       ]
     }
   ],
   "sources": [
     {
       "id": "S1",
-      "title": "Welcome to Exa",
+      "title": "Welcome / getting started entry",
       "url": "https://exa.ai/docs/reference/getting-started",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "QuickStart and API Playground entry points"
+        "Entry to first-request quickstart"
       ]
     },
     {
@@ -249,45 +222,59 @@
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
-        "Dashboard API key requirement",
-        "EXA_API_KEY setup",
-        "Python/JS/cURL installs",
-        "Search, Answer, and Chat Completions examples"
+        "EXA_API_KEY export for cURL",
+        "cURL needs no installation",
+        "cURL POST to https://api.exa.ai/search with x-api-key"
       ]
     },
     {
       "id": "S3",
+      "title": "Exa Dashboard",
+      "url": "https://dashboard.exa.ai/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Dashboard entry for account and keys"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Error codes",
+      "url": "https://exa.ai/docs/reference/error-codes",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Requests fail with 402 when credits are exhausted"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Search API guide",
+      "url": "https://exa.ai/docs/reference/search-api-guide",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Search API context"
+      ]
+    },
+    {
+      "id": "S6",
       "title": "Billing",
       "url": "https://exa.ai/docs/reference/billing",
       "source_type": "official-documentation",
       "accessed_at": "2026-07-22",
       "evidence_supported": [
         "$10 free credits after onboarding",
-        "Pay-as-you-go credits",
-        "Requests blocked when balance is empty"
-      ]
-    },
-    {
-      "id": "S4",
-      "title": "API Keys dashboard",
-      "url": "https://dashboard.exa.ai/api-keys",
-      "source_type": "observed-public-ui",
-      "accessed_at": "2026-07-22",
-      "evidence_supported": [
-        "Authenticated API Keys management surface exists"
+        "Requests blocked when credit balance runs out",
+        "Add credits via Stripe when needed"
       ]
     }
   ],
   "uncertainties": [
     {
-      "question": "What exact signup, verification, team, onboarding, and API-key creation controls does a new Exa developer complete?",
-      "impact": "Unrecorded screens can add fields, waits, or approvals before free credits and the QuickStart begin.",
-      "evidence_needed": "A dated fresh-account Dashboard walkthrough from signup through first API key copy."
-    },
-    {
-      "question": "Which of the nine language and use-case QuickStart combinations is the canonical shortest route?",
-      "impact": "Installation, code, endpoint, and observable output differ by combination with no named default.",
-      "evidence_needed": "An official recommended first request, or an explicit workshop choice of one language and one use case."
+      "question": "Exact interactive fields and steps inside Dashboard onboarding that gate the $10 free credits.",
+      "impact": "Could add undocumented form or wait steps before free credits appear.",
+      "evidence_needed": "Billing docs state free credits after onboarding but do not publish the interactive onboarding field contract."
     }
   ],
   "counts": null
