@@ -99,56 +99,49 @@ const runSearch = debounce(async (q) => {
   }
 }, 160);
 
-/* ---------- Rendering one platform's documented route ---------- */
-
-// A short, honest "how to read this" strip shown with every result. It frames
-// the content as documented steps, not a measurement, score, or ranking.
-function readStrip() {
-  return `
-    <p class="read-strip">
-      <strong>What this means:</strong> this is the route described by official docs. It is not observed
-      developer behavior, a conversion rate, or a product ranking.
-    </p>`;
-}
+/* ---------- Platform result ---------- */
 
 function auditBanner(a) {
-  if (a.auditStatus === "verified") {
-    return `<div class="draft-banner"><strong>Shortest required path verified.</strong> Starts at account creation, ends at first success, includes every evidenced required field, and excludes optional work.</div>`;
+  const status = a.auditStatus || "pending";
+  let text = "Pending re-audit: preserved evidence is not treated as a verified shortest path.";
+  if (status === "verified") {
+    text = "Verified shortest required path: account creation → first success, required fields only.";
+  } else if (status === "needs-human-judgment") {
+    text = "Not verified: a route or field choice is still unresolved. Counts and peer comparison withheld.";
+  } else if (status === "blocked") {
+    text = "Audit blocked: a required step or field is hidden from available evidence. Counts withheld.";
   }
-  if (a.auditStatus === "needs-human-judgment") {
-    return `<div class="draft-banner"><strong>Route not yet verified.</strong> Current evidence leaves a consequential route or field choice unresolved. Counts and peer comparison are withheld.</div>`;
-  }
-  if (a.auditStatus === "blocked") {
-    return `<div class="draft-banner"><strong>Audit blocked.</strong> A required transition or field is hidden from available evidence. Counts and peer comparison are withheld.</div>`;
-  }
-  return `<div class="draft-banner"><strong>Pending re-audit.</strong> The original evidence record is preserved, but it is not presented as a verified shortest path.</div>`;
+  return `<div class="status-banner" data-status="${esc(status)}">${text}</div>`;
 }
 
 function renderLoad(load) {
   if (!load || !load.available) {
     return `
       <section class="load-card load-unavailable" aria-labelledby="load-title">
-        <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
-        <h3 id="load-title">${esc(load?.label || "Comparison unavailable")}</h3>
-        <p>${esc(load?.summary || "There is not enough qualified evidence for a peer comparison.")}</p>
-        <p class="microcopy">${esc(load?.note || "No drop-off score is inferred from documentation.")}</p>
+        <p class="section-kicker">Peer comparison</p>
+        <h3 id="load-title">${esc(load?.label || "Unavailable")}</h3>
+        <p>${esc(load?.summary || "Not enough qualified evidence for a peer comparison.")}</p>
       </section>`;
   }
 
-  const components = load.components.map((component) => `
+  const components = load.components
+    .map(
+      (component) => `
     <li class="signal-row">
       <span><strong>${num(component.value)}</strong> ${esc(component.label)}</span>
-      <span class="position position-${esc(component.position)}">${esc(component.position)} peer median (${num(component.peerMedian)})</span>
-    </li>`).join("");
+      <span class="position position-${esc(component.position)}">${esc(component.position)} median (${num(component.peerMedian)})</span>
+    </li>`,
+    )
+    .join("");
 
   return `
     <section class="load-card" aria-labelledby="load-title">
       <div class="load-head">
         <div>
-          <p class="section-kicker">DOCUMENTED ONBOARDING LOAD</p>
+          <p class="section-kicker">Peer comparison</p>
           <h3 id="load-title">${esc(load.label)}</h3>
         </div>
-        <span class="load-score" aria-label="${num(load.signalsAboveMedian)} of ${num(load.signalCount)} signals above peer median">
+        <span class="load-score" aria-label="${num(load.signalsAboveMedian)} of ${num(load.signalCount)} above median">
           ${num(load.signalsAboveMedian)}<small>/${num(load.signalCount)}</small>
         </span>
       </div>
@@ -170,9 +163,17 @@ function stepItem(s) {
     ? `<p class="step-signal"><strong>Success signal:</strong> ${esc(s.successSignal)}</p>`
     : "";
   const optional = s.required ? "" : '<span class="step-optional">optional</span>';
-  const fields = s.requiredFields && s.requiredFields.length
-    ? `<div class="step-fields"><strong>Required fields</strong><ul class="step-details">${s.requiredFields.map((field) => `<li>${esc(field.label)} <span class="step-tag">${esc(field.type)}</span>${field.notes ? `<br><span class="microcopy">${esc(field.notes)}</span>` : ""}</li>`).join("")}</ul></div>`
-    : "";
+  const fields =
+    s.requiredFields && s.requiredFields.length
+      ? `<div class="step-fields"><strong>Required fields</strong><ul class="step-details">${s.requiredFields
+          .map(
+            (field) =>
+              `<li>${esc(field.label)} <span class="step-tag">${esc(field.type)}</span>${
+                field.notes ? `<br><span class="microcopy">${esc(field.notes)}</span>` : ""
+              }</li>`,
+          )
+          .join("")}</ul></div>`
+      : "";
   return `
     <li class="step">
       <div class="step-head"><span class="step-num">${num(s.stepNumber)}</span>${meta}${optional}</div>
@@ -188,13 +189,18 @@ function renderAssessment(a) {
     ? `<div class="chips">${a.prerequisites
         .map((p) => `<span class="chip ${p.required ? "req" : ""}">${esc(p.type)}${p.required ? " (required)" : ""}</span>`)
         .join("")}</div>`
-    : '<p class="lede">No prerequisites documented for this route.</p>';
+    : '<p class="lede">None documented.</p>';
 
   const gates = a.frictionGates.length
     ? `<ul class="gate-list">${a.frictionGates
-        .map((g) => `<li><span class="chip">${esc(g.type)}</span> ${esc(g.description)}${g.atStep ? ` <span class="gate-step">(at step ${num(g.atStep)})</span>` : ""}</li>`)
+        .map(
+          (g) =>
+            `<li><span class="chip">${esc(g.type)}</span> ${esc(g.description)}${
+              g.atStep ? ` <span class="gate-step">(step ${num(g.atStep)})</span>` : ""
+            }</li>`,
+        )
         .join("")}</ul>`
-    : '<p class="lede">No friction gates documented on this route.</p>';
+    : '<p class="lede">None documented.</p>';
 
   const time = a.timeToFirstSuccess
     ? `${esc(a.timeToFirstSuccess.value)} ${a.timeToFirstSuccess.vendorClaim ? "(vendor claim)" : ""}`
@@ -209,7 +215,7 @@ function renderAssessment(a) {
 
   const steps = a.steps.length
     ? `<ol class="steps-list">${a.steps.map(stepItem).join("")}</ol>`
-    : '<p class="lede">No shortest required path is published until this platform passes re-audit.</p>';
+    : '<p class="lede">No shortest required path until re-audit passes.</p>';
 
   const asOf = a.researchedAt
     ? ` Documented from official docs as of ${esc(a.researchedAt)}. Docs change.`
@@ -217,7 +223,7 @@ function renderAssessment(a) {
 
   const prompts = a.investigationPrompts?.length
     ? `<ul class="prompt-list">${a.investigationPrompts.map((prompt) => `<li>${esc(prompt)}</li>`).join("")}</ul>`
-    : '<p class="lede">No specific investigation prompts were derived from the documented route.</p>';
+    : '<p class="lede">None derived for this route.</p>';
 
   const signals = a.routeSignals
     ? `<div class="signal-counters" aria-label="Verified shortest-path signals">
@@ -226,10 +232,10 @@ function renderAssessment(a) {
           <div><strong>${num(a.routeSignals.waits)}</strong><span>unavoidable waits</span></div>
           <div><strong>${num(a.routeSignals.gates)}</strong><span>external gates</span></div>
         </div>`
-    : '<div class="signal-counters"><div><strong>Withheld</strong><span>until shortest-path audit passes</span></div></div>';
+    : '<div class="signal-counters"><div><strong>Withheld</strong><span>until audit passes</span></div></div>';
 
   const comparison = a.auditStatus === "verified" ? renderLoad(a.onboardingLoad) : "";
-  const pathLabel = a.auditStatus === "verified" ? "Open the verified shortest required path" : "Review the current audit evidence";
+  const pathLabel = a.auditStatus === "verified" ? "Verified path" : "Audit evidence";
   const pathCount = a.pathStepCount == null ? "not verified" : `${num(a.pathStepCount)} actions`;
 
   return `
@@ -239,45 +245,44 @@ function renderAssessment(a) {
         <span class="pill pill-cat">${esc(a.category)}</span>
       </div>
       <p class="lede">${esc(a.outcome)}</p>
-      ${readStrip()}
+      <p class="read-strip">Official docs route only: not observed behavior, conversion, or a ranking.</p>
       ${auditBanner(a)}
 
       <div class="summary-grid">
         <div class="summary-block">
-          <p class="section-kicker">DOCUMENTED FIRST SUCCESS</p>
+          <p class="section-kicker">First success</p>
           <p class="summary-answer">${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</p>
-          <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
+          <p class="microcopy">Route: ${esc(a.selectedSurface)}</p>
         </div>
         ${signals}
       </div>
 
       ${comparison}
 
-      <section class="prompt-card" aria-labelledby="prompt-title">
-        <p class="section-kicker">WHERE TO INVESTIGATE</p>
-        <h3 id="prompt-title">Possible attention points</h3>
-        <p class="microcopy">These prompts come from documented gates and prerequisites. They are not recorded causes of drop-off.</p>
-        ${prompts}
-      </section>
-
       <details class="detail-panel">
         <summary>${pathLabel} <span>${pathCount}</span></summary>
         <dl class="kv">
           <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
           <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
-          <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
+          <div><dt>Friction gates</dt><dd>${gates}</dd></div>
         </dl>
-        <h3 class="steps-heading">Account creation to first success <span class="steps-count">${pathCount}</span></h3>
+        <h3 class="steps-heading">Steps <span class="steps-count">${pathCount}</span></h3>
         ${steps}
       </details>
 
+      <details class="detail-panel">
+        <summary>Investigation prompts <span>${num(a.investigationPrompts?.length || 0)}</span></summary>
+        <p class="microcopy">From documented gates and prerequisites, not recorded drop-off causes.</p>
+        ${prompts}
+      </details>
+
       <details class="detail-panel sources-block">
-        <summary>Check the evidence <span>${num(a.sourceCount)} official sources</span></summary>
+        <summary>Sources <span>${num(a.sourceCount)} official</span></summary>
         ${sources}
       </details>
 
-      <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Open the full evidence record (JSON)</a></p>
-      ${a.auditUrl ? `<p class="dist-line"><a href="${esc(a.auditUrl)}" rel="noreferrer">Open the shortest-path audit (JSON)</a></p>` : ""}
+      <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Full evidence record (JSON)</a></p>
+      ${a.auditUrl ? `<p class="dist-line"><a href="${esc(a.auditUrl)}" rel="noreferrer">Shortest-path audit (JSON)</a></p>` : ""}
       <p class="dist-line note-line">${esc(a.note)}${asOf}</p>
     </div>`;
 }
@@ -285,7 +290,7 @@ function renderAssessment(a) {
 async function showPlatform(slug) {
   hideSuggestions();
   el.result.hidden = false;
-  el.result.innerHTML = '<div class="state-message">Loading the documented route…</div>';
+  el.result.innerHTML = '<div class="state-message">Loading…</div>';
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
   try {
     const assessment = await api(`/api/platforms/${encodeURIComponent(slug)}`);
@@ -299,10 +304,9 @@ function renderUnknown(query) {
   el.result.hidden = false;
   el.result.innerHTML = `
     <div class="card unknown-panel">
-      <p class="section-kicker">NEW PLATFORM</p>
-      <h2>"${esc(query)}" is not in the Atlas yet</h2>
-      <p class="lede">Research its official docs, show the draft here, then open a draft GitHub contribution for human review.</p>
-      <p class="microcopy">The Atlas will research this platform automatically from official documentation and prepare a draft contribution for human review.</p>
+      <p class="section-kicker">New platform</p>
+      <h2>${esc(query)} is not in the Atlas yet</h2>
+      <p class="lede">Researching official docs and drafting a contribution for review.</p>
       <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
       <ol class="research-log" id="research-log" hidden></ol>
     </div>`;
@@ -326,13 +330,11 @@ function draftBanner(record) {
   const blob = URL.createObjectURL(new Blob([json], { type: "application/json" }));
   return `
     <div class="draft-banner">
-      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com and OpenRouter. It passed schema
-      validation but has not been human-reviewed. Treat it as a starting point, not a source of truth.
-      <a href="${blob}" download="${esc(record.platform.slug)}.json">Download the drafted record (JSON)</a>
+      <strong>Machine draft, unverified.</strong> Schema-valid from live research; not human-reviewed.
+      <a href="${blob}" download="${esc(record.platform.slug)}.json">Download JSON</a>
     </div>`;
 }
 
-// Parse a Server-Sent Events stream from a fetch Response body.
 async function* readSse(res) {
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -381,12 +383,17 @@ async function researchPlatform(query) {
         resultHtml = draftBanner(ev.record) + renderAssessment(ev.assessment);
         el.result.innerHTML = resultHtml;
       } else if (ev.type === "pr") {
-        el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line"><strong>Draft PR opened:</strong> <a href="${esc(ev.url)}" rel="noreferrer">${esc(ev.url)}</a></p></div>`;
+        el.result.innerHTML =
+          resultHtml +
+          `<div class="card"><p class="dist-line"><strong>Draft PR:</strong> <a href="${esc(ev.url)}" rel="noreferrer">${esc(ev.url)}</a></p></div>`;
       } else if (ev.type === "pr_skipped") {
-        el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line">${esc(ev.reason)}</p></div>`;
+        el.result.innerHTML =
+          resultHtml + `<div class="card"><p class="dist-line">${esc(ev.reason)}</p></div>`;
       } else if (ev.type === "error") {
-        if (resultHtml) el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line err">${esc(ev.message)}</p></div>`;
-        else logStep(ev.message, "err");
+        if (resultHtml) {
+          el.result.innerHTML =
+            resultHtml + `<div class="card"><p class="dist-line err">${esc(ev.message)}</p></div>`;
+        } else logStep(ev.message, "err");
       }
     }
   } catch {
@@ -410,8 +417,6 @@ async function submitQuery(q) {
     el.result.innerHTML = `<div class="state-message">${esc(err.message)}</div>`;
   }
 }
-
-/* ---------- Events ---------- */
 
 el.input.addEventListener("input", (e) => runSearch(e.target.value));
 el.input.addEventListener("blur", () => setTimeout(hideSuggestions, 150));
