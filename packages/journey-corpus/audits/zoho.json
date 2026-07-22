@@ -1,0 +1,271 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Zoho",
+    "slug": "zoho",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "bfee1111bc6398bdf5fb842d5cc254a93ddc0d11d949d7f53e9eef2d1888516e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "No Zoho account, regional data-center choice, product account, organization, portal, client, scope, authorization code, access token, or refresh token is assumed.",
+      "A browser and an email or supported external identity are available.",
+      "No signup, identity-provider authorization, verification, product provisioning, API Console action, client creation, code generation, or token request was performed during research."
+    ]
+  },
+  "developer_goal": "Start without a Zoho account, create access for a Zoho product, register a Self Client in the Zoho API Console, choose the product scopes and grant flow, and obtain the first access token for the developer's own account.",
+  "first_success": {
+    "outcome": "A successful Self Client token exchange returns an access token, token type, API domain, and expiration; the authorization-code branch also returns a refresh token.",
+    "observable_signal": "The token endpoint returns a JSON response containing `access_token`, `api_domain`, `token_type`, and `expires_in`, plus `refresh_token` for the authorization-code branch.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Zoho OAuth self client access-token path",
+    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Zoho OAuth self client access-token path",
+        "status": "unresolved",
+        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+      },
+      {
+        "name": "Zoho CRM API V8",
+        "status": "unresolved",
+        "reason": "CRM is one product in the Zoho suite. Selecting a CRM endpoint would silently redefine Zoho as Zoho CRM and still require a scope and usable CRM organization."
+      },
+      {
+        "name": "Server-based OAuth application",
+        "status": "unresolved",
+        "reason": "This route adds redirect URI, user consent, and multi-user application concerns. Self Client is explicitly intended for the developer's own account and removes end-user authorization."
+      },
+      {
+        "name": "Client credentials grant for Self Client",
+        "status": "unresolved",
+        "reason": "Authorization code and client credentials are peer token branches. The overview does not select one universally, and a service-specific scope still has to be chosen."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete Zoho account creation or trial signup at the official entry URL.",
+      "required_fields": [
+        {
+          "label": "Signup identity and required account fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
+        }
+      ],
+      "observable_result": "A new Zoho account or trial session exists.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Complete any required email or identity verification for the new account.",
+      "required_fields": [
+        {
+          "label": "Verification challenge",
+          "field_type": "challenge",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The account becomes usable for developer onboarding.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the documented post-login setup for the selected Zoho candidate through first success.",
+      "required_fields": [
+        {
+          "label": "Candidate-specific configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
+        }
+      ],
+      "observable_result": "The token endpoint returns a JSON response containing `access_token`, `api_domain`, `token_type`, and `expires_in`, plus `refresh_token` for the authorization-code branch.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "{'order': 1, 'type': 'account', 'requirement': 'Have a Zoho account and access to the Zoho service whose data the Self Client will fetch.', 'required': True, 'source_ids': ['S1', 'S4', 'S5']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 2, 'type': 'region', 'requirement': \"Use the account's Zoho data center and corresponding accounts-server URL for token requests.\", 'required': True, 'source_ids': ['S3', 'S5', 'S6']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 3, 'type': 'configuration', 'requirement': 'Choose Self Client in the API Console, enter the required Client Name, and create it to receive a Client ID and Client Secret.', 'required': True, 'source_ids': ['S1', 'S2']}",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A Zoho account is required, but the public signup response does not expose the complete form or completion sequence.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The API Console is behind Zoho Accounts sign-in and can involve external identity, password, OTP, MFA, linked-account, and data-center states.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The developer must choose a Zoho service and scope, and Self Client offers two peer token grant flows.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Get access token for a Self Client.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Making product-specific API calls, refreshing or rotating tokens, building a multi-user OAuth application, production security hardening, publishing extensions, and ongoing API operations occur after ",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Self Client - Overview | Developer OAuth 2.0 - Zoho",
+      "url": "https://www.zoho.com/developer/oauth/self-client/overview.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary documented developer route and first-success framing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Register Your App | OAuth 2.0 - Zoho",
+      "url": "https://www.zoho.com/developer/oauth/register-app.html",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Register Your App | OAuth 2.0 - Zoho"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Self Client - Authorization Code Flow | Developer OAuth 2.0 - Zoho",
+      "url": "https://www.zoho.com/developer/oauth/self-client/authorization-code-flow.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Self Client - Authorization Code Flow | Developer OAuth 2.0 - Zoho"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create New Account | Sign up to Zoho",
+      "url": "https://www.zoho.com/signup.html",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Create New Account | Sign up to Zoho"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Zoho Accounts",
+      "url": "https://api-console.zoho.com/",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Zoho Accounts"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Self Client - Client Credentials Flow | Developer OAuth 2.0 - Zoho",
+      "url": "https://www.zoho.com/developer/oauth/self-client/client-credentials-flow.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Self Client - Client Credentials Flow | Developer OAuth 2.0 - Zoho"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Zoho product and API should define first success for the umbrella Zoho platform?",
+      "impact": "The product determines account provisioning, organization or portal setup, scopes, API domain, and the useful first API call.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The shared OAuth documentation spans Zoho services and gives no universal product or endpoint default."
+    },
+    {
+      "question": "What exact signup, verification, regional-account, and product-provisioning states lead a new user into the API Console?",
+      "impact": "The complete chronological first-user path and page count cannot be verified.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The public signup response does not render those states, and the API Console begins behind account sign-in."
+    },
+    {
+      "question": "Which Self Client grant should be the default first-mile route?",
+      "impact": "Authorization code adds code generation and a refresh token, while client credentials requires the service scope and sometimes `soid`, omits the refresh token, and uses repeated token requests.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The official overview presents both as valid peer options without a universal selection rule."
+    },
+    {
+      "question": "What exact current required signup, identity, legal, and entitlement fields does Zoho show for a new developer, and which peer route is the lexicographic shortest path?",
+      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
+      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+    }
+  ],
+  "counts": null
+}

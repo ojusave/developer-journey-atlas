@@ -1,0 +1,253 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "CodeRabbit",
+    "slug": "coderabbit",
+    "category": "API infrastructure and developer tooling"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "39e354325b2c6eca99a1f247891a1281534705aa8d9a92f10964da97a5624389",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an existing Git-provider account that can own or administer target repositories.",
+      "No CodeRabbit account, installed Git App, authorized repositories, or reviewed pull request exists yet."
+    ]
+  },
+  "developer_goal": "Create a CodeRabbit account, authorize repositories on a supported Git platform, and receive the first actionable pull-request review.",
+  "first_success": {
+    "outcome": "CodeRabbit posts an actionable review on a pull request in an authorized repository.",
+    "observable_signal": "After setup reaches You're all set and a pull request is opened, the pull request shows a CodeRabbit review with actionable findings.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "CodeRabbit hosted Quickstart with Git-platform-specific authorization",
+    "rule": "Prefer the hosted pull-request Quickstart over CLI or IDE reviews, then resolve one Git platform only when its complete permission and signup fields are established.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "GitHub.com hosted integration",
+        "status": "unresolved",
+        "reason": "First-listed platform docs cover Login with GitHub, OAuth authorize, org selection, and Install & Authorize, but a conditional Complete your signup dialog may still collect undocumented fields."
+      },
+      {
+        "name": "GitLab.com, Azure DevOps, Bitbucket Cloud, or self-hosted Git platforms",
+        "status": "unresolved",
+        "reason": "Official Quickstart and platforms overview present these as peer integrations with different ownership, service-account, and permission mechanics."
+      },
+      {
+        "name": "IDE or CLI reviews without a hosted pull request",
+        "status": "not-selected",
+        "reason": "Quickstart lists IDE and CLI reviews after You're all set as alternate next actions; the documented first hosted success is pull-request review feedback."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open the CodeRabbit login surface and choose a Git-platform sign-in method.",
+      "required_fields": [
+        {
+          "label": "Git platform sign-in method",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"],
+          "notes": "Public login shows GitHub Cloud, GitLab Cloud, Bitbucket Cloud, Azure DevOps Cloud, and SSO."
+        },
+        {
+          "label": "Terms of Use and Privacy Policy acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"],
+          "notes": "Login states that continuing agrees to CodeRabbit Terms of Use and Privacy Policy."
+        }
+      ],
+      "observable_result": "The browser redirects to the selected Git provider for authorization.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "external-authorization",
+      "interface": "external-system",
+      "action": "Authorize CodeRabbit on the selected Git platform and grant repository access.",
+      "required_fields": [
+        {
+          "label": "Git provider OAuth or App authorization",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Organization or personal account selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Repository access scope",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "GitHub.com documents All repositories versus Only select repositories."
+        },
+        {
+          "label": "Complete your signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Hands-on guide says a Complete your signup dialog may appear and must be filled with requested information, without listing the fields."
+        }
+      ],
+      "observable_result": "CodeRabbit finishes integration setup and the product presents the post-setup You're all set state.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2", "S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "external-system",
+      "action": "Open a pull request in an authorized repository.",
+      "required_fields": [
+        {
+          "label": "Pull request contents and target branch",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "Quickstart says open a pull request; exact create-PR fields depend on the Git platform and whether a test repository must be created first."
+        }
+      ],
+      "observable_result": "A reviewable pull request exists in a repository CodeRabbit can access.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open the CodeRabbit review on the pull request and confirm actionable findings.",
+      "required_fields": [],
+      "observable_result": "The pull request shows CodeRabbit review feedback with actionable findings or suggested improvements.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "An existing supported Git-provider account with owner-level permissions on at least one repository; organization installs need organization owner permissions.",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "The Git provider must grant CodeRabbit the OAuth or Git App permissions required to read code and review pull requests.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "After a pull request is opened, CodeRabbit needs a few minutes to analyze the changes and post the first review.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "CodeRabbit creates the hosted account from the Git-provider sign-in and completes repository integration until You're all set.",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "description": "CodeRabbit posts an automated review with actionable findings on the open pull request.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading CodeRabbit documentation and the hands-on guide narrative",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "item": "IDE and CLI uncommitted-change reviews",
+      "reason": "Presented as alternate next actions after hosted setup, not the Quickstart pull-request first success.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Custom coderabbit.yaml tuning",
+      "reason": "Optional customization after default reviews already work.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "CodeRabbit Quickstart",
+      "url": "https://docs.coderabbit.ai/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sign up with existing Git-provider account",
+        "Repository access grant",
+        "You're all set",
+        "Pull-request review within minutes"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "CodeRabbit hands-on guide",
+      "url": "https://docs.coderabbit.ai/guide",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "GitHub-focused walkthrough",
+        "Conditional Complete your signup dialog",
+        "Pull-request review observation"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "CodeRabbit login",
+      "url": "https://app.coderabbit.ai/login",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Git platform sign-in buttons",
+        "Terms and privacy acknowledgement on continue"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "CodeRabbit GitHub.com integration",
+      "url": "https://docs.coderabbit.ai/platforms/github-com",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Login with GitHub",
+        "Authorize coderabbitai",
+        "Organization selection",
+        "Repository access and Install & Authorize"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "CodeRabbit platforms overview",
+      "url": "https://docs.coderabbit.ai/platforms/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Peer Git platform integrations",
+        "Shared authenticate-add-org-grant-repos pattern"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Git platform's authorization path is the corpus comparison route, and what fields appear if Complete your signup is shown?",
+      "impact": "Platform choice changes permission UI, service-account requirements, and field counts; the conditional signup dialog can add undocumented required fields.",
+      "evidence_needed": "Pick one platform, then capture a dated fresh-account walkthrough from CodeRabbit login through You're all set and the first pull-request review, including any signup dialog fields."
+    }
+  ],
+  "counts": null
+}

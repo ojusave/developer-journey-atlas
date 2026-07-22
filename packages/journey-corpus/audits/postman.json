@@ -1,0 +1,251 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Postman",
+    "slug": "postman",
+    "category": "API infrastructure and developer tooling"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "ff525b6cd757605ccd7fdcdebff70499d678949990586900f550b6c98485959f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported desktop OS, browser, and email address.",
+      "No Postman desktop install, Postman account, collection, or saved Echo request exists yet."
+    ]
+  },
+  "developer_goal": "Install Postman, create an account, send the Postman Echo request from the official Quick start, save it, and review a status-code test result.",
+  "first_success": {
+    "outcome": "The Quick start request is saved and Test Results show the Status code is 200 assertion for the Postman Echo response.",
+    "observable_signal": "After the final Send, the Response pane is populated and Test Results shows the status-code test result.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Postman desktop Quick start with Postman Echo",
+    "rule": "Use the official Quick start through save and test only after resolving whether first success stops at the first Echo response in the lightweight client.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Desktop Quick start through collection save and Test Results",
+        "status": "unresolved",
+        "reason": "Matches the current Quick start document end state, but requires sign-in before save and adds personalize-your-experience fields whose exact requiredness versus social signup is not fully settled."
+      },
+      {
+        "name": "Unsigned lightweight API Client first Echo Send only",
+        "status": "unresolved",
+        "reason": "Docs say the desktop app can send requests before sign-in; stopping after the first response is shorter but omits the Quick start's save and test sections."
+      },
+      {
+        "name": "Email signup versus GitHub, Google, or SSO",
+        "status": "unresolved",
+        "reason": "Official sign-up docs present peer identity methods with different verification and redirect steps."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Download, install, and open the Postman desktop app.",
+      "required_fields": [],
+      "observable_result": "The Postman desktop workbench is open.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open a new request tab, enter the Postman Echo GET URL, and select Send.",
+      "required_fields": [
+        {
+          "label": "Request URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Quick start uses postman-echo.com/get."
+        }
+      ],
+      "observable_result": "The Response pane shows the Echo response body.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Postman account and sign in before saving the request.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Documented for the email signup option."
+        },
+        {
+          "label": "Username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Email verification code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Personalize your experience step."
+        },
+        {
+          "label": "Role",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "The developer is signed in and can save requests to collections.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Save the request into a new named collection.",
+      "required_fields": [
+        {
+          "label": "Collection name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The request appears under Collections in the sidebar.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add the Status code: Code is 200 post-response snippet, Send again, and open Test Results.",
+      "required_fields": [
+        {
+          "label": "Post-response status code test snippet",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Test Results shows the status-code assertion outcome for the Echo response.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Ability to install the Postman desktop app on the developer's machine.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Email verification is required for the email signup option before the account can be used.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Postman must deliver the 6-digit email verification code for the email signup route.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Postman Echo returns a response that the desktop client renders in the Response pane.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Postman runs the post-response test and populates Test Results.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Connecting a local Git repository during signup",
+      "reason": "Official signup docs label the Git connection step optional.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Stay signed in for 30 days",
+      "reason": "Presented as an optional preference during signup.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Reading broader Postman Learning Center overview pages",
+      "reason": "Documentation reading is not a product action.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Postman quick start",
+      "url": "https://learning.postman.com/docs/getting-started/quick-start",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Desktop install prerequisite",
+        "Postman Echo request",
+        "Sign in before save",
+        "Collection save",
+        "Status code test and Test Results"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get started overview",
+      "url": "https://learning.postman.com/docs/getting-started/overview/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Quick start positioning for new users"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign up for Postman",
+      "url": "https://learning.postman.com/docs/getting-started/installation/account/sign-up-for-postman/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email, username, password, and verification code",
+        "GitHub, Google, and SSO alternatives",
+        "Optional Git repository connect",
+        "Name and role personalization"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does first success stop after the first unsigned Echo response, or must the path include official Quick start save and test with account creation?",
+      "impact": "Stopping early removes account fields and collection/test actions; continuing requires choosing an identity method and counting personalization fields.",
+      "evidence_needed": "A corpus rule choice between lightweight first response and full Quick start end state, plus a fresh desktop signup walkthrough for the chosen identity method."
+    }
+  ],
+  "counts": null
+}

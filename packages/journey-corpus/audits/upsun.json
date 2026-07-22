@@ -1,0 +1,340 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Upsun",
+    "slug": "upsun",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "ba161d9fd458f9e07c6d60680154d9d562172e89446a69d000cf6ab4f4c9a4f9",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has Git and a terminal.",
+      "No Upsun account, organization, or project exists yet.",
+      "Despite Start from zero labeling, a local project that already runs may still be required by Setup."
+    ]
+  },
+  "developer_goal": "Create an Upsun account and deploy a first application to a live production environment URL.",
+  "first_success": {
+    "outcome": "Upsun has built and deployed the application to the default production environment and exposed its primary URL.",
+    "observable_signal": "Deployment succeeds, the production environment is Active, and the primary environment URL opens or is returned by the CLI.",
+    "source_ids": [
+      "S1",
+      "S5"
+    ]
+  },
+  "route_selection": {
+    "surface": "Upsun CLI plus Console project creation",
+    "rule": "Get Started presents Start from zero, Bring your project, and Connect your repo as peer paths; signup fields and the expected local app remain unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Start from zero via CLI",
+        "status": "unresolved",
+        "reason": "Vendor default narrative, but Setup still requires working local code and does not pick one framework."
+      },
+      {
+        "name": "Bring your existing project",
+        "status": "unresolved",
+        "reason": "Peer path that may skip greenfield app creation but still needs config, resources, and push."
+      },
+      {
+        "name": "Connect GitHub/GitLab/Bitbucket",
+        "status": "not-selected",
+        "reason": "Adds external repo linking and preview automation beyond the minimal first live production deploy."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Register for an Upsun trial account using email or GitHub, Bitbucket, or Google.",
+      "required_fields": [
+        {
+          "label": "Signup identity and verification fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Docs name providers and link signup but do not expose the atomic registration screens."
+        }
+      ],
+      "observable_result": "The developer can authenticate with the Upsun CLI or Console.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install the Upsun CLI and run upsun login.",
+      "required_fields": [
+        {
+          "label": "CLI install command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "upsun login",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The CLI is authenticated to the Upsun account.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Create the first organization if prompted, then create a project and initialize Upsun configuration for the local application.",
+      "required_fields": [
+        {
+          "label": "First organization fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Project creation prompts",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S3"
+          ]
+        },
+        {
+          "label": ".upsun/config.yaml contents",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "A project exists with committed Upsun configuration for the application.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Set resources if required, commit configuration, and run upsun push.",
+      "required_fields": [
+        {
+          "label": "Resource settings",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Get Started shows upsun resources:set; whether it is mandatory on every trial is unresolved."
+        }
+      ],
+      "observable_result": "Upsun accepts the push and starts build and deploy.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open or retrieve the environment primary URL after production becomes Active.",
+      "required_fields": [],
+      "observable_result": "The primary URL serves the deployed application.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Git installed locally and basic command-line familiarity.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "A supported runtime and a local project that already runs, despite Start from zero framing.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account signup with email or third-party identity must succeed before CLI login completes.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "Creating the first organization activates the time-limited trial.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Upsun must validate configuration, build images, allocate resources, and deploy before the primary URL is live.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "upsun push triggers build and deploy to the default production environment.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "description": "A successful deploy marks the environment Active and exposes a primary URL.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Get Started overview cards",
+      "reason": "Documentation is evidence for unresolved route choice.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Connecting GitHub for automatic PR previews",
+      "reason": "Optional after first production deploy.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Local tethered development tunnels",
+      "reason": "Occurs after first live deployment.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started with Upsun",
+      "url": "https://developer.upsun.com/docs/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Peer start paths",
+        "CLI install",
+        "project create",
+        "init",
+        "resources",
+        "push"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Setup",
+      "url": "https://developer.upsun.com/docs/get-started/here/setup",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account providers",
+        "Git prerequisite",
+        "Local project requirement",
+        "Trial on first organization"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create a project",
+      "url": "https://developer.upsun.com/docs/get-started/here/create-project",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Project creation flow"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Configure your project",
+      "url": "https://developer.upsun.com/docs/get-started/here/configure",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Configuration file expectations"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Build and deploy",
+      "url": "https://developer.upsun.com/docs/core-concepts/build-deploy",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Build deploy pipeline",
+        "Live deployment outcomes"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What local application does Start from zero expect when the developer has no project yet?",
+      "impact": "Framework choice and local setup can add a large undocumented segment before Upsun commands.",
+      "evidence_needed": "Human selection of one official starter stack and verification that Setup and Get Started agree on required local artifacts."
+    },
+    {
+      "question": "What is the current account signup, verification, and first-organization field order?",
+      "impact": "Pre-CLI account counts cannot be verified from public documentation.",
+      "evidence_needed": "Fresh-account Console signup walkthrough with dated screenshots."
+    },
+    {
+      "question": "Is explicit upsun resources:set mandatory on the current trial before first push?",
+      "impact": "Adds or removes a required CLI configuration action.",
+      "evidence_needed": "Current trial walkthrough confirming whether defaults allow push without resources:set."
+    }
+  ],
+  "counts": null
+}

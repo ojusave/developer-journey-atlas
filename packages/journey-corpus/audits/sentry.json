@@ -1,0 +1,340 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Sentry",
+    "slug": "sentry",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "26f2bc6da5ddc4994a3f2650acb5844047842c3897bd84bc76df45fe06d90577",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "The developer is creating a new Sentry organization on the free trial signup surface.",
+      "No Sentry organization, project, DSN, or SDK instrumentation exists yet."
+    ]
+  },
+  "developer_goal": "Create a Sentry account and project, instrument an application with a Sentry SDK, and open the first captured issue.",
+  "first_success": {
+    "outcome": "A new error appears in Issues and opens to show full details and context.",
+    "observable_signal": "The Issues view shows a newly captured error with expandable event details.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "Sentry Cloud signup and platform SDK quickstarts",
+    "rule": "Select the shortest complete signup-to-first-issue route only after one platform SDK is fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Node.js Error Monitoring quickstart",
+        "status": "unresolved",
+        "reason": "Fully documented candidate, but the platforms index does not rank Node above peer SDKs."
+      },
+      {
+        "name": "Other first-class SDK families (Python, Java, .NET, Ruby, Go, mobile, and many JavaScript frameworks)",
+        "status": "unresolved",
+        "reason": "Official Platforms docs present co-equal SDK routes with different packages, files, and verification steps."
+      },
+      {
+        "name": "Sentry REST API project management",
+        "status": "not-selected",
+        "reason": "API manages resources; SDK quickstarts are the documented routes for sending application events."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free Sentry account on the public signup form.",
+      "required_fields": [
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Organization",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Data Storage Location",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "US or EU; immutable after organization creation."
+        },
+        {
+          "label": "Terms of Service and Privacy Policy agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "reCAPTCHA",
+          "field_type": "challenge",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The developer has an authenticated Sentry organization.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a project and choose the application's platform.",
+      "required_fields": [
+        {
+          "label": "Platform / SDK",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3",
+            "S4"
+          ]
+        },
+        {
+          "label": "Alert frequency",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Project name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Team",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "Sentry creates the project and shows platform configure guidance including a DSN.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Install and configure the selected Sentry SDK, trigger a first error, and open it in Issues.",
+      "required_fields": [
+        {
+          "label": "DSN",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "SDK install and instrumentation steps",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4",
+            "S5"
+          ],
+          "notes": "Exact package, instrument file, preload/import order, and verification command depend on the unresolved platform choice."
+        }
+      ],
+      "observable_result": "A new error appears in Issues with full event details.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A runnable application matching the eventually selected Sentry platform SDK.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "reCAPTCHA must be completed to submit signup.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Data storage location is immutable for the organization.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Sentry must ingest and process the first error event before it appears in Issues.",
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Signup creates an organization on a 14-day Business trial that can later move to the free plan.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Project creation issues a DSN used by the SDK to associate events.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Sentry documentation",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "Optional Tracing, Profiling, or Logs product toggles beyond core Issues",
+      "reason": "Error Monitoring/Issues is the documented first-success boundary for the create-project tutorial path.",
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "item": "Social signup via Google, GitHub, or Azure DevOps",
+      "reason": "Peer auth alternatives to the observed email/password form; not required once email signup is available.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Sentry signup",
+      "url": "https://sentry.io/signup/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Name, Organization, Email, Password fields",
+        "US/EU data storage location",
+        "Terms agreement",
+        "reCAPTCHA",
+        "Social signup alternatives",
+        "14-day trial positioning"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Data Storage Location",
+      "url": "https://docs.sentry.io/organization/data-storage-location/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Immutable organization data region choice"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create a Sentry Project",
+      "url": "https://docs.sentry.io/product/sentry-basics/integrate-frontend/create-new-project/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Create Project controls",
+        "Platform selection",
+        "DSN copy",
+        "Issues navigation"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Platforms",
+      "url": "https://docs.sentry.io/platforms/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Many co-equal official SDK families without a ranked default"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Sentry for Node.js",
+      "url": "https://docs.sentry.io/platforms/javascript/guides/node/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Node install and instrument.js initialization pattern as one candidate route"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Sentry SDK should represent the platform-wide shortest path to first Issues success?",
+      "impact": "Package, runtime prerequisites, instrumentation files, event trigger, and verification steps all change by SDK.",
+      "evidence_needed": "A corpus decision selecting one platform (or an official ranked default if one appears) and a complete cold-account walkthrough to the first Issues event."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Workday",
+    "slug": "workday",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "1cc1d7a17b3c34fdb58b448d48c1872d534f5f5b3111f3cee916727f4a730b42",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has not supplied a Workday customer organization, Developer Site account, Personal or Enterprise Extend account, development tenant, production tenant, subscription, or administrator role.",
+      "No REST, SOAP, Graph, Extend, or Integration app surface has been preselected.",
+      "Public documentation is the only available evidence; no customer tenant credentials are assumed."
+    ]
+  },
+  "developer_goal": "Obtain required Workday developer and tenant access, choose an API or app surface, and reach that surface's earliest official authenticated first-success result.",
+  "first_success": {
+    "outcome": "For a selected surface such as Extend App Builder: show a Development tenant connection with a green status indicator, or for a selected REST path: complete the first authenticated business-object response defined by that guide.",
+    "observable_signal": "Depends on the unresolved surface: App Builder green connection indicator is one documented candidate terminal; REST Explorer and Integration apps define different terminals.",
+    "source_ids": ["S1", "S2", "S4"]
+  },
+  "route_selection": {
+    "surface": "Workday Developer Site and tenant-backed API or Extend surfaces",
+    "rule": "Official entry points present REST, SOAP, Graph, Extend, and Integration apps as peer routes. Prefer a path without unavailable entitlement only after confirming which program and tenant access the developer actually has.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "REST API Explorer authenticated business-object call",
+        "status": "unresolved",
+        "reason": "Requires Developer Site plus tenant security configuration that public docs do not grant from account creation alone."
+      },
+      {
+        "name": "Extend App Builder connected to a Development tenant",
+        "status": "unresolved",
+        "reason": "Company administrator, Extend subscription, and development-tenant provisioning gates differ from direct REST."
+      },
+      {
+        "name": "Integration apps / Orchestrate getting started",
+        "status": "unresolved",
+        "reason": "Peer official route with different tools and entitlements."
+      },
+      {
+        "name": "SOAP or Graph API first call",
+        "status": "unresolved",
+        "reason": "Alternate protocols with distinct security and gateway setup."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Obtain Workday Developer Site access for the intended company or program.",
+      "required_fields": [
+        {"label": "Developer Site access path", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S6"], "notes": "Public docs describe administrator invitation and entitlements rather than a fully self-serve cold signup inventory."}
+      ],
+      "observable_result": "The developer can sign in to the Developer Site Console.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S6"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose REST, SOAP, Graph, Extend, or Integration apps as the development surface.",
+      "required_fields": [
+        {"label": "Workday platform surface", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1", "S7"]}
+      ],
+      "observable_result": "One official getting-started guide becomes the candidate route.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S7"]
+    },
+    {
+      "step_number": 3,
+      "kind": "external-authorization",
+      "interface": "web-ui",
+      "action": "Obtain the tenant, security configuration, and administrator grants required by the selected surface.",
+      "required_fields": [
+        {"label": "Tenant and security entitlements", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S3", "S4", "S6"]}
+      ],
+      "observable_result": "A development or eligible tenant is available to the developer identity.",
+      "evidence_state": "documented",
+      "source_ids": ["S3", "S4", "S6"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Follow the selected guide's register-client, authenticate, build, or connect steps through its documented terminal result.",
+      "required_fields": [
+        {"label": "Surface-specific configuration", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S2", "S4", "S5", "S9"]}
+      ],
+      "observable_result": "The selected guide's first authenticated business-object or app-connection success is visible.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S4", "S5", "S7"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Developer Site and Workday tenant access are required for owned authenticated data or app paths.", "source_ids": ["S4", "S6", "S7"]},
+    {"description": "Company Administrators create and manage Workday Cloud Platform Development tenants under Extend contract limits.", "source_ids": ["S4"]}
+  ],
+  "external_gates": [
+    {"description": "Company administrator invitation, customer entitlement, subscription agreement, or innovation-services opt-in may be required before Developer Site use.", "source_ids": ["S6", "S7"]},
+    {"description": "REST API security depends on Workday domain and authentication configuration in a tenant the developer does not create alone from public signup.", "source_ids": ["S3"]},
+    {"description": "API client registration and grant-type choices are constrained by tenant and Developer Site permissions.", "source_ids": ["S5", "S9"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Development tenant build and administrator email notification must finish before tenant sign-in.", "source_ids": ["S4"]},
+    {"description": "Administrator invitation and entitlement provisioning may precede any developer console work.", "source_ids": ["S6"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Workday can provision Development tenants requested by Company Administrators and email sign-in details when ready.", "source_ids": ["S4"]},
+    {"description": "Authenticated REST or Extend flows return tenant-backed API or app-connection results after security setup.", "source_ids": ["S2", "S4", "S5"]}
+  ],
+  "excluded": [
+    {"item": "Reading the full Workday API catalog without selecting a surface", "reason": "Discovery reading is not a measured product action.", "source_ids": ["S1"]},
+    {"item": "Production tenant changes", "reason": "Official development guidance centers on Development or non-production tenants.", "source_ids": ["S4"]},
+    {"item": "Implicit grant type authentication", "reason": "Workday documents it as vulnerable and recommends PKCE authorization-code flows instead.", "source_ids": ["S5"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Workday APIs overview", "url": "https://developer.workday.com/api-overview", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Developer Site API entry and platform surface overview"]},
+    {"id": "S2", "title": "REST APIs Overview and Explorer", "url": "https://developer.workday.com/rest-api-explorer/get-started", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["REST Explorer getting started"]},
+    {"id": "S3", "title": "Workday REST API Security", "url": "https://developer.workday.com/documentation/dan1370797986071/ConceptWorkdayRESTAPISecurity", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Tenant security configuration requirements"]},
+    {"id": "S4", "title": "Connect to a Development Tenant", "url": "https://developer.workday.com/documentation/GUID-f9ad6bdf-f687-4263-9cd0-12bd2b0ebf54-enHYPHENus", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Company Administrator tenant creation", "Provisioning wait and email"]},
+    {"id": "S5", "title": "Authenticate Using the Client Credentials Grant Type", "url": "https://developer.workday.com/documentation/vle1524593542839/AuthenticateUsingtheClientCredentialsGrantType", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["API client authentication grant setup"]},
+    {"id": "S6", "title": "Manage Users in Companies", "url": "https://developer.workday.com/documentation/dnc1570465297115", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Administrator invitation and company user management"]},
+    {"id": "S7", "title": "Getting Started with Integration Apps", "url": "https://developer.workday.com/documentation/GUID-1293c9bb-ea02-48cd-a523-254b5060b3a6-enHYPHENus", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Integration apps as a peer starting surface"]},
+    {"id": "S8", "title": "Access Orchestrate for Integrations", "url": "https://developer.workday.com/documentation/GUID-a6fbeb9f-2ef0-4838-9bf4-f5fd11b6d91a/AccessOrchestrateforIntegrations", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Orchestrate entitlement and access"]},
+    {"id": "S9", "title": "Create Your API Client", "url": "https://developer.workday.com/documentation/zwx1518028675482/CreateYourAPIClient", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["API client registration steps"]},
+    {"id": "S10", "title": "Call Workday SOAP APIs Using the API Gateway", "url": "https://developer.workday.com/documentation/ouv1543606422515", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["SOAP as an alternate protocol path"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Workday platform surface and business operation should define first success: REST, SOAP, Graph, Extend, or Integration apps?",
+      "impact": "Protocol, product, tenant, actors, security, tools, and terminal result all change, so lexicographic selection cannot pick among peer official entry points.",
+      "evidence_needed": "A bounded surface and operation choice, then a complete cold path against that guide."
+    },
+    {
+      "question": "What Developer Site and tenant access can a workshop participant obtain without an existing Workday customer, partner, or Extend entitlement?",
+      "impact": "Many documented paths cannot start without administrator invitation and provisioned tenant context.",
+      "evidence_needed": "Official public documentation of any fully self-serve developer program, or confirmation that entitlement is always required."
+    },
+    {
+      "question": "What exact signup fields exist for Developer Site account creation when invitation is available?",
+      "impact": "Account-creation field counts remain unverified.",
+      "evidence_needed": "A dated invited-user signup walkthrough listing required fields."
+    }
+  ],
+  "counts": null
+}

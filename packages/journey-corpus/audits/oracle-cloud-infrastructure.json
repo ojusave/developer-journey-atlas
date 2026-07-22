@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Oracle Cloud Infrastructure",
+    "slug": "oracle-cloud-infrastructure",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "2a30aa03bac48e31db377998ddb355050b28919c4f837479d358984e91c76c4d",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, a valid email address, and an accepted payment card for identity verification.",
+      "The developer's country supports self-service Free Trial signup rather than an Oracle Sales-only path.",
+      "No OCI tenancy, Home Region, compartment, or first resource exists yet."
+    ]
+  },
+  "developer_goal": "Create an OCI Free Trial tenancy and reach the earliest meaningful first-resource success.",
+  "first_success": {
+    "outcome": "Unresolved: Create Your First Resources lists coequal Compute, Object Storage, Networking, Database, Block Volume, and Load Balancer tutorials.",
+    "observable_signal": "A candidate terminal is an authenticated shell on the first Linux instance, but peer first-resource tutorials exist.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "Oracle Cloud Free Trial signup and OCI Console tutorials",
+    "rule": "Free Trial signup is documented, but first-resource tutorials remain coequal; do not invent a winner.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Launch your first Linux instance",
+        "status": "unresolved",
+        "reason": "Complete console path to an instance shell, listed as one Compute tutorial among several first-resource categories."
+      },
+      {
+        "name": "Launch your first Windows instance",
+        "status": "unresolved",
+        "reason": "Peer Compute tutorial with a different guest OS and connection path."
+      },
+      {
+        "name": "Object Storage, Networking, Database, Block Volume, or Load Balancer first tutorials",
+        "status": "unresolved",
+        "reason": "Official Create Your First Resources page presents these as parallel learning paths after Free Trial signup."
+      },
+      {
+        "name": "Get Started with the CLI",
+        "status": "unresolved",
+        "reason": "Interface-specific walkthrough with separate CLI setup; not the only general route."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open Oracle Cloud Free Trial signup, enter country, name, email, and CAPTCHA, then choose Verify my email.",
+      "required_fields": [
+        {"label": "Country or territory", "field_type": "select", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Email address", "field_type": "email", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "CAPTCHA / I am human", "field_type": "challenge", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "Oracle sends a verification email with a signup link valid for 30 minutes.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the verification email and follow the link to continue signup.",
+      "required_fields": [
+        {"label": "Email verification link", "field_type": "url", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "The signup flow returns to account information entry.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Set password, cloud account name, Home Region, address and phone details, accept Terms of Use, and continue.",
+      "required_fields": [
+        {"label": "Password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Cloud account name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Home Region", "field_type": "select", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Address and phone", "field_type": "other", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Terms of Use", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "The payment verification step opens.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Add a credit card payment verification method, accept terms, and start the free trial.",
+      "required_fields": [
+        {"label": "Credit card", "field_type": "other", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Free trial terms acceptance", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "Oracle provisions the Free Trial tenancy and redirects to the OCI Console.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose one first-resource tutorial category and complete that resource path.",
+      "required_fields": [
+        {
+          "label": "First resource tutorial",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "One bounded OCI first-resource terminal is fixed.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Country eligibility for self-service Free Trial signup; some countries must contact Oracle Sales instead.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Accepted payment card for identity verification with a possible temporary hold.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email delivery of the 30-minute verification link.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "Tenancy and service provisioning after Start my free trial before Console use.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Oracle creates the Free Trial tenancy and redirects to the OCI Console after payment verification.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "A welcome Get Started email arrives with account information.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional company name during signup",
+      "reason": "Official signup instructions mark company name optional.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Choosing Linux instance as the universal OCI first success without human judgment",
+      "reason": "Create Your First Resources lists multiple coequal categories and tutorials.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Create Your First Resources",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/GSG/Reference/tutorials.htm",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Coequal first-resource tutorial categories",
+        "Compute Linux and Windows peers",
+        "Post-Free-Trial framing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Launching Your First Linux Instance",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/launchinginstance.htm",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Candidate Linux instance path",
+        "Console connection terminal"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign Up for the Free Oracle Cloud Promotion",
+      "url": "https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/signingup_topic-Sign_Up_for_Free_Oracle_Cloud_Promotion.htm",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "signup.oraclecloud.com steps",
+        "Email verification",
+        "Home Region and password rules",
+        "Payment verification and Start my free trial"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which first-resource tutorial is the selected OCI shortest path after Free Trial signup?",
+      "impact": "Compute, networking, storage, and database tutorials produce different required actions and terminals.",
+      "evidence_needed": "Human selection of one first-resource goal, then audit that tutorial from a provisioned Free Trial tenancy."
+    },
+    {
+      "question": "Do live signup.oraclecloud.com screens match the documented optional company field and country-specific Terms checkboxes?",
+      "impact": "Exact field counts for a verified audit need public UI confirmation.",
+      "evidence_needed": "Dated screenshots of the current Free Trial signup wizard."
+    }
+  ],
+  "counts": null
+}

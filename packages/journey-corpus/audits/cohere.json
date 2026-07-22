@@ -1,0 +1,231 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Cohere",
+    "slug": "cohere",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "0a77d70bb926bf0a3dbb09c40079ae725cee021fb790738415cbe178b54206f7",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run Python and pip locally.",
+      "No Cohere account, trial API key, SDK install, or Chat request exists yet."
+    ]
+  },
+  "developer_goal": "Create a Cohere account, obtain a trial API key, and run a first native Python Chat call that prints a Command model response.",
+  "first_success": {
+    "outcome": "A Python ClientV2 Chat request returns and prints a Cohere message response.",
+    "observable_signal": "The executed program prints response.message.content text from the Chat endpoint.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Cohere Platform dashboard signup plus native Python SDK quickstart",
+    "rule": "Prefer the Cohere Platform trial-key route over cloud private deployments; resolve email versus Google or GitHub signup only when public evidence shows one lowest-friction complete path.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email and password signup on dashboard.cohere.com/welcome/register",
+        "status": "unresolved",
+        "reason": "Public register UI exposes Email and Password plus Terms agreement, but email verification, captcha, and post-submit transitions are not documented."
+      },
+      {
+        "name": "Continue with Google or Continue with Github",
+        "status": "unresolved",
+        "reason": "Peer OAuth buttons sit beside email signup; provider consent screens and whether they skip verification are not established from public evidence."
+      },
+      {
+        "name": "Amazon Bedrock, SageMaker, Azure, or private deployment clients",
+        "status": "not-selected",
+        "reason": "Official installation docs present these as alternate platforms with different credentials and longer setup than the Cohere Platform trial key."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Cohere account from the dashboard register surface.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S1"],
+          "notes": "Visible on the email signup form; OAuth routes may not collect this field directly."
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S1"],
+          "notes": "Visible on the email signup form only."
+        },
+        {
+          "label": "Terms of Use and Privacy Policy acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S1"],
+          "notes": "Signup states that clicking Sign up constitutes agreement."
+        }
+      ],
+      "observable_result": "The developer has an authenticated Cohere account that can open the dashboard.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open API Keys and copy the automatically issued Trial API key.",
+      "required_fields": [],
+      "observable_result": "A Trial API key value is available to paste into local code.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install or upgrade the Cohere Python SDK.",
+      "required_fields": [
+        {
+          "label": "pip install -U cohere",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The cohere package is available in the local Python environment.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Create a ClientV2 with the trial key and call chat with a user message, then print the response text.",
+      "required_fields": [
+        {
+          "label": "API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "model",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "messages",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The program prints Chat response text from a Command model.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Local Python and pip are available to install the Cohere SDK.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Signup requires accepting Cohere Terms of Use and Privacy Policy.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Cohere automatically creates a Trial API key when an account is created.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "The Chat endpoint returns generated message content for the submitted user prompt.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading installation and platform-options documentation",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S4"]
+    },
+    {
+      "item": "Bedrock, SageMaker, Azure, or private-deployment client setup",
+      "reason": "These are alternate platforms with different credentials than the Cohere Platform trial route.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Register | Cohere",
+      "url": "https://dashboard.cohere.com/welcome/register",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email and password fields",
+        "Google and Github continue buttons",
+        "Terms of Use and Privacy Policy agreement on Sign up"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Text generation - quickstart",
+      "url": "https://docs.cohere.com/docs/text-gen-quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "pip install cohere",
+        "ClientV2 construction with API key",
+        "Chat call and printed response text"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Pricing FAQ: How do I get a Trial API key?",
+      "url": "https://cohere.com/pricing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Trial API key is created automatically on account creation",
+        "Key is available on the dashboard to copy"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Installation",
+      "url": "https://docs.cohere.com/docs/get-started-installation",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Cohere Platform versus private and cloud deployment options"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which signup identity route (email/password, Google, or Github) is the shortest complete path, and what verification or challenge steps follow Submit?",
+      "impact": "The routes differ in external authorization handoffs and possibly email waits; field counts and action counts cannot be fixed until one route is chosen and walked.",
+      "evidence_needed": "A dated fresh-account walkthrough of each public register option showing post-submit screens, verification, and when the Trial key first appears."
+    },
+    {
+      "question": "Does any captcha, phone challenge, or email verification appear on the current email signup path?",
+      "impact": "Hidden challenges would add required fields or an unavoidable wait not visible on the static register page.",
+      "evidence_needed": "Observed-public-ui or authenticated screenshots from a cold email registration attempt."
+    }
+  ],
+  "counts": null
+}

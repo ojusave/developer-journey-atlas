@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Tailscale",
+    "slug": "tailscale",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "faacf1c19dfe45341065717ce007558f2062aa2085131e2da3aecbb8d387e272",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and access to two devices that can install Tailscale clients.",
+      "No tailnet or enrolled devices exist yet.",
+      "No identity-provider choice or OS install path has been fixed."
+    ]
+  },
+  "developer_goal": "Create a Tailscale account and a private tailnet, then enroll devices until the admin console is reachable with the quickstart's first-success state.",
+  "first_success": {
+    "outcome": "A new tailnet contains two authenticated devices and the developer reaches the Tailscale admin console.",
+    "observable_signal": "After the second device authenticates, both devices display; selecting Take me home opens the admin console.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Tailscale web Get Started onboarding and client installers",
+    "rule": "Prefer the documented Create a tailnet quickstart; do not invent a winner among identity providers or OS installers when those choices change required actions.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Web Get Started then install two clients",
+        "status": "unresolved",
+        "reason": "This is the primary documented sequence, but SSO provider and OS install steps still branch the action count."
+      },
+      {
+        "name": "Install client first then sign up",
+        "status": "unresolved",
+        "reason": "The quickstart explicitly allows downloading and installing the client before signup, which reorders account creation versus install."
+      },
+      {
+        "name": "Public-domain Personal plan versus custom-domain Enterprise trial signup",
+        "status": "unresolved",
+        "reason": "Official notes say the identity-provider email domain auto-enrolls Personal versus a 14-day Enterprise trial, a consequential entitlement fork."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open Get Started and sign up with a supported SSO identity provider.",
+      "required_fields": [
+        {"label": "Identity provider account", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S1"], "notes": "Exact IdP chooser labels and any secondary IdP consent fields are not fully enumerated on the public quickstart page."}
+      ],
+      "observable_result": "Tailscale creates a tailnet and shows the Welcome to Tailscale page.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select Business use or Personal use.",
+      "required_fields": [
+        {"label": "Business use or Personal use", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "Tailscale advances to the first-device enrollment step.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Select the OS for the first device, install the Tailscale client, and authenticate with the same credentials used at signup.",
+      "required_fields": [
+        {"label": "Device operating system", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1", "S2"]},
+        {"label": "Client authentication", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "The first device appears in the browser onboarding window after OS-specific install completes.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Select the OS for a second device, share the install link, install the client, and authenticate the second device.",
+      "required_fields": [
+        {"label": "Second device operating system", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Second device client authentication", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "Both devices display in the onboarding UI.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select Take me home.",
+      "required_fields": [],
+      "observable_result": "The Tailscale admin console opens.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Access to two devices capable of installing a Tailscale client is required by the official Create a tailnet sequence.", "source_ids": ["S1"]},
+    {"description": "A supported SSO identity provider account is required to sign up.", "source_ids": ["S1"]}
+  ],
+  "external_gates": [
+    {"description": "SSO identity-provider authorization is required to create the tailnet.", "source_ids": ["S1"]},
+    {"description": "Signup email domain determines Personal plan versus custom-domain Enterprise trial enrollment.", "source_ids": ["S1"]}
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {"description": "Tailscale creates the tailnet after SSO signup.", "source_ids": ["S1"]},
+    {"description": "Authenticated devices appear in onboarding and later in the Machines view of the admin console.", "source_ids": ["S1", "S2"]}
+  ],
+  "excluded": [
+    {"item": "Renaming devices, inviting users, and optional MagicDNS configuration", "reason": "These appear after Take me home in the quickstart and are not required for the documented two-device terminal.", "source_ids": ["S1"]},
+    {"item": "Reading the under-10-minute marketing video as a measured action", "reason": "Watching documentation media is excluded from required developer actions.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Tailscale quickstart",
+      "url": "https://tailscale.com/docs/how-to/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Get Started", "SSO signup", "Business versus Personal", "Two-device enrollment", "Take me home admin console", "Plan enrollment by email domain"]
+    },
+    {
+      "id": "S2",
+      "title": "Add a device",
+      "url": "https://tailscale.com/docs/features/access-control/device-management/how-to/set-up",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Download and install by OS", "Client login adds device unless approval is enabled"]
+    },
+    {
+      "id": "S3",
+      "title": "Download Tailscale",
+      "url": "https://tailscale.com/download",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Per-OS download and install entry points"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which SSO provider and Personal versus Enterprise-trial enrollment path should be measured as the default shortest route?",
+      "impact": "Provider consent screens and plan entitlement differ, so action and gate counts are not stable across equal documented options.",
+      "evidence_needed": "A bounded IdP choice plus confirmation that Personal public-email signup is the intended lexicographic default over custom-domain trial."
+    },
+    {
+      "question": "How many OS-specific installer, permission, and app-store actions are required for the two devices on the chosen platforms?",
+      "impact": "macOS, Windows, Linux, iOS, and Android install flows are not one shared action count.",
+      "evidence_needed": "Fresh install walkthroughs for two concrete OS targets, counting only required installer and permission steps."
+    }
+  ],
+  "counts": null
+}

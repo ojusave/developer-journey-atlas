@@ -1,0 +1,258 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "SingleStore",
+    "slug": "singlestore",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "09aea4f17964c4e26357bb2f1c695feea76e9e5336b9a6646104460b905143dd",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a modern browser and no existing SingleStore account or workspace.",
+      "The intended workload is learning or prototyping on Free Shared Edition, not production."
+    ]
+  },
+  "developer_goal": "Register for SingleStore Helios, obtain a Free Shared workspace with an attached database, and run a first SQL query in the Cloud Portal SQL Editor.",
+  "first_success": {
+    "outcome": "SQL Editor returns a result set against the database attached to a Free Shared workspace.",
+    "observable_signal": "SQL Editor displays the executed query's result set in the Cloud Portal.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "SingleStore Cloud Portal self-service web",
+    "rule": "Prefer Free Shared Edition as the no-credit Getting Started entry, starting at account creation, then query through portal SQL Editor rather than external clients.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email signup then Free Shared workspace and SQL Editor",
+        "status": "unresolved",
+        "reason": "Docs say email signup is available and Getting Started points Free Shared users to SQL Editor, but the post-Continue validation, agreements, verification, and whether Shared is created automatically remain incomplete."
+      },
+      {
+        "name": "Google or Microsoft signup then Free Shared and SQL Editor",
+        "status": "unresolved",
+        "reason": "Peer identity providers; docs only say follow provider steps then the account exists."
+      },
+      {
+        "name": "Standard Edition trial workspace",
+        "status": "not-selected",
+        "reason": "Consumes trial credits and adds provider, region, size, admin password, and firewall configuration beyond Free Shared."
+      },
+      {
+        "name": "External SQL client or Kai Shell first query",
+        "status": "not-selected",
+        "reason": "Adds endpoint credentials or a different shell after the portal SQL Editor path already queries the attached database."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a SingleStore account from the Cloud Portal using email, Google, or Microsoft.",
+      "required_fields": [
+        {
+          "label": "Signup method",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email, Google, and Microsoft are peer options."
+        },
+        {
+          "label": "Email signup form fields after Continue",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Screenshoted initial fields exist in older docs context, but post-Continue validation and completion states are not established from current public evidence."
+        }
+      ],
+      "observable_result": "The developer is signed in to the Cloud Portal with an organization.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Obtain a Free Shared workspace with its attached database.",
+      "required_fields": [
+        {
+          "label": "Shared workspace creation or selection controls",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Unclear whether Shared is auto-provisioned at registration or requires an explicit create action."
+        }
+      ],
+      "observable_result": "A Shared workspace and attached database are selectable in Workspaces.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open SQL Editor for the Shared workspace and run a query against the attached database.",
+      "required_fields": [
+        {
+          "label": "SQL statement",
+          "field_type": "code",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S3"
+          ],
+          "notes": "Portal docs describe opening SQL Editor but do not publish one mandatory first query text for Shared Edition."
+        }
+      ],
+      "observable_result": "SQL Editor displays a result set.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "JavaScript-enabled browser access to portal.singlestore.com.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account creation may require accepting SingleStore terms and completing identity-provider authorization for Google or Microsoft routes.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Any email verification or provider redirect delay during signup is possible but not documented in detail.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Free Shared Edition provides a shared-compute workspace with one attached database and no credit consumption.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Load Data and Run Queries sample that creates a sales database",
+      "reason": "Tutorial warns free Shared users cannot create databases, so it is not executable for the selected edition.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "item": "Notebooks and Kai Shell as first query surfaces",
+      "reason": "Documented peers; Getting Started presents SQL Editor for the general Free Shared database route.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started with SingleStore Helios",
+      "url": "https://docs.singlestore.com/cloud/getting-started-with-singlestore-helios/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free Shared Edition entry",
+        "SQL Editor connection path"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sign Up to try SingleStore Helios",
+      "url": "https://docs.singlestore.com/cloud/developer-resources/try-singlestore-helios-for-free/sign-up-to-try-singlestore-helios/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email Google Microsoft signup",
+        "Shared versus Standard trial options"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Connect with the SQL Editor",
+      "url": "https://docs.singlestore.com/cloud/connect-to-singlestore/connect-with-the-sql-editor/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SQL Editor runs queries in Cloud Portal"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "SingleStore Cloud Portal",
+      "url": "https://portal.singlestore.com/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Portal entry for registration"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Load Data and Run Queries into SingleStore",
+      "url": "https://docs.singlestore.com/cloud/getting-started-with-singlestore-helios/next-steps-and-examples/sample-data/load-data-and-run-queries-into-singlestore/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Shared users cannot create databases warning"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What validation, agreements, verification, password setup, and completion states appear after the documented email signup Continue action?",
+      "impact": "Account action count and waits cannot be finalized.",
+      "evidence_needed": "Fresh-account walkthrough of portal email signup from first form through authenticated home."
+    },
+    {
+      "question": "Does Free Shared registration auto-create the Shared workspace and attached database, or must the developer create them explicitly?",
+      "impact": "Adds or removes product-interaction steps between login and SQL Editor.",
+      "evidence_needed": "Post-signup portal capture for a new Free Shared user showing Workspaces state."
+    },
+    {
+      "question": "Which first SQL statement is required for Shared Edition first success?",
+      "impact": "Without a mandated query, verification of the terminal step stays incomplete even if SQL Editor opens.",
+      "evidence_needed": "Official Shared Edition first-query text or a documented default sample query in SQL Editor."
+    }
+  ],
+  "counts": null
+}

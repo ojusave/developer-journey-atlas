@@ -1,0 +1,305 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "DigitalOcean",
+    "slug": "digitalocean",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "54eb68e15d42308b011b325fa46e5675e495b1a1cb25eb65297a62e86335b4c3",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a browser and can complete DigitalOcean signup if no account exists.",
+      "No App Platform app or Control Panel project resources exist yet.",
+      "The selected sample path uses App Platform rather than Droplets or Functions."
+    ]
+  },
+  "developer_goal": "Create a DigitalOcean account, deploy a first App Platform sample application, and open its public URL.",
+  "first_success": {
+    "outcome": "App Platform has deployed the selected starter and exposed a Hello World style site at the Overview URL.",
+    "observable_signal": "Opening the URL at the top of the app Overview page shows the sample website.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "DigitalOcean Control Panel App Platform",
+    "rule": "Prefer Control Panel sample deployment over API or doctl; exact starter and signup sequence remain unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Deploy from template repository sample",
+        "status": "unresolved",
+        "reason": "Documented as requiring no additional repository information, but no canonical starter is named."
+      },
+      {
+        "name": "Create new GitHub repository from sample then deploy",
+        "status": "unresolved",
+        "reason": "Same sample surface with extra GitHub repository creation before App Platform continues."
+      },
+      {
+        "name": "App Platform Quickstart from own Git repo",
+        "status": "not-selected",
+        "reason": "Requires an existing repository and more configuration than the sample template branch."
+      },
+      {
+        "name": "doctl or Apps API",
+        "status": "not-selected",
+        "reason": "Requires tokens and an app spec; Control Panel is the documented primary create path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or sign in to a DigitalOcean account and reach the Control Panel.",
+      "required_fields": [
+        {
+          "label": "Signup or login identity fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6",
+            "S7"
+          ],
+          "notes": "Support pages mention email, Google, GitHub, verification codes, locks, and payment method without one chronological signup route."
+        }
+      ],
+      "observable_result": "The developer is authenticated in the Control Panel.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose Create > App Platform, open Templates, select a starter, and choose Deploy from template repository.",
+      "required_fields": [
+        {
+          "label": "Starter template",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ],
+          "notes": "Template grid exists; no single default starter is designated."
+        }
+      ],
+      "observable_result": "App Platform presents detected resources and configuration for the starter.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Review resource, info, and pricing settings required by the starter, then Create App.",
+      "required_fields": [
+        {
+          "label": "Resource and plan settings required by the starter",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3",
+            "S4",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "App Platform creates the app and starts the first deployment.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "After deployment completes, open the URL at the top of the app Overview page.",
+      "required_fields": [],
+      "observable_result": "The browser shows the sample Hello World style website.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Control Panel access with permission to create App Platform apps.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "description": "Payment method may be required for identity verification before paid resources.",
+      "source_ids": [
+        "S7"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account verification or lock handling can block signup before Control Panel use.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "description": "Payment method may be required to verify identity before creating resources.",
+      "source_ids": [
+        "S7"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "App Platform must build and deploy the starter before the Overview URL serves the sample site.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Create App starts automatic build and deploy for the selected starter.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "A public Overview URL is assigned when the deployment finishes.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading App Platform documentation",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Optional environment variables and databases",
+      "reason": "Sample path presents them as optional.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "item": "Forking into a new GitHub repository when Deploy from template repository is available",
+      "reason": "Template-repository option avoids that GitHub creation detour.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started with App Platform",
+      "url": "https://docs.digitalocean.com/products/app-platform/getting-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "App Platform entry index"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "App Platform Quickstart",
+      "url": "https://docs.digitalocean.com/products/app-platform/getting-started/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Create App control-panel path",
+        "Git and image sources"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Deploy Sample Apps to App Platform",
+      "url": "https://docs.digitalocean.com/products/app-platform/getting-started/deploy-sample-apps/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Templates tab",
+        "Deploy from template repository",
+        "Create App",
+        "Overview URL"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How to Create Apps in App Platform",
+      "url": "https://docs.digitalocean.com/products/app-platform/how-to/create-apps/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Resource configuration fields",
+        "Finalize and Create App"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "App Platform Pricing",
+      "url": "https://docs.digitalocean.com/products/app-platform/details/pricing/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Resource pricing variation by component type"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Logging In",
+      "url": "https://docs.digitalocean.com/support/logging-in/",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Login methods",
+        "Verification codes",
+        "Account lock during signup"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Why do I need to enter a payment method?",
+      "url": "https://docs.digitalocean.com/support/why-do-i-need-to-enter-a-payment-method/",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Payment method for identity verification"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What is the complete current signup, verification, and payment-method sequence for a new DigitalOcean developer?",
+      "impact": "Account-segment action and field counts before Control Panel cannot be verified.",
+      "evidence_needed": "Fresh-account Control Panel signup walkthrough with dated screenshots of required fields and gates."
+    },
+    {
+      "question": "Which starter template is the canonical shortest sample, and does it stay on free static-site resources?",
+      "impact": "Resource fields, price, build behavior, and rendered content change by starter.",
+      "evidence_needed": "Human selection of one official starter plus confirmation of its App Platform resource types and pricing tier."
+    }
+  ],
+  "counts": null
+}

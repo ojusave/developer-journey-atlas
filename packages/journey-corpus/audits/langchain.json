@@ -1,0 +1,285 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "LangChain",
+    "slug": "langchain",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "0b3375fa7f3f91eaf95dd862f3470daab30f8b383398ad8f5c2714b5fbe703b3",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has Python 3.10+ and a package manager such as uv or pip.",
+      "No LangChain project packages are installed yet for this app.",
+      "No model-provider credentials required by the selected quickstart tab exist yet."
+    ]
+  },
+  "developer_goal": "Install LangChain, configure one supported chat-model provider, and run the official weather-tool agent until it calls the tool and prints final content blocks.",
+  "first_success": {
+    "outcome": "A LangChain agent with a selected chat model and get_weather tool answers the San Francisco weather question after calling the tool.",
+    "observable_signal": "The executed example prints the agent's final content blocks and the agent calls get_weather with San Francisco.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "LangChain Python OSS quickstart",
+    "rule": "Select the shortest complete install-to-agent-run route only after one model provider and one package-manager path are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "uv install + OpenAI provider tab",
+        "status": "unresolved",
+        "reason": "Equal provider tabs are documented; OpenAI onboarding itself is outside LangChain docs."
+      },
+      {
+        "name": "uv or pip install + Gemini, Anthropic, Ollama, or other provider tab",
+        "status": "unresolved",
+        "reason": "Each provider changes account, billing, env vars, and sometimes local daemon requirements with no named default."
+      },
+      {
+        "name": "LangSmith tracing-first journey",
+        "status": "not-selected",
+        "reason": "Overview recommends LangSmith for debugging, but the agent quickstart reaches first success without requiring a LangSmith account."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "external-system",
+      "action": "Create or use credentials for one supported model provider required by the selected quickstart tab.",
+      "required_fields": [
+        {
+          "label": "Provider account and API key fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "LangChain documents env var names only; each provider's signup path is outside these pages."
+        }
+      ],
+      "observable_result": "A provider API key or local runtime credential exists for the chosen model string.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Initialize the project and install langchain and deepagents with the selected package manager.",
+      "required_fields": [
+        {
+          "label": "Install commands",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "uv init/add/sync and pip variants are both documented."
+        }
+      ],
+      "observable_result": "LangChain and deepagents are installed in the project environment.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export the environment variable or variables required by the chosen provider.",
+      "required_fields": [
+        {
+          "label": "Provider API key environment variable",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The selected model provider credential is available to the process.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Create runnable Python that imports create_agent, defines get_weather, builds the agent, and invokes the San Francisco weather message.",
+      "required_fields": [
+        {
+          "label": "Agent example source",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
+        },
+        {
+          "label": "Model identifier for selected provider",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The example file is ready to execute.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Run the example and print the final message content blocks.",
+      "required_fields": [
+        {
+          "label": "Python run command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The agent calls get_weather for San Francisco and prints final content blocks.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Python 3.10+ and one documented package-management workflow.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Most hosted model providers require their own account, key creation, and possibly billing before the agent can run.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Local Ollama routes require a running Ollama runtime instead of a hosted key.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "The selected chat model returns content that the agent uses after the weather tool call.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading overview comparisons of LangGraph and Deep Agents",
+      "reason": "Documentation reading is excluded from required actions.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "LangSmith account creation and tracing setup",
+      "reason": "Optional observability relative to the agent quickstart first success.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Installing the LangChain Docs MCP server or Skills",
+      "reason": "Presented as assistance for coding agents, not required for the manual quickstart.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "LangChain overview",
+      "url": "https://docs.langchain.com/oss/python/langchain/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "create_agent weather example",
+        "Multi-provider model tabs",
+        "LangSmith optional tracing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Quickstart",
+      "url": "https://docs.langchain.com/oss/python/langchain/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "uv/pip install",
+        "Provider env vars",
+        "Basic agent build and invoke"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Install LangChain",
+      "url": "https://docs.langchain.com/oss/python/langchain/install",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Installation entry linked from overview"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create an account and API key",
+      "url": "https://docs.langchain.com/langsmith/create-account-api-key",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "LangSmith signup options for optional tracing journeys"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which supported model provider and package-manager path define the canonical LangChain first mile?",
+      "impact": "Provider onboarding can dominate action and field counts; local Ollama versus hosted keys are not comparable without a fixed choice.",
+      "evidence_needed": "An explicit workshop or vendor-recommended provider default, then a verified provider onboarding path joined to the LangChain quickstart."
+    },
+    {
+      "question": "Does the measured journey begin at a LangChain/LangSmith account or only at an external model-provider account?",
+      "impact": "LangChain OSS itself has no required account, which conflicts with a universal account-creation boundary unless the provider account is treated as the start.",
+      "evidence_needed": "A corpus decision that either scopes LangChain as library-only with a named provider, or measures LangSmith signup as the platform account."
+    }
+  ],
+  "counts": null
+}

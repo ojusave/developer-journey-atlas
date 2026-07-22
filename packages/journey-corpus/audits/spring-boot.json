@@ -1,0 +1,283 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Spring Boot",
+    "slug": "spring-boot",
+    "category": "Frameworks, mobile, games, hardware, and creative ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "44c1945c4b118ef6f4d97940dfada35ba94a3af17e6ff79677941fdbfb8a2308",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "Spring Boot's documented quickstart does not require a Spring, VMware, or cloud account.",
+      "No Spring Boot project exists yet.",
+      "JDK and IDE installations may still be required as external prerequisites."
+    ]
+  },
+  "developer_goal": "Generate a Spring Boot web project, add the Hello World /hello endpoint, run it locally, and verify the browser response.",
+  "first_success": {
+    "outcome": "Embedded Tomcat serves the documented Hello World endpoint locally.",
+    "observable_signal": "Opening http://localhost:8080/hello returns Hello World!.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Spring Quickstart Guide via start.spring.io",
+    "rule": "Prefer the vendor-labeled Super quick route over the more general Building an Application guide.",
+    "selected": "Spring Quickstart Guide Hello World endpoint",
+    "candidates": [
+      {
+        "name": "Spring Quickstart Guide",
+        "status": "selected",
+        "reason": "The Spring Boot project page labels this Super quick and it ends at the /hello browser response."
+      },
+      {
+        "name": "Building an Application with Spring Boot",
+        "status": "not-selected",
+        "reason": "Labeled more general and continues through tests, Actuator, and build artifacts."
+      },
+      {
+        "name": "Developing Your First Spring Boot Application (manual project files)",
+        "status": "not-selected",
+        "reason": "Creates Maven or Gradle files manually and continues through an executable JAR."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Install or verify a compatible JDK and choose an IDE or editor that can open the generated project.",
+      "required_fields": [
+        {
+          "label": "JDK install or verification",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Quickstart recommends BellSoft Liberica JDK 17 or 21."
+        },
+        {
+          "label": "IDE or editor choice",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Examples include IntelliJ IDEA, VS Code with Spring Boot Extension Pack, or Eclipse with Spring Tools."
+        }
+      ],
+      "observable_result": "A JDK and IDE are available to open and run the generated project.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "On start.spring.io, create a web project, add the Web dependency, and Generate the ZIP.",
+      "required_fields": [
+        {
+          "label": "Web dependency",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Initializr project metadata and build settings",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S3"
+          ],
+          "notes": "Public Initializr UI exposes Project, Language, Spring Boot version, Group, Artifact, Packaging, and Java fields; the quickstart text does not enumerate required values beyond a web project."
+        }
+      ],
+      "observable_result": "A downloadable Spring Boot project ZIP is generated.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Download, unpack, and open the project, then add the documented /hello controller code to DemoApplication.java.",
+      "required_fields": [
+        {
+          "label": "Documented DemoApplication.java controller code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The project contains the RestController /hello mapping.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "From the project folder, run the generated Gradle wrapper bootRun command for the developer's OS.",
+      "required_fields": [
+        {
+          "label": "./gradlew bootRun or .\\gradlew.bat bootRun",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Spring Boot starts embedded Tomcat on localhost:8080.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open http://localhost:8080/hello.",
+      "required_fields": [],
+      "observable_result": "The browser shows Hello World!.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A JDK; the quickstart recommends BellSoft Liberica JDK 17 or 21.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "An IDE or editor capable of opening the generated project.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Browser access to start.spring.io and permission to download and unpack a ZIP.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Gradle wrapper resolution and first bootRun startup before Tomcat listens on port 8080.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Spring Initializr generates the project archive with Spring Boot and the Web starter.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "description": "Embedded Tomcat serves /hello after bootRun succeeds.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional ?name= query-parameter experiment and pop quiz",
+      "reason": "Presented after the Hello World response as enrichment, not the terminal check.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Building an Application guide extras (tests, Actuator, packaging)",
+      "reason": "A longer peer route, not the selected Super quick path.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Spring Quickstart Guide",
+      "url": "https://spring.io/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "No account requirement",
+        "start.spring.io web project",
+        "Web dependency",
+        "Controller code",
+        "Gradle bootRun",
+        "/hello terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Spring Boot project page",
+      "url": "https://spring.io/projects/spring-boot/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Super quick versus more general guide labeling"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Spring Initializr",
+      "url": "https://start.spring.io/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public Initializr form controls for project metadata and dependencies"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "How should the corpus account-creation starting boundary map for Spring Boot, which has no required vendor account on the quickstart?",
+      "impact": "Prevents a verified account-creation-to-first-success measurement even though the local Hello World path is otherwise documented.",
+      "evidence_needed": "Corpus policy for open-source frameworks without platform accounts."
+    },
+    {
+      "question": "Which exact Spring Initializr field values are required beside adding Web?",
+      "impact": "Build tool, language, package name, and Java version change generated files and run commands.",
+      "evidence_needed": "Official quickstart text that enumerates every required Initializr field, or a dated walkthrough that records the defaults used."
+    },
+    {
+      "question": "Which OS and IDE installation journey is in scope on a clean machine?",
+      "impact": "External JDK and IDE setup can dominate the action count and is only linked, not fully specified, by the quickstart.",
+      "evidence_needed": "A bounded OS/IDE assumption plus evidence of which install steps are mandatory versus skippable."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,331 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "OVHcloud",
+    "slug": "ovhcloud",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "5f7303760a47b7d4f1c65316fbe7d2fce9e1ba66102ab31e38daa464ce668111",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet unless the goal explicitly requires an existing artifact."
+    ]
+  },
+  "developer_goal": "Create an OVHcloud account and Public Cloud project, launch a first public Linux instance, and obtain an authenticated remote shell.",
+  "first_success": {
+    "outcome": "OVHcloud reports the first Linux Public Cloud instance Enabled and the developer has logged in through SSH.",
+    "observable_signal": "The instance table shows Enabled and ssh username@IPv4 opens the remote command line.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "OVHcloud Control Panel account creation and Public Cloud getting started",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Create account, Public Cloud project, then Linux instance with SSH",
+        "status": "unresolved",
+        "reason": "Account-type choice and regional payment or anti-fraud checks change required fields; default model, image, and location are not universal."
+      },
+      {
+        "name": "Order-first account creation during service purchase",
+        "status": "unresolved",
+        "reason": "Official docs allow creating the account during first order, which interleaves payment differently."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create an OVHcloud account with tax residence, credentials, email code, account type, and identity details.",
+      "required_fields": [
+        {
+          "label": "Country of tax residence",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Currency",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Language",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Email address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Email one-time code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Account type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Non-profit, Company, or Private individual."
+        },
+        {
+          "label": "Identity and contact details for the chosen account type",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The OVHcloud account is created and Control Panel access is available.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Public Cloud project and complete required payment or voucher steps.",
+      "required_fields": [
+        {
+          "label": "Project creation and payment or voucher details",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "An active Public Cloud project is available.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create SSH keys and launch a public Linux instance with unresolved defaults.",
+      "required_fields": [
+        {
+          "label": "SSH key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4"
+          ]
+        },
+        {
+          "label": "Instance model",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Linux image",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Region or location",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "The instance reaches Enabled with a public IPv4 address.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Complete first SSH login as the image's preconfigured user.",
+      "required_fields": [
+        {
+          "label": "ssh username@IPv4_instance",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "An interactive remote shell opens.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A valid email address is required to create the account.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Payment instruments and regional anti-fraud checks for Public Cloud project activation.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email one-time code delivery during signup.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Instance provisioning until Enabled.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "OVHcloud creates the account after email verification and profile submission.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "OVHcloud provisions the Public Cloud instance.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading compute essential information overview",
+      "reason": "Reading is excluded from required actions.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Creating an OVHcloud account",
+      "url": "https://docs.ovhcloud.com/en/guides/account-and-service-management/account-information/ovhcloud-account-creation",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account fields",
+        "Email OTP",
+        "Account types"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Creating your first OVHcloud Public Cloud project",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/cross-functional/create-a-public-cloud-project",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public Cloud project creation"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "How to create a Public Cloud instance and connect to it",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Instance create and SSH"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Creating and using SSH authentication keys",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/compute/creating-ssh-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH keys"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Get started with Public Cloud",
+      "url": "https://docs.ovhcloud.com/en/guides/public-cloud/cross-functional/compute-essential-information",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public Cloud overview"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which payment instruments, authorization amounts, and anti-fraud checks apply by region?",
+      "impact": "These change whether first project creation is self-service.",
+      "evidence_needed": "Regional walkthrough evidence for a fresh account creating a Public Cloud project."
+    },
+    {
+      "question": "Which model, Linux image, and location should be the universal tutorial default?",
+      "impact": "These change required fields and price.",
+      "evidence_needed": "Official current default recommendation for first-instance tutorials."
+    }
+  ],
+  "counts": null
+}

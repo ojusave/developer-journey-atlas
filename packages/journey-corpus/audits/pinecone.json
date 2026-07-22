@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Pinecone",
+    "slug": "pinecone",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "05d82c54a6b4a1e1c6192f91bdfaf3030ce0f42168629a27dc168b9ed8628ee6",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run Python and pip locally.",
+      "No Pinecone account, API key, index, or sample records exist yet."
+    ]
+  },
+  "developer_goal": "Create a Pinecone account, obtain an API key, and complete the official Quickstart through a semantic search that returns ranked hits.",
+  "first_success": {
+    "outcome": "Sample records are upserted and a text query returns searchable hits from the quickstart index.",
+    "observable_signal": "The Quickstart search loop prints hit scores and content fields for the sample query.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Pinecone console signup plus official Database Quickstart Python SDK path",
+    "rule": "Prefer a free Starter plan when it reaches the same Quickstart outcome; do not invent a winner among Starter, Builder, and Standard trial when plan choice changes cost and region limits.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Starter plan (free) then Python SDK Quickstart",
+        "status": "unresolved",
+        "reason": "Docs present Starter as free with one-region limits, but signup fields and whether Starter can run the documented aws/us-east-1 create_index_for_model path are not fully verified from public evidence alone."
+      },
+      {
+        "name": "Builder plan or Standard plan trial then Python SDK Quickstart",
+        "status": "unresolved",
+        "reason": "These plans change payment and entitlement relative to Starter and are consequential under the lexicographic payment rule."
+      },
+      {
+        "name": "AI coding-tool plugin Quickstart",
+        "status": "not-selected",
+        "reason": "The Quickstart presents the IDE-plugin path as an alternate surface from the self-service SDK route."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up at app.pinecone.io and choose a plan.",
+      "required_fields": [
+        {
+          "label": "Plan selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Starter, Builder, and Standard trial are documented choices."
+        },
+        {
+          "label": "Account signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "Public console shell does not expose a static registration field contract."
+        }
+      ],
+      "observable_result": "The developer has a Pinecone account on a chosen plan.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create or copy a Pinecone API key from the console.",
+      "required_fields": [],
+      "observable_result": "An API key value is available for the SDK client.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install the Pinecone Python SDK.",
+      "required_fields": [
+        {
+          "label": "pip install pinecone",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The pinecone package is available locally.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Initialize the client, create the quickstart index for the hosted embedding model if needed, upsert sample records, wait briefly, and search.",
+      "required_fields": [
+        {
+          "label": "API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Index name, cloud, region, and embed model",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Sample records and search query",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Search prints ranked hits for the sample query.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Local Python and pip are available for the SDK Quickstart.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Plan selection can introduce payment for Builder or trial entitlements for Standard.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "The Quickstart inserts a short sleep after upsert so records become searchable.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Pinecone creates the index for the hosted embedding model and serves search hits.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Quickstart documentation and optional rerank elaboration pages",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "AI coding-tool plugin path",
+      "reason": "Different interaction surface from the self-service SDK Quickstart.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Optional integrated rerank with bge-reranker-v2-m3 after first search hits",
+      "reason": "First searchable hits already satisfy an earliest meaningful Quickstart success; rerank is an additional demonstration in the same page.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://docs.pinecone.io/guides/get-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account signup at app.pinecone.io",
+        "Starter, Builder, and Standard trial plan choices",
+        "API key requirement",
+        "Python create_index_for_model, upsert_records, search example"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Pinecone Console",
+      "url": "https://app.pinecone.io",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public console entry exists",
+        "Static registration field contract not exposed without authenticated signup"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which plan is required for the documented aws/us-east-1 create_index_for_model Quickstart, and do Starter limits block that path?",
+      "impact": "If Starter cannot host the documented region or model path, the free route fails and a paid or trial plan becomes required.",
+      "evidence_needed": "Official plan-limit confirmation or a fresh Starter-account walkthrough that either completes or blocks the Quickstart create_index_for_model call."
+    },
+    {
+      "question": "What exact signup fields, OAuth options, agreements, and verification steps appear on app.pinecone.io registration?",
+      "impact": "Account-creation actions and fields cannot be counted without inventing auth UI.",
+      "evidence_needed": "Observed-public-ui screenshots or a read-only cold signup walkthrough of the current console register flow."
+    }
+  ],
+  "counts": null
+}

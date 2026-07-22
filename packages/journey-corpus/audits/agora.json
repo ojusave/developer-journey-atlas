@@ -1,0 +1,225 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Agora",
+    "slug": "agora",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "0dfe645d14b397c58816a68e3ba094fbd0a08805b15486c2f72bdd41e3acd04f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email access, and for the Video Calling Web sample: Node tooling plus two camera-and-microphone clients.",
+      "No Agora account, project, App ID, or token exists yet."
+    ]
+  },
+  "developer_goal": "Create an Agora account and project, then reach the earliest official first realtime media success.",
+  "first_success": {
+    "outcome": "Unresolved across Agora products; Video Calling Web quickstart ends when two clients join one channel and show local and remote video.",
+    "observable_signal": "For Video Calling Web: each client shows local video and plays the remote track after user-published; other products define different terminals.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "Agora Console plus product-specific SDK quickstarts",
+    "rule": "Fix one Agora product and platform before selecting a shortest path; equal consequential product outcomes remain unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Video Calling Web SDK quickstart with secured project and temporary token",
+        "status": "unresolved",
+        "reason": "Account-management docs and the Web Video SDK quickstart form one complete candidate, but Agora also ships other first-mile products."
+      },
+      {
+        "name": "Voice Calling, Interactive Live Streaming, Chat, Signaling, or AI surfaces",
+        "status": "unresolved",
+        "reason": "Each product has different resources, credentials, and success signals and cannot be compared as one universal Agora path."
+      },
+      {
+        "name": "Email signup versus third-party account signup",
+        "status": "unresolved",
+        "reason": "Official account docs document both email and third-party routes with different field sequences before project creation."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for an Agora account using the email route.",
+      "required_fields": [
+        {
+          "label": "Email signup required fields",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Docs say fill required fields but do not list every control label in one place."
+        },
+        {
+          "label": "Terms of Service, Privacy Policy, and Acceptable Use Policy checkbox",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Email verification code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Name, company name, phone number, and password",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The account is created and the developer can access Agora Console.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a project with a name, use case, and Secured mode App ID + Token authentication.",
+      "required_fields": [
+        {
+          "label": "Project name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Use case",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Authentication mechanism",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The project appears on the Projects page with an App ID.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate a temporary RTC token for a channel name from the project security panel.",
+      "required_fields": [
+        {
+          "label": "Channel name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "A temporary token is available for the selected Video Calling sample.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Complete the unresolved product and platform SDK sample through first success.",
+      "required_fields": [
+        {
+          "label": "Product-specific SDK install and join or publish steps",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Depends on the unresolved Agora product route.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Video Calling sessions require an Agora App ID from a Console project.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Secured mode projects require a token in addition to the App ID for client join.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Agora must deliver the email verification code on the email signup route.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Agora assigns an App ID when the project is created.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Console can generate a temporary RTC token for testing.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production token-server deployment and cloud recording",
+      "reason": "These occur after the basic Video Calling sample works.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "item": "Reading platform-tab documentation for non-selected SDKs",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Video SDK Quickstart",
+      "url": "https://docs.agora.io/en/realtime-media/video/get-started-sdk?platform=web",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Video Calling app goal", "Multi-platform quickstart structure", "Account and project prerequisites"]
+    },
+    {
+      "id": "S2",
+      "title": "Agora account management",
+      "url": "https://docs.agora.io/en/realtime-media/video/manage-agora-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Email and third-party signup", "Policy checkbox", "Verification", "Project creation", "Temp token"]
+    },
+    {
+      "id": "S3",
+      "title": "Agora homepage",
+      "url": "https://www.agora.io/en/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Multiple realtime engagement product surfaces"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Agora product should define the platform-wide first mile?",
+      "impact": "Required implementation steps, credentials, and the observable success signal all change by product.",
+      "evidence_needed": "A workshop-owner product choice, then verification of that product's current official quickstart from account creation to first success."
+    },
+    {
+      "question": "What exact live email-signup field labels and third-party continuation screens appear on the current Agora SSO pages?",
+      "impact": "Account field counts may differ from the summarized account-management checklist.",
+      "evidence_needed": "Dated screenshots of the current Agora signup flows for email and at least one third-party provider."
+    }
+  ],
+  "counts": null
+}

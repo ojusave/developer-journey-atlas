@@ -1,0 +1,269 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Intuit QuickBooks",
+    "slug": "intuit-quickbooks",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "38fbb912a53587e25af51ef305c784ec782633e1b91e90ef8925a8dc97cfdef6",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No Intuit Developer account, workspace, app, or sandbox company exists yet.",
+      "QuickBooks Online Accounting API is the candidate family unless another product is explicitly selected."
+    ]
+  },
+  "developer_goal": "Create an Intuit Developer account and reach the earliest official QuickBooks first-success API or demo outcome.",
+  "first_success": {
+    "outcome": "Unresolved among OAuth Playground CompanyInfo sample, language-specific demo app CompanyInfo, and Payments Submit Charge.",
+    "observable_signal": "Start developing documents a quick CompanyInfo cURL after Playground tokens; Build a demo app and Payments samples define alternate terminals.",
+    "source_ids": ["S1", "S4", "S5"]
+  },
+  "route_selection": {
+    "surface": "Intuit Developer Portal plus QuickBooks Online get-started docs",
+    "rule": "Include account creation. Do not invent a winner among Accounting Playground, demo-app, Payments, Desktop, or Explorer routes.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Developer account, Accounting-scoped app, OAuth Playground, GET CompanyInfo",
+        "status": "unresolved",
+        "reason": "Start developing presents this as the quick sample API call, but signup fields and exact app-creation screens remain partly undocumented."
+      },
+      {
+        "name": "Build a demo app in .NET, Java, or PHP then CompanyInfo",
+        "status": "unresolved",
+        "reason": "Official alternate first-app path with heavier implementation and language forks."
+      },
+      {
+        "name": "QuickBooks Payments Submit Charge via Playground",
+        "status": "unresolved",
+        "reason": "Playground lists Submit Charge under payments scope: different product outcome from CompanyInfo."
+      },
+      {
+        "name": "QuickBooks Desktop or API Explorer-only exploration",
+        "status": "unresolved",
+        "reason": "Start developing links these as separate valid entry paths with different tooling."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create an Intuit Developer account with basic company information and a workspace name.",
+      "required_fields": [
+        {
+          "label": "Basic company information",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "Docs state these are requested but do not enumerate current form controls."
+        },
+        {
+          "label": "Workspace name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The developer can open App dashboard and manage apps and sandboxes.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a developer app and select the scopes required by the chosen first-success route.",
+      "required_fields": [
+        {
+          "label": "App creation on-screen steps",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Scopes",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S4"],
+          "notes": "Accounting versus Payments scopes change which sample calls are valid."
+        }
+      ],
+      "observable_result": "Development Client ID and Client Secret are available.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Use the sandbox company created with the developer profile, or create an additional sandbox if required by the selected route.",
+      "required_fields": [],
+      "observable_result": "A sandbox company realm ID is available for authorization and API calls.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "external-authorization",
+      "interface": "web-ui",
+      "action": "In the OAuth 2.0 Playground or selected demo app, obtain an authorization code and exchange it for access and refresh tokens for the sandbox company.",
+      "required_fields": [
+        {
+          "label": "Sandbox app or company selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Scopes for token",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Connect / authorize consent",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "A temporary access token and realm ID are available for API calls.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "api",
+      "action": "Send the selected sample request (CompanyInfo, Payments charge, or demo-app equivalent) using the access token.",
+      "required_fields": [
+        {
+          "label": "Access token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S4"]
+        },
+        {
+          "label": "Sandbox company / realm ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S4"]
+        },
+        {
+          "label": "Sample API selection",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S4", "S5"]
+        }
+      ],
+      "observable_result": "The selected official sample response shape is returned.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4", "S5"]
+    }
+  ],
+  "prerequisites": [],
+  "external_gates": [
+    {
+      "description": "User consent in the OAuth authorization flow is required before access tokens are issued for a company realm.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Creating a developer account provisions a sandbox QuickBooks Online company with sample data.",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "description": "App creation generates Development Client ID and Client Secret.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production Keys & OAuth and App Store submission",
+      "reason": "Sandbox Development credentials and Playground tokens are sufficient for the documented quick sample call.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Reading bookkeeping primers and platform overview links before account creation",
+      "reason": "Documentation reading is excluded from required developer actions.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Create and start developing your app",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/start-developing-your-app",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer account and workspace",
+        "App and scope creation",
+        "Sandbox company provisioning",
+        "Quick CompanyInfo sample via Playground"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get the Client ID and Client Secret for your app",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/get-client-id-and-client-secret",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Development versus production credentials"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create and test with a sandbox company",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/develop/sandboxes/manage-your-sandboxes",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox company management"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Practice authorization in the OAuth Playground",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0-playground",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Playground token steps",
+        "CompanyInfo versus Payments sample calls"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Build a demo app",
+      "url": "https://developer.intuit.com/app/developer/qbo/docs/get-started/build-your-first-app",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Language-specific demo app alternate route"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which QuickBooks product and first-success surface is canonical: Accounting Playground CompanyInfo, demo app, Payments charge, Desktop, or Explorer?",
+      "impact": "Scopes, tools, implementation burden, and success signals all change.",
+      "evidence_needed": "Human selection of one bounded developer goal, then a fresh-account walkthrough of that route."
+    },
+    {
+      "question": "What exact Intuit Developer signup and current app-creation screens appear today?",
+      "impact": "Account and app field counts remain partly unverified.",
+      "evidence_needed": "Dated screenshots of developer account creation and first app wizard."
+    }
+  ],
+  "counts": null
+}

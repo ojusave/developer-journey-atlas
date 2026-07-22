@@ -1,0 +1,293 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "FusionAuth",
+    "slug": "fusionauth",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "04d4b092f0c7d8233e26cfaea6ca5d8e3eff296105e2f0abc64c91a8e9213cba",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run local tooling required by the selected 5 Minute Intro route.",
+      "No FusionAuth instance, administrator, application, or sample Express app exists yet.",
+      "The first administrator account is created in the FusionAuth Setup Wizard rather than on a hosted SaaS signup form for the self-hosted routes."
+    ]
+  },
+  "developer_goal": "Stand up FusionAuth through the 5 Minute Intro and complete login to the sample Express application so the home page greets the authenticated administrator by first name.",
+  "first_success": {
+    "outcome": "The registered administrator logs into the sample Express application through FusionAuth and returns to the home page with a personalized greeting.",
+    "observable_signal": "After login, the browser returns to the application home page and displays the user's first name; the guide states authentication data is stored in the Express session.",
+    "source_ids": ["S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "FusionAuth 5 Minute Intro",
+    "rule": "Choose among Docker, FastPath, and Sandbox only after lexicographic comparison of those documented peers to the same login terminal; do not invent a winner when environment-conditioned recommendations conflict with fewest-actions ranking.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "5 Minute Intro Docker route",
+        "status": "unresolved",
+        "reason": "Documented as the best choice when Docker and Docker Compose are installed, with a complete Setup Wizard through sample-app login path, but Sandbox is documented as the quickest no-install test drive to the same functioning login outcome."
+      },
+      {
+        "name": "5 Minute Intro FastPath route",
+        "status": "unresolved",
+        "reason": "Peer route when a local PostgreSQL or MySQL database is already installed; different install actions before the shared application configuration."
+      },
+      {
+        "name": "5 Minute Intro hosted Sandbox route",
+        "status": "unresolved",
+        "reason": "Documented as the quickest way to test drive without installing anything, reaching the same functioning application login outcome, while warning the environment is public, shared, and regularly wiped."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install and start FusionAuth using the selected 5 Minute Intro installation route.",
+      "required_fields": [
+        {
+          "label": "Route-specific install inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3", "S4"],
+          "notes": "Docker requires compose files and .env password edits; FastPath and Sandbox change or remove those inputs."
+        }
+      ],
+      "observable_result": "FusionAuth is reachable for Setup Wizard or Sandbox administration.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete the Setup Wizard by creating the administrator account and accepting the license.",
+      "required_fields": [
+        {
+          "label": "Administrator email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Administrator password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "License acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer is logged into the FusionAuth admin UI as the new administrator.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an Application, configure OAuth redirect and logout URLs, and copy Client Id and Client Secret.",
+      "required_fields": [
+        {
+          "label": "Application display name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Authorized redirect URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Logout URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "OAuth credentials exist for the sample application.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Register the administrator to the Application and ensure a first name exists for the greeting.",
+      "required_fields": [
+        {
+          "label": "Application registration",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Required if missing so the sample greeting can display it."
+        }
+      ],
+      "observable_result": "The administrator can authorize against the sample Application.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Clone the sample guide app, configure CLIENT_ID and CLIENT_SECRET, install dependencies, and start the Express app.",
+      "required_fields": [
+        {
+          "label": "CLIENT_ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "CLIENT_SECRET",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The sample app listens on localhost:3000.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open the sample app, choose Login, and authenticate with the Setup Wizard administrator.",
+      "required_fields": [
+        {
+          "label": "Administrator credentials",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The home page greets the user by first name after successful authentication.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Node.js is required for the sample Express application on the Docker 5 Minute route.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Docker and Docker Compose are required if the Docker install peer is selected.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "The Setup Wizard requires license acceptance before the administrator session continues.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Docker Compose must pull and start FusionAuth and dependent containers before the Setup Wizard is available.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "FusionAuth creates the administrator account and logs the developer into the admin UI after Setup Wizard submit.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Successful sample-app login stores user data in the Express session and shows the personalized greeting.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Get Started and 5 Minute Intro docs as measured actions",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "item": "Self-service registration, themes, and other Next Steps",
+      "reason": "The guide places these after the functioning login terminal.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Framework-specific QuickStarts beyond the 5 Minute Intro sample",
+      "reason": "Get Started points to the 5 Minute Intro as the general interactive introduction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started",
+      "url": "https://fusionauth.io/docs/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Entry to FusionAuth getting started and 5 Minute Intro"]
+    },
+    {
+      "id": "S2",
+      "title": "Docker Install",
+      "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/5-minute-docker",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Docker compose download and .env edits",
+        "Setup Wizard administrator and license",
+        "Application OAuth configuration",
+        "Sample Express app login terminal"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "5 Minute Intro",
+      "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Docker, FastPath, and Sandbox peer choices",
+        "Shared functioning login and logout outcome"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Sandbox",
+      "url": "https://fusionauth.io/docs/extend/examples/5-minute-intro/5-minute-sandbox",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Hosted Sandbox as no-install peer route"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which 5 Minute Intro peer is the selected shortest path: Docker, FastPath, or Sandbox?",
+      "impact": "Sandbox minimizes install actions while Docker is recommended when Docker is present; the peers change prerequisites, waits, and whether Setup Wizard runs on localhost or a shared public host.",
+      "evidence_needed": "Lexicographic ranking of the three official peers to the same personalized login greeting, including whether Sandbox's shared wiped environment is an acceptable first-success boundary."
+    },
+    {
+      "question": "Does the Sandbox route use the same Setup Wizard administrator fields and sample-app steps as Docker?",
+      "impact": "If Sandbox omits or replaces Setup Wizard or sample-app steps, action and field counts diverge from the Docker reconstruction.",
+      "evidence_needed": "Complete current Sandbox guide walkthrough aligned to the same Express greeting terminal."
+    }
+  ],
+  "counts": null
+}

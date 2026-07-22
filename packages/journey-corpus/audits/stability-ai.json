@@ -1,0 +1,232 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Stability AI",
+    "slug": "stability-ai",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "f8fb59869c6a3447c60058544665e3bd8f2d23132f695bd2eaf359971dc4ae4f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
+    ]
+  },
+  "developer_goal": "Create a Stability AI Developer Platform account with free credits and an API key, then run Stable Image Core until lighthouse.webp is saved.",
+  "first_success": {
+    "outcome": "The Stable Image Core sample returns HTTP 200 and saves the generated lighthouse image as lighthouse.webp.",
+    "observable_signal": "A non-empty lighthouse.webp file is written locally after HTTP 200.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "Stability AI Developer Platform Stable Image Core REST sample",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Google social login for free credits then Stable Image Core Python sample",
+        "status": "unresolved",
+        "reason": "Google consent and account-convergence states are not fully public; username/password route grants different credit positioning."
+      },
+      {
+        "name": "Username and password signup then purchase or use credits",
+        "status": "unresolved",
+        "reason": "Official docs state Google social login grants 25 free credits; email route credit grant is not equivalently evidenced."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Developer Platform account via Login.",
+      "required_fields": [
+        {
+          "label": "Signup method",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Username/password or Google."
+        },
+        {
+          "label": "Google account consent when choosing social login",
+          "field_type": "permission",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The developer is authenticated to the Developer Platform.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key on the API Keys page.",
+      "required_fields": [
+        {
+          "label": "API key creation",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "An API key value is available for Authorization headers.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Run the Stable Image Core sample that writes lighthouse.webp.",
+      "required_fields": [
+        {
+          "label": "STABILITY_API_KEY or Authorization header value",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S3"
+          ]
+        },
+        {
+          "label": "Stable Image Core request sample execution",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "HTTP 200 response and lighthouse.webp are saved.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Credits are required to call generation APIs; free credits depend on signup method.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Google identity-provider authorization for the social signup route.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Stability AI issues API keys and consumes credits on successful generation.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Purchasing additional credits after free balance is depleted",
+      "reason": "Occurs after first successful generation if free credits remain.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started",
+      "url": "https://platform.stability.ai/docs/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account creation",
+        "API keys",
+        "Credits"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Where can I find my API Key?",
+      "url": "https://kb.stability.ai/knowledge-base/where-can-i-find-my-api-key",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key location"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Stable Image",
+      "url": "https://platform.stability.ai/docs/getting-started/stable-image",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Stable Image Core sample"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "StabilityAI REST API (v2beta)",
+      "url": "https://platform.stability.ai/docs/api-reference",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API reference"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Pricing",
+      "url": "https://platform.stability.ai/pricing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Credit pricing"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does the username/password signup route grant the same free credits as Google login?",
+      "impact": "Changes whether payment is required before first generation.",
+      "evidence_needed": "Official credit-grant comparison for both signup methods on a fresh account."
+    },
+    {
+      "question": "What exact Google consent and post-login states appear before the API Keys page?",
+      "impact": "Blocks verified account-step fields.",
+      "evidence_needed": "Fresh-account walkthrough from Login through first API key."
+    }
+  ],
+  "counts": null
+}

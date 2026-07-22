@@ -1,0 +1,252 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Neon",
+    "slug": "neon",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "bda60552397b1cf1f483605527e31f3c914264d19037a2aecfd62657e14fca2a",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can install CLI tools if a CLI-heavy route is selected.",
+      "No Neon account, project, production branch, or development branch exists yet.",
+      "No Neon getting-started product path is preselected."
+    ]
+  },
+  "developer_goal": "Create a Neon account and complete the earliest official getting-started first-success outcome for Neon Postgres.",
+  "first_success": {
+    "outcome": "Depends on the still-unresolved getting-started route: either Schema Diff shows identical development and production branches after the Console tour reset, or an init/backend quickstart reaches its own documented terminal.",
+    "observable_signal": "For the Tour the Neon Console route, Schema Diff reports development and production are identical after the final reset.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Neon Console and Start with Neon documentation",
+    "rule": "Current Neon docs home presents multiple first routes; select only after one complete official path is fixed. Equal consequential routes remain unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Tour the Neon Console (formerly Learn the basics / signing-up)",
+        "status": "unresolved",
+        "reason": "Still the detailed Console tour ending in branching and Schema Diff, but it now also inserts Managed Better Auth and early-exit links to connect-your-stack, so required scope is ambiguous."
+      },
+      {
+        "name": "One-command setup via npx neon@latest init",
+        "status": "unresolved",
+        "reason": "Neon docs home now leads with AI-guided one-command setup that creates a project, applies schema, and writes .env; that is a different surface and terminal from the Console tour."
+      },
+      {
+        "name": "Full backend quickstart (Next.js + Neon backend)",
+        "status": "unresolved",
+        "reason": "Docs home presents a full backend tutorial as a primary getting-started path with region constraints and neon.ts deploy steps."
+      },
+      {
+        "name": "Connect Neon to your stack after minimal onboarding",
+        "status": "not-selected",
+        "reason": "The Console tour explicitly offers an early exit to connecting tools before the branching exercises; that is a shorter alternate goal, not the full tour terminal."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for Neon with email, GitHub, Google, or another supported partner account.",
+      "required_fields": [
+        {
+          "label": "Supported signup identity",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Docs list email, GitHub, Google, or partner account. The public signup page fetch did not expose concrete email/password field controls."
+        }
+      ],
+      "observable_result": "The developer is authenticated and enters Neon Console onboarding.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete Neon Console onboarding to create a Project with a production branch.",
+      "required_fields": [
+        {
+          "label": "Project onboarding selections",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S5"],
+          "notes": "Tour calls onboarding self-explanatory. Separate project-create docs list Project Name, Postgres version, Cloud provider, and Region for additional projects, but first-project onboarding fields remain unenumerated."
+        }
+      ],
+      "observable_result": "A Project Dashboard opens with production and neondb available.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "If the Console tour route is selected, run the SQL Editor sample table, inspect Tables, create a development branch, and complete CLI or psql branching exercises through Schema Diff reset.",
+      "required_fields": [
+        {
+          "label": "SQL Editor Run for playing_with_neon",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "development branch name and production parent",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Neon CLI install, neon auth, and branch/schema commands",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Full branching half of the fetched page was truncated; exact remaining CLI and Schema Diff steps need a complete page or walkthrough."
+        }
+      ],
+      "observable_result": "The selected getting-started route's terminal signal is visible.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For the Console tour branching half, Homebrew or npm for Neon CLI and a psql client when following the psql modification steps.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "GitHub, Google, or partner identity authorization when those signup methods are chosen.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Browser-based Neon CLI authorization during neon auth.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Neon must provision the project, production compute, and later development branch before SQL and Schema Diff steps can succeed.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Onboarding creates a Project with a production branch, default database, role, and compute.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Creating a development branch yields an isolated copy of production for schema experiments.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Neon documentation home as a counted action",
+      "reason": "Docs navigation is evidence for route selection, not a product interaction.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Inviting teammates after organization setup",
+      "reason": "Tour presents inviting members as optional team guidance.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "AI Assistant natural-language prompts in the SQL Editor",
+      "reason": "Tour presents Try the AI Assistant as exploratory practice after the sample table; it is not required to create a development branch or reach Schema Diff.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Managed Better Auth enablement during the Console tour",
+      "reason": "Tour includes a Managed Better Auth section, but branching and Schema Diff do not depend on enabling Auth.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Neon documentation",
+      "url": "https://neon.com/docs/introduction",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "One-command setup",
+        "Full backend quickstart",
+        "Tour and connect guides as alternate getting-started entries"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Tour the Neon Console",
+      "url": "https://neon.com/docs/get-started/signing-up",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup identity options",
+        "Project onboarding",
+        "SQL Editor sample table",
+        "AI Assistant prompts",
+        "Tables view",
+        "Managed Better Auth section",
+        "Create development branch and CLI/psql branching direction",
+        "Early exit to connect-your-stack"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Connect with psql",
+      "url": "https://neon.com/docs/connect/query-with-psql-editor",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["psql connection and platform-specific install guidance referenced by the tour"]
+    },
+    {
+      "id": "S4",
+      "title": "Neon Console signup",
+      "url": "https://console.neon.tech/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup URL loads Neon branding",
+        "Concrete email or OAuth field controls were not extractable from the public fetch"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Manage projects",
+      "url": "https://neon.com/docs/manage/projects",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Additional project create fields: name, Postgres version, cloud provider, region"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which current Neon getting-started route is the canonical shortest path: Console tour, npx neon init, or full backend quickstart?",
+      "impact": "These routes diverge in required CLI work, Auth setup, framework scaffolding, and first-success signal.",
+      "evidence_needed": "A bounded goal choice, then a complete fresh-account walkthrough of that single official route."
+    },
+    {
+      "question": "Which exact fields appear on Neon signup and first-project onboarding?",
+      "impact": "Signup and onboarding fields change required-action and required-field counts for the Console tour.",
+      "evidence_needed": "Dated screenshots of console.neon.tech/signup and first-project onboarding for a fresh account."
+    },
+    {
+      "question": "Which OS path applies for psql install if the selected Console tour branch requires psql?",
+      "impact": "psql install commands differ by OS and architecture and change implementation steps.",
+      "evidence_needed": "Pin one OS for any psql-required branch of the path, or confirm the CLI-only branch covers Schema Diff without psql."
+    }
+  ],
+  "counts": null
+}

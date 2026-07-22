@@ -1,0 +1,216 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Telnyx",
+    "slug": "telnyx",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "eb9d8e72c49d875944271d2a96c5c3125781fca08d228f792cb3378a125d037b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and curl or an equivalent HTTP client.",
+      "No Telnyx account, numbers, messaging profile, or API key exists yet."
+    ]
+  },
+  "developer_goal": "Create a Telnyx account and send a first on-net SMS with the Messaging API.",
+  "first_success": {
+    "outcome": "A POST to /v2/messages with a Bearer API key queues an SMS between two Telnyx numbers.",
+    "observable_signal": "The Messaging API accepts the send request for the documented Hello, world! text between the two configured numbers.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Telnyx Mission Control Portal plus Messaging API quickstart",
+    "rule": "Use the official Send Your First Message guide as the documented self-service messaging route; leave the path unverified while signup fields remain opaque.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Mission Control: buy two numbers, messaging profile, API key, on-net SMS",
+        "status": "unresolved",
+        "reason": "This is the official five-minute messaging guide, but account creation and any KYC or billing prompts are not publicly reconstructed."
+      },
+      {
+        "name": "Off-net messaging to an external carrier number",
+        "status": "not-selected",
+        "reason": "The guide states off-net US messaging typically requires sender registration such as 10DLC."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free Telnyx account and sign in to Mission Control.",
+      "required_fields": [
+        {
+          "label": "Signup and KYC fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "The guide requires an account and links signup, but does not enumerate interactive fields."
+        }
+      ],
+      "observable_result": "The developer can open Mission Control portal resources.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Search for SMS-capable numbers and purchase two Telnyx numbers.",
+      "required_fields": [
+        {
+          "label": "Area code or region",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "SMS feature filter",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Two Telnyx numbers are available in My Numbers.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a messaging profile and assign both numbers to it.",
+      "required_fields": [
+        {
+          "label": "Messaging profile name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Both numbers are assigned to the messaging profile.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Copy or create an API key in Mission Control.",
+      "required_fields": [],
+      "observable_result": "The developer has a Bearer token for Messaging API calls.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "POST to https://api.telnyx.com/v2/messages with from, to, and text set for the two Telnyx numbers.",
+      "required_fields": [
+        {
+          "label": "Authorization Bearer API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "from E.164 number",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "to E.164 number",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "text",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The API returns a successful outbound message payload.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Two Telnyx numbers are required so the guide can test on-net messaging without carrier registration.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Purchasing numbers may incur Mission Control charges depending on number type and region.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Telnyx accepts and queues the outbound message after a valid authenticated send request.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "10DLC or other sender registration for off-net destinations",
+      "reason": "The selected guide intentionally uses Telnyx-to-Telnyx numbers to avoid carrier registration.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Webhook delivery tracking",
+      "reason": "Webhooks are outside the first accepted send request.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Send Your First Message",
+      "url": "https://developers.telnyx.com/docs/messaging/messages/send-message",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Free account prerequisite", "Buy two numbers", "Messaging profile", "API key", "On-net send curl"]
+    },
+    {
+      "id": "S2",
+      "title": "Telnyx sign up",
+      "url": "https://telnyx.com/sign-up",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Official signup entry linked from messaging docs; interactive fields not fully public"]
+    },
+    {
+      "id": "S3",
+      "title": "Create and Manage API Keys",
+      "url": "https://developers.telnyx.com/development/api-fundamentals/create-api-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Mission Control API key creation flow"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact signup fields, KYC prompts, payment-method requirements, and post-submit screens appear for a free Telnyx account?",
+      "impact": "Account creation remains one opaque step, so required field and gate counts cannot be verified.",
+      "evidence_needed": "A dated fresh-account Mission Control signup walkthrough including any identity or billing gates before number purchase."
+    },
+    {
+      "question": "Does purchasing the two guide numbers currently require a funded balance or card before Place Order succeeds?",
+      "impact": "A payment gate would change lexicographic ranking versus any alternate no-purchase messaging demo if one exists.",
+      "evidence_needed": "Official billing docs or a fresh-account number-purchase attempt showing whether payment is required for the on-net test path."
+    }
+  ],
+  "counts": null
+}

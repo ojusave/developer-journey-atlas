@@ -1,0 +1,261 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "GoCardless",
+    "slug": "gocardless",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "5fc49a9a6204609f5779137c2301b5ff6b323e23d3eb9a4e062daf92f4701263",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, an email address, and a local environment able to send HTTP requests.",
+      "No GoCardless sandbox account or access token exists yet.",
+      "Sandbox payer test bank details are used; live money movement is out of scope."
+    ]
+  },
+  "developer_goal": "Create a GoCardless sandbox account and complete the earliest official first test payment authorisation path.",
+  "first_success": {
+    "outcome": "Unresolved among Collect-payments Billing Request authorisation, Send-payments payouts setup, and partner OAuth integrations.",
+    "observable_signal": "Send your first API request demonstrates a completed sandbox Billing Request and a new Customers dashboard entry, but Set up also presents Send payments and later partner guides.",
+    "source_ids": ["S1", "S3"]
+  },
+  "route_selection": {
+    "surface": "GoCardless developer getting-started sandbox guides",
+    "rule": "Select the shortest complete sandbox route only after Collect versus Send versus partner surface is fixed; do not invent a winner across unequal product goals.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Sandbox Collect payments via Billing Request Flow (BACS example)",
+        "status": "unresolved",
+        "reason": "Official getting-started API request guide walks this path to a dashboard customer, but Set up presents Collect and Send as peer API functions and libraries versus raw HTTP remain tied."
+      },
+      {
+        "name": "Sandbox Send payments / payouts first success",
+        "status": "unresolved",
+        "reason": "Set up lists Send payments as a primary API function with a different success definition from mandate authorisation."
+      },
+      {
+        "name": "Partner OAuth integrations",
+        "status": "unresolved",
+        "reason": "Send your first API request links a partner getting-started path that connects to users' GoCardless accounts instead of a single merchant sandbox token."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a free GoCardless sandbox testing account.",
+      "required_fields": [
+        {
+          "label": "Business name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Business location / country",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Business type",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Terms of service and related agreements",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer can open the sandbox dashboard at manage-sandbox.gocardless.com.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Read-Write sandbox access token from Developers and copy it.",
+      "required_fields": [
+        {
+          "label": "Access token name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Read-Write access",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "A sandbox access token is available once for API calls.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Create a Billing Request and Billing Request Flow for the selected scheme, then open the hosted authorisation URL.",
+      "required_fields": [
+        {
+          "label": "Mandate scheme (example docs use bacs)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Scheme choice may vary by country and product; docs demonstrate bacs."
+        },
+        {
+          "label": "Authorization Bearer access token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S3"]
+        }
+      ],
+      "observable_result": "An authorisation_url is returned for the hosted payer flow.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Complete the sandbox payer authorisation using documented test bank details and confirm the customer appears in the dashboard.",
+      "required_fields": [
+        {
+          "label": "Sandbox payer bank details",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "Customers in the sandbox dashboard shows the newly created customer.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A developer environment capable of calling the GoCardless sandbox API is required.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Partner integrations require OAuth connection to users' GoCardless accounts instead of only a merchant sandbox token.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Hosted payer flow completion is required before the customer appears for Billing Request success.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "GoCardless creates Billing Request and Billing Request Flow resources and returns an authorisation_url.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "After payer completion, a customer record is visible in the sandbox dashboard.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Installing a specific official client library language tab",
+      "reason": "Set up allows direct HTTP as an equal alternative to libraries; choosing one language would invent a tie-break.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Create a payment after first authorisation",
+      "reason": "Send your first API request lists Create a payment as a next step after the customer is visible.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Live environment tokens and real payments",
+      "reason": "Getting started confines the guide to Sandbox.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Set up",
+      "url": "https://developer.gocardless.com/getting-started/set-up/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox versus Live",
+        "Read-Write access token creation",
+        "Collect versus Send overview",
+        "Client library versus HTTP options"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sandbox sign-up",
+      "url": "https://manage-sandbox.gocardless.com/sign-up",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Business name and location",
+        "Business type",
+        "Email and password",
+        "Terms agreement"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Send your first API request",
+      "url": "https://developer.gocardless.com/getting-started/send-your-first-api-request/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Billing Request create",
+        "Billing Request Flow",
+        "Hosted authorisation",
+        "Test bank details",
+        "Customers dashboard terminal",
+        "Partner integrations next step"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should Collect-payments Billing Request authorisation, Send-payments, or partner OAuth define GoCardless first success?",
+      "impact": "These are peer product goals with different tokens, objects, and observable terminals, so lexicographic selection cannot invent a winner.",
+      "evidence_needed": "A corpus policy choice of one getting-started goal, then verification that its current sandbox docs form a single complete path."
+    },
+    {
+      "question": "If Collect payments is selected, which mandate scheme and request style (library language versus raw HTTP) are canonical?",
+      "impact": "Scheme and client-library tabs can change prerequisites and request details without a documented single default.",
+      "evidence_needed": "Official recommendation of one scheme and one request surface for the shortest first authorisation path."
+    }
+  ],
+  "counts": null
+}

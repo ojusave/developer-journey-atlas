@@ -1,0 +1,347 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Qovery",
+    "slug": "qovery",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "c22019e187474fe1393891d7aeb389a0806a4fe6d001fb58770a51fd4c3db240",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer can authenticate with an identity provider supported by Qovery signup and accept Terms.",
+      "For the local path, Docker can run a k3s demo cluster on the machine.",
+      "No Qovery organization, project, or application exists yet."
+    ]
+  },
+  "developer_goal": "Create a Qovery account and deploy a first containerized web application to an observable live URL.",
+  "first_success": {
+    "outcome": "Qovery reports the application Running and exposes a generated URL that serves the live app.",
+    "observable_signal": "Status reaches Running and opening https://your-app-xxx.qovery.io (or the generated URL) shows the application.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "Qovery Console with optional local demo cluster",
+    "rule": "Get Started presents AI, cloud, local, and BYOK peers; signup screens and which project to use remain unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Local k3s demo cluster + Console Git deploy",
+        "status": "unresolved",
+        "reason": "Positioned for free first-time learning, but requires Docker/CLI and an unspecified sample repo."
+      },
+      {
+        "name": "Managed cloud cluster path",
+        "status": "unresolved",
+        "reason": "Peer path needing a cloud account and longer cluster provisioning before the same app flow."
+      },
+      {
+        "name": "AI agent deploy",
+        "status": "not-selected",
+        "reason": "Different interaction surface centered on an external coding agent."
+      },
+      {
+        "name": "Bring Your Own Kubernetes",
+        "status": "not-selected",
+        "reason": "Assumes an existing cluster and admin access."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up at the Qovery Console, authenticate with a supported identity provider, and accept Terms.",
+      "required_fields": [
+        {
+          "label": "Identity provider and Terms acceptance",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4",
+            "S7"
+          ]
+        }
+      ],
+      "observable_result": "An authenticated Qovery organization session exists.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create or select the organization project and environment on a connected cluster (local demo or cloud).",
+      "required_fields": [
+        {
+          "label": "Project name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Environment name and type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Cluster selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "An environment ready for New Service exists on a cluster.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "external-authorization",
+      "interface": "external-system",
+      "action": "Authorize Git provider access if deploying from a Git repository.",
+      "required_fields": [
+        {
+          "label": "Git repository access",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "The target repository is selectable in application creation.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the application from Git or container source with required name, port, and compute settings, then Create and Deploy.",
+      "required_fields": [
+        {
+          "label": "Application name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Repository, branch, and Dockerfile path or image",
+          "field_type": "repository",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ],
+          "notes": "Guide gives examples but no canonical starter repository."
+        },
+        {
+          "label": "Port and protocol",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "Qovery starts building and deploying the application.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "When status is Running, open the generated application URL.",
+      "required_fields": [],
+      "observable_result": "The browser shows the live application.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For local demo: Docker daemon and sufficient local CPU/memory to run k3s.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "Git repository with Dockerfile, or a pre-built image in a connected registry.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Identity-provider signup and Terms acceptance gate Console access.",
+      "source_ids": [
+        "S4",
+        "S7"
+      ]
+    },
+    {
+      "description": "Git provider authorization is required for Git-sourced applications.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Qovery must clone, build, deploy, and mark the application Running before the URL works.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "Local demo cluster provisioning via qovery demo up must finish before Console deploy to that cluster.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Create and Deploy builds the container and exposes a generated HTTPS URL.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Get Started path cards",
+      "reason": "Docs present unresolved peer routes.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Optional health checks and environment variables when the app needs neither",
+      "reason": "First-app guide treats them as optional.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "Managed database, Helm, and custom domains",
+      "reason": "After first application success.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started with Qovery",
+      "url": "https://www.qovery.com/docs/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Peer AI cloud local BYOK paths"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Local Cluster for Development",
+      "url": "https://www.qovery.com/docs/configuration/integrations/kubernetes/docker",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Local k3s demo cluster"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Deploy Your First Application",
+      "url": "https://www.qovery.com/docs/getting-started/guides/getting-started/deploy-your-first-application",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Project environment app fields",
+        "Git auth",
+        "Create and Deploy",
+        "Running URL"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Organization",
+      "url": "https://www.qovery.com/docs/configuration/organization",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Organization and project creation outcomes"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Git Repository Access",
+      "url": "https://www.qovery.com/docs/configuration/organization/git-repository-access",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Git provider authorization"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Qovery Terms",
+      "url": "https://www.qovery.com/terms",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Terms acceptance"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact signup screens, verification steps, Terms checkbox, organization fields, and project fields does a new user encounter today?",
+      "impact": "Account-segment counts cannot be verified from public docs.",
+      "evidence_needed": "Fresh-account Console signup walkthrough with dated screenshots."
+    },
+    {
+      "question": "Should a first-time developer reuse the project created at signup or create the additional project named by the first-app guide?",
+      "impact": "Adds or removes a project-creation action and can duplicate project state.",
+      "evidence_needed": "Human reconciliation of organization/signup docs versus Deploy Your First Application."
+    },
+    {
+      "question": "Which canonical repository and Dockerfile should a completely new evaluator use?",
+      "impact": "Missing starter artifacts can add large undocumented implementation work before Qovery onboarding.",
+      "evidence_needed": "Official sample repository designation or a bounded human-chosen starter with Dockerfile and port."
+    }
+  ],
+  "counts": null
+}

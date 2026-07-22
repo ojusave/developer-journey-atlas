@@ -1,0 +1,226 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "PayPal",
+    "slug": "paypal",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "fc489a5e1c33247d35f1c8d3c7367763ab72bc7c33b6250cf8b68f15b116fb4b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer is testing a US integration where a PayPal Developer account is documented as sufficient for sandbox.",
+      "No Developer Dashboard session or REST app credentials exist yet.",
+      "Live go-live and non-US testing that require a Business account are out of scope unless selected."
+    ]
+  },
+  "developer_goal": "Create or sign in to a PayPal Developer account, obtain sandbox REST credentials, and complete the earliest official authenticated first success.",
+  "first_success": {
+    "outcome": "Unresolved between sandbox OAuth access-token acquisition and a later product API call such as Orders.",
+    "observable_signal": "Get Started documents an access_token response; it does not designate which product API is the shared first business success.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "PayPal Developer Dashboard plus REST Get Started docs",
+    "rule": "Prefer routes without Business-account entitlement when US sandbox testing is allowed. Do not invent a winner among token-only versus first product API outcomes.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Own credentials: Default Application then sandbox OAuth token via cURL",
+        "status": "unresolved",
+        "reason": "Matches the numbered Get Started path, but signup field inventory and secret-reveal UI remain unverified."
+      },
+      {
+        "name": "Own credentials: Create App then sandbox OAuth token",
+        "status": "unresolved",
+        "reason": "Docs allow Create App instead of Default Application; action count may differ by one create step."
+      },
+      {
+        "name": "Postman without a PayPal Developer account",
+        "status": "unresolved",
+        "reason": "Official Get Started states REST APIs can be tried in Postman without a Developer account, conflicting with an account-creation boundary."
+      },
+      {
+        "name": "Continue past token into Orders, Payments, Subscriptions, Invoicing, or Disputes",
+        "status": "unresolved",
+        "reason": "Get Started lists these products without selecting one post-token first business result."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Log in to the Developer Dashboard or sign up for a PayPal Developer account.",
+      "required_fields": [
+        {
+          "label": "PayPal account signup or login fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3"],
+          "notes": "Docs link log in or sign up and mention email verification for new developer accounts, but do not enumerate current screens."
+        }
+      ],
+      "observable_result": "The developer can open Apps & Credentials.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open Apps & Credentials and copy the sandbox client ID and client secret for Default Application or a newly created app.",
+      "required_fields": [
+        {
+          "label": "Client ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Client secret",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Whether a reveal click is required is not documented."
+        }
+      ],
+      "observable_result": "Sandbox REST credentials are available for the token request.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Exchange client ID and client secret for a sandbox OAuth 2.0 access token.",
+      "required_fields": [
+        {
+          "label": "CLIENT_ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2"]
+        },
+        {
+          "label": "CLIENT_SECRET",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2"]
+        },
+        {
+          "label": "grant_type=client_credentials",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2"]
+        }
+      ],
+      "observable_result": "PayPal returns access_token, token_type Bearer, and expires_in.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "US sandbox testing is documented as available with a Developer account; non-US testing and going live require a Business account.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A PayPal Business account is required to go live or to test integrations outside the US.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "New developer accounts may require responding to a PayPal verification email before sandbox tools are enabled.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email verification may delay Dashboard enablement after signup.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "New accounts receive a Default Application in REST API apps and default personal plus business sandbox accounts.",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "description": "The OAuth token endpoint returns a bearer access token for subsequent REST calls.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Sandbox buyer/seller login exercises after the token response",
+      "reason": "Get sandbox account credentials is documented after token acquisition and is not required to observe access_token.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Live Apps & Credentials and go-live Business account setup",
+      "reason": "Live entitlement is an explicit later gate beyond US sandbox first success.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started with PayPal REST APIs",
+      "url": "https://developer.paypal.com/api/rest/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer account for US sandbox",
+        "Business account for live and non-US",
+        "Apps & Credentials steps",
+        "OAuth token sample",
+        "Postman without account note"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Authentication",
+      "url": "https://developer.paypal.com/api/rest/authentication/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "cURL and Postman token exchange",
+        "Bearer access token response shape"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "PayPal Sandbox Testing Guide",
+      "url": "https://developer.paypal.com/tools/sandbox/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer signup and email verification",
+        "Default sandbox accounts",
+        "Sandbox versus live workflow"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact screens, fields, and verification challenges occur during PayPal Developer signup today?",
+      "impact": "Account-step field counts and possible identity gates cannot be verified from public docs alone.",
+      "evidence_needed": "A dated fresh-account signup walkthrough of developer.paypal.com."
+    },
+    {
+      "question": "Is first success the OAuth access token, or the first product API after the token?",
+      "impact": "Orders, payments, subscriptions, invoicing, and disputes each add different payloads and actors.",
+      "evidence_needed": "Human selection of one bounded terminal outcome for the corpus."
+    },
+    {
+      "question": "Does the Postman-without-account route invalidate an account-creation starting boundary for PayPal?",
+      "impact": "If allowed, the measured path may exclude Developer account creation entirely.",
+      "evidence_needed": "Policy decision on whether account-less Postman is in scope for this atlas journey."
+    }
+  ],
+  "counts": null
+}

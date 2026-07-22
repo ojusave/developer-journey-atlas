@@ -1,0 +1,255 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "GitGuardian",
+    "slug": "gitguardian",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "27e9f45dad12792fa61cc496c0bd678f7d8193a580c86868e6c772c5c0545cac",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
+    ]
+  },
+  "developer_goal": "Obtain GitGuardian access and complete a first secret scan with ggshield on a local Git repository, or confirm whether dashboard GitHub monitoring is the selected first mile.",
+  "first_success": {
+    "outcome": "ggshield has authenticated and completed a secret scan of the selected local repository, if the CLI route is selected.",
+    "observable_signal": "The repository scan command exits with code 0 or 1 after completing the scan.",
+    "source_ids": [
+      "S1",
+      "S4"
+    ]
+  },
+  "route_selection": {
+    "surface": "ggshield local repository scan versus dashboard GitHub integration",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "ggshield install, login, and local repo scan",
+        "status": "unresolved",
+        "reason": "Account creation may use GitHub app install or email verification; exact login field path for CLI auth needs confirmation."
+      },
+      {
+        "name": "Dashboard signup with GitHub then integrate repositories",
+        "status": "unresolved",
+        "reason": "Peer first-success via Internal Monitoring dashboard rather than local CLI scan."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a GitGuardian account via GitHub, email, or SSO.",
+      "required_fields": [
+        {
+          "label": "Signup method",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "GitHub social login, email/password, or SSO."
+        },
+        {
+          "label": "GitHub App repository access when using GitHub signup",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Email confirmation when using email signup",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "A GitGuardian workspace is available.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install ggshield using the recommended install route.",
+      "required_fields": [
+        {
+          "label": "ggshield install command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "ggshield is available on the PATH.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "external-authorization",
+      "interface": "cli",
+      "action": "Authenticate ggshield to the GitGuardian workspace.",
+      "required_fields": [
+        {
+          "label": "ggshield auth / login flow",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "CLI authentication succeeds.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Scan a local Git repository for secrets.",
+      "required_fields": [
+        {
+          "label": "ggshield secret scan repo command and repository path",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "Scan completes with exit code 0 or 1.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A GitGuardian account or workspace is required for authenticated scanning.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "GitHub authorization when using GitHub signup or repository integration.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email confirmation for the email signup route.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "GitGuardian returns scan findings or a clean completion status.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading reference overview pages beyond the scan command",
+      "reason": "Optional reference reading.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "ggshield Getting started",
+      "url": "https://docs.gitguardian.com/ggshield-docs/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Install and first scan guidance"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create your GitGuardian account",
+      "url": "https://docs.gitguardian.com/platform/getting-started/account-creation",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "GitHub, email, SSO signup"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Dashboard signup",
+      "url": "https://dashboard.gitguardian.com/auth/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup entry choices"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "ggshield secret scan repo reference",
+      "url": "https://docs.gitguardian.com/ggshield-docs/reference/secret/scan/repo",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Repo scan command"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "ggshield reference overview",
+      "url": "https://docs.gitguardian.com/ggshield-docs/reference/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "CLI reference overview"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Is first success the local ggshield repo scan or dashboard GitHub monitoring after signup?",
+      "impact": "These are different terminals with different required actions.",
+      "evidence_needed": "Explicit first-success selection plus a fresh-account walkthrough for that route."
+    },
+    {
+      "question": "What exact ggshield authentication steps appear after account creation today?",
+      "impact": "Blocks verified auth action fields.",
+      "evidence_needed": "Observed ggshield login against a fresh workspace."
+    }
+  ],
+  "counts": null
+}

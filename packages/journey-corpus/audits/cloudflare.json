@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Cloudflare",
+    "slug": "cloudflare",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "c360d1c0bd4a38a2ddf565ada928c48ed7c5429131fe2958eda2fe2a42337d0f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No Cloudflare account, Worker project, or Workers onboarding interface has been selected yet.",
+      "Node.js may be available later if a CLI route is chosen."
+    ]
+  },
+  "developer_goal": "Create a Cloudflare account and deploy a first Worker to a public workers.dev endpoint.",
+  "first_success": {
+    "outcome": "Unresolved among parallel Workers getting-started routes that can all reach a deployed Worker, with different surfaces and prerequisites.",
+    "observable_signal": "A common candidate signal is a public workers.dev response such as Hello Worker!, but the route to that signal is not uniquely selected.",
+    "source_ids": ["S1", "S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "Cloudflare Workers getting-started router",
+    "rule": "Official Workers getting started lists CLI, Dashboard, Prompting, and Templates as parallel options; lexicographic selection cannot invent a winner when routes are coequal and consequential.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Workers CLI (C3 + Wrangler)",
+        "status": "unresolved",
+        "reason": "Complete code-first path requiring Node.js and account login; one of four listed getting-started options."
+      },
+      {
+        "name": "Workers Dashboard",
+        "status": "unresolved",
+        "reason": "Parallel dashboard path that uses a Git provider and different required authorizations."
+      },
+      {
+        "name": "Workers Prompting",
+        "status": "unresolved",
+        "reason": "Parallel agent-assisted route whose steps depend on the AI tool and prompt."
+      },
+      {
+        "name": "Workers Templates",
+        "status": "unresolved",
+        "reason": "Requires choosing among many templates rather than one universal Worker outcome."
+      },
+      {
+        "name": "Workers Playground",
+        "status": "not-selected",
+        "reason": "Cloudflare positions it for instant preview; accountful deploy onboarding differs from CLI and Dashboard journeys."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a Cloudflare account required by the chosen CLI or Dashboard deployment route.",
+      "required_fields": [
+        {
+          "label": "Cloudflare account signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S4"],
+          "notes": "CLI guide requires signup; dash.cloudflare.com/sign-up was temporarily unavailable during this audit, so live fields were not observed."
+        }
+      ],
+      "observable_result": "The developer has an authenticated Cloudflare account.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose one Workers getting-started surface: CLI, Dashboard, Prompting, or Templates.",
+      "required_fields": [
+        {
+          "label": "Workers onboarding route",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "One Workers first-success route is fixed.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "If the CLI candidate is later selected, create a Worker with C3, edit the response, and deploy with Wrangler.",
+      "required_fields": [
+        {
+          "label": "C3 starter, template, language, git, and deploy prompts",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Worker response text change",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "A Worker project exists locally and can be published to workers.dev.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Node.js 16.17.0 or later for the CLI route.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "A supported Git provider and repository choice for the Dashboard route.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Browser login to a Cloudflare account during first Wrangler use on the CLI route.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "First workers.dev publish can briefly return 523 errors that resolve without further developer action.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Wrangler deploy publishes the Worker to a workers.dev subdomain on the CLI candidate route.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Workers getting-started documentation",
+      "reason": "Documentation identifies parallel routes; reading is not a product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Playground-only preview without accountful deploy",
+      "reason": "Different journey boundary from CLI and Dashboard deployment guides.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Workers Getting started",
+      "url": "https://developers.cloudflare.com/workers/get-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Parallel CLI, Dashboard, Prompting, and Templates options"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get started - CLI",
+      "url": "https://developers.cloudflare.com/workers/get-started/guide/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and Node.js prerequisites",
+        "C3 prompts",
+        "Wrangler login, edit, deploy",
+        "workers.dev verification and 523 note"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get started - Dashboard",
+      "url": "https://developers.cloudflare.com/workers/get-started/dashboard/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Parallel Dashboard and Git-provider route"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Cloudflare Dashboard sign-up",
+      "url": "https://dash.cloudflare.com/sign-up",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sign-up URL reachable but dashboard temporarily unavailable during audit"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Workers onboarding surface is the selected shortest path: CLI, Dashboard, Prompting, or Templates?",
+      "impact": "Prerequisites, authorizations, and action counts differ materially across the parallel official options.",
+      "evidence_needed": "Human selection of one Workers surface, then a fresh-account walkthrough to the workers.dev terminal."
+    },
+    {
+      "question": "What required fields appear on the current Cloudflare sign-up form?",
+      "impact": "Account field counts cannot be verified while the public sign-up UI is unavailable or unobserved.",
+      "evidence_needed": "Dated screenshots of a working dash.cloudflare.com/sign-up session."
+    }
+  ],
+  "counts": null
+}

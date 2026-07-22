@@ -1,0 +1,227 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Descope",
+    "slug": "descope",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "3e88d93fb53835873d3f6ae9af8813707138ba89db7696666a5a2390d553b1ce",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email address, and a local application workspace.",
+      "No Descope account, project, Flow, or SDK integration exists yet."
+    ]
+  },
+  "developer_goal": "Create a Descope account and project, embed a Descope authentication experience in an application, and complete a test sign-up or sign-in that yields an authenticated user and session.",
+  "first_success": {
+    "outcome": "A test sign-up or sign-in through the selected Descope Flow or SDK path produces an authenticated user and session.",
+    "observable_signal": "The React quickstart's Application is working checkpoint, or an equivalent onSuccess/session authenticated state for the selected framework route.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Descope Getting Started Quickstart and framework Flow guides",
+    "rule": "Select Native versus Hosted Flows and one framework route only after those peer choices are fixed; Flows are recommended but not a single fully specified universal path.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Native Implementation with Descope Flows in React",
+        "status": "unresolved",
+        "reason": "Flows are the recommended easiest approach and React has a concrete quickstart, but Native versus Hosted and many framework peers remain unranked for a universal first-mile path."
+      },
+      {
+        "name": "Hosted Application with Descope Flows",
+        "status": "unresolved",
+        "reason": "Official getting started presents Hosted Application as a peer Flow-based option beside Native Implementation."
+      },
+      {
+        "name": "Client SDKs without Flows",
+        "status": "not-selected",
+        "reason": "Documented as an alternative when not using Flows; the guide recommends Flows as easiest."
+      },
+      {
+        "name": "Backend SDKs without Flows",
+        "status": "not-selected",
+        "reason": "Requires owning frontend and session behavior; not the recommended easiest route."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for Descope and obtain a project with a Project ID.",
+      "required_fields": [
+        {
+          "label": "Console signup and project creation fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3"],
+          "notes": "Docs say a Project ID is required to start, but the public Console shell does not document signup, verification, or onboarding fields."
+        }
+      ],
+      "observable_result": "The developer can copy a Project ID from project settings.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Confirm the project contains the sign-up-or-in Flow used by the selected quickstart.",
+      "required_fields": [
+        {
+          "label": "Flow ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2"],
+          "notes": "Getting started centers on Flows; exact default Flow presence for a fresh project is not independently observed here."
+        }
+      ],
+      "observable_result": "A usable Flow ID is available for SDK embedding.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Install the selected framework SDK, wrap the app with AuthProvider, and render the Descope Flow component.",
+      "required_fields": [
+        {
+          "label": "Project ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2"]
+        },
+        {
+          "label": "Framework-specific provider and Flow component wiring",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "React is one of many framework routes; Native versus Hosted changes the required implementation surface."
+        }
+      ],
+      "observable_result": "The local app renders a Descope authentication experience.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Complete a test sign-up or sign-in and confirm authenticated user and session state.",
+      "required_fields": [
+        {
+          "label": "Flow-defined user inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S4"],
+          "notes": "Required inputs depend on the Flow's screens and authentication methods."
+        }
+      ],
+      "observable_result": "onSuccess or session hooks report an authenticated user and the quickstart checkpoint can be marked complete.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A Descope account and project are required before a Project ID and Flow can be used.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Flow authentication methods may require email delivery or third-party identity-provider authorization.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Descope issues a session token at the end of a successful Flow.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading getting-started documentation as a measured action",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Backend session validation and Flow customization after first success",
+      "reason": "The React quickstart places backend session management and customization after Application is working.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart Guide",
+      "url": "https://docs.descope.com/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Flows recommended as easiest approach",
+        "Native versus Hosted Flow options",
+        "Client and Backend SDK alternatives",
+        "Project ID prerequisite"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "React Quickstart",
+      "url": "https://docs.descope.com/getting-started/react",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "React frontend integration entry",
+        "Application is working style first-success framing",
+        "Backend session management deferred"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Descope Console",
+      "url": "https://app.descope.com",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Console entry URL; signup field set not publicly documented"]
+    },
+    {
+      "id": "S4",
+      "title": "Flows overview",
+      "url": "https://docs.descope.com/flows",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Flows as orchestration",
+        "Session JWT output",
+        "Screens and authentication actions"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Flow delivery mode and framework define the selected Descope first-success route: Native versus Hosted, and which SDK quickstart?",
+      "impact": "Peer choices change install packages, hosted redirect behavior, required code, and verification steps.",
+      "evidence_needed": "Fix one bounded framework and Flow delivery mode, then verify the complete current Console-to-app path."
+    },
+    {
+      "question": "What exact Descope Console signup, verification, onboarding wizard, and first-project fields are required today?",
+      "impact": "Account-creation actions and field counts cannot be verified, so the audit cannot start cleanly at account creation.",
+      "evidence_needed": "Dated screenshots or a read-only walkthrough from public signup through Project ID visibility."
+    },
+    {
+      "question": "Does every fresh project include a usable sign-up-or-in Flow without additional Console editing?",
+      "impact": "Missing or differently named default Flows would add required Console configuration before the SDK path works.",
+      "evidence_needed": "Fresh-project observation of default Flows and the Flow ID expected by the selected quickstart."
+    }
+  ],
+  "counts": null
+}

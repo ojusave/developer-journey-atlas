@@ -1,0 +1,299 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "PostHog",
+    "slug": "posthog",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "f068861704cbf34e0435e3abb5e91eeb44b237c25b7a186dcd658c96b14bc431",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a terminal, Node.js/npx, and a local project directory.",
+      "No PostHog Cloud account or project instrumentation exists yet.",
+      "The project uses a framework the wizard lists as supported."
+    ]
+  },
+  "developer_goal": "Create or authenticate a PostHog Cloud account via the official wizard and reach the documented project-onboarded state.",
+  "first_success": {
+    "outcome": "The PostHog wizard finishes and the project is onboarded with installed SDKs, credentials, instrumentation, and generated insights/dashboards.",
+    "observable_signal": "The interactive wizard command completes and docs state the project is onboarded; developer is told to test the setup.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "PostHog AI wizard CLI (documented default integration)",
+    "rule": "Prefer the vendor's documented recommended/default installation method when it is an explicit first route.",
+    "selected": "AI wizard default integration with --signup for a new account",
+    "candidates": [
+      {
+        "name": "AI wizard with --signup (new account)",
+        "status": "selected",
+        "reason": "Official wizard-signup docs present this as the fastest zero-to-events path and create account + project from one command; product-analytics install docs call the wizard the default method."
+      },
+      {
+        "name": "AI wizard against an existing account",
+        "status": "not-selected",
+        "reason": "Assumes a prior PostHog account rather than starting at account creation."
+      },
+      {
+        "name": "Manual SDK installation",
+        "status": "not-selected",
+        "reason": "Docs route unsupported frameworks here and recommend the wizard as default when supported."
+      },
+      {
+        "name": "Self-hosted PostHog",
+        "status": "not-selected",
+        "reason": "Adds infrastructure deployment beyond the Cloud wizard path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "In the project directory, run the wizard signup command with email and region.",
+      "required_fields": [
+        {
+          "label": "--signup",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "--email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "--region (us or eu)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ],
+          "notes": "Region is fixed at account creation."
+        }
+      ],
+      "observable_result": "The wizard begins OAuth/PKCE provisioning of a new PostHog account and project.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Complete any interactive wizard prompts required for the detected framework until instrumentation finishes.",
+      "required_fields": [
+        {
+          "label": "Framework-specific interactive prompts",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Docs enumerate wizard operations and supported frameworks but do not publish a stable prompt transcript."
+        }
+      ],
+      "observable_result": "SDKs are installed, credentials written, and code instrumented for the detected app.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the welcome email and set a password so the PostHog app can be used later.",
+      "required_fields": [
+        {
+          "label": "Password set via welcome email link",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "The developer can sign in at us.posthog.com or eu.posthog.com for the chosen region.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "other",
+      "action": "Test the setup after the wizard completes.",
+      "required_fields": [
+        {
+          "label": "Project-specific verification action",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Docs say to test after completion but do not prescribe one universal app action or UI event check."
+        }
+      ],
+      "observable_result": "The developer confirms the onboarded integration behaves as expected.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A local project using a wizard-supported framework.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "npx availability to run @posthog/wizard.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Region choice is permanent for the new Cloud account.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "Welcome-email delivery is required to set a browser login password.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Wizard must download, authenticate via OAuth/PKCE, provision the project, and finish instrumentation.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "description": "PostHog must deliver the welcome email before password setup.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Wizard creates the account and project and returns project API key and host.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "Wizard installs SDKs, writes env credentials, instruments client/server code, and can generate insights and dashboards.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reverse proxy setup",
+      "reason": "Documented as recommended, not required for first onboarding.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Self-driving wizard command",
+      "reason": "Open beta follow-on after events are already captured.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Creating a personal API key",
+      "reason": "Signup via wizard does not mint one by default; only needed for later scripts/API use.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "AI wizard",
+      "url": "https://posthog.com/docs/ai-engineering/ai-wizard",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Default npx wizard command",
+        "Onboarded product list",
+        "Automatic auth/install/scan/instrument/dashboard steps",
+        "Supported frameworks"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "AI wizard product analytics installation",
+      "url": "https://posthog.com/docs/product-analytics/installation/ai-wizard",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Install via wizard",
+        "Wait and test after completion",
+        "Framework support list"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign up with the wizard",
+      "url": "https://posthog.com/docs/ai-engineering/wizard-signup",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "--signup --email --region flags",
+        "OAuth/PKCE provisioning steps",
+        "Welcome email password setup",
+        "Region immutability"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact interactive prompts and file edits does the wizard require for a given supported repository?",
+      "impact": "Required developer actions and fields after the initial command cannot be listed as a stable path.",
+      "evidence_needed": "A dated transcript from running the signup wizard on one named supported framework template repository."
+    },
+    {
+      "question": "Is wizard completion alone the first-success terminal, or is a specific first captured event/UI check required?",
+      "impact": "Whether step 4 is required changes action counts and the observable signal.",
+      "evidence_needed": "Clarify against official onboarding success criteria whether 'project is onboarded' is sufficient without a universal event-verification action."
+    }
+  ],
+  "counts": null
+}

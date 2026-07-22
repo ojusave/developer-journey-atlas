@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "WorkOS",
+    "slug": "workos",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "a2e807dbde0a7c542bd52586caf9178eeae8d9eacd70c63078305aaeda1555f0",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a local project or empty directory.",
+      "No WorkOS account, product selection, or AuthKit framework route has been chosen yet."
+    ]
+  },
+  "developer_goal": "Create a WorkOS account and reach the first documented success for a chosen WorkOS product and integration route.",
+  "first_success": {
+    "outcome": "The selected WorkOS product route reaches its documented first workflow result.",
+    "observable_signal": "Depends on the unresolved product; for AuthKit Node.js, the local app can complete hosted sign-up and the user appears in the Dashboard Users list.",
+    "source_ids": ["S1", "S4"]
+  },
+  "route_selection": {
+    "surface": "WorkOS Dashboard and AuthKit documentation",
+    "rule": "Select the shortest complete route only after one product and one integration surface are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "AuthKit AI Installer",
+        "status": "unresolved",
+        "reason": "Docs present npx workos install as the fastest AuthKit path, but it edits the project and still requires a framework and WorkOS account."
+      },
+      {
+        "name": "AuthKit manual framework guide",
+        "status": "unresolved",
+        "reason": "Manual stack guides such as Node.js are peer alternatives to the AI Installer with different action shapes."
+      },
+      {
+        "name": "Non-AuthKit WorkOS products",
+        "status": "unresolved",
+        "reason": "Docs expose additional product families such as SSO, Directory Sync, Vault, and Widgets with different first-success outcomes."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a WorkOS account and obtain API Key and Client ID for a staging environment.",
+      "required_fields": [
+        {"label": "WorkOS account signup fields", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S4"], "notes": "Guides require a WorkOS account but do not publish the exact signup form fields."}
+      ],
+      "observable_result": "The developer can access the WorkOS Dashboard and copy API credentials.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Configure redirect URIs and related Dashboard settings required by the selected AuthKit or product route.",
+      "required_fields": [
+        {"label": "Redirect URI", "field_type": "url", "evidence_state": "documented", "source_ids": ["S4"]},
+        {"label": "Sign-in endpoint if required by AuthKit", "field_type": "url", "evidence_state": "documented", "source_ids": ["S4"]}
+      ],
+      "observable_result": "Dashboard redirect settings match the local application callbacks.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Integrate the selected product using the AI Installer or manual framework guide.",
+      "required_fields": [
+        {"label": "API Key and Client ID", "field_type": "other", "evidence_state": "documented", "source_ids": ["S4"]},
+        {"label": "Framework-specific packages and routes", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S3", "S4"]}
+      ],
+      "observable_result": "The local app builds or runs with AuthKit or the selected product wired.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3", "S4"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Execute the route's first user workflow, such as signing up through AuthKit.",
+      "required_fields": [
+        {"label": "First user authentication inputs for the configured methods", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S4"]}
+      ],
+      "observable_result": "The product-specific success signal appears, such as a Dashboard user for AuthKit.",
+      "evidence_state": "unverified",
+      "source_ids": ["S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "A WorkOS account with API Key and Client ID is required before AuthKit guides proceed.", "source_ids": ["S4"]},
+    {"description": "AuthKit AI Installer requires Node.js 20+ and a supported framework project.", "source_ids": ["S3"]}
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {"description": "WorkOS issues API credentials and can auto-configure redirect settings when the CLI installer authenticates.", "source_ids": ["S3", "S4"]},
+    {"description": "Successful AuthKit sign-up creates a user visible in the Dashboard Users section.", "source_ids": ["S4"]}
+  ],
+  "excluded": [
+    {"item": "Production environment cutover and custom branding", "reason": "Staging versus production and branding guides come after the first AuthKit integration.", "source_ids": ["S2", "S3"]},
+    {"item": "Reading the full product catalog as a measured action", "reason": "Documentation browsing is excluded from required developer actions.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "WorkOS Docs",
+      "url": "https://workos.com/docs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Multiple product families without one platform-wide default"]
+    },
+    {
+      "id": "S2",
+      "title": "Get started with AuthKit",
+      "url": "https://workos.com/docs/authkit",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["AI Installer entry", "Manual preferred-stack alternative"]
+    },
+    {
+      "id": "S3",
+      "title": "AI Installer and CLI",
+      "url": "https://workos.com/docs/authkit/cli-installer",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["npx workos install", "Browser auth", "Framework detection", "AuthKit is ready outcome"]
+    },
+    {
+      "id": "S4",
+      "title": "AuthKit for Node.js",
+      "url": "https://workos.com/docs/authkit/vanilla/nodejs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Account and credentials prerequisite", "Redirect URI", "Sign-in endpoint", "Local sign-up validation", "Dashboard Users"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which WorkOS product and AuthKit installer versus manual framework route define the canonical first mile?",
+      "impact": "Product choice changes the success outcome itself; installer versus manual changes required actions and trust boundaries.",
+      "evidence_needed": "Choose one bounded route such as AuthKit Next.js AI Installer, then verify account creation through first hosted sign-up."
+    },
+    {
+      "question": "What exact fields appear on current WorkOS account signup?",
+      "impact": "Signup field counts remain unverified without a public or fresh-account capture.",
+      "evidence_needed": "A dated walkthrough of WorkOS Dashboard registration for a new developer."
+    }
+  ],
+  "counts": null
+}

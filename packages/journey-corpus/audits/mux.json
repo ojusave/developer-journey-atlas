@@ -1,0 +1,226 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Mux",
+    "slug": "mux",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "2845871a91394bbfe8ad3c1841d60892ca0f918d4dbcab0cd13764b07c3e14b0",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run curl.",
+      "No Mux organization, environment access token, or asset exist yet.",
+      "A publicly reachable sample video URL may be used; Mux documents demo URLs."
+    ]
+  },
+  "developer_goal": "Create Mux access, ingest a sample video, wait until it is ready, and watch the streamed result.",
+  "first_success": {
+    "outcome": "A publicly playable Mux asset reaches ready state and can be watched through its playback ID.",
+    "observable_signal": "Opening https://stream.new/v/{PLAYBACK_ID} (or an equivalent documented player URL) streams the uploaded video.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Mux docs Stream videos in five minutes",
+    "rule": "Prefer the core get-started on-demand guide; within it prefer the complete curl request path over language SDK tabs.",
+    "selected": "Stream videos in five minutes using dashboard access token and curl",
+    "candidates": [
+      {
+        "name": "Stream videos in five minutes (curl / HTTP)",
+        "status": "selected",
+        "reason": "Docs present this as the core upload-and-playback get-started route with an explicit five-minute claim and stream.new preview."
+      },
+      {
+        "name": "Same guide via official language SDKs",
+        "status": "not-selected",
+        "reason": "SDK tabs add package installation for the same asset-create outcome; curl is a complete request without language package setup."
+      },
+      {
+        "name": "Mux live streaming starter",
+        "status": "not-selected",
+        "reason": "Separate live-broadcast outcome; on-demand Stream videos in five minutes is the core get-started path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Mux account and open the dashboard.",
+      "required_fields": [
+        {
+          "label": "Mux account registration fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "The five-minute guide begins at Access Token settings inside an existing dashboard; public signup HTML did not expose the registration field set."
+        }
+      ],
+      "observable_result": "The developer can open Access Token settings for an environment.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate an Access Token with Mux Video Read and Write permissions and save the Token ID and Secret.",
+      "required_fields": [
+        {
+          "label": "Environment",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Guide allows keeping Production selected."
+        },
+        {
+          "label": "Mux Video Read and Write permissions",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Access Token name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Guide treats the internal name as optional guidance."
+        }
+      ],
+      "observable_result": "Token ID and Secret Key are displayed for use as Basic auth.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "POST a public video URL to the Mux assets endpoint using Basic authentication with the token pair.",
+      "required_fields": [
+        {
+          "label": "Token ID and Secret (Basic auth)",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "input video URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Mux returns an asset including an Asset ID and Playback ID with status preparing.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "After the asset status becomes ready, open stream.new/v/{PLAYBACK_ID} to watch the video.",
+      "required_fields": [
+        {
+          "label": "PLAYBACK_ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The browser streams the ingested video.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A publicly accessible input video URL, or one of the demo URLs Mux documents.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "curl or another HTTP client capable of authenticated POST requests.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Mux must download and process the asset until status becomes ready before playback should be attempted.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Mux creates an asset in preparing state and issues playback IDs.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "When processing finishes, asset status becomes ready for stream.mux.com / stream.new playback.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Installing official language SDKs",
+      "reason": "Optional tabs for the same asset-create step; curl completes the request without package install.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Webhook setup for asset.ready",
+      "reason": "Documented as the best notification method, while manual polling is allowed at low volume.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Mux Data player integration",
+      "reason": "Presented as a next step after playback works.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Reading documentation as a counted action",
+      "reason": "Documentation is evidence, not a product interaction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Stream videos in five minutes",
+      "url": "https://www.mux.com/docs/core/stream-video-files",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Access token generation fields and permissions",
+        "Asset POST and preparing-to-ready wait",
+        "Playback ID and stream.new preview terminal",
+        "SDK tabs as alternatives to direct HTTP"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Mux fundamentals",
+      "url": "https://www.mux.com/docs/core/mux-fundamentals",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Organization and environment account model",
+        "Access token permission meanings"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact Mux account registration and organization-creation fields precede Access Token settings for a brand-new user?",
+      "impact": "The guide's five-minute path starts after dashboard access, so account-boundary field counts remain unverified and the audit cannot be marked verified.",
+      "evidence_needed": "A dated walkthrough from Mux signup through first Access Token generation."
+    },
+    {
+      "question": "Does the five-minute claim include account creation?",
+      "impact": "Vendor time claims cannot be interpreted for cold-start developers until account steps are inventoried.",
+      "evidence_needed": "Clarify whether marketing timing starts at token creation or at account registration."
+    }
+  ],
+  "counts": null
+}

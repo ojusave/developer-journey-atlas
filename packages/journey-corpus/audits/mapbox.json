@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Mapbox",
+    "slug": "mapbox",
+    "category": "Maps and location APIs"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "1e3524b249c16220ca131110df92884dad0a8583227b9fb7f665595ce61ab41d",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can use to register.",
+      "No Mapbox account, access token, product family, or application platform has been selected yet.",
+      "The aspirational Maps first-success outcome is an interactive map that responds to drag and zoom."
+    ]
+  },
+  "developer_goal": "Create a Mapbox account and reach the earliest official interactive first-map success for a selected Maps platform route.",
+  "first_success": {
+    "outcome": "An interactive Mapbox map is rendered and responds to drag and zoom.",
+    "observable_signal": "The map visibly responds to drag and zoom input in the selected web, iOS, or Android runtime.",
+    "source_ids": ["S2", "S4"]
+  },
+  "route_selection": {
+    "surface": "Mapbox Getting Started and Map Developer Journey",
+    "rule": "Begin at account creation, then select one product family and, for Maps, one application platform and dependency variant before counting. Do not invent a winner among consequential platform ties.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Maps web with Mapbox GL JS CDN",
+        "status": "unresolved",
+        "reason": "Shortest documented standalone web candidate from default public token through an interactive Standard-style map, but Choosing it requires fixing the product and platform fork and still lacks a verified signup-field transcript."
+      },
+      {
+        "name": "Maps web with npm or scaffolded project",
+        "status": "unresolved",
+        "reason": "Peer GL JS install variants change dependency and project-setup actions for the same interactive-map outcome."
+      },
+      {
+        "name": "Maps SDK for iOS or Android",
+        "status": "unresolved",
+        "reason": "Official Add a map stage presents these as peer Get Started guides with different toolchains, credentials placement, and runtimes."
+      },
+      {
+        "name": "Search, Navigation, Location AI, or data products",
+        "status": "unresolved",
+        "reason": "Getting Started lists these as peer product families with different first-success signals from a rendered map."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free Mapbox account from the official signup surface.",
+      "required_fields": [
+        {"label": "Signup identity and credentials", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S7", "S8"], "notes": "Public docs state signup creates an account and default token; the signup page marketing copy does not enumerate required form fields."}
+      ],
+      "observable_result": "The developer has an authenticated Mapbox account and can open the Developer Console.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S7", "S8"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Locate and copy the automatically created default public access token from the Developer Console.",
+      "required_fields": [
+        {"label": "Default public access token", "field_type": "other", "evidence_state": "documented", "source_ids": ["S4", "S7"]}
+      ],
+      "observable_result": "A valid pk. public token is available for the selected application guide.",
+      "evidence_state": "documented",
+      "source_ids": ["S4", "S7"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Choose the Maps product family and one application platform plus install variant from the official Get Started guides.",
+      "required_fields": [
+        {"label": "Product family", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1", "S2"]},
+        {"label": "Application platform and install variant", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2", "S3"]}
+      ],
+      "observable_result": "One official first-map guide is selected.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Follow the selected guide through dependency setup, token configuration, map container or view setup, and map instantiation.",
+      "required_fields": [
+        {"label": "Public access token in application code or platform config", "field_type": "other", "evidence_state": "documented", "source_ids": ["S4", "S5", "S6"]},
+        {"label": "Platform-specific project and dependency setup", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S4", "S5", "S6"], "notes": "Exact fields depend on the unresolved web CDN, npm, iOS, or Android selection."}
+      ],
+      "observable_result": "The application is ready to run with Mapbox map rendering configured.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S4", "S5", "S6"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Run or open the application and drag and zoom the rendered map.",
+      "required_fields": [],
+      "observable_result": "The map is visible and responds to drag and zoom input.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "A Mapbox account whose default public access token can authenticate Maps SDK or GL JS requests.", "source_ids": ["S2", "S4", "S7"]},
+    {"description": "The selected platform toolchain: a web page and browser, Xcode and an iOS project, or Android Studio and an Android project.", "source_ids": ["S2", "S4", "S5", "S6"]},
+    {"description": "Network access for CDN or package resources, styles, and tiles at first render.", "source_ids": ["S4"]}
+  ],
+  "external_gates": [
+    {"description": "Account signup and any identity-provider or email verification steps required by the live Mapbox registration flow.", "source_ids": ["S7", "S8"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Map style, tile, and SDK or CDN resources must load before the interactive map can be verified.", "source_ids": ["S4"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Mapbox automatically creates a default public access token when the account is created.", "source_ids": ["S7"]},
+    {"description": "Mapbox GL JS or the selected Maps SDK renders the Mapbox Standard map and accepts drag and zoom interaction.", "source_ids": ["S2", "S4"]}
+  ],
+  "excluded": [
+    {"item": "Adding custom data after the first interactive map", "reason": "Map Developer Journey places Add data after the first-map milestone.", "source_ids": ["S2"]},
+    {"item": "Creating additional public or secret tokens", "reason": "Default public token is documented as sufficient to start.", "source_ids": ["S4", "S7"]},
+    {"item": "Mapbox Studio style authoring and production token restriction", "reason": "Post-success customization and operations work.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Getting Started", "url": "https://docs.mapbox.com/help/getting-started/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Product families", "Create free account pointer", "Map Developer Journey overview"]},
+    {"id": "S2", "title": "Add a map", "url": "https://docs.mapbox.com/help/getting-started/map-developer-journey/start-mapping/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Few-minutes first map", "Web iOS Android peer guides", "Interactive map milestone"]},
+    {"id": "S3", "title": "Getting Started with Mapbox GL JS", "url": "https://docs.mapbox.com/mapbox-gl-js/guides/get-started/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["CDN npm and scaffold variants"]},
+    {"id": "S4", "title": "Get started with Mapbox GL JS using a CDN", "url": "https://docs.mapbox.com/mapbox-gl-js/guides/get-started/use-with-cdn/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Default public token", "CDN CSS and JS", "Container dimensions", "Map instantiation", "Drag and zoom verification"]},
+    {"id": "S5", "title": "Get Started with Maps SDK for iOS", "url": "https://docs.mapbox.com/ios/maps/guides/install/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Account and token prerequisites", "iOS install path"]},
+    {"id": "S6", "title": "Get Started with Maps SDK for Android", "url": "https://docs.mapbox.com/android/maps/guides/install/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Android install path peer to web and iOS"]},
+    {"id": "S7", "title": "Map Developer Journey", "url": "https://docs.mapbox.com/help/getting-started/map-developer-journey/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Signup creates access token", "Order before Add a map"]},
+    {"id": "S8", "title": "Mapbox signup", "url": "https://account.mapbox.com/auth/signup/", "source_type": "observed-public-ui", "accessed_at": "2026-07-22", "evidence_supported": ["Public signup marketing surface", "Free tiers positioning", "No enumerated form fields in fetched HTML"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Mapbox product family and, for Maps, which application platform and dependency variant define the selected first-success route?",
+      "impact": "The choice changes toolchain, credential placement, required code, waits, and the runtime where drag-and-zoom is observed.",
+      "evidence_needed": "A corpus policy commit to one Maps platform guide, then a complete step transcript for that guide from account creation through interactive map."
+    },
+    {
+      "question": "What exact signup fields, verification steps, or billing-card gates appear on a fresh Mapbox account before the default public token is usable?",
+      "impact": "Undocumented signup or payment gates change required fields, external gates, and whether the account step can be verified.",
+      "evidence_needed": "A dated signup-screen transcript or official field list; live credential submission is out of scope for this audit."
+    }
+  ],
+  "counts": null
+}

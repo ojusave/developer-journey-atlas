@@ -1,0 +1,243 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Fireworks AI",
+    "slug": "fireworks-ai",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "86d7d3029baeedfd931374ea464de047e89bc91ed91e03578c8aa6f7547116c1",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run Python and pip locally.",
+      "No Fireworks account, payment method, credits, API key, or Serverless request exists yet."
+    ]
+  },
+  "developer_goal": "Create a Fireworks developer account, obtain a usable funded API key, and run the official Python Serverless first call.",
+  "first_success": {
+    "outcome": "The Fireworks Python SDK sends the published DeepSeek V3.1 Serverless request and prints the model reply.",
+    "observable_signal": "The program prints chat-completion content such as a Spanish greeting.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Fireworks dashboard signup plus Serverless Quickstart",
+    "rule": "Email, Google, GitHub, and LinkedIn signup are peer identity routes with no documented default; do not invent a winner among them.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email signup then Serverless Python SDK first call",
+        "status": "unresolved",
+        "reason": "Public signup shows Email then Next, but verification and post-email fields are not fully exposed before Next."
+      },
+      {
+        "name": "Google, GitHub, or LinkedIn OAuth signup then Serverless Python SDK first call",
+        "status": "unresolved",
+        "reason": "Three peer OAuth buttons sit beside email; each changes external authorization without an official default."
+      },
+      {
+        "name": "OpenAI or Anthropic compatible SDK examples on the same Quickstart",
+        "status": "not-selected",
+        "reason": "Alternate clients after the same unresolved account and credit prerequisites."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Fireworks account from app.fireworks.ai/signup and accept Terms of service and Data Processing Agreement.",
+      "required_fields": [
+        {
+          "label": "Identity route (Email, Google, GitHub, or LinkedIn)",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"],
+          "notes": "Visible for the email path; OAuth routes may not collect it on this screen."
+        },
+        {
+          "label": "Terms of service and Data Processing Agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer reaches an authenticated Fireworks dashboard.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Ensure the account has usable prepaid credits for Serverless usage.",
+      "required_fields": [
+        {
+          "label": "Payment method and billing address",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Credit FAQ requires adding payment method and purchasing credits before usage; whether a $1 starter credit still applies without a card is unclear."
+        }
+      ],
+      "observable_result": "The account has a positive credit balance usable for Serverless calls.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key in the Fireworks dashboard and copy it.",
+      "required_fields": [],
+      "observable_result": "An API key value is available to export as FIREWORKS_API_KEY.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export FIREWORKS_API_KEY and install the Fireworks Python SDK with the documented pre-release flag.",
+      "required_fields": [
+        {
+          "label": "export FIREWORKS_API_KEY",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "pip install --pre fireworks-ai",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The fireworks package is installed and the key is in the environment.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Run the published Serverless chat.completions.create example and print the content.",
+      "required_fields": [
+        {
+          "label": "model and messages",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The terminal prints the Serverless model reply.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Local Python and pip are available for the Serverless Quickstart.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Signup requires agreeing to Terms of service and the Data Processing Agreement.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Fireworks uses prepaid credits; usage pauses when the balance reaches zero without auto top-up.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Fireworks returns a Serverless chat completion for the selected model.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Onboarding playground exploration",
+      "reason": "Separate from the Serverless API first-call terminal.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Priority tier and Fast mode",
+      "reason": "Documented as advanced Serverless options after the basic first call.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Serverless Quickstart",
+      "url": "https://docs.fireworks.ai/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Create API key",
+        "FIREWORKS_API_KEY export",
+        "pip install --pre fireworks-ai",
+        "Python Serverless first call"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sign Up - Fireworks AI",
+      "url": "https://app.fireworks.ai/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email field and Next",
+        "Google, GitHub, and LinkedIn signup",
+        "Terms of service and Data Processing Agreement"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Credit system",
+      "url": "https://docs.fireworks.ai/faq/billing-pricing-usage/billing/credit-system",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Prepaid credits",
+        "Add payment method and purchase credits before usage"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How do credits work?",
+      "url": "https://docs.fireworks.ai/faq-new/billing-pricing/what-happens-when-i-finish-my-1-dollar-credit",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Behavior when $1 credit is exhausted",
+        "Payment method required to continue after depletion"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which of the four peer signup routes (email, Google, GitHub, LinkedIn) is the shortest complete path, and what verification screens follow?",
+      "impact": "Identity choice changes external handoffs and possibly email waits, so no single verified account path can be selected.",
+      "evidence_needed": "Official default identity recommendation or dated walkthroughs of each signup option through authenticated dashboard access."
+    },
+    {
+      "question": "Does a brand-new account receive usable free credits that allow the first Serverless call without adding a payment method?",
+      "impact": "If the $1 credit still applies without a card, payment is not on the critical path; if prepaid purchase is required first, billing becomes a required gate.",
+      "evidence_needed": "Fresh-account billing observation showing starting credit balance and whether a Serverless call succeeds before any payment method is added."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,259 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Bird",
+    "slug": "bird",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "f02c2b42ca4d9b99ddbaf4fc704fd69aed24ef81e21dcb13e22f45c07799f9a4",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, a work email inbox, and curl or an equivalent HTTP client.",
+      "No Bird account, workspace, API key, or prior message exists yet."
+    ]
+  },
+  "developer_goal": "Create a Bird account and workspace, then send a first sandbox email through the shared onboarding domain until delivered status.",
+  "first_success": {
+    "outcome": "A sandbox email sent from onboarding@messagebird.dev to delivered@messagebird.dev reports delivered status.",
+    "observable_signal": "Polling the message by its em_ ID returns status delivered.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "Bird dashboard signup plus Send your first email quickstart",
+    "rule": "Prefer the documented onboarding-domain email quickstart over production domain verification; leave unverified while live signup controls remain incompletely observed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Work-email signup, API key with emails:write, onboarding-domain cURL send and poll",
+        "status": "unresolved",
+        "reason": "This is the official fastest path to a delivered sandbox email, but the live signup form and SSO versus password controls were not fully observed."
+      },
+      {
+        "name": "Legacy MessageBird channel install with DNS verification",
+        "status": "not-selected",
+        "reason": "Older docs require installing an Email channel and verifying DNS before send, which is longer than the shared onboarding-domain route."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open Bird signup and submit the work-email account creation form.",
+      "required_fields": [
+        {
+          "label": "Work email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Terms and Privacy Policy agreement",
+          "field_type": "agreement",
+          "evidence_state": "unverified",
+          "source_ids": ["S3"],
+          "notes": "Signup page may treat submission as agreement; exact control was not independently confirmed in this audit."
+        }
+      ],
+      "observable_result": "Bird sends a verification email and shows the confirmation screen.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Enter the emailed verification code or follow the confirmation link.",
+      "required_fields": [
+        {
+          "label": "Email verification code or link",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer is signed in to a ready workspace.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key under Developers with emails:write scope and copy the full token.",
+      "required_fields": [
+        {
+          "label": "API key name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "emails:write scope",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "A region-prefixed API key such as bk_us1_... is available once.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "POST the documented onboarding-domain email payload to the regional Bird email API host.",
+      "required_fields": [
+        {
+          "label": "Authorization Bearer API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "from onboarding@messagebird.dev",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "to delivered@messagebird.dev",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "subject and html body",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The API accepts the message and returns an em_ message ID.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "GET the message by em_ ID until status is delivered.",
+      "required_fields": [
+        {
+          "label": "Message ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The message status is delivered for the sandbox recipient.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "API keys belong to a workspace and require an owner, Admin, or Developer role to create.",
+      "source_ids": ["S4", "S5"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Bird must deliver the signup verification email before dashboard use.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Sandbox email status progresses asynchronously from accepted through delivered.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Bird provides an automatically available workspace after email verification.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "The shared onboarding domain accepts sends without DNS setup.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Verifying a production sending domain and publishing DNS records",
+      "reason": "The official first-email quickstart uses the shared onboarding domain before production domain setup.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Reading documentation and optional dashboard tour",
+      "reason": "Reading and optional orientation are not counted developer actions.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Send your first email",
+      "url": "https://bird.com/en-us/docs/get-started/send-your-first-email",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["API key creation", "Onboarding-domain send", "Sandbox delivered poll"]
+    },
+    {
+      "id": "S2",
+      "title": "Create an account & workspace",
+      "url": "https://bird.com/en-us/docs/knowledge-base/getting-started/create-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Work email and password signup", "Email verification", "Automatic workspace"]
+    },
+    {
+      "id": "S3",
+      "title": "Bird signup",
+      "url": "https://bird.com/dashboard/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Public signup entry; exact live controls incompletely observed"]
+    },
+    {
+      "id": "S4",
+      "title": "Authentication & API keys",
+      "url": "https://bird.com/en-us/docs/guides/authentication",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Bearer API keys", "emails:write scope", "Key shown once"]
+    },
+    {
+      "id": "S5",
+      "title": "API key management",
+      "url": "https://bird.com/en-us/docs/knowledge-base/account-security/api-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Developers API keys location in dashboard"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact current signup controls appear on bird.com/dashboard/signup, including SSO defaults, password-toggle wording, and terms checkbox versus implied agreement?",
+      "impact": "Account-step field counts and whether an extra password-route click is required remain unverified.",
+      "evidence_needed": "Dated screenshots of the live signup form for email/password and any Google or SSO alternatives."
+    },
+    {
+      "question": "Does Bird currently require a work-email domain and reject personal mailboxes before verification?",
+      "impact": "A work-email gate would change prerequisites and may block some fresh-account audits.",
+      "evidence_needed": "Official signup validation behavior or a fresh attempt with a personal versus work email address."
+    }
+  ],
+  "counts": null
+}

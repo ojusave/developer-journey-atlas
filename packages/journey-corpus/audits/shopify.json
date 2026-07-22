@@ -1,0 +1,231 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Shopify",
+    "slug": "shopify",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "68f878a3356446598c18f9a320f25d7093f68741758981b663a5dd9d7abdecae",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a machine that can install Shopify CLI.",
+      "No Partner or merchant developer account, Dev Dashboard app, or local app repository exists yet.",
+      "The intended family is an embedded admin app rather than a pure API-credential integration."
+    ]
+  },
+  "developer_goal": "Create the required Shopify developer identity and dev store, scaffold the recommended React Router app, install it on the dev store, and exercise the starter home action.",
+  "first_success": {
+    "outcome": "The scaffolded app is installed on a dev store and the developer reaches the documented Generate a product action.",
+    "observable_signal": "Scaffold tutorial ends at Generate a product; it does not document a post-click product object or toast confirmation.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Shopify CLI plus Dev Dashboard / Partner developer account and scaffold-app tutorial",
+    "rule": "Prefer the documented React Router scaffold when building an admin app. Account-creation prerequisites must be included from a cold start.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Partner account plus CLI React Router scaffold and Generate a product",
+        "status": "unresolved",
+        "reason": "Matches the recommended scaffold path, but Partner versus merchant-with-permissions account creation is not fully field-documented."
+      },
+      {
+        "name": "Merchant store owner with app development permissions plus same scaffold",
+        "status": "unresolved",
+        "reason": "CLI login docs accept Partner or merchant accounts; entitlement and store-creation steps differ."
+      },
+      {
+        "name": "Extension-only template or Dev Dashboard API-credential-only app",
+        "status": "unresolved",
+        "reason": "Official scaffold page presents these as alternate goals with different first-success signals."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Shopify Partner account or a merchant account with app development permissions, then create a dev store.",
+      "required_fields": [
+        {
+          "label": "Developer account signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3"],
+          "notes": "Scaffold requirements assume an existing user with permissions and a created dev store; signup field inventory is not on the scaffold page."
+        },
+        {
+          "label": "Dev store name and plan selection",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "The developer can log in with Shopify CLI and select a owned or staff-accessible dev store.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Run shopify app init, enter an app name, and select Build a React Router app.",
+      "required_fields": [
+        {
+          "label": "App name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Template selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "React Router is the documented recommended path for most apps."
+        }
+      ],
+      "observable_result": "A local app directory is created with Shopify CLI dependencies installed.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Run shopify app dev and complete CLI login plus Dev Dashboard app connection prompts.",
+      "required_fields": [
+        {
+          "label": "Developer account authorization for Shopify CLI",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Local server runs with a tunnel and a connected Dev Dashboard app.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Press p to open the preview URL and install the app on the selected dev store.",
+      "required_fields": [
+        {
+          "label": "Install app confirmation",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The app is installed and its home page is available in Shopify admin.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "From the app home page, select Generate a product.",
+      "required_fields": [],
+      "observable_result": "The Generate a product control is exercised; exact success UI or product state is not documented.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Latest Shopify CLI and a current Chrome or Firefox browser are required.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Dev store use with CLI requires store owner or staff access.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "App development permissions and an existing or newly created dev store gate the scaffold tutorial before CLI init.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "shopify app dev creates or connects a Dev Dashboard app, Prisma SQLite database, and Cloudflare tunnel.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Build a Shopify app using React Router feature tutorial beyond Generate a product",
+      "reason": "That tutorial extends the scaffold after the scaffold page's terminal learning task.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "App distribution, billing, and production hosting",
+      "reason": "Documented as later launch work after local install success.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Scaffold an app",
+      "url": "https://shopify.dev/docs/apps/build/scaffold-app",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Partner or merchant permission prerequisite",
+        "Dev store prerequisite",
+        "shopify app init React Router path",
+        "Install app and Generate a product"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Build a Shopify app using React Router",
+      "url": "https://shopify.dev/docs/apps/build/build?framework=reactRouter",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Post-scaffold feature tutorial boundary"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Development stores",
+      "url": "https://shopify.dev/docs/apps/build/dev-dashboard/stores/development-stores",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Partner or merchant developer prerequisite",
+        "Create store name and plan steps",
+        "Dev store testing limits"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which account surface is canonical from a cold start: Partner signup or merchant store with developer permissions?",
+      "impact": "Signup fields, org structure, and when the first dev store is created all change.",
+      "evidence_needed": "Human selection of one account type plus a fresh signup and store-creation walkthrough."
+    },
+    {
+      "question": "What observable UI confirms Generate a product succeeded?",
+      "impact": "The scaffold tutorial instructs the click but does not document a toast, product title, or recovery path.",
+      "evidence_needed": "Observed admin UI after Generate a product, or clearer official success criteria."
+    },
+    {
+      "question": "Should extension-only or Dev Dashboard credential-only apps compete as equal shortest first-success routes?",
+      "impact": "Those paths omit React Router scaffold and Generate a product entirely.",
+      "evidence_needed": "Corpus policy fixing the Shopify developer goal to admin-app scaffold versus API credentials."
+    }
+  ],
+  "counts": null
+}

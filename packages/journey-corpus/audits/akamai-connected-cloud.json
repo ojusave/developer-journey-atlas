@@ -1,0 +1,471 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Akamai Connected Cloud",
+    "slug": "akamai-connected-cloud",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "d6425a732a657bf110a05d75110ac6d4c3e04224c8b7a724cf314e74d2d72880",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has email and SMS-capable phone access.",
+      "The developer can provide an accepted payment method and billing address and accept the Master Services Agreement.",
+      "No Akamai Cloud / Linode account or compute instance exists yet."
+    ]
+  },
+  "developer_goal": "Create an Akamai Cloud account, provision a first Linux virtual machine, and establish an interactive remote shell on it.",
+  "first_success": {
+    "outcome": "The first Linode is provisioned and fully booted, and the developer reaches its Linux shell.",
+    "observable_signal": "The Linode detail page shows provisioning finished and the developer reaches a root shell via SSH Access or a Lish login prompt.",
+    "source_ids": [
+      "S1",
+      "S2",
+      "S5"
+    ]
+  },
+  "route_selection": {
+    "surface": "Akamai Cloud Manager self-service web flow",
+    "rule": "Get started chooses a first Linode; Distribution plus SSH is the documented general path, but plan/distribution defaults and rare manual review remain unresolved.",
+    "selected": "Cloud Manager Distribution Linode with remote shell access",
+    "candidates": [
+      {
+        "name": "Distribution Linode + SSH",
+        "status": "selected",
+        "reason": "Create guide assumes Distribution; secure-setup and getting-started treat SSH as the normal first connection."
+      },
+      {
+        "name": "Distribution Linode + Lish only",
+        "status": "unresolved",
+        "reason": "Also reaches a shell without local SSH keys, so lexicographic comparison to SSH remains consequential."
+      },
+      {
+        "name": "Quick Deploy App",
+        "status": "not-selected",
+        "reason": "Peer source that can take longer and is not the general Distribution assumption."
+      },
+      {
+        "name": "Linode CLI or API",
+        "status": "not-selected",
+        "reason": "Different surface requiring tokens/CLI before first instance."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open login.linode.com/signup and create credentials with email, username, and password, or Google/GitHub signup.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "OAuth signup prompts for username in a separate step instead of password on the first screen."
+        }
+      ],
+      "observable_result": "Akamai sends a confirmation email for the new account.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the confirmation email and click the verification link.",
+      "required_fields": [
+        {
+          "label": "Email confirmation link",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Email confirmation completes and signup can continue to phone verification.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter a phone number, receive the SMS code, and submit the code.",
+      "required_fields": [
+        {
+          "label": "Phone number",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "SMS verification code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Phone verification succeeds.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Choose Business or Personal account type, enter billing details, and accept the Master Services Agreement.",
+      "required_fields": [
+        {
+          "label": "Account type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Company name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Required for Business; omitted for Personal."
+        },
+        {
+          "label": "Payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Billing address",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Master Services Agreement",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Most accounts activate instantly; some enter manual review.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "In Cloud Manager, open Create > Linode and complete region, Distribution, plan, label, and access settings, then Create Linode.",
+      "required_fields": [
+        {
+          "label": "Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Distribution",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Any supported Distribution is allowed; no universal tutorial default is designated."
+        },
+        {
+          "label": "Plan",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Label",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Root password or SSH key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S4",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "Cloud Manager starts provisioning the Linode.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "After the Linode boots, connect with the SSH Access command or open Lish to reach a shell.",
+      "required_fields": [
+        {
+          "label": "SSH Access command or Lish session",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S5",
+            "S6"
+          ]
+        }
+      ],
+      "observable_result": "The developer has an interactive root shell on the Linode.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Deliverable email and SMS-capable phone number for signup verification.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Accepted credit/debit card or PayPal plus billing address.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Email confirmation and SMS phone verification are mandatory fraud-prevention gates.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Payment method and MSA acceptance are required before activation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "A minority of accounts are routed to manual review before services can be created.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email and SMS delivery must arrive during signup.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Linode image provisioning and first boot must finish before SSH or Lish succeeds.",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "description": "Manual review, when triggered, delays activation by an undocumented duration.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Most accounts activate instantly after billing and verification.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Create Linode provisions and boots the selected Distribution image.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Get started documentation",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Post-login hardening beyond first shell access",
+      "reason": "Package updates, limited sudo user, and firewall hardening are after first success.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "item": "Installing an application on the Linode",
+      "reason": "First success is interactive shell access, not an app deploy.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Akamai Cloud",
+      "url": "https://techdocs.akamai.com/cloud-computing/docs/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup fields",
+        "Email and SMS verification",
+        "Account type",
+        "Billing and MSA",
+        "Manual review",
+        "First Linode guidance"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create a Linode",
+      "url": "https://techdocs.akamai.com/cloud-computing/docs/create-a-compute-instance",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Create form",
+        "Region Distribution plan",
+        "Security options",
+        "Create Linode"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get started with Linodes",
+      "url": "https://techdocs.akamai.com/cloud-computing/docs/getting-started-with-compute-instances",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Linode overview and interfaces"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Manage SSH keys",
+      "url": "https://techdocs.akamai.com/cloud-computing/docs/manage-ssh-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH key management"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Set up and secure a Linode",
+      "url": "https://techdocs.akamai.com/cloud-computing/docs/set-up-and-secure-a-compute-instance",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH access after boot",
+        "Post-provision setup"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Troubleshooting SSH on Linodes",
+      "url": "https://techdocs.akamai.com/cloud-computing/docs/troubleshooting-ssh-on-compute-instances",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH and Lish access options"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "Akamai free credit offer",
+      "url": "https://www.akamai.com/lp/free-credit-100",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Promotional credit subject to separate rules"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What evidence, duration, and decision criteria apply when signup is routed to manual review?",
+      "impact": "A minority path adds an unbounded external gate before Create Linode.",
+      "evidence_needed": "Official documentation or support article detailing current manual-review steps and timing."
+    },
+    {
+      "question": "Which Distribution and plan are the universal tutorial default for first success?",
+      "impact": "OS packages, hourly price, and capacity vary across otherwise valid first paths.",
+      "evidence_needed": "Human designation of one Distribution/plan pair as the measured default."
+    },
+    {
+      "question": "Is SSH Access or Lish the lexicographic shortest first-shell route after Create Linode?",
+      "impact": "SSH may require key generation and profile upload; Lish may avoid local key setup.",
+      "evidence_needed": "Human judgment comparing documented SSH and Lish first-connection actions under SELECTION-POLICY."
+    }
+  ],
+  "counts": null
+}

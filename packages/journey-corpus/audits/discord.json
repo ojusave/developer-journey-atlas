@@ -1,0 +1,346 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Discord",
+    "slug": "discord",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "1d9a3c8fd2389f8665d3a1d33350e00a14bcba3bd33fc4cdbded08fdb9fb6b0a",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run Node.js tooling locally.",
+      "No Discord user account, Developer Portal application, bot token, or interaction endpoint exist yet.",
+      "The developer can create or use a test server where they hold MANAGE_GUILD for installation."
+    ]
+  },
+  "developer_goal": "Create a Discord developer app and complete the official first-bot tutorial through an interactive success the guide treats as finished.",
+  "first_success": {
+    "outcome": "A configured and installed Discord bot receives interactions through a public endpoint and completes the tutorial's rock-paper-scissors challenge flow.",
+    "observable_signal": "The finished two-user /challenge game posts the calculated result to the original channel.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Discord developer docs Bots & Companion Apps getting-started tutorial",
+    "rule": "Prefer the documented first-bot tutorial over Activities and Social SDK when measuring a common Discord app path.",
+    "selected": "Building your first Discord Bot (JavaScript example app)",
+    "candidates": [
+      {
+        "name": "Building your first Discord Bot",
+        "status": "selected",
+        "reason": "Overview's Start Building section leads with Bots & Companion Apps, and the linked Getting Started guide is the end-to-end first-bot tutorial; it redirects iframe game builders to Activities."
+      },
+      {
+        "name": "Building your first Activity",
+        "status": "not-selected",
+        "reason": "It is a separate Embedded App SDK outcome; the bot guide explicitly points Activity builders elsewhere."
+      },
+      {
+        "name": "Discord Social SDK for games",
+        "status": "not-selected",
+        "reason": "It targets in-game social features rather than a server bot first success."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Discord user account if one does not already exist.",
+      "required_fields": [
+        {
+          "label": "Discord registration fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "The bot guide assumes an available Discord account; the public register page is a JavaScript app whose fields were not readable from static HTML."
+        }
+      ],
+      "observable_result": "The developer can sign in to the Discord Developer Portal.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Clone discord/discord-example-app and install npm dependencies.",
+      "required_fields": [
+        {
+          "label": "git clone and npm install",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The local example project is ready for credentials.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Discord application in the Developer Portal and enter an app name.",
+      "required_fields": [
+        {
+          "label": "App name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The app General Information page shows Application ID and related settings.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Copy Application ID, Public Key, and a reset Bot token into the project's .env file.",
+      "required_fields": [
+        {
+          "label": "Application ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Public Key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Bot token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "Local environment credentials required by the sample app are present.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Configure Installation contexts, Discord Provided Link, default scopes, and bot Send Messages permission.",
+      "required_fields": [
+        {
+          "label": "User Install and Guild Install contexts",
+          "field_type": "checkbox",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "applications.commands and bot scopes",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Send Messages bot permission",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "An install link is ready for server and user installation.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 6,
+      "kind": "external-authorization",
+      "interface": "web-ui",
+      "action": "Install the app to a test server and to the user account via the install link prompts.",
+      "required_fields": [
+        {
+          "label": "Server installation authorization",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "User installation authorization",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The app appears in the test server member list and as a user-installed app.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 7,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Register slash commands, start the local server, expose it with ngrok, and save the Interactions Endpoint URL.",
+      "required_fields": [
+        {
+          "label": "npm run register",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "npm run start",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "ngrok http 3000",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Interactions Endpoint URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "Discord verifies the interaction endpoint and slash commands are available.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 8,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Add the documented /challenge and component handlers required to finish the tutorial game.",
+      "required_fields": [
+        {
+          "label": "Tutorial handler code edits",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The app contains the complete challenge interaction path.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 9,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Run the two-user /challenge flow through Accept and object selection.",
+      "required_fields": [],
+      "observable_result": "The calculated game result is posted to the original channel.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Node.js, Git, npm, a code editor, and a terminal.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "A test server where the developer can authorize installation with MANAGE_GUILD, or permission to create a free server.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "ngrok or another public HTTPS tunnel for the local interactions endpoint.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Server installation requires a member with MANAGE_GUILD to authorize the bot.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Discord must be able to reach a publicly accessible Interactions Endpoint URL.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Global slash-command propagation may lag after registration before commands appear in the client.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Discord creates the application and bot user, and issues credentials used by the sample app.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Discord verifies the interactions endpoint and delivers component and command interactions to the running app.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Building an Activity instead of a bot",
+      "reason": "The selected guide redirects iframe/game builders to the Activity tutorial.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "item": "Marketplace submission or public distribution",
+      "reason": "The getting-started path ends at local tutorial success in a test server.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Reading overview documentation as a counted action",
+      "reason": "Documentation is evidence, not a product interaction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Overview of Discord Apps",
+      "url": "https://docs.discord.com/developers/quick-start/overview-of-apps",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Bots, Activities, and Social SDK app types",
+        "Start-building links for bots versus Activities"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Building your first Discord Bot",
+      "url": "https://docs.discord.com/developers/quick-start/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Clone and npm install setup",
+        "Application creation and credential fields",
+        "Installation contexts, scopes, and install link",
+        "ngrok interactions endpoint",
+        "Challenge game terminal"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact Discord account registration steps precede Developer Portal access for a new person?",
+      "impact": "Account-creation field counts at the audit boundary remain unverified.",
+      "evidence_needed": "A dated walkthrough of discord.com/register through first Developer Portal login."
+    },
+    {
+      "question": "Should first success stop at /test after endpoint verification, or continue through the full two-user /challenge game the tutorial presents as the finished app?",
+      "impact": "Choosing the earlier /test checkpoint would shorten required implementation actions versus the guide's end-state narrative.",
+      "evidence_needed": "A corpus decision on whether tutorial midpoints count as first success when the guide's stated finished app is the longer game flow."
+    },
+    {
+      "question": "How long do global slash commands currently take to appear after registration?",
+      "impact": "Unavoidable wait duration and whether developers must retry remain incompletely specified.",
+      "evidence_needed": "Current official guidance or a fresh-account observation of command propagation after npm run register."
+    }
+  ],
+  "counts": null
+}
