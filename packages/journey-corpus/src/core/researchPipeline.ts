@@ -98,22 +98,12 @@ export async function runResearchPipeline(
   const row = ctx.buildRow(record);
   const assessment = buildAssessment(row, record, buildDocumentedOnboardingLoad(row, ctx.store));
 
-  let contribution: ContributionResult;
-  if (record.research_status !== "complete") {
-    contribution = {
-      status: "skipped",
-      reason: `Record marked "${record.research_status}", so no automatic contribution was opened. Review it before submitting.`,
-    };
-  } else {
-    try {
-      contribution = await steps.draftContribution({ record });
-    } catch {
-      contribution = {
-        status: "skipped",
-        reason: "The contribution service was unavailable. The drafted record is shown below for manual submission.",
-      };
-    }
-  }
+  // Live research shows the draft in the UI. GitHub draft PRs are not part of the
+  // runtime path: Postgres (or the in-session result) is enough for the product.
+  const contribution: ContributionResult = {
+    status: "skipped",
+    reason: "Draft shown in the Atlas; no GitHub contribution step.",
+  };
 
   return { outcome: "completed", slug: record.platform.slug, record, assessment, contribution };
 }
