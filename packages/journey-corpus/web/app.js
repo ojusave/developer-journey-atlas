@@ -318,10 +318,10 @@ function renderUnknown(query) {
   el.result.innerHTML = `
     <div class="card unknown-panel">
       <p class="section-kicker">New platform</p>
-      <h2>${esc(query)} is not in the Atlas yet</h2>
-      <p class="lede">Researching official docs on a durable Workflow, then drafting a contribution for review.</p>
+      <h2>Researching ${esc(query)}</h2>
+      <p class="lede">Looking up official docs and drafting the documented route.</p>
       <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
-      <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
+      <button class="btn btn-secondary" id="research-btn" type="button" hidden>Retry research</button>
     </div>`;
   wireRetry(query);
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -330,29 +330,11 @@ function renderUnknown(query) {
 
 function wireRetry(query) {
   const btn = document.querySelector("#research-btn");
-  if (btn) btn.addEventListener("click", () => researchPlatform(query));
+  if (!btn) return;
+  btn.hidden = false;
+  btn.addEventListener("click", () => researchPlatform(query));
 }
 
-function draftBanner(record) {
-  const json = JSON.stringify(record, null, 2);
-  const blob = URL.createObjectURL(new Blob([json], { type: "application/json" }));
-  return `
-    <div class="draft-banner">
-      <strong>Machine draft, unverified.</strong> Schema-valid from live research; not human-reviewed.
-      <a href="${blob}" download="${esc(record.platform.slug)}.json">Download JSON</a>
-    </div>`;
-}
-
-function renderContribution(contribution) {
-  if (!contribution) return "";
-  if (contribution.status === "opened") {
-    const reused = contribution.reused ? " An existing open contribution was reused." : "";
-    return `<div class="card"><p class="dist-line"><strong>Draft contribution opened for human review:</strong> <a href="${esc(contribution.url)}" rel="noreferrer">${esc(contribution.url)}</a>${reused}</p></div>`;
-  }
-  return `<div class="card"><p class="dist-line">${esc(contribution.reason)}</p></div>`;
-}
-
-// Render a terminal error outcome with a keyboard-accessible retry control.
 function renderResearchError(message, query) {
   el.result.hidden = false;
   el.result.innerHTML = `
@@ -368,8 +350,7 @@ function renderResearchError(message, query) {
 function renderResult(result, query) {
   if (result.outcome === "known") return showPlatform(result.slug);
   if (result.outcome === "completed") {
-    el.result.innerHTML =
-      draftBanner(result.record) + renderAssessment(result.assessment) + renderContribution(result.contribution);
+    el.result.innerHTML = renderAssessment(result.assessment);
     return;
   }
   renderResearchError(OUTCOME_MESSAGE[result.outcome] || "Research could not be completed.", query);
@@ -477,10 +458,10 @@ function resumeFromUrl() {
   el.result.innerHTML = `
     <div class="card unknown-panel">
       <p class="section-kicker">New platform</p>
-      <h2>${esc(query)} is not in the Atlas yet</h2>
+      <h2>Researching ${esc(query)}</h2>
       <p class="lede">Resuming research…</p>
       <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
-      <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
+      <button class="btn btn-secondary" id="research-btn" type="button" hidden>Retry research</button>
     </div>`;
   wireRetry(query);
   setStatus("Resuming…");
