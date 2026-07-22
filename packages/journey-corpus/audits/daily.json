@@ -1,0 +1,207 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Daily",
+    "slug": "daily",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "e896c13c16535d7b2c04bd20696b4ae2a83267690b68e0fb8c486007d88a2958",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can edit a minimal HTML page.",
+      "No Daily account, room URL, or embedded call exist yet.",
+      "The goal is the fastest embeddable call UI rather than a fully custom call object."
+    ]
+  },
+  "developer_goal": "Create a Daily account, obtain a room URL, and embed Daily Prebuilt until the page joins the room and shows the working call UI.",
+  "first_success": {
+    "outcome": "A minimal HTML page imports daily-js, creates the Daily Prebuilt frame, joins the developer's Daily room URL, and displays the functioning video-call interface.",
+    "observable_signal": "Opening the page joins the specified room and shows the embedded Prebuilt call UI.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Daily Docs Start here with Daily Prebuilt",
+    "rule": "Prefer the first Start here route that the vendor recommends when speed is the top priority.",
+    "selected": "Embed video chat quickly with Daily Prebuilt",
+    "candidates": [
+      {
+        "name": "Daily Prebuilt embed with dashboard room URL",
+        "status": "selected",
+        "reason": "Docs home places Daily Prebuilt first under Start here; the Prebuilt guide calls it the best choice when speed is the top priority and shows a complete room-URL plus createFrame join path."
+      },
+      {
+        "name": "Custom UI with daily-js",
+        "status": "not-selected",
+        "reason": "Listed after Prebuilt; Prebuilt reserves the custom call object for UI customization needs."
+      },
+      {
+        "name": "Daily React quickstart",
+        "status": "not-selected",
+        "reason": "Framework-specific custom-UI route rather than the first Start here option."
+      },
+      {
+        "name": "REST API room creation alone",
+        "status": "not-selected",
+        "reason": "Creates rooms and tokens but does not by itself render or join the first call UI."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Daily account and sign in to the dashboard.",
+      "required_fields": [
+        {
+          "label": "Daily registration fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "The Prebuilt guide requires a room from the dashboard or REST API but does not document the signup form; the public signup page did not expose a complete field inventory."
+        }
+      ],
+      "observable_result": "The developer can access dashboard room creation.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Daily room in the dashboard and copy its room URL.",
+      "required_fields": [
+        {
+          "label": "Room creation fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3"],
+          "notes": "Docs require a room URL (for example https://your-team.daily.co/hello) without publishing the current dashboard form controls."
+        }
+      ],
+      "observable_result": "A Daily room URL is available to paste into the embed snippet.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Create a minimal HTML page that loads @daily-co/daily-js, calls Daily.createFrame(), and joins with the room URL.",
+      "required_fields": [
+        {
+          "label": "DAILY_ROOM_URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Prebuilt HTML/JS snippet",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The page contains the documented Prebuilt join code with the developer room URL.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open the page and confirm the embedded Prebuilt call UI joins the room.",
+      "required_fields": [],
+      "observable_result": "The functioning Daily Prebuilt video chat widget is visible.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A website or minimal HTML page that can load JavaScript in a supported browser.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Daily provisions a room URL that Prebuilt can join.",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "description": "daily-js createFrame join initializes the Prebuilt call interface for that room.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "NPM install of @daily-co/daily-js",
+      "reason": "The selected guide's primary snippet uses the unpkg script import; NPM is documented as an alternative.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Custom iframeStyle or avatar configuration",
+      "reason": "Presented as optional customization after the minimal join snippet.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Reading documentation as a counted action",
+      "reason": "Documentation is evidence, not a product interaction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Welcome to Daily Docs",
+      "url": "https://docs.daily.co/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Daily Prebuilt listed first under Start here",
+        "Custom UI and REST API as alternate start paths"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Embed video chat quickly with Daily Prebuilt",
+      "url": "https://docs.daily.co/docs/prebuilt",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Speed-priority recommendation for Prebuilt",
+        "Dashboard or REST room URL requirement",
+        "createFrame and join snippet",
+        "Observable embedded call UI success"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "POST /rooms",
+      "url": "https://docs.daily.co/reference/rest-api/rooms/create-room",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "REST alternative for creating a room URL"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact current registration and dashboard room-creation fields does a brand-new Daily account see?",
+      "impact": "Account and room gates cannot be counted precisely, so the audit cannot be verified.",
+      "evidence_needed": "A dated walkthrough of Daily signup through copying a new room URL from the dashboard."
+    },
+    {
+      "question": "Does the minimal HTML need to be served from a particular origin for target browser media policies?",
+      "impact": "Opening a local file may behave differently from serving over HTTPS, potentially adding an unpublished serving step.",
+      "evidence_needed": "Official clarification or a fresh-browser observation of file:// versus served origins for Prebuilt join and media permissions."
+    }
+  ],
+  "counts": null
+}

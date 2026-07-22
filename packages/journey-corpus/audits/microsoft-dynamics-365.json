@@ -1,0 +1,127 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Microsoft Dynamics 365",
+    "slug": "microsoft-dynamics-365",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "72806275662c554890ec63696a6e51dc3dd7e7136743b80f3accee13daa17599",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can install Visual Studio Code if a Business Central candidate is later selected.",
+      "No Microsoft tenant, Dynamics 365 license, sandbox, or extension project exists yet.",
+      "No Dynamics 365 application family has been preselected."
+    ]
+  },
+  "developer_goal": "Obtain Dynamics 365 developer access and reach the earliest meaningful first-success outcome for a chosen Dynamics 365 application and extension job.",
+  "first_success": {
+    "outcome": "For the Business Central AL candidate: the HelloWorld sample extension is visible and running in an online sandbox session.",
+    "observable_signal": "After Ctrl+F5 publish, the HelloWorld sample is visible and running in the opened Business Central sandbox session.",
+    "source_ids": ["S3"]
+  },
+  "route_selection": {
+    "surface": "Microsoft Learn Dynamics 365 developer resources matrix",
+    "rule": "Microsoft's suite-level developer page routes each application family to different resources. Do not invent a single Dynamics 365 winner among Business Central, finance and operations, model-driven apps, Commerce, and Human Resources.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Business Central AL: sandbox signup, VS Code, AL Go!, Ctrl+F5 HelloWorld",
+        "status": "unresolved",
+        "reason": "Complete official candidate for one app family, but the suite page presents it as one row among several peer families."
+      },
+      {
+        "name": "Model-driven apps / Dataverse and Power Platform developer guide",
+        "status": "unresolved",
+        "reason": "Different licensing, environment, and packaging path from Business Central AL."
+      },
+      {
+        "name": "Finance and operations / Supply Chain Lifecycle Services development",
+        "status": "unresolved",
+        "reason": "Different toolchain and entitlement model from Business Central."
+      },
+      {
+        "name": "Commerce or Human Resources extensibility",
+        "status": "unresolved",
+        "reason": "Peer suite entries with distinct developer resources."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "product-interaction",
+      "interface": "browser",
+      "action": "Open the Dynamics 365 developer resources matrix and choose one application family before continuing.",
+      "required_fields": [
+        {"label": "Dynamics 365 application family", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1", "S2"]}
+      ],
+      "observable_result": "One application family's developer entry point is selected.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or obtain the tenant, trial, sandbox, or license required by the selected application family.",
+      "required_fields": [
+        {"label": "Tenant or sandbox signup fields", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S2", "S3"], "notes": "Business Central documents sandbox signup, but suite-wide entitlement and form fields differ by product."}
+      ],
+      "observable_result": "A usable development environment exists for the selected product.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "ide",
+      "action": "Install the product-specific toolchain and complete the selected family's first official build-and-run steps.",
+      "required_fields": [
+        {"label": "Tooling and project settings for the selected family", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S3"]}
+      ],
+      "observable_result": "The selected family's documented HelloWorld or equivalent first extension runs.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Dynamics 365 is a suite; product and developer job must be selected before one path exists.", "source_ids": ["S1", "S2"]},
+    {"description": "Business Central AL requires a sandbox tenant, Visual Studio Code, and the AL Language extension.", "source_ids": ["S3"]}
+  ],
+  "external_gates": [
+    {"description": "Product trials, previews, licenses, and entitlements are separate and product-specific.", "source_ids": ["S2", "S3"]},
+    {"description": "Sandbox or environment credentials must be supplied when the IDE connects to the cloud development target.", "source_ids": ["S3"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Sandbox or environment provisioning for the selected product must finish before publish and verification.", "source_ids": ["S3"]}
+  ],
+  "platform_outcomes": [
+    {"description": "For the Business Central candidate, AL Go! generates a HelloWorld project that Ctrl+F5 publishes to the online sandbox.", "source_ids": ["S3"]}
+  ],
+  "excluded": [
+    {"item": "Reading the full Dynamics 365 product documentation set", "reason": "Documentation reading is not a product action.", "source_ids": ["S2"]},
+    {"item": "Marketplace publishing of an extension", "reason": "Occurs after local or sandbox first-run success.", "source_ids": ["S3"]},
+    {"item": "Container-based Business Central sandbox setup", "reason": "Documented alternative to the Microsoft cloud sandbox path.", "source_ids": ["S3"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Developer resources for building and extending Dynamics 365", "url": "https://learn.microsoft.com/en-us/dynamics365/get-started/developers", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Suite-level matrix of app families and developer resources"]},
+    {"id": "S2", "title": "Dynamics 365 documentation", "url": "https://learn.microsoft.com/en-us/dynamics365/get-started/", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Product get-started entry points"]},
+    {"id": "S3", "title": "Get started with AL", "url": "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-get-started", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Business Central sandbox signup", "VS Code and AL extension", "AL Go! and Ctrl+F5 HelloWorld"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Dynamics 365 application and extension job should define the first mile?",
+      "impact": "The answer changes licensing, tenant setup, language, tools, packaging, deployment, and visible success. Lexicographic selection cannot pick among peer suite families.",
+      "evidence_needed": "A bounded product choice such as Business Central only, then a cold walkthrough of that family's account-to-HelloWorld path including signup fields."
+    },
+    {
+      "question": "What exact signup, trial, or license gates appear for a fresh Microsoft identity on the selected product?",
+      "impact": "Entitlement and form burden sit before toolchain setup and remain unverified at suite scope.",
+      "evidence_needed": "A dated signup walkthrough for the chosen product's sandbox or trial URL."
+    }
+  ],
+  "counts": null
+}

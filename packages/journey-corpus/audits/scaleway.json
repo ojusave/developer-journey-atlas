@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Scaleway",
+    "slug": "scaleway",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "de7c2de826de544d100cba3d538aa6e73100cc3ce93301b678b2bac59b688867",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet unless the goal explicitly requires an existing artifact."
+    ]
+  },
+  "developer_goal": "Create a Scaleway account, provision a first Linux CPU Instance, and establish an authenticated SSH session.",
+  "first_success": {
+    "outcome": "A Linux CPU Instance is running and the developer has an authenticated SSH session as root.",
+    "observable_signal": "ssh to the Instance IP opens an interactive root shell.",
+    "source_ids": [
+      "S6"
+    ]
+  },
+  "route_selection": {
+    "surface": "Scaleway console account creation and Instances quickstart",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Console signup then Instances quickstart with uploaded SSH key",
+        "status": "unresolved",
+        "reason": "Account-type choice changes profile fields; payment and identity-verification timing for a first Instance are not fully fixed publicly."
+      },
+      {
+        "name": "Alternate account-type or verification branch",
+        "status": "unresolved",
+        "reason": "Official docs show account-type decisions and possible later verification that can change path length."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Scaleway account and complete required profile steps.",
+      "required_fields": [
+        {
+          "label": "Account type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Email or identity-provider credentials",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Profile and contact fields for the chosen account type",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The Scaleway console Organization and default Project become available.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add billing information required before resource creation when prompted.",
+      "required_fields": [
+        {
+          "label": "Payment or billing details",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "Billing is ready for Instance creation.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate or upload an SSH key into the Project.",
+      "required_fields": [
+        {
+          "label": "SSH public key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "The Project has an SSH key available for Instances.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Linux CPU Instance with unresolved zone and plan defaults.",
+      "required_fields": [
+        {
+          "label": "Availability zone",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "label": "Instance type",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "label": "Image",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ]
+        }
+      ],
+      "observable_result": "Scaleway creates the Instance and assigns a public IP.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Connect over SSH as root with the Project private key.",
+      "required_fields": [
+        {
+          "label": "ssh command with private key and Instance IP",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S6"
+          ]
+        }
+      ],
+      "observable_result": "An interactive root shell opens.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Billing setup is required before creating billable resources.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Payment-provider authorization and possible identity verification for quota or risk.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Account confirmation and Instance provisioning readiness.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Scaleway creates Organization and Project structures after signup.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Scaleway provisions the Instance and publishes its IP.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Organizations and Projects concepts",
+      "reason": "Reading is not a counted product action.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "How to create an account",
+      "url": "https://www.scaleway.com/en/docs/account/how-to/create-an-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account creation and account-type branching"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Billing - Quickstart",
+      "url": "https://www.scaleway.com/en/docs/billing/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Billing setup"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Billing FAQ",
+      "url": "https://www.scaleway.com/en/docs/billing/faq/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Payment expectations"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Organizations and Projects - Concepts",
+      "url": "https://www.scaleway.com/en/docs/organizations-and-projects/concepts/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Organization model"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "How to generate an SSH key pair",
+      "url": "https://www.scaleway.com/en/docs/organizations-and-projects/how-to/create-ssh-key/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH key"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Instances - Quickstart",
+      "url": "https://www.scaleway.com/en/docs/instances/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Instance create and SSH"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which account-type profile fields, payment timing, and identity-verification triggers apply to a fresh first Instance?",
+      "impact": "These gates change required fields and whether first success needs manual review.",
+      "evidence_needed": "A dated fresh-account console walkthrough covering signup fields, billing prompts, and Instance create controls."
+    },
+    {
+      "question": "Which zone and Instance plan should be the universal lowest-friction default?",
+      "impact": "Availability and pricing differ by zone and plan.",
+      "evidence_needed": "Official default recommendation that is currently universal for new accounts."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,269 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Resend",
+    "slug": "resend",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "9025d9162e7beb6f21261f80420e5140b041b486fa68be50d6e9fa2f4a56aa8b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address.",
+      "No Resend account, API key, or verified domain exist yet.",
+      "The developer goal is to send a first transactional email after platform setup."
+    ]
+  },
+  "developer_goal": "Create a Resend account, obtain sending credentials, and send the first transactional email through an official quickstart.",
+  "first_success": {
+    "outcome": "Unresolved across peer quickstarts; each language or CLI route returns that route's successful send response after shared account and API-key setup.",
+    "observable_signal": "For SDK routes, a successful emails.send-style response with an email id; the exact client differs by quickstart.",
+    "source_ids": ["S1", "S4"]
+  },
+  "route_selection": {
+    "surface": "Resend Introduction quickstart grid after Dashboard account and API key setup",
+    "rule": "When official docs present peer language and CLI quickstarts without labeling a default, do not invent a winner.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Node.js Quickstart",
+        "status": "unresolved",
+        "reason": "Listed among many peer Quickstart cards; Introduction does not label Node.js as the default over Next.js, Python, CLI, or others."
+      },
+      {
+        "name": "Next.js Quickstart",
+        "status": "unresolved",
+        "reason": "Peer framework quickstart with the same transactional-email terminal class."
+      },
+      {
+        "name": "Express, PHP, Laravel, Python, Ruby, Rails, Go, Rust, Elixir, Java, or .NET Quickstart",
+        "status": "unresolved",
+        "reason": "Introduction presents these as equal Quickstart entries beside Node.js and Next.js."
+      },
+      {
+        "name": "CLI Quickstart",
+        "status": "unresolved",
+        "reason": "A separate top-level quickstart reaching a send through the CLI rather than an SDK."
+      },
+      {
+        "name": "Marketing Broadcast",
+        "status": "not-selected",
+        "reason": "Introduction separates marketing campaigns from transactional email; quickstarts target the first transactional send."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Resend account from the public signup page.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"]
+        },
+        {
+          "label": "Terms, Acceptable Use, and Privacy Policy acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"],
+          "notes": "Signup states that creating an account constitutes agreement; Google and GitHub alternatives are also offered."
+        }
+      ],
+      "observable_result": "The developer has an authenticated Resend account and can open the Dashboard.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S7"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key from the Dashboard API keys page.",
+      "required_fields": [
+        {
+          "label": "API key name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Maximum 50 characters."
+        },
+        {
+          "label": "Permission",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Sending access versus full access."
+        }
+      ],
+      "observable_result": "A one-time API key secret is displayed for secure storage.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose one official quickstart implementation after shared setup.",
+      "required_fields": [
+        {
+          "label": "Quickstart / language or CLI choice",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Introduction lists many peer quickstarts without naming a default."
+        }
+      ],
+      "observable_result": "A single implementation guide becomes the measured path to first send.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Introduction states a Resend API key is required before sending.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "description": "Introduction also states a domain verified with Resend is needed to get started; several SDK quickstarts demonstrate onboarding@resend.dev for testing, which may shorten or bypass custom-domain verification for a first test send.",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "If a custom domain is required for the selected route, DNS providers must accept Resend DKIM/SPF/MX records before verification completes.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "When domain verification is in-path, Resend must verify DNS before the domain is ready for production-like sending.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Resend issues a one-time API key secret when Create API Key succeeds.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "A successful send on the selected quickstart returns that route's email id / success payload.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Marketing Broadcast / one-to-many campaigns",
+      "reason": "Introduction separates marketing campaigns from transactional quickstarts.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "AI Onboarding / MCP agent paths as the primary human route",
+      "reason": "They still require a human-created account and API key, and add agent tooling after that shared gate.",
+      "source_ids": ["S5"]
+    },
+    {
+      "item": "Reading documentation as a counted action",
+      "reason": "Documentation is evidence, not a product interaction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Introduction",
+      "url": "https://resend.com/docs/introduction",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key and domain prerequisites",
+        "Transactional versus marketing framing",
+        "Peer quickstart grid across many languages plus CLI"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create an API key",
+      "url": "https://resend.com/docs/create-an-api-key",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Dashboard Create API Key flow",
+        "Name and permission fields",
+        "One-time secret visibility"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Add a domain",
+      "url": "https://resend.com/docs/add-a-domain",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Custom domain verification path referenced from Introduction"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Send emails with Node.js",
+      "url": "https://resend.com/docs/send-with-nodejs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "One peer SDK quickstart",
+        "Test sender onboarding@resend.dev example",
+        "Successful send response shape with id"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "AI Onboarding",
+      "url": "https://resend.com/docs/ai-onboarding",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Agent and MCP routes that still presuppose human account and key creation"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Resend signup",
+      "url": "https://resend.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email and password fields",
+        "Terms, Acceptable Use, and Privacy Policy acknowledgement",
+        "Google and GitHub alternatives"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which of Resend's peer quickstarts should define the canonical first transactional-email path?",
+      "impact": "Language and CLI choices change install commands and code actions while sharing account and API-key setup; rule 5 forbids inventing a default among equal consequential routes.",
+      "evidence_needed": "A vendor-labeled default quickstart, or an explicit corpus decision naming one implementation after confirming no official default exists."
+    },
+    {
+      "question": "For the eventual selected quickstart, is custom-domain verification required before first success, or does onboarding@resend.dev (or equivalent test sender) satisfy the official terminal?",
+      "impact": "Domain DNS steps and waits may be in-path or excludable depending on whether the selected guide's test sender is accepted as first success.",
+      "evidence_needed": "Reconcile Introduction's domain prerequisite with the selected quickstart's demonstrated from address and success criteria."
+    },
+    {
+      "question": "Are email verification or other post-password screens required before Dashboard API key creation?",
+      "impact": "Additional account actions could exist behind authentication after the observed signup form.",
+      "evidence_needed": "A dated fresh-account walkthrough from Create account through the API keys page."
+    }
+  ],
+  "counts": null
+}

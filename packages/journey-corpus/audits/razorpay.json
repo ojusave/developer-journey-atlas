@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Razorpay",
+    "slug": "razorpay",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "14bd12173daaf1da3f08491959e6530b7a385a73ff4ad30198b764681991343e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address or Indian mobile number as required by signup.",
+      "No Razorpay account, KYC submission, or Test Mode API keys exist yet.",
+      "Test Mode first success is acceptable while KYC is pending."
+    ]
+  },
+  "developer_goal": "Create a Razorpay account and complete the earliest official Test Mode first-success path for a chosen product and integration.",
+  "first_success": {
+    "outcome": "Unresolved among Payment Links, Payment Gateway web Checkout variants, subscriptions, plugins, and other product-specific Test Mode terminals.",
+    "observable_signal": "Quickstart requires product selection before integration and names successful Test Mode use without one universal transaction terminal.",
+    "source_ids": ["S1", "S4", "S5"]
+  },
+  "route_selection": {
+    "surface": "Razorpay Payments Quickstart plus Dashboard Test Mode",
+    "rule": "Select the shortest complete account-to-Test-Mode-success route only after product, integration method, and business onboarding branch are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Payment Gateway Standard Checkout web integration",
+        "status": "unresolved",
+        "reason": "A common developer path, but Quickstart presents it as one of several product and coding-requirement options."
+      },
+      {
+        "name": "Payment Gateway Quick Integration",
+        "status": "unresolved",
+        "reason": "Official docs offer a separate quick-integration guide that may differ in steps from Standard Checkout."
+      },
+      {
+        "name": "No-code Payment Links or industry/platform plugins",
+        "status": "unresolved",
+        "reason": "Quickstart explicitly offers no-code and platform-plugin routes with different first-success mechanics."
+      },
+      {
+        "name": "Subscriptions or other product families",
+        "status": "unresolved",
+        "reason": "Quickstart routes SaaS and other industries to product-specific solutions with different terminals."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a Razorpay account and complete the onboarding branch required for the business type.",
+      "required_fields": [
+        {
+          "label": "Signup identifier and password or OTP challenges",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "Quickstart and set-up docs confirm account creation and KYC, but exact live signup controls were not inventory-verified in this audit."
+        },
+        {
+          "label": "Registered versus unregistered business details and KYC inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Business-type branches change required documents and forms."
+        }
+      ],
+      "observable_result": "The developer can open the Dashboard in Test Mode.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select the Razorpay product and integration method that matches the business.",
+      "required_fields": [
+        {
+          "label": "Product",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Integration method",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "One product and integration guide becomes the measured route.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate Test Mode API keys when the selected route uses APIs, SDKs, or plugins.",
+      "required_fields": [
+        {
+          "label": "Key ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S3"]
+        },
+        {
+          "label": "Key Secret",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S3"]
+        }
+      ],
+      "observable_result": "rzp_test_ keys are available to the integration.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Complete the selected product's Test Mode first transaction path.",
+      "required_fields": [
+        {
+          "label": "Product-specific integration fields and code",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S4", "S5"]
+        }
+      ],
+      "observable_result": "One simulated Test Mode transaction succeeds for the selected product.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Owner or Admin role is required to access API keys.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "KYC verification is required to unlock Live Mode, typically cited as 24-48 hours.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "KYC verification may take 24-48 hours before Live Mode unlocks.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Signup OTP or email verification waits may occur during account creation.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Razorpay allows Test Mode product use during KYC verification.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Dashboard generates Test Mode key pairs with secrets shown once.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Adding team members and webhook configuration",
+      "reason": "Quickstart lists these as key Dashboard actions after product choice, not as the universal first-success terminal.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Live Mode activation and live keys",
+      "reason": "Quickstart places Live Mode after KYC and thorough Test Mode testing.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Payments Quickstart",
+      "url": "https://razorpay.com/docs/payments/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and KYC overview",
+        "Test versus Live Mode",
+        "Product selection branches",
+        "API key generation"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Set up Razorpay account",
+      "url": "https://razorpay.com/docs/payments/set-up/?preferred-country=IN",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account setup and KYC branching"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "API keys",
+      "url": "https://razorpay.com/docs/payments/dashboard/account-settings/api-keys/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key generation and roles"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Standard Checkout integration steps",
+      "url": "https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/integration-steps/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "One Payment Gateway web integration candidate"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Payment Gateway quick integration",
+      "url": "https://razorpay.com/docs/payments/payment-gateway/quick-integration/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Alternate Payment Gateway integration candidate"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Razorpay product and integration method should represent the platform's universal first mile?",
+      "impact": "No-code links, Standard Checkout, quick integration, plugins, and subscriptions change required actions and first-success signals.",
+      "evidence_needed": "Choose one bounded product and integration guide, then verify its complete Test Mode path from a fresh account."
+    },
+    {
+      "question": "Which regional and business-type onboarding branch should represent all developers?",
+      "impact": "Registered versus unregistered KYC paths change required fields, documents, and waits before Dashboard use.",
+      "evidence_needed": "A dated walkthrough of the current signup and KYC forms for the selected business type and country."
+    }
+  ],
+  "counts": null
+}

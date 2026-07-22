@@ -1,0 +1,258 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Datadog",
+    "slug": "datadog",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "1c306d3365949d74dfcef43372d79980b72c50b425e880ddc1e6fa84e3549775",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a business email address.",
+      "No Datadog organization, site selection, API key, Agent, or product instrumentation exists yet."
+    ]
+  },
+  "developer_goal": "Create a Datadog trial account and reach a first observable telemetry result for one chosen Datadog product.",
+  "first_success": {
+    "outcome": "First telemetry for the selected Datadog product is visible in the Datadog UI.",
+    "observable_signal": "For the representative Agent candidate, Metrics Summary shows datadog.agent.started or datadog.agent.running with host and Agent version tags.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "Datadog Getting Started and product-specific install guides",
+    "rule": "Select the shortest complete trial-to-first-signal route only after one product and install surface are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Linux host Agent via Fleet Automation",
+        "status": "unresolved",
+        "reason": "Documented Agent getting-started path with default Agent metrics, but Getting Started does not make Agent the sole platform default."
+      },
+      {
+        "name": "HTTP API first request",
+        "status": "unresolved",
+        "reason": "Peer getting-started route using API and application keys instead of an installed Agent."
+      },
+      {
+        "name": "APM tracing, Logs, RUM, Synthetics, CI Visibility, Security, and other product guides",
+        "status": "unresolved",
+        "reason": "Official Getting Started lists many product areas with unrelated first-success signals."
+      },
+      {
+        "name": "Container, Kubernetes, cloud, and config-management Agent installs",
+        "status": "unresolved",
+        "reason": "Peer Agent platforms with different installers, permissions, and verification."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Start a Datadog free trial and create the organization.",
+      "required_fields": [
+        {
+          "label": "Trial signup fields (email, region, remaining account details, agreements)",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6",
+            "S7"
+          ],
+          "notes": "Marketing trial page confirms a 14-day trial and Get Started Free CTA, but the interactive form field set was not fully recoverable from public fetches."
+        }
+      ],
+      "observable_result": "The developer has an authenticated Datadog organization on a chosen site.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose a Datadog product area and complete its documented first-install path to a first signal.",
+      "required_fields": [
+        {
+          "label": "Product / telemetry choice",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Install and verification steps for the chosen product",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "The selected product shows its first telemetry in Datadog.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Access appropriate for the eventually selected install surface (for example a supported host if using the Agent route).",
+      "source_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Self-service trial signup depends on Datadog accepting the provided identity and creating the organization.",
+      "source_ids": [
+        "S6",
+        "S7"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "After Agent or other collectors start, Datadog must receive and index the first metrics or events before UI verification.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "A successful Agent install reports datadog.agent.running / datadog.agent.started among other default checks.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Fleet Automation can generate the in-app install script once an account and API key exist.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Datadog Learning Center Quick Start hosted lab",
+      "reason": "Training environment with trial compute rather than onboarding the developer's own systems.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Reading Getting Started documentation",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started",
+      "url": "https://docs.datadoghq.com/getting_started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Many product areas",
+        "Agent listed among peer getting-started paths",
+        "No single platform-wide first success"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting Started with the Agent",
+      "url": "https://docs.datadoghq.com/getting_started/agent/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and API key prerequisites",
+        "Fleet Automation install",
+        "datadog.agent.running and datadog.agent.started metrics"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Datadog Agent",
+      "url": "https://docs.datadoghq.com/agent/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multiple Agent platforms"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Agent supported platforms for Linux",
+      "url": "https://docs.datadoghq.com/agent/supported_platforms/linux/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Linux host Agent platform details"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Account management users",
+      "url": "https://docs.datadoghq.com/account_management/users/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Organization membership and user access concepts"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Free Datadog Trial",
+      "url": "https://www.datadoghq.com/free-datadog-trial/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "14-day free trial marketing",
+        "Get Started Free CTA"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Account management",
+      "url": "https://docs.datadoghq.com/account_management/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and organization management docs entry"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Datadog product and install surface should define first success?",
+      "impact": "Agent metrics, API requests, traces, logs, RUM, Synthetics, and security findings have unrelated actions and terminal signals.",
+      "evidence_needed": "A corpus-level product choice plus a cold-account walkthrough of that product's current install and verification UI."
+    },
+    {
+      "question": "What exact fields does the current Datadog trial signup form require?",
+      "impact": "Required field counts and region selection cannot be finalized from public marketing pages alone.",
+      "evidence_needed": "A dated capture of the live trial registration form listing every required control."
+    }
+  ],
+  "counts": null
+}

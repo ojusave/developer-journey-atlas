@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Clerk",
+    "slug": "clerk",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "0a5dcaf0b88396d13118d35dc6d557f4726fd9dd7c9d578537e9bae1809aa73f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser.",
+      "No Clerk account, Dashboard application, SDK, or authentication identifier set has been chosen yet."
+    ]
+  },
+  "developer_goal": "Create a Clerk account and application, integrate Clerk into an application stack, and reach the first signed-in user state.",
+  "first_success": {
+    "outcome": "A first test user completes sign-up in the integrated app and the signed-in profile control appears.",
+    "observable_signal": "The profile icon is visible in place of Sign in and Sign up.",
+    "source_ids": ["S1", "S4"]
+  },
+  "route_selection": {
+    "surface": "Clerk Dashboard account setup plus framework Quickstarts",
+    "rule": "Select the shortest complete route only after one SDK stack and Account Portal versus components versus custom flow model are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Next.js App Router quickstart",
+        "status": "unresolved",
+        "reason": "Next.js is one of many full-stack quickstarts and itself has App Router versus Pages Router variants."
+      },
+      {
+        "name": "Other full-stack or frontend SDK quickstarts",
+        "status": "unresolved",
+        "reason": "Clerk's Quickstarts index lists multiple peer stacks such as React, Expo, Vue, Express, and native SDKs."
+      },
+      {
+        "name": "Clerk CLI agent-assisted init versus manual SDK setup",
+        "status": "unresolved",
+        "reason": "Current Next.js docs emphasize clerk auth login and clerk init, which is a different surface from manual package and file edits."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Clerk account or sign into the Clerk Dashboard.",
+      "required_fields": [
+        {"label": "Clerk account signup fields", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S2"], "notes": "Setup docs link to account creation but do not enumerate current required fields."}
+      ],
+      "observable_result": "The developer reaches the Clerk Dashboard or the first-application setup form.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Clerk application and choose sign-up and sign-in identifiers and social providers.",
+      "required_fields": [
+        {"label": "Authentication identifiers and social providers", "field_type": "other", "evidence_state": "documented", "source_ids": ["S2"], "notes": "Exact required defaults versus optional toggles are not fully enumerated without the live setup form."}
+      ],
+      "observable_result": "A Clerk application exists with API keys available in the Dashboard.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Integrate Clerk using the selected stack quickstart or CLI init path.",
+      "required_fields": [
+        {"label": "Publishable and secret API keys", "field_type": "other", "evidence_state": "documented", "source_ids": ["S4"]},
+        {"label": "Stack-specific packages, middleware, and components", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S3", "S4"]}
+      ],
+      "observable_result": "The local app runs with Clerk sign-in and sign-up controls visible.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3", "S4"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Sign up as the first test user in the running application.",
+      "required_fields": [
+        {"label": "First test user credentials for the configured identifiers", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S4"]}
+      ],
+      "observable_result": "The profile icon replaces Sign in and Sign up.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "A Clerk Dashboard application must exist before SDK keys can be copied into a project.", "source_ids": ["S2"]},
+    {"description": "An application stack must be chosen because Quickstarts are stack-specific.", "source_ids": ["S1"]}
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {"description": "Clerk creates the application and issues publishable and secret API keys.", "source_ids": ["S2", "S4"]},
+    {"description": "Clerk creates the first user after successful in-app sign-up.", "source_ids": ["S4"]}
+  ],
+  "excluded": [
+    {"item": "Reading Core concepts and AI prompt guides as measured actions", "reason": "Documentation reading is excluded from required developer actions.", "source_ids": ["S1"]},
+    {"item": "Organizations and component customization after first user", "reason": "Official Next.js after-setup recommendations come after the first signed-in profile state.", "source_ids": ["S4"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstarts",
+      "url": "https://clerk.com/docs/getting-started/quickstart/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Multiple full-stack, frontend, and backend peer quickstarts"]
+    },
+    {
+      "id": "S2",
+      "title": "Set up your Clerk account",
+      "url": "https://clerk.com/docs/getting-started/quickstart/setup-clerk",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Account creation", "Create application", "Identifiers and social providers", "Then integrate via quickstarts"]
+    },
+    {
+      "id": "S3",
+      "title": "Add Clerk Authentication to Next.js",
+      "url": "https://clerk.com/docs/nextjs/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Clerk CLI login and init path for Next.js"]
+    },
+    {
+      "id": "S4",
+      "title": "Next.js Quickstart (Pages Router)",
+      "url": "https://clerk.com/docs/getting-started/quickstart/pages-router",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["API keys", "Provider and components", "Create first user", "Profile icon success signal"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Clerk SDK stack and Account Portal versus components versus custom-flow model define first success?",
+      "impact": "Stack and UI model change dependencies, files, environment keys, and verification steps.",
+      "evidence_needed": "Choose one bounded quickstart such as Next.js App Router with prebuilt components, then verify Dashboard setup through first profile icon."
+    },
+    {
+      "question": "What exact fields appear on current Clerk account signup and the interactive authentication setup form?",
+      "impact": "Unverified signup and identifier defaults block a verified field count.",
+      "evidence_needed": "A dated fresh-account capture of dashboard.clerk.com signup and Create application setup."
+    }
+  ],
+  "counts": null
+}

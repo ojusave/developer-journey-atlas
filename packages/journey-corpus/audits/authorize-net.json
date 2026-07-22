@@ -1,0 +1,299 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Authorize.net",
+    "slug": "authorize-net",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "e3529314c555e2884fa09f4403d3df743a3b91d338bbefc3278ee275cae76ba5",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No Authorize.net sandbox account or API Login ID / Transaction Key exists yet.",
+      "Sandbox charging a test card is the intended first-success family; production merchant boarding is later."
+    ]
+  },
+  "developer_goal": "Create an Authorize.net sandbox account, obtain API credentials, and run the Hello World first test charge.",
+  "first_success": {
+    "outcome": "A sandbox authCaptureTransaction succeeds and returns a transaction ID and authorization code.",
+    "observable_signal": "Hello World describes charging a test card and printing the auth code and transaction ID.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Authorize.net Developer Center sandbox signup and Hello World",
+    "rule": "Prefer sandbox over production. Do not invent a winner among language samples when the Hello World presents multiple implementations.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Sandbox signup plus Java Hello World sample",
+        "status": "unresolved",
+        "reason": "Java appears first in the preserved research path, but public Hello World evidence does not prove it is the only or shortest language route."
+      },
+      {
+        "name": "Sandbox signup plus another official language sample or API Reference try-it request",
+        "status": "unresolved",
+        "reason": "API Reference and Hello World both support authenticated sandbox calls; language choice changes install and run actions."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create an Authorize.net sandbox account on the official signup form.",
+      "required_fields": [
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Last name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Country/Region",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Developer type",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Job level",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Sandbox company name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Sandbox currency",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Login ID",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Confirm password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Sandbox Account Agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "reCAPTCHA",
+          "field_type": "challenge",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The sandbox account is created and Merchant Interface login becomes available.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Sign in to the sandbox Merchant Interface and create a new Transaction Key under API Credentials & Keys.",
+      "required_fields": [
+        {
+          "label": "Sandbox login",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Sandbox password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Credential verification PIN",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "PIN delivery channel and timing are not specified."
+        }
+      ],
+      "observable_result": "A Transaction Key is revealed for sandbox API authentication.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Run the selected Hello World or API Reference sample that submits an authCaptureTransaction with sandbox credentials and a test card.",
+      "required_fields": [
+        {
+          "label": "API Login ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3", "S4"]
+        },
+        {
+          "label": "Transaction Key",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3", "S4"]
+        },
+        {
+          "label": "Implementation language sample",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S4"]
+        }
+      ],
+      "observable_result": "The console or response shows a successful transaction ID and authorization code.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A language runtime matching the chosen Hello World sample is required before the first charge can run locally.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Requesting a new Transaction Key requires requesting and verifying a PIN before the key is shown.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "PIN delivery for Transaction Key generation may introduce an external wait whose channel and duration are not documented.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Sandbox simulates card-network responses without processing real card payments.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Successful Hello World charge returns transaction identifiers and an authorization code.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production merchant account boarding and live credentials",
+      "reason": "Hello World and sandbox docs keep production separate; mixing credentials returns error 13.",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "item": "Refund, settlement, and error-condition testing guides",
+      "reason": "Documented as additional sandbox capabilities after the first successful charge.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Authorize.net Hello world",
+      "url": "https://developer.authorize.net/hello_world.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First API call by charging a test card",
+        "Sandbox utilities entry points"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create sandbox account",
+      "url": "https://developer.authorize.net/hello_world/sandbox.html",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Required signup fields",
+        "Agreement and reCAPTCHA",
+        "Sandbox versus production differences"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Common setup questions",
+      "url": "https://developer.authorize.net/hello_world/common_setup_questions.html",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API Login ID and Transaction Key",
+        "PIN verification for new Transaction Key",
+        "Sandbox Merchant Interface URL"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Authorize.net API Reference",
+      "url": "https://developer.authorize.net/api/reference/index.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox API endpoint",
+        "Merchant authentication requirement",
+        "Try-it credential insertion"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What happens immediately after Create Account, including email confirmation or activation?",
+      "impact": "Extra steps before Merchant Interface login would change the required path.",
+      "evidence_needed": "A dated fresh sandbox signup through first Merchant Interface login."
+    },
+    {
+      "question": "How is the Transaction Key PIN delivered, and how long can it take?",
+      "impact": "Adds an external wait and possibly a device or email interaction that cannot be counted precisely.",
+      "evidence_needed": "Official detail or observed PIN delivery channel, expiry, and retry behavior."
+    },
+    {
+      "question": "Which Hello World language or API Reference try-it path is the canonical shortest implementation?",
+      "impact": "Install and run actions differ by language while targeting the same charge outcome.",
+      "evidence_needed": "Human selection of one implementation surface after confirming sample credential-replacement instructions."
+    }
+  ],
+  "counts": null
+}

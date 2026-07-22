@@ -1,0 +1,303 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "X Developer Platform",
+    "slug": "x-developer-platform",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "76593bfc77b46a6a3105a36c53a71c4e2a1caed3adece57f2dfa80a6d609ad2d",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer already can sign in with an X account or can create one outside the Developer Console flow.",
+      "No X developer profile, app, Bearer Token, or API credits exist yet.",
+      "The measured goal is pay-per-use X API access rather than Enterprise."
+    ]
+  },
+  "developer_goal": "Obtain self-service X API access and complete the official first read-only API v2 request.",
+  "first_success": {
+    "outcome": "The developer uses the app Bearer Token to look up a user through X API v2 and receives the user object.",
+    "observable_signal": "The cURL user-lookup response includes a JSON data object with id, name, and username.",
+    "source_ids": ["S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "X Developer Console pay-per-use Getting Access plus Make Your First Request",
+    "rule": "Prefer pay-per-use over Enterprise, and the documented fastest first-request test (cURL) over SDK production paths.",
+    "selected": "Pay-per-use Getting Access with cURL user lookup",
+    "candidates": [
+      {
+        "name": "Pay-per-use Getting Access + Make Your First Request (cURL)",
+        "status": "selected",
+        "reason": "Overview presents pay-per-use as the no-commitment access level; Getting Access defines account/app/credentials; Make Your First Request calls cURL the fastest test."
+      },
+      {
+        "name": "X API Enterprise",
+        "status": "not-selected",
+        "reason": "Enterprise is positioned for high-volume endpoints, dedicated account management, and custom rate limits."
+      },
+      {
+        "name": "OAuth user-context first request",
+        "status": "not-selected",
+        "reason": "The official first-request guide demonstrates app-only Bearer Token user lookup rather than user-context OAuth."
+      },
+      {
+        "name": "Official Python or TypeScript SDK first request",
+        "status": "not-selected",
+        "reason": "SDKs are recommended for production, while the first-request guide names cURL as the fastest test."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign in to console.x.com with an X account to begin developer onboarding.",
+      "required_fields": [
+        {
+          "label": "X account sign-in",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The Developer Console onboarding flow is available.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Review and accept the Developer Agreement and Policy.",
+      "required_fields": [
+        {
+          "label": "Developer Agreement and Policy acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "Legal acceptance is recorded for the developer account.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete the developer profile with basic information about API use.",
+      "required_fields": [
+        {
+          "label": "Developer profile / API-use information",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Getting Access requires basic information but does not publish the exact current form fields or review states."
+        }
+      ],
+      "observable_result": "The developer profile is complete enough to continue to app creation.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a new app with name, description, and use case, then save the generated credentials including the Bearer Token.",
+      "required_fields": [
+        {
+          "label": "App name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "App description",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Use case",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Docs require a use case without enumerating the control type or allowed values."
+        }
+      ],
+      "observable_result": "API keys, tokens, and a Bearer Token are generated for the app.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Purchase X API credits upfront in the Developer Console so pay-per-use requests can be charged.",
+      "required_fields": [
+        {
+          "label": "Credit purchase / payment method",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S4"],
+          "notes": "Pricing requires purchasing credits upfront; Getting Access omits the payment UI sequence."
+        }
+      ],
+      "observable_result": "The account has credits available for API usage.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 6,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Send the documented user-lookup GET request with the Bearer Token Authorization header.",
+      "required_fields": [
+        {
+          "label": "BEARER_TOKEN",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "cURL user-lookup command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "The API returns JSON for the requested user.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Confirm the response data field contains the looked-up user object.",
+      "required_fields": [],
+      "observable_result": "The first-request success criteria are met.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "An X account is required to sign in to the Developer Console.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Pay-per-use access requires purchasing credits before billed requests succeed.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Developer Agreement and Policy acceptance is mandatory.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Upfront credit purchase is required under pay-per-usage pricing.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "The Developer Console generates API keys, secrets, and a Bearer Token when the app is created.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "X API v2 returns the user lookup JSON when the Bearer Token request succeeds.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Enterprise API onboarding",
+      "reason": "It is a separate access product with different commercial terms.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Official SDK installation for the first request",
+      "reason": "The first-request guide treats cURL as the fastest test path.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Reading documentation as a counted action",
+      "reason": "Documentation is evidence, not a product interaction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "X Developer Platform overview",
+      "url": "https://docs.x.com/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Pay-per-use versus Enterprise product split",
+        "Get-started framing for API access"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Getting Access",
+      "url": "https://docs.x.com/x-api/getting-started/getting-access",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer Console sign-in",
+        "Developer Agreement acceptance",
+        "Developer profile step",
+        "New App and credential generation including Bearer Token"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Make Your First Request",
+      "url": "https://docs.x.com/make-your-first-request",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "cURL as fastest test",
+        "Bearer Token user-lookup example",
+        "JSON data response shape"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "X API pay-per-usage pricing and credits",
+      "url": "https://docs.x.com/x-api/getting-started/pricing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Credits purchased upfront in Developer Console",
+        "Per-resource User Read pricing",
+        "No subscription framing for pay-per-use"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Where does the Developer Console place payment-method entry and credit purchase relative to app creation for a brand-new account?",
+      "impact": "Screen order can change whether billing is before or after credentials and whether the first request is blocked earlier than Getting Access implies.",
+      "evidence_needed": "A dated Console walkthrough from a fresh developer signup through first successful credited request."
+    },
+    {
+      "question": "What exact fields and possible review states appear in the developer profile and app use-case forms?",
+      "impact": "Required field counts and potential manual-review gates remain unverified.",
+      "evidence_needed": "Current screenshots or a read-only inventory of profile and New App form controls for a new account."
+    },
+    {
+      "question": "Does creating the underlying X consumer account add required fields before console.x.com sign-in when the developer has no X account yet?",
+      "impact": "The audit boundary is account creation; if X consumer signup is in-path, those fields must be counted.",
+      "evidence_needed": "Confirm whether the measured starting state may assume an existing X account, or document the consumer signup fields."
+    }
+  ],
+  "counts": null
+}

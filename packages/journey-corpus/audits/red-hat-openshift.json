@@ -1,0 +1,358 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Red Hat OpenShift",
+    "slug": "red-hat-openshift",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "093664dbd52e5031c71eb7e1b722f11ae22b0c4277f170ea12630ef9ca75cb5f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email.",
+      "The developer has not yet created a Red Hat account or provisioned a Developer Sandbox.",
+      "No OpenShift project, Deployment, or Route exists yet."
+    ]
+  },
+  "developer_goal": "Create a Red Hat account, enter the free Developer Sandbox, and complete the official Get started with your Developer Sandbox learning path through source and container-image deployments.",
+  "first_success": {
+    "outcome": "The developer has entered the Developer Sandbox, opened a source-built application from Topology, and created a second Deployment from the specified container image.",
+    "observable_signal": "The source-built application opens from the Topology external link, and the container-image Deployment is created in Topology.",
+    "source_ids": [
+      "S3",
+      "S4",
+      "S5"
+    ]
+  },
+  "route_selection": {
+    "surface": "Red Hat Developer Sandbox self-service web flow plus recommended learning path",
+    "rule": "Prefer the vendor-presented free Developer Sandbox over local or production OpenShift installs; use the recommended Get started learning path after Sandbox access.",
+    "selected": "Developer Sandbox access plus Get started with your Developer Sandbox learning path",
+    "candidates": [
+      {
+        "name": "Developer Sandbox + Get started learning path",
+        "status": "selected",
+        "reason": "OpenShift getting-started and Sandbox surfaces point new developers to the free Sandbox and recommend this learning path."
+      },
+      {
+        "name": "OpenShift Local",
+        "status": "not-selected",
+        "reason": "Requires local cluster installation rather than the no-setup Sandbox entry."
+      },
+      {
+        "name": "OpenShift Container Platform install",
+        "status": "not-selected",
+        "reason": "Operator and infrastructure installation, not the free developer try path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "From Start your sandbox for free, register or sign in with a Red Hat account.",
+      "required_fields": [
+        {
+          "label": "Red Hat account registration or sign-in fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4"
+          ],
+          "notes": "Official access article says to complete registration and return but does not enumerate current fields."
+        }
+      ],
+      "observable_result": "The developer is authenticated and can continue Sandbox provisioning.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "other",
+      "action": "Complete phone-number validation required for Developer Sandbox access.",
+      "required_fields": [
+        {
+          "label": "Phone number validation",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S7"
+          ],
+          "notes": "FAQ requires a valid phone number; the verification channel and UI controls are not fully enumerated."
+        }
+      ],
+      "observable_result": "Sandbox access is no longer blocked by phone validation.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S7"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select Start using your sandbox, choose DevSandbox on the OpenShift Dedicated login page, then Launch the Red Hat OpenShift tile.",
+      "required_fields": [],
+      "observable_result": "The Developer Sandbox OpenShift console opens in the developer perspective.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "In Topology, open Add to Project, choose Import from Git, enter an official sample repository URL, set Resource type to Deployment, and Create.",
+      "required_fields": [
+        {
+          "label": "Git repository URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "label": "Resource type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "OpenShift creates the source-based Deployment and begins building.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "After the application icon ring turns dark blue, open the Topology external link for the source-built application.",
+      "required_fields": [],
+      "observable_result": "The browser displays the source-built application.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "In Topology, open Add to Project, choose Container image, enter quay.io/rhdevelopers/intro-front, set Resource type to Deployment, and Create.",
+      "required_fields": [
+        {
+          "label": "Container image",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "label": "Resource type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S6"
+          ]
+        }
+      ],
+      "observable_result": "OpenShift creates the container-image Deployment.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A free Developer Sandbox OpenShift cluster entitlement after Red Hat account and phone validation.",
+      "source_ids": [
+        "S2",
+        "S3",
+        "S7"
+      ]
+    },
+    {
+      "description": "Access to the official sample Git repositories and quay.io/rhdevelopers/intro-front image named by the learning path.",
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Red Hat account registration must succeed before Sandbox login.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Phone validation is required to reduce fraudulent Sandbox accounts.",
+      "source_ids": [
+        "S7"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Sandbox provisioning and OpenShift builds must finish before Topology shows a ready application.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Developer Sandbox provisions an OpenShift environment after Start using your sandbox.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Import from Git and Container image flows create Deployments and Routes used by the learning path.",
+      "source_ids": [
+        "S5",
+        "S6"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading OpenShift documentation and learning-path overview pages",
+      "reason": "Documentation reading is evidence, not a counted product action.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "item": "OpenShift Local or production cluster installation",
+      "reason": "The vendor try path is the no-setup Developer Sandbox.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "item": "Optional Sandbox experimentation after the terminal container-image resource",
+      "reason": "First success ends at the learning-path terminal resource.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting started with Red Hat OpenShift",
+      "url": "https://developers.redhat.com/products/openshift/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox as free try path",
+        "Getting-started entry"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Developer Sandbox",
+      "url": "https://developers.redhat.com/developer-sandbox",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Start your sandbox for free",
+        "Recommended Get started activity"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get started with your Developer Sandbox",
+      "url": "https://developers.redhat.com/learn/openshift/get-started-your-developer-sandbox",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Learning-path structure",
+        "Source and container-image resources",
+        "Sandbox prerequisite"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How to access the Developer Sandbox for Red Hat OpenShift",
+      "url": "https://developers.redhat.com/articles/2023/03/30/how-access-developer-sandbox-red-hat-openshift",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Register or sign in",
+        "Start using your sandbox",
+        "DevSandbox login",
+        "Launch OpenShift"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Build your application from source code",
+      "url": "https://developers.redhat.com/learning/learn%3Aopenshift%3Aget-started-your-developer-sandbox/resource/resources%3Abuild-your-application-source-code",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Import from Git",
+        "Deployment resource",
+        "Topology ready signal",
+        "External link"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Build your application from a container image",
+      "url": "https://developers.redhat.com/learning/learn%3Aopenshift%3Aget-started-your-developer-sandbox/resource/resources%3Abuild-your-application-container-image",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Container image path",
+        "quay.io/rhdevelopers/intro-front"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Developer Sandbox FAQ",
+      "url": "https://developers.redhat.com/developer-sandbox/FAQ",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Phone number validation requirement"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Red Hat account-registration fields and phone-verification UI appear for a fresh developer today?",
+      "impact": "Account and verification action and field counts before Sandbox access cannot be verified.",
+      "evidence_needed": "Dated screenshots or a read-only walkthrough of current Red Hat registration and Sandbox phone validation from a fresh account."
+    },
+    {
+      "question": "Does first success require both learning-path resources, or is opening the source-built app alone the earliest meaningful outcome?",
+      "impact": "Including the container-image resource adds Topology actions after an already observable deployed application.",
+      "evidence_needed": "Human judgment against SELECTION-POLICY first-success rules for whether the vendor learning-path terminal overrides the earlier Topology external-link success."
+    }
+  ],
+  "counts": null
+}

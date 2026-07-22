@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Okta",
+    "slug": "okta",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "031ede0592f3bb510f68c4e813bcbe25ff8004081a80f6066b6ec5a97547b377",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a work email they can verify.",
+      "No Okta Integrator Free Plan org, app integration, or runtime sample exists yet.",
+      "No application type or language has been chosen for the sign-in or API-protection quickstart."
+    ]
+  },
+  "developer_goal": "Create an Okta Integrator Free Plan org and reach the first signed-in or protected-API success for a chosen application type and runtime.",
+  "first_success": {
+    "outcome": "A selected redirect sign-in or API-protection sample reaches its documented authenticated terminal state.",
+    "observable_signal": "Depends on the unresolved app class and runtime; for example, a SPA Profile view showing the signed-in user and Sign out.",
+    "source_ids": ["S1", "S3"]
+  },
+  "route_selection": {
+    "surface": "Okta Developer self-service web signup and Admin Console quickstarts",
+    "rule": "Select the shortest complete Integrator Free Plan route only after one application class and runtime are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Server-side web app redirect sign-in",
+        "status": "unresolved",
+        "reason": "The Quickstart lists server-side web as a peer class with its own language guides and app-integration settings."
+      },
+      {
+        "name": "Front-end SPA redirect sign-in",
+        "status": "unresolved",
+        "reason": "The Quickstart lists front-end web as a peer class; configuration and success UI differ from server and native routes."
+      },
+      {
+        "name": "Mobile or native app redirect sign-in",
+        "status": "unresolved",
+        "reason": "Native apps use non-HTTP callbacks and platform-specific SDKs that cannot be compared as one universal path."
+      },
+      {
+        "name": "Protect your API",
+        "status": "unresolved",
+        "reason": "API protection is a separate Quickstart outcome from interactive sign-in and changes the first-success signal."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Choose the Okta Integrator Free Plan on the developer signup surface and submit the visible signup form.",
+      "required_fields": [
+        {"label": "First name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Last name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Work email", "field_type": "email", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Country/Region", "field_type": "select", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Integrator Free Plan Agreement and Privacy Policy", "field_type": "agreement", "evidence_state": "observed-public-ui", "source_ids": ["S2"], "notes": "Agreement text is shown with Sign up; a separate checkbox was not confirmed as required."}
+      ],
+      "observable_result": "Okta accepts the signup and sends a verification email to the provided address.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the activation link from the Okta verification email and set a new password.",
+      "required_fields": [
+        {"label": "Activation link", "field_type": "other", "evidence_state": "documented", "source_ids": ["S4"]},
+        {"label": "New password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S4"]}
+      ],
+      "observable_result": "Okta redirects the developer to the Admin Console of the new Identity Engine org.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the app integration required by the selected Quickstart application class.",
+      "required_fields": [
+        {"label": "Application class and sign-in method", "field_type": "select", "evidence_state": "unverified", "source_ids": ["S1", "S5"], "notes": "OIDC versus other methods and SPA versus web versus native change required wizard fields."}
+      ],
+      "observable_result": "Okta creates an app integration with client credentials for the selected class.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S5"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Complete the selected language quickstart configuration and sample integration through first authenticated success.",
+      "required_fields": [
+        {"label": "Runtime and sample configuration", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S3"]}
+      ],
+      "observable_result": "The selected sample reaches its documented signed-in or protected-API terminal state.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "A work email address is required for the Integrator Free Plan signup form.", "source_ids": ["S2"]},
+    {"description": "The developer must choose an application class and runtime before a complete integration path exists.", "source_ids": ["S1"]}
+  ],
+  "external_gates": [
+    {"description": "Email delivery and activation are required before the Admin Console opens.", "source_ids": ["S4"]},
+    {"description": "Integrator Free Plan access expires after 180 consecutive days of inactivity per the signup agreement text.", "source_ids": ["S2"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Okta must deliver the account verification email with the activation link.", "source_ids": ["S4"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Okta creates an Identity Engine org and assigns the signup user the super administrator role after activation.", "source_ids": ["S4"]},
+    {"description": "Okta generates app-integration credentials when a custom app is created.", "source_ids": ["S5"]}
+  ],
+  "excluded": [
+    {"item": "Reading Sign users in overview and optional org setup for multifactor or password-optional policies", "reason": "Documentation reading and optional authenticator policy work are outside the measured required path until a route is fixed.", "source_ids": ["S1", "S4"]},
+    {"item": "Creating test users, groups, and embedded widget settings from the set-up-org guide", "reason": "Those steps support broader org configuration and are not required for every Quickstart first-success route.", "source_ids": ["S4"]},
+    {"item": "Auth0 Platform or Okta Platform commercial trial choices on the same signup chooser", "reason": "The Integrator Free Plan is the documented free developer org path for building integrations.", "source_ids": ["S2"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://developer.okta.com/docs/guides/quickstart/main/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Server, SPA, native, and Protect your API peer routes", "Redirect authentication positioning"]
+    },
+    {
+      "id": "S2",
+      "title": "Okta Developer sign up",
+      "url": "https://developer.okta.com/signup/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Integrator Free Plan chooser", "First name", "Last name", "Work email", "Country/Region", "Agreement text"]
+    },
+    {
+      "id": "S3",
+      "title": "Sign users in to your SPA using the redirect model",
+      "url": "https://developer.okta.com/docs/guides/sign-into-spa-redirect/main/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["One possible SPA redirect first-success route among several"]
+    },
+    {
+      "id": "S4",
+      "title": "Set up your org",
+      "url": "https://developer.okta.com/docs/guides/set-up-org/main/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Verification email", "Activation link", "Password", "Admin Console redirect", "Super administrator role"]
+    },
+    {
+      "id": "S5",
+      "title": "Create an app integration",
+      "url": "https://developer.okta.com/docs/guides/create-an-app-integration/openidconnect/main/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Custom app integration wizard", "Sign-in method choices"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Okta application class and runtime define the measured first-success route?",
+      "impact": "The choice changes app-integration fields, SDKs, sample code, and the observable terminal signal.",
+      "evidence_needed": "Pick one bounded goal such as Angular SPA redirect sign-in, then verify the full current Admin Console and sample path against official docs and a fresh Integrator org."
+    },
+    {
+      "question": "Which authenticator enrollment or recovery screens appear after the activation link on a fresh Integrator Free Plan org?",
+      "impact": "Extra factor enrollment would add required actions and fields before the Admin Console is usable.",
+      "evidence_needed": "A dated walkthrough from a fresh signup through activation into the Admin Console, including any Okta Verify or email-factor prompts."
+    }
+  ],
+  "counts": null
+}

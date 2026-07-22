@@ -1,0 +1,238 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Together AI",
+    "slug": "together-ai",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "c57b83ed0559257529d1b794394e59bebfa5de1707f1bcb4339cfeb7cc1c77b9",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, an OAuth-capable Google or GitHub identity, and a payment card.",
+      "No Together AI account, organization, project, credits, API key, or request exists yet."
+    ]
+  },
+  "developer_goal": "Create a Together AI account, fund the prepaid minimum credits, create a project API key, and run the official Python first chat query.",
+  "first_success": {
+    "outcome": "The Python Together SDK sends the published MiniMax M3 chat prompt and prints the returned answer.",
+    "observable_signal": "After running the Quickstart script, the model response appears in the terminal.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Together AI self-service web signup plus official Quickstart Python SDK",
+    "rule": "Google and GitHub are peer OAuth signup providers with no documented default; do not invent a winner when the choice changes external identity handoffs.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Google OAuth signup, $5 prepaid credits, Default Project API key, Python first query",
+        "status": "unresolved",
+        "reason": "Complete after identity choice, but Google versus GitHub remains an equal consequential signup fork."
+      },
+      {
+        "name": "GitHub OAuth signup, $5 prepaid credits, Default Project API key, Python first query",
+        "status": "unresolved",
+        "reason": "Peer of the Google route with a different external authorization surface and future sign-in lock-in."
+      },
+      {
+        "name": "OpenAI SDK pointed at Together base URL",
+        "status": "not-selected",
+        "reason": "Alternate client after the same unresolved account, billing, and key prerequisites."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Register via together.ai Get Started using Google or GitHub OAuth.",
+      "required_fields": [
+        {
+          "label": "OAuth provider choice (Google or GitHub)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Provider authorization consent",
+          "field_type": "permission",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Together documents OAuth but not the provider consent screens or scopes."
+        }
+      ],
+      "observable_result": "An organization with a Default Project exists for the new account.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add a payment method and purchase the minimum prepaid credits required for platform access.",
+      "required_fields": [
+        {
+          "label": "Payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Minimum $5 credit purchase",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "The account has a positive prepaid credit balance.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a project API key, name it, and copy the value immediately.",
+      "required_fields": [
+        {
+          "label": "API key name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "A project API key value is available to export as TOGETHER_API_KEY.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export TOGETHER_API_KEY and install the Together Python SDK.",
+      "required_fields": [
+        {
+          "label": "export TOGETHER_API_KEY",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "pip install together",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The together package is installed and the key is in the environment.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Run the published MiniMax M3 chat.completions.create example and print the content.",
+      "required_fields": [
+        {
+          "label": "model and messages",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The terminal prints the model response.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Together uses OAuth only; the developer must have Google or GitHub available and must reuse the same provider later.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Google or GitHub OAuth authorization is required to create the account.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "No free trial: a minimum $5 prepaid credit purchase is required for platform access.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Together returns a chat completion for the Quickstart model and messages.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Streaming and reasoning-field variations",
+      "reason": "Documented as going-further after the first printed response.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Auto-recharge configuration",
+      "reason": "Optional billing automation after the minimum prepaid balance exists.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://docs.together.ai/docs/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Register for an account",
+        "Create and copy API key",
+        "SDK install",
+        "Python first query terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Manage your account",
+      "url": "https://docs.together.ai/docs/account-management",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Google or GitHub OAuth signup",
+        "Same-provider sign-in requirement"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Credits",
+      "url": "https://docs.together.ai/docs/billing-credits",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "No free trial",
+        "Minimum $5 credit purchase",
+        "Prepaid balance required before API calls"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which OAuth provider should a new developer use when Google and GitHub are documented as peers with no default?",
+      "impact": "Provider choice changes external consent screens, scopes, and permanent sign-in method, so lexicographic route selection cannot pick a single verified path.",
+      "evidence_needed": "An official default recommendation, or a human decision selecting one provider plus a walkthrough of that provider's current consent screens."
+    },
+    {
+      "question": "What exact payment-method fields and bank or card verification challenges appear during the required $5 purchase?",
+      "impact": "Billing step field counts remain incomplete.",
+      "evidence_needed": "Observed billing settings walkthrough for a fresh organization completing the minimum credit purchase."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,324 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Replicate",
+    "slug": "replicate",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "1e7c3d3fa9480ffbdd49deec8bc551b5f4e155bf9d216c0457cf12ea81318ea2",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and, for Node.js routes, Node.js 16+.",
+      "No Replicate account, API token, or billing setup exist yet.",
+      "No Get started runtime among Node.js, Google Colab, or Python has been preselected."
+    ]
+  },
+  "developer_goal": "Create a Replicate account, obtain an API token, and run a public model through one official Get started route until the documented success output appears.",
+  "first_success": {
+    "outcome": "Depends on the unresolved runtime; for the Node.js FLUX.1 Schnell guide, the script saves output.png after running the model.",
+    "observable_signal": "For the manual Node.js path, the terminal prints Running the model then Image saved as output.png and output.png exists.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "Replicate documentation Get started cards",
+    "rule": "Node.js, Google Colab, and Python are separate top-level run-model routes with no universal default; fine-tune and deploy are other first outcomes.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "npx create-replicate scaffold for FLUX.1 Schnell",
+        "status": "unresolved",
+        "reason": "Documented fastest Node path, but still requires account/token/billing gates that are not fully enumerated."
+      },
+      {
+        "name": "Manual Node.js project from scratch",
+        "status": "unresolved",
+        "reason": "Equal documented Node outcome with more local setup steps than create-replicate."
+      },
+      {
+        "name": "Google Colab or Python get-started",
+        "status": "unresolved",
+        "reason": "Different runtimes and success signals with equal top-level docs placement."
+      },
+      {
+        "name": "Fine-tune or deploy custom model",
+        "status": "not-selected",
+        "reason": "Different first-success type from running a public model."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "product-interaction",
+      "interface": "browser",
+      "action": "Choose the intended first outcome and Get started runtime route.",
+      "required_fields": [
+        {
+          "label": "Get started route choice",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "One official run-model route is selected.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Replicate account or log in.",
+      "required_fields": [
+        {
+          "label": "Account signup or login inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "The developer can open API tokens and billing settings.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "If prompted for the selected model or account, complete billing setup required to continue running predictions.",
+      "required_fields": [
+        {
+          "label": "Billing setup controls",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S6"
+          ],
+          "notes": "Docs say some models run free until limits, after which billing setup is required; timing is account-dependent."
+        }
+      ],
+      "observable_result": "The account is allowed to run the selected prediction.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open API tokens and copy the default token or create and copy a dedicated token.",
+      "required_fields": [
+        {
+          "label": "API token value",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "A REPLICATE_API_TOKEN value is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "For the Node.js manual route: export REPLICATE_API_TOKEN, scaffold the project, install replicate, add index.js, and run node index.js.",
+      "required_fields": [
+        {
+          "label": "REPLICATE_API_TOKEN",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Project setup commands",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "index.js example",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The terminal prints Image saved as output.png and the file exists.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Node.js 16 or greater for the Node.js get-started routes.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A Replicate account and API token are required to authenticate predictions.",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    },
+    {
+      "description": "Billing setup may be required after free limits or for some features.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Model instances may cold-boot while setting up before becoming active.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Replicate runs the selected model prediction and returns generated output such as an image file.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Public model billing charges only active processing time once the account is billable.",
+      "source_ids": [
+        "S6"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Fine-tune an image model and Deploy a custom model cards",
+      "reason": "Different first-success types from running a public model.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Next.js website and other follow-on guides",
+      "reason": "Listed after the Node.js first-run success.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Replicate Documentation",
+      "url": "https://replicate.com/docs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Get started cards for Node, Colab, Python, fine-tune, deploy"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Run a model from Node.js",
+      "url": "https://replicate.com/docs/get-started/nodejs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "create-replicate quickstart",
+        "Manual token export",
+        "FLUX.1 Schnell example",
+        "output.png success"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Run a model from Google Colab",
+      "url": "https://replicate.com/docs/get-started/google-colab",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Alternate Colab get-started route"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Run a model from Python",
+      "url": "https://replicate.com/docs/get-started/python",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Alternate Python get-started route"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "API tokens",
+      "url": "https://replicate.com/docs/topics/security/api-tokens",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API token management"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Billing",
+      "url": "https://replicate.com/docs/topics/billing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free limits then billing setup",
+        "Public model active-time billing",
+        "Cold boot lifecycle"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which official Replicate Get started route should define the canonical workshop journey?",
+      "impact": "Runtime, installation, external notebook auth, and success signals all change.",
+      "evidence_needed": "An explicit choice among Node.js create-replicate, manual Node.js, Colab, and Python, or an official recommended default."
+    },
+    {
+      "question": "What exact account signup screens and billing prompts appear for a fresh user before the first FLUX prediction succeeds?",
+      "impact": "Signup fields and whether billing is required before first success remain unverified.",
+      "evidence_needed": "A dated fresh-account walkthrough from signup through first successful prediction, including any billing interstitial."
+    }
+  ],
+  "counts": null
+}

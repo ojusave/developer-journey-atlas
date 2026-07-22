@@ -1,0 +1,257 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Amazon Web Services",
+    "slug": "amazon-web-services",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "01f33d5e769d4f11f95bd62ea2574b771a07c71db6ca531115ea798b529a17c7",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, a reachable email address, a phone number, and a valid payment method.",
+      "The developer is creating a standalone AWS account outside AWS Organizations and India-specific seller flows unless those routes are later selected.",
+      "No AWS service, workload, region, or IAM administrator setup exists yet."
+    ]
+  },
+  "developer_goal": "Create a standalone AWS account and reach the earliest meaningful AWS first-success outcome.",
+  "first_success": {
+    "outcome": "Unresolved: AWS documents complete account signup, then many co-equal service and orientation routes rather than one default workload terminal.",
+    "observable_signal": "Candidates include console orientation completion or a service-specific result such as a running EC2 instance.",
+    "source_ids": ["S1", "S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "Self-service AWS account signup and Management Console",
+    "rule": "Account creation can be reconstructed from official docs, but the post-account first-success route must be fixed before counting a complete path.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Standalone account signup only through activation",
+        "status": "unresolved",
+        "reason": "Official first-time-user docs define a complete signup sequence ending in account activation, but activation alone is not a demonstrated workload first success under the measurement contract."
+      },
+      {
+        "name": "Management Console orientation guide",
+        "status": "unresolved",
+        "reason": "Hands-on console guide reaches navigation familiarity and then points to separate service tutorials."
+      },
+      {
+        "name": "Launch a first EC2 instance",
+        "status": "unresolved",
+        "reason": "Complete compute path, but AWS general getting-started material does not designate EC2 over other services."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open Sign up for AWS, enter the root-user email address and AWS account name, and choose Verify email address.",
+      "required_fields": [
+        {"label": "Root user email address", "field_type": "email", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "AWS account name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS sends a verification code to the root-user email address.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Enter the email verification code and verify it.",
+      "required_fields": [
+        {"label": "Email verification code", "field_type": "code", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS advances to root-user password creation.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create and confirm a compliant root-user password, then continue.",
+      "required_fields": [
+        {"label": "Root user password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS advances to account plan selection.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Choose an account plan, enter contact information, and accept the AWS Customer Agreement.",
+      "required_fields": [
+        {"label": "Account plan", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Contact information", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "AWS Customer Agreement", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS advances to billing information.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter a valid payment method and billing address.",
+      "required_fields": [
+        {"label": "Payment method", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Billing address", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS can continue to phone identity confirmation.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 6,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Confirm identity by phone SMS code when prompted.",
+      "required_fields": [
+        {"label": "Phone number", "field_type": "text", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "SMS verification code", "field_type": "code", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS advances to Support plan selection.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 7,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Choose a Support plan and complete sign up.",
+      "required_fields": [
+        {"label": "AWS Support plan", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "AWS shows account activation in progress.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 8,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "After activation, select one post-account first-success route such as console orientation or a specific service quickstart.",
+      "required_fields": [
+        {
+          "label": "Post-account first-success route",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3"]
+        }
+      ],
+      "observable_result": "One bounded AWS workload or orientation terminal is fixed.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A reachable root-user email address, phone number for SMS or voice identity checks, contact and billing addresses, and a valid payment method.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A valid payment method is mandatory before standalone signup can continue.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Phone-based identity confirmation must succeed before Support plan selection.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email delivery of the signup verification code.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Account activation usually takes a few minutes and can take up to 24 hours before console use.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "AWS creates the account and sends an activation confirmation email after signup completes.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Recommended AWS CLI install and AWS MCP Server setup",
+      "reason": "Official first-time-user docs label these steps recommended after account creation, not required for a specific workload terminal.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "AWS Organizations member-account creation",
+      "reason": "Different entitlement and administrator path from standalone signup.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "India-specific AWS India signup variations",
+      "reason": "Official docs branch India address and CVV verification separately from the audited non-India instructions.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting started with an AWS account",
+      "url": "https://docs.aws.amazon.com/accounts/latest/reference/welcome-first-time-user.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Root email and account name",
+        "Email verification code",
+        "Password rules",
+        "Plan, contact, agreement",
+        "Payment method requirement",
+        "Phone SMS identity check",
+        "Support plan and activation wait"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "AWS Getting Started Resource Center",
+      "url": "https://aws.amazon.com/getting-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multiple beginner onboarding tasks and tutorials",
+        "No single service-selected first workload"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "What is an AWS account / create account overview",
+      "url": "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-creating.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First-time users must sign up",
+        "Post-signup MFA and administrator recommendations"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which post-account AWS outcome is the selected first success: console orientation, a specific service quickstart, or another hands-on guide?",
+      "impact": "Action counts, waits, and external gates after activation change by service and guide.",
+      "evidence_needed": "Human selection of one bounded workload or orientation goal with current official steps from an activated account."
+    },
+    {
+      "question": "Do live signup screens currently match the documented field order, including plan picker and Support plan names?",
+      "impact": "Field labels and step boundaries for a verified count need public UI confirmation.",
+      "evidence_needed": "Dated screenshots of portal.aws.amazon.com/billing/signup for a new standalone account."
+    }
+  ],
+  "counts": null
+}

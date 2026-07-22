@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Salesforce",
+    "slug": "salesforce",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "4bf28d55279d50a65ac2d810b8cda2ad9cdbca41adb80a5362ee7849b2d765b2",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an accessible email inbox.",
+      "No Salesforce org, Developer Edition credentials, Connected App, or CLI auth session exist yet.",
+      "The developer has not preselected Apex, Lightning, GraphQL, Bulk, Marketing, Commerce, Data Cloud, or another non-REST surface."
+    ]
+  },
+  "developer_goal": "Create a Salesforce developer account and reach the earliest meaningful first-success outcome for a chosen Salesforce development surface.",
+  "first_success": {
+    "outcome": "For the REST API Quick Start candidate: authenticate a free Developer Edition org and complete the documented Account BillingCity update verified in Salesforce.",
+    "observable_signal": "The PATCH request returns HTTP 204 No Content and the Account BillingCity shows as Fremont after refresh, when the REST Quick Start is the selected route.",
+    "source_ids": ["S1", "S5"]
+  },
+  "route_selection": {
+    "surface": "Salesforce Developers self-service web and CLI surfaces",
+    "rule": "Select the shortest complete route only after the Salesforce product surface and first-success terminal are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "REST API Quick Start with free Developer Edition and Salesforce CLI auth",
+        "status": "unresolved",
+        "reason": "Official and complete within REST API, but Salesforce does not claim it as the universal first-mile across Apex, Lightning, GraphQL, Bulk, and other surfaces."
+      },
+      {
+        "name": "Apex, Lightning, GraphQL, Bulk, Marketing, Commerce, or Data Cloud first mile",
+        "status": "unresolved",
+        "reason": "Each surface has different tools, entitlements, and terminal outcomes that cannot be compared as one Salesforce path."
+      },
+      {
+        "name": "Existing production org or sandbox instead of Developer Edition",
+        "status": "unresolved",
+        "reason": "Uses a different account and entitlement boundary than the free Developer Edition signup route."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open the Salesforce Developer Edition signup form and complete the visible identity and company prompts.",
+      "required_fields": [
+        {"label": "First name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Last name", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Job title", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Company", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Country/region", "field_type": "select", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Work email", "field_type": "email", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Main Services Agreement, Salesforce Program Agreement, and API Terms of Service", "field_type": "agreement", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Developer Edition AI features and inactivity acknowledgement", "field_type": "agreement", "evidence_state": "observed-public-ui", "source_ids": ["S2"]},
+        {"label": "Remaining anti-abuse or username controls", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S2", "S3"], "notes": "Cold fetch exposed identity, email, and agreement controls; CAPTCHA, username uniqueness, or post-submit challenges still need a complete walkthrough."}
+      ],
+      "observable_result": "Salesforce accepts the signup submission and begins Developer Edition provisioning.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the Developer Edition activation or welcome email and follow the verification link.",
+      "required_fields": [],
+      "observable_result": "The developer reaches password and security-question setup for the new org.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Set the Developer Edition password, complete the security challenge, and sign in.",
+      "required_fields": [
+        {"label": "Password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Security challenge question and answer", "field_type": "other", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "The developer is signed in to a Developer Edition org with API Enabled permission available on the profile.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install Salesforce CLI if needed, run sf org login web, and allow the CLI connected app for the Developer Edition org.",
+      "required_fields": [
+        {"label": "Org login authorization", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S4"]}
+      ],
+      "observable_result": "Salesforce CLI holds an access token for the Developer Edition org.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Run the REST Quick Start discovery, Account query, and BillingCity PATCH sequence with cURL or an equivalent REST client.",
+      "required_fields": [
+        {"label": "Access token", "field_type": "other", "evidence_state": "documented", "source_ids": ["S4", "S5"]},
+        {"label": "Account Id and BillingCity value", "field_type": "other", "evidence_state": "documented", "source_ids": ["S5"]}
+      ],
+      "observable_result": "The PATCH returns HTTP 204 and the Account BillingCity update is visible in Salesforce.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "An accessible email inbox is required to activate the Developer Edition org.", "source_ids": ["S3"]},
+    {"description": "The user profile must have the API Enabled permission before REST calls succeed.", "source_ids": ["S1", "S3"]}
+  ],
+  "external_gates": [
+    {"description": "Developer Edition signup requires accepting Salesforce developer and API program terms on the live form.", "source_ids": ["S2"]},
+    {"description": "CLI authentication requires authorizing Salesforce CLI as a connected app in the browser.", "source_ids": ["S4"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Salesforce must deliver the activation or welcome email and provision the Developer Edition org before first login.", "source_ids": ["S3"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Salesforce provisions a free Developer Edition org after signup and verification.", "source_ids": ["S1", "S3"]},
+    {"description": "Salesforce CLI authentication yields an access token usable for REST requests.", "source_ids": ["S4"]},
+    {"description": "A successful Account PATCH returns HTTP 204 and persists the BillingCity change.", "source_ids": ["S5"]}
+  ],
+  "excluded": [
+    {"item": "Reading REST API conceptual documentation beyond the Quick Start steps", "reason": "Documentation reading is evidence, not a measured product action.", "source_ids": ["S1"]},
+    {"item": "Creating a custom Connected App instead of using Salesforce CLI", "reason": "The Quick Start documents Salesforce CLI as the convenience auth path that requires no Connected App configuration.", "source_ids": ["S4"]},
+    {"item": "Apex, Lightning, GraphQL, Bulk, Marketing, Commerce, or Data Cloud onboarding", "reason": "Those are alternate product surfaces, not part of the REST Quick Start candidate.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "REST API Quick Start", "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart.htm", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Developer Edition signup as step one", "CLI authentication convenience path", "REST sample sequence boundary"]},
+    {"id": "S2", "title": "Sign up for your Developer Edition", "url": "https://developer.salesforce.com/signup", "source_type": "observed-public-ui", "accessed_at": "2026-07-22", "evidence_supported": ["First name, last name, job title, company, country/region, and work email", "MSA / Program Agreement / API Terms checkbox", "AI features and inactivity acknowledgement", "Free Developer Edition positioning"]},
+    {"id": "S3", "title": "Step One: Sign up for Salesforce Developer Edition", "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_dev_org.htm", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Signup URL", "API Enabled permission prerequisite", "Developer Edition suitability for examples"]},
+    {"id": "S4", "title": "Step Two: Set Up Authentication", "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_oauth.htm", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Salesforce CLI connected-app authentication", "Access token requirement"]},
+    {"id": "S5", "title": "Step Three: Walk Through the Sample Code", "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/quickstart_code.htm", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Account query and BillingCity PATCH", "HTTP 204 success signal"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Salesforce product surface should define the organization-wide first mile: REST API, Apex, Lightning, GraphQL, Bulk, Marketing, Commerce, Data Cloud, or another surface?",
+      "impact": "The choice changes required tools, fields, permissions, and the observable first-success terminal.",
+      "evidence_needed": "A bounded developer goal that names one surface, then a cold walkthrough of that surface from account creation to its official first success."
+    },
+    {
+      "question": "Do CAPTCHA, username uniqueness, or other post-submit challenges appear after the observed Developer Edition signup fields for a fresh participant?",
+      "impact": "Additional anti-abuse or username controls would change the verified required-field count even for the REST candidate.",
+      "evidence_needed": "A dated full-page screenshot or read-only walkthrough of developer.salesforce.com/signup through successful submission for a new identity."
+    }
+  ],
+  "counts": null
+}

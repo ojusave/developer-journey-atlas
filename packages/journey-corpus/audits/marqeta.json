@@ -1,0 +1,343 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Marqeta",
+    "slug": "marqeta",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "71b6283186b6a8aedd56309f684c3b12c0f609e461f56e646a434c0e76d8eaf6",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can verify.",
+      "No Marqeta.com account, public sandbox, or API credentials exist yet.",
+      "Public sandbox simulation is in scope; private sandbox and production card programs are out of scope."
+    ]
+  },
+  "developer_goal": "Create a Marqeta.com account and complete the earliest official Core API Quick Start first success through a simulated sandbox transaction.",
+  "first_success": {
+    "outcome": "A simulated $10 VISA authorization completes in the public sandbox for a card created in the Quick Start.",
+    "observable_signal": "The simulations cardtransactions authorization request succeeds and Transaction Timeline can show the simulated transaction for the active card token.",
+    "source_ids": ["S2", "S5"]
+  },
+  "route_selection": {
+    "surface": "Marqeta Core API Quick Start plus Marqeta.com account and Dashboard",
+    "rule": "Select the shortest complete account-to-simulated-transaction path only after sandbox provisioning order and request surface (interactive widget versus cURL) are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Account creation auto-provisions sandbox and user, then card product, card, and simulation",
+        "status": "unresolved",
+        "reason": "Core API Quick Start and Account Management state that creating a Marqeta.com account also creates a sandbox and a user."
+      },
+      {
+        "name": "Sign in, Create sandbox, wait for ready email, then create user via API or widget",
+        "status": "unresolved",
+        "reason": "The same Quick Start separately instructs Create sandbox, email wait, Dashboard credentials, and a POST /users step after account creation."
+      },
+      {
+        "name": "Interactive docs widgets versus Sample cURLs for user, card, and simulation",
+        "status": "unresolved",
+        "reason": "Widgets require signed-in docs sessions; Sample cURLs use Dashboard Basic-auth keys. Action counts differ without a named default."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Marqeta.com account from the official create-account form.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Last name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"],
+          "notes": "Public UI requires at least 16 characters with lower case, capital letters, numbers, and symbols."
+        },
+        {
+          "label": "Confirm password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Terms of Service",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "Marqeta accepts the account registration and begins verification.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Complete account verification from the Marqeta email, then sign in.",
+      "required_fields": [
+        {
+          "label": "Account verification",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer is authenticated to Marqeta.com and can open Docs or Dashboard.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Resolve sandbox readiness and obtain Application token, Admin access token, and Base URL from the Dashboard.",
+      "required_fields": [
+        {
+          "label": "Sandbox provisioning path",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3"],
+          "notes": "Docs conflict on whether Create sandbox is still required after account creation auto-provisions a sandbox."
+        },
+        {
+          "label": "Application token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S5"]
+        },
+        {
+          "label": "Admin access token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S5"]
+        },
+        {
+          "label": "Base URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S5"]
+        }
+      ],
+      "observable_result": "Public sandbox API credentials are available for authenticated requests.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S5"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Create or obtain the Quick Start user, retrieve a Reloadable Card product token, create a card, and simulate the $10 authorization.",
+      "required_fields": [
+        {
+          "label": "Request surface (docs widget versus cURL)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "User first_name and last_name (minimal create)",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "May be skipped if account creation already provisioned a usable user token; unresolved against Create a user step."
+        },
+        {
+          "label": "user_token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "card_product_token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "card token for simulation",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The simulated authorization completes for the active card.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open Transaction Timeline for the active card token and confirm the simulated transaction history.",
+      "required_fields": [],
+      "observable_result": "Transaction Timeline displays the simulated card transaction.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Access to Marqeta Docs while signed in if using interactive widgets, or a client able to call sandbox-api.marqeta.com with Basic auth.",
+      "source_ids": ["S2", "S5"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account email verification is required before signing in and using the Dashboard or widgets.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Account verification email delivery is required before sign-in.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "If Create sandbox remains required, Marqeta emails when the sandbox is ready before Dashboard credentials appear.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Marqeta creates the Marqeta.com account and, depending on route interpretation, a public sandbox and user.",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "description": "Dashboard exposes Application token, Admin access token, Base URL, and a sample sandbox cURL.",
+      "source_ids": ["S5"]
+    },
+    {
+      "description": "Simulation and Transaction Timeline reflect the authorized test transaction.",
+      "source_ids": ["S2", "S5"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Webhook notification setup after the simulated transaction",
+      "reason": "Core API Quick Start lists webhook setup as an additional learning goal after the Transact step.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Optional Marqeta news and updates checkbox",
+      "reason": "The create-account form presents marketing email as optional.",
+      "source_ids": ["S4"]
+    },
+    {
+      "item": "Private sandbox and production program operations",
+      "reason": "Quick Start targets public sandbox learning and warns production behavior differs.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Marqeta documentation",
+      "url": "https://www.marqeta.com/docs/developer-guides",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Core API Quick Start entry",
+        "Sandbox and credentials entry points"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Core API Quick Start",
+      "url": "https://www.marqeta.com/docs/developer-guides/core-api-quick-start",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account signup link",
+        "Create sandbox instructions",
+        "User, card product, and card steps",
+        "Simulate $10 authorization",
+        "Widget versus Sample cURLs"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Marqeta.com Account Management",
+      "url": "https://www.marqeta.com/docs/developer-guides/marqeta-account-management",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account creation also creates sandbox and user claim",
+        "Dashboard API key and timeline access"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Marqeta create account",
+      "url": "https://auth.marqeta.com/create-account",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email, first name, last name",
+        "Password rules and confirm password",
+        "Terms of Service",
+        "Optional news checkbox"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Developer Tools",
+      "url": "https://www.marqeta.com/docs/developer-guides/developer-tools",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Application and admin access tokens",
+        "Base URL",
+        "Transaction history tools"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does Marqeta.com account creation already provision the first sandbox and user, or must the developer still Create sandbox and POST /users?",
+      "impact": "Provisioning order changes required actions, waits, and whether user_token creation is mandatory.",
+      "evidence_needed": "A dated fresh-account walkthrough showing whether Create sandbox and Create a user still appear after signup."
+    },
+    {
+      "question": "Are interactive docs widgets or Sample cURLs the canonical request surface for the shortest Transact path?",
+      "impact": "Widgets and cURL change auth setup and whether Dashboard key copying is on the critical path.",
+      "evidence_needed": "Official recommendation of one request surface for Core API Quick Start first success."
+    }
+  ],
+  "counts": null
+}

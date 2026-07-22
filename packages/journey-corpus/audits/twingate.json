@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Twingate",
+    "slug": "twingate",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "fd609040eea7f58531b43ac636b51e7125cbbc4b104696e61763a70182935d65",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email address, and a device that can install the Twingate Client.",
+      "No Twingate account, Remote Network, Resource, Connector, or Client session exists yet.",
+      "The developer can deploy a Connector on a host that can reach the private Resource."
+    ]
+  },
+  "developer_goal": "Create a Twingate account, protect a private Resource, and access that Resource from the Twingate Client.",
+  "first_success": {
+    "outcome": "An authenticated Twingate Client reaches the configured private Resource from the developer's device.",
+    "observable_signal": "Once connected and authenticated, the Resource address opens directly from the Client device.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Twingate Private Access Quick Start",
+    "rule": "Use the official Quick Start after account creation, but only after signup fields and one Connector plus Client platform path are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Manual Quick Start with free signup",
+        "status": "unresolved",
+        "reason": "Official general route for Remote Network, Resource, Connector, and Client access, but signup is an opaque prerequisite and Connector deployment options are environment-specific peers."
+      },
+      {
+        "name": "Automated Deployment alternative",
+        "status": "unresolved",
+        "reason": "Quick Start presents automated deployment as an alternative to the manual general route without ranking it as subordinate for every developer."
+      },
+      {
+        "name": "API getting started",
+        "status": "not-selected",
+        "reason": "Assumes an existing tenant and API key and targets automation rather than first private Resource access."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a free Twingate account at the official signup URL.",
+      "required_fields": [
+        {
+          "label": "Signup and initial tenant fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "Quick Start requires an account and links signup, but does not document identity provider choice, verification, or whether a Remote Network is created during signup."
+        }
+      ],
+      "observable_result": "The developer can open the Twingate Admin Console for a new tenant.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Remote Network if signup did not already create one.",
+      "required_fields": [
+        {
+          "label": "Remote Network location",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Remote Network name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "A Remote Network exists in the Admin Console.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add a Resource and authorize the Everyone group.",
+      "required_fields": [
+        {
+          "label": "Resource address and details",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S3"]
+        },
+        {
+          "label": "Authorized group",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Everyone is the only available group unless custom groups already exist."
+        }
+      ],
+      "observable_result": "The Resource is created and granted to a group.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Deploy a Connector on a host that can reach the Resource using one of the displayed deployment methods.",
+      "required_fields": [
+        {
+          "label": "Connector deployment method and host commands",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "Quick Start presents multiple environment-specific Connector options without selecting one universal path."
+        }
+      ],
+      "observable_result": "Connector Connection Status shows successful Controller and Relay connectivity.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Install the Twingate Client and authenticate.",
+      "required_fields": [
+        {
+          "label": "Client platform install and authentication",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "get.twingate.com covers multiple OS clients; required auth fields are not enumerated in the Quick Start."
+        }
+      ],
+      "observable_result": "The Client is connected and authenticated to the tenant.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open the configured Resource address from the Client device.",
+      "required_fields": [],
+      "observable_result": "The protected Resource is reachable directly from the device.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Sufficient permissions to deploy a Docker container or native Linux service on the Remote Network host.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "A private Resource address the Connector host can reach.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Connector deployment requires administrative access to a reachable remote host outside the Twingate Admin Console.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "After Connector deploy starts, Connection Status must show Controller and Relay connectivity before the Connector can serve requests.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "A connected Connector provides encrypted access into the Remote Network for authorized Resources.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "An authenticated Client can open authorized Resource addresses from the device network path Twingate provides.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Quick Start documentation as a measured action",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Team management, security policies, and Services for CI/CD",
+      "reason": "Quick Start places these under Next Steps after Resource access.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quick Start",
+      "url": "https://www.twingate.com/docs/quick-start",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account prerequisite and free signup link",
+        "Remote Network and Resource creation",
+        "Everyone group authorization",
+        "Connector deploy options and Connection Status",
+        "Client install and Resource access terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Twingate signup",
+      "url": "https://auth.twingate.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Official signup entry URL referenced by Quick Start"]
+    },
+    {
+      "id": "S3",
+      "title": "Resources",
+      "url": "https://www.twingate.com/docs/resources/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Resource address definition detail"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What is the complete current Twingate signup, identity, verification, and initial Remote Network sequence?",
+      "impact": "All required account-creation fields and whether a Remote Network is created during signup remain unknown, so the path cannot be verified from account creation.",
+      "evidence_needed": "Dated screenshots or a read-only walkthrough from auth.twingate.com/signup through the Admin Console state that enters Quick Start configuration."
+    },
+    {
+      "question": "Which Connector deployment method and Client platform define the selected first-mile path?",
+      "impact": "Installation commands, screen counts, and host prerequisites change by environment and OS.",
+      "evidence_needed": "Fix one Connector target (for example Docker on Linux) and one Client OS, then verify the complete deploy and auth steps against current Console UI."
+    }
+  ],
+  "counts": null
+}

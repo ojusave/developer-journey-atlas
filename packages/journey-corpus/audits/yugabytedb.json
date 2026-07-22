@@ -1,0 +1,301 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "YugabyteDB",
+    "slug": "yugabytedb",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "3b9b08bac4954bccac0696865fc91af6c741f8fc9b2f473a3907ab6ef8df37a8",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer can use a browser for YugabyteDB Aeon or Docker for a local cluster.",
+      "No Aeon account, Sandbox cluster, or local container is assumed to exist yet.",
+      "No payment method is assumed for the Sandbox path, which docs say requires no credit card."
+    ]
+  },
+  "developer_goal": "Reach a usable YSQL shell against a free YugabyteDB cluster using the vendor's primary getting-started route.",
+  "first_success": {
+    "outcome": "A YSQL shell session is open against a running free cluster.",
+    "observable_signal": "The shell shows a ysqlsh prompt such as yugabyte=> or yugabyte=#.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "YugabyteDB Aeon Cloud Portal self-service web, with local Docker as a documented alternate",
+    "rule": "Journeys begin at account creation when a self-service cloud path exists; Aeon docs call Sandbox the quickest start, but signup fields are not publicly reconstructable and local Docker is a complete no-account alternate.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "YugabyteDB Aeon signup, Sandbox cluster, Cloud Shell YSQL",
+        "status": "unresolved",
+        "reason": "Official Aeon quick start calls this the quickest path and documents Sandbox plus Cloud Shell, but signup form fields, verification, and first-login tutorial screens are not enumerated."
+      },
+      {
+        "name": "YugabyteDB Aeon signup then 15-minute Get Started tutorial",
+        "status": "unresolved",
+        "reason": "Docs say first login offers a guided tutorial that connects, loads sample data, and explores a sample app, without publishing ordered UI steps or a completion signal."
+      },
+      {
+        "name": "Local Docker quick start to ysqlsh",
+        "status": "unresolved",
+        "reason": "Fully documented pull, run, status, and ysqlsh commands without an account, but it bypasses the account-creation boundary used for managed peers and is marked for advanced Docker users."
+      },
+      {
+        "name": "Dedicated cluster or desktop client shell",
+        "status": "not-selected",
+        "reason": "Requires billing or trial access and additional client or topology configuration after account access."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for YugabyteDB Aeon if the selected route is the managed Sandbox path.",
+      "required_fields": [
+        {
+          "label": "Aeon signup fields and agreements",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Docs link signup but do not list required inputs; public signup shell does not expose the form without client-side app execution."
+        }
+      ],
+      "observable_result": "The developer can log in to YugabyteDB Aeon.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Sandbox cluster with name, cloud provider, region, compatibility options, IP allow list, and downloaded admin credentials.",
+      "required_fields": [
+        {
+          "label": "Cluster name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Cloud provider",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Enhanced Postgres Compatibility",
+          "field_type": "checkbox",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Current IP address allow list entry",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Aeon provisions the Sandbox cluster and shows the cluster Overview when ready.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Launch Cloud Shell, confirm database and user, and enter the admin password to reach ysqlsh.",
+      "required_fields": [
+        {
+          "label": "Database name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "User name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "API type YSQL",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Admin database password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Cloud Shell displays the ysqlsh prompt.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Docker runtime is required only if the local Docker candidate is selected instead of Aeon.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Managed Sandbox path requires completing Aeon signup and login before Create Cluster.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Sandbox provisioning takes around five minutes after Create Cluster.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Cloud Shell can take up to about thirty seconds to become ready.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Aeon bootstraps and provisions the Sandbox cluster and configures YugabyteDB.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Cloud Shell opens a browser ysqlsh session against the cluster.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional getting-started survey during provisioning",
+      "reason": "Documented as optional while waiting for the cluster.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Sample application language tutorials after Cloud Shell",
+      "reason": "Begin after a cluster and CA or IP prerequisites beyond first shell access.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Reading Explore YSQL after local Docker connect",
+      "reason": "Occurs after the ysqlsh prompt on the local route.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "YugabyteDB Aeon quick start",
+      "url": "https://docs.yugabyte.com/stable/yugabyte-cloud/cloud-quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup login create cluster framing",
+        "Sandbox wizard fields",
+        "Provisioning wait",
+        "Cloud Shell YSQL terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "YugabyteDB Aeon signup",
+      "url": "https://cloud.yugabyte.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup URL referenced by docs",
+        "Unauthenticated static response does not enumerate form fields"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "YugabyteDB Quick start for Docker",
+      "url": "https://docs.yugabyte.com/stable/quick-start/docker/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Docker pull run status and ysqlsh commands",
+        "Local no-account alternate"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact fields, agreements, verification, and login methods appear in self-service Aeon signup?",
+      "impact": "Without signup evidence the account-creation boundary for the managed route cannot be counted or verified.",
+      "evidence_needed": "Dated fresh-account screenshots or a read-only walkthrough of cloud.yugabyte.com/signup through first login."
+    },
+    {
+      "question": "Should the atlas route prefer Aeon Sandbox with account creation or the fully documented local Docker path?",
+      "impact": "Cloud versus local changes whether account creation applies, action count, waits, and first-success surface.",
+      "evidence_needed": "Human judgment applying SELECTION-POLICY account-creation and self-service-web rules against the complete Docker alternate."
+    },
+    {
+      "question": "If Aeon is selected, is first success the Cloud Shell prompt or completion of the first-login 15-minute Get Started tutorial?",
+      "impact": "The tutorial adds unknown screens and sample-data steps beyond Cloud Shell.",
+      "evidence_needed": "Official enumeration or a recorded tutorial completion signal."
+    }
+  ],
+  "counts": null
+}

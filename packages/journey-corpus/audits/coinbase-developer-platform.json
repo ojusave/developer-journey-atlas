@@ -1,0 +1,260 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Coinbase Developer Platform",
+    "slug": "coinbase-developer-platform",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "481be0654357aebe32f80de59ed80f6322a79c9299506ebe0e5405f85cff637f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, an email address, and a local Node.js 22+ or Python 3.10+ runtime when following an SDK quickstart.",
+      "No CDP Portal account, project, API key, or Wallet Secret exists yet.",
+      "Sandbox or non-custodial first success is acceptable unless a custodial route is deliberately selected."
+    ]
+  },
+  "developer_goal": "Create a CDP Portal account and reach the earliest official first-success outcome for a chosen CDP product and custody model.",
+  "first_success": {
+    "outcome": "Unresolved among API Key Wallet account creation, User Auth wallets, custodial APIs after business verification, and CDP CLI/agentic quickstarts.",
+    "observable_signal": "The API Key Wallet quickstart prints Created EVM account with a 0x address, but peer product families define different terminals and eligibility rules.",
+    "source_ids": ["S1", "S3", "S4"]
+  },
+  "route_selection": {
+    "surface": "CDP Portal signup plus official CDP docs quickstarts",
+    "rule": "Select the shortest complete account-to-first-success route only after product family, custody model, auth model, and runtime are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Non-custodial API Key Wallet SDK quickstart (create EVM account)",
+        "status": "unresolved",
+        "reason": "Official intro says non-custodial APIs are available immediately after signup, and the API Key Wallet quickstart demonstrates terminal account creation, but it is one product family among peers."
+      },
+      {
+        "name": "Non-custodial User Auth wallets",
+        "status": "unresolved",
+        "reason": "Official wallets docs present a separate user-auth quickstart with different credentials, client setup, and first-success semantics."
+      },
+      {
+        "name": "Custodial APIs after verified business account link",
+        "status": "unresolved",
+        "reason": "Official intro requires a verified business account linked to CDP; eligibility, actors, and first operations differ from non-custodial routes."
+      },
+      {
+        "name": "CDP CLI or Agentic Wallet CLI quickstart",
+        "status": "unresolved",
+        "reason": "Official CLI docs offer create-and-fund flows that reach wallet outcomes on a different interaction surface than the SDK quickstart."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up at the CDP Portal and open the default project.",
+      "required_fields": [
+        {
+          "label": "CDP Portal signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S4"],
+          "notes": "Initial Setup documents signup at portal.cdp.coinbase.com, but the live portal did not expose a public field inventory (fetch blocked)."
+        }
+      ],
+      "observable_result": "The developer can open the CDP Portal and manage API keys for a project.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose the CDP product family and custody model for the measured first-success route.",
+      "required_fields": [
+        {
+          "label": "Product and custody model",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "Official intro separates non-custodial and custodial API sets with different eligibility."
+        }
+      ],
+      "observable_result": "One product family is selected as the measured route.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the credentials required by the selected authentication model.",
+      "required_fields": [
+        {
+          "label": "Secret API key ID and secret",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3", "S4"]
+        },
+        {
+          "label": "Wallet Secret",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"],
+          "notes": "Required for API Key Wallet write operations; other auth models differ."
+        }
+      ],
+      "observable_result": "Credentials for the selected auth model are available to the developer.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3", "S4"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Configure the selected SDK or CLI and run the first documented operation for that product.",
+      "required_fields": [
+        {
+          "label": "Runtime and credential environment variables",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3", "S4"]
+        },
+        {
+          "label": "First operation (network, account type, command)",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S3", "S5"],
+          "notes": "EVM versus Solana, SDK versus CLI, and create versus fund change the terminal."
+        }
+      ],
+      "observable_result": "The selected official quickstart reaches its documented first-success signal.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Node.js 22+ or Python 3.10+ is required for the documented API Key Wallet SDK path.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "Custodial API groups require a verified business account linked to CDP.",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Business verification and account linking gate custodial API access.",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Business verification approval may be required before custodial routes become available.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "CDP creates a first project automatically after Portal signup.",
+      "source_ids": ["S4"]
+    },
+    {
+      "description": "For the API Key Wallet route, CDP returns a created account address after createAccount.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading the full CDP API overview and authentication guide",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "item": "Funding via faucet or sending a transaction after account creation",
+      "reason": "The API Key Wallet quickstart demonstrates create-account before optional fund and send steps.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Switching Portal from Sandbox to Live",
+      "reason": "Initial Setup presents Live keys as a later go-live step.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Welcome to CDP API",
+      "url": "https://docs.cdp.coinbase.com/api-reference/v2/introduction",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Non-custodial versus custodial API split",
+        "Immediate signup eligibility for non-custodial APIs",
+        "Business verification requirement for custodial groups"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API Authentication",
+      "url": "https://docs.cdp.coinbase.com/api-reference/v2/authentication",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Secret API Key",
+        "Client API Key",
+        "Wallet Secret requirements"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Quickstart: API Key Wallet",
+      "url": "https://docs.cdp.coinbase.com/wallets/quickstart/api-key-auth",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Portal account prerequisite",
+        "API key and Wallet Secret setup",
+        "Created EVM account terminal example"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Initial Setup",
+      "url": "https://docs.cdp.coinbase.com/get-started/initial-setup",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Portal signup URL",
+        "API key and wallet secret download",
+        "Business link and Live switch guidance"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Agentic Wallet CLI Quickstart",
+      "url": "https://docs.cdp.coinbase.com/agentic-wallet/cli/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Alternate CLI first-success surface"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which CDP product family and custody model should define corpus first success?",
+      "impact": "It changes eligibility, credentials, implementation surface, waits, and the observable terminal.",
+      "evidence_needed": "A corpus policy choice among non-custodial API Key Wallet, User Auth wallets, custodial APIs, and CLI/agentic routes, then a fresh walkthrough of that one route."
+    },
+    {
+      "question": "What exact live screens and required fields create a new CDP Portal account?",
+      "impact": "Signup field counts and verification steps cannot be verified without a public form inventory or authenticated walkthrough.",
+      "evidence_needed": "A dated read-only capture of portal.cdp.coinbase.com signup fields and any email or entity verification gates."
+    }
+  ],
+  "counts": null
+}

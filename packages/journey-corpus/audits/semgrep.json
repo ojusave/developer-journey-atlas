@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Semgrep",
+    "slug": "semgrep",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "ba706e0f24a3af427e6af428cfa288bfec26a51f6fb266b1ca03c8fa1c606536",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
+    ]
+  },
+  "developer_goal": "Reach first Semgrep scan success, resolving whether Community Edition no-account CLI or AppSec Platform cloud onboarding is the selected route.",
+  "first_success": {
+    "outcome": "Either Semgrep CE reports a successful sample scan finding, or AppSec Platform CLI login completes a first project scan, depending on route.",
+    "observable_signal": "Terminal shows Scan completed successfully or semgrep ci finishes for the selected route.",
+    "source_ids": [
+      "S1",
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "Semgrep Community Edition quickstart versus Semgrep AppSec Platform quickstart",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Semgrep Community Edition no-account Python sample scan",
+        "status": "unresolved",
+        "reason": "No-account path may win lexicographically; OS/package-manager variants still need a fixed install route."
+      },
+      {
+        "name": "Semgrep AppSec Platform GitHub/GitLab signup then semgrep ci",
+        "status": "unresolved",
+        "reason": "Requires org creation and IdP permissions; different product surface and terminal."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Semgrep AppSec Platform organization if the cloud route is selected.",
+      "required_fields": [
+        {
+          "label": "Continue with GitHub or GitLab",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Organization display name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "A Semgrep organization exists and CLI scan instructions are shown.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install Semgrep CLI for the selected OS route.",
+      "required_fields": [
+        {
+          "label": "Install command",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S3"
+          ],
+          "notes": "pipx, uv, brew, and OS-specific variants are peers."
+        }
+      ],
+      "observable_result": "semgrep --version succeeds.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Run the selected first scan command.",
+      "required_fields": [
+        {
+          "label": "semgrep scan or semgrep ci command",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "Scan completes with the documented success signal for the selected route.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Python 3.10+ is required where the AppSec Platform CLI route runs.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "Community Edition quickstart has its own OS prerequisites.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "GitHub or GitLab OAuth permissions for the AppSec Platform route.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Semgrep reports findings or a successful scan completion message.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Homebrew install when using preferred pipx or uv on macOS AppSec route",
+      "reason": "Docs mark Homebrew as best-effort and often lagging.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Semgrep Community Edition",
+      "url": "https://docs.semgrep.dev/getting-started/quickstart-ce",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "CE no-account quickstart"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Prerequisites",
+      "url": "https://docs.semgrep.dev/prerequisites",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Prerequisites"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Quickstart",
+      "url": "https://docs.semgrep.dev/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "AppSec Platform signup and CLI scan"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Local scans with Semgrep",
+      "url": "https://docs.semgrep.dev/getting-started/cli",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "CLI local scans"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should first success be Community Edition no-account CLI or AppSec Platform cloud onboarding?",
+      "impact": "These routes differ on account creation, IdP gates, and scan commands.",
+      "evidence_needed": "Explicit corpus selection of one Semgrep first-mile product surface."
+    },
+    {
+      "question": "Which install method and OS should be fixed for the selected route?",
+      "impact": "Changes required commands.",
+      "evidence_needed": "Pick one OS and preferred installer, then verify against current docs."
+    }
+  ],
+  "counts": null
+}

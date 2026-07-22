@@ -1,0 +1,231 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Microsoft Azure",
+    "slug": "microsoft-azure",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "0529be3566b9ac4c67e6498dd54e4e4eca22361e293afb2385d065aeee59948f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, a phone number, and a credit or debit card for identity verification.",
+      "The developer can use a Microsoft account or GitHub account identity.",
+      "No Azure subscription, sample deployment, or developer-tool environment exists yet."
+    ]
+  },
+  "developer_goal": "Create an Azure account and reach the earliest meaningful Azure developer first-success outcome.",
+  "first_success": {
+    "outcome": "Unresolved: the developer-intro quickstart ends after deploying a sample app, inspecting resources, and using GitHub Copilot for Azure, while other official portals offer different first resources.",
+    "observable_signal": "Candidates include a deployed to-do app URL, portal Quickstart Center completion, or a portal VM.",
+    "source_ids": ["S1", "S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "Azure free account signup and Azure developer documentation",
+    "rule": "Prefer the vendor developer-intro quickstart only if Copilot and tool prerequisites are accepted as part of the same first success; otherwise treat portal and azd-only routes as consequential alternatives.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Quickstart: Get started with Azure developer tools",
+        "status": "unresolved",
+        "reason": "Single quickstart under Introduction to Azure for developers, but terminal includes GitHub Copilot for Azure and a Copilot subscription prerequisite."
+      },
+      {
+        "name": "Browser VS Code for the Web versus local tool install",
+        "status": "unresolved",
+        "reason": "The same quickstart offers two environment branches with different install burden before azd deploy."
+      },
+      {
+        "name": "Azure Quickstart Center or portal VM quickstart",
+        "status": "unresolved",
+        "reason": "Official portal routes reach different environment-setup or VM outcomes and are not the developer-intro quickstart."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for an Azure free account or pay-as-you-go account using a Microsoft or GitHub identity.",
+      "required_fields": [
+        {
+          "label": "Microsoft account or GitHub account",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "FAQ states either identity works; live form controls after identity sign-in were not fully observed."
+        },
+        {
+          "label": "Phone number",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Credit or debit card",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "Used for identity verification; temporary authorization may appear."
+        }
+      ],
+      "observable_result": "An Azure subscription is available to the signed-in identity.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose the first-success route: developer-tools quickstart, Quickstart Center, or another portal product quickstart.",
+      "required_fields": [
+        {
+          "label": "First-success route",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2", "S3"]
+        }
+      ],
+      "observable_result": "One bounded Azure onboarding path is fixed.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "ide",
+      "action": "If using the developer-tools quickstart, open VS Code for the Web or a local environment and complete the selected tool setup.",
+      "required_fields": [
+        {
+          "label": "Environment branch",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "GitHub Copilot subscription for Copilot-for-Azure terminal",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Required for the guide's stated Copilot hands-on terminal; may be out of scope if first success stops at deploy verification."
+        }
+      ],
+      "observable_result": "The chosen Azure developer tool environment can authenticate and run azd.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Phone number plus credit or debit card for Azure account identity verification.",
+      "source_ids": ["S4"]
+    },
+    {
+      "description": "For the developer-tools quickstart Copilot exercise, a GitHub Copilot subscription.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Payment-method identity verification with a possible temporary authorization hold.",
+      "source_ids": ["S4"]
+    },
+    {
+      "description": "GitHub authorization when signing up or signing in with GitHub.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "azd up provisioning and deployment of the sample App Service and Cosmos DB resources before the app URL can be opened.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Azure free account signup grants $200 credit for 30 days and free-tier monthly amounts when eligibility checks pass.",
+      "source_ids": ["S4"]
+    },
+    {
+      "description": "azd up creates the resource group, provisions services, and deploys the sample application for the developer-tools quickstart.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Introduction to Azure for developers",
+      "reason": "Documentation reading is not a counted product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Next steps and cleanup after the developer-tools quickstart",
+      "reason": "Official guide places cleanup after the demonstrated terminal exercises.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Introduction to Azure for developers",
+      "url": "https://learn.microsoft.com/en-us/azure/developer/intro/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Single Quickstart link under Get started",
+        "Developer onboarding framing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Quickstart: Get started with Azure developer tools",
+      "url": "https://learn.microsoft.com/en-us/azure/developer/intro/quickstart-developer-tools",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Browser versus local tool branches",
+        "azd init and azd up sample deploy",
+        "Resource and log inspection",
+        "GitHub Copilot for Azure terminal"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get started with the Azure Quickstart Center",
+      "url": "https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-quickstart-center",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Portal-oriented alternate onboarding"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create Your Azure Free Account Or Pay As You Go",
+      "url": "https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free versus pay-as-you-go offers",
+        "Phone and card requirements",
+        "Microsoft or GitHub identity options",
+        "Temporary verification authorization"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does first success stop when the deployed to-do URL works, or must it include Copilot for Azure as the guide's stated terminal?",
+      "impact": "Including Copilot adds a paid GitHub Copilot subscription gate and extra IDE actions.",
+      "evidence_needed": "Human decision on the measurement boundary, then re-audit the selected terminal against the current quickstart."
+    },
+    {
+      "question": "What exact signup form fields appear after Microsoft or GitHub sign-in on signup.azure.com?",
+      "impact": "Account field counts remain partly FAQ-level rather than observed-public-ui.",
+      "evidence_needed": "Dated screenshots of the live Azure free-account signup wizard for a new identity."
+    }
+  ],
+  "counts": null
+}

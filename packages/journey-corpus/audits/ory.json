@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Ory",
+    "slug": "ory",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "2ece140117b64f391ce74b7de6dc2f8039175484974ed28eef513ba98effbaa8",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and either local Docker tooling or access to Ory Network signup.",
+      "No Ory Network project and no local Ory Kratos quickstart stack exist yet."
+    ]
+  },
+  "developer_goal": "Reach the earliest meaningful first authenticated identity success on Ory, either by creating an Ory Network project or by completing the local Ory Kratos quickstart registration and verification flow.",
+  "first_success": {
+    "outcome": "Either an Ory Network developer project is usable for identity flows, or a local Kratos identity is registered, email-verified through MailSlurper, and shows an active verified session.",
+    "observable_signal": "For local Kratos: /welcome after verification and /sessions showing verified: true. For Ory Network: unresolved until the selected Network first-success terminal is fixed.",
+    "source_ids": ["S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "Ory Network console versus Ory Kratos local Docker quickstart",
+    "rule": "The audit boundary starts at account creation and prefers self-service web onboarding when one exists; Ory Network signup and local OSS Kratos are consequential peers that must be ranked before counting.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Ory Network free developer project signup",
+        "status": "unresolved",
+        "reason": "Official Network docs invite signup for a free developer project and provide a console registration URL, matching the account-creation boundary and self-service web surface, but the complete first authenticated-app terminal after signup is not fixed here."
+      },
+      {
+        "name": "Ory Kratos local Docker quickstart",
+        "status": "unresolved",
+        "reason": "Documents a complete local registration, MailSlurper verification, and /sessions terminal without a SaaS account, but it is not a web account-creation route and conflicts with preferring an existing self-service Network surface."
+      },
+      {
+        "name": "Ory Network framework quickstarts such as Next.js or Express",
+        "status": "unresolved",
+        "reason": "Peer framework guides that assume or create Network projects; they are not ranked as a single universal first path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "other",
+      "action": "Create the first Ory identity-control-plane account or local bootstrap required by the selected route.",
+      "required_fields": [
+        {
+          "label": "Route-specific account or bootstrap inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3", "S4"],
+          "notes": "Network signup fields are not fully documented publicly; local Kratos has no SaaS signup and starts with git clone and docker compose."
+        }
+      ],
+      "observable_result": "Either an Ory Network project exists or the local Kratos stack is healthy.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Complete the selected route's first registration or project identity configuration through first success.",
+      "required_fields": [
+        {
+          "label": "Route-specific identity and verification inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S3"],
+          "notes": "Local Kratos documents email, name, and password for registration plus MailSlurper verification; Network first-user steps remain unresolved."
+        }
+      ],
+      "observable_result": "The selected route's first authenticated identity outcome is visible.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Local Kratos quickstart requires Git, Docker, Docker Compose, and free ports 4455, 4433, 4434, and 4436.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "Ory Network requires access to console registration for a developer project.",
+      "source_ids": ["S2", "S4"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Local docker compose may take minutes before Kratos public and admin HTTP servers report healthy.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Local quickstart MailSlurper captures verification email for the registered identity.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "Ory Network provides a managed identity stack after developer project signup.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Ory documentation as a measured action",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Production database backends beyond the quickstart SQLite volume",
+      "reason": "The Kratos quickstart defers production database setup to later guides.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Ory Documentation",
+      "url": "https://www.ory.com/docs/welcome",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Ory documentation entry and product family context"]
+    },
+    {
+      "id": "S2",
+      "title": "Introduction to Ory Network",
+      "url": "https://www.ory.com/docs/network/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Managed Network deployment model",
+        "Sign up for a free developer project",
+        "Console and Account Experience capabilities"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Ory Kratos Quickstart",
+      "url": "https://www.ory.com/docs/kratos/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Git and Docker Compose setup",
+        "Registration form",
+        "MailSlurper verification",
+        "/welcome and /sessions terminal"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create Your Ory Account",
+      "url": "https://console.ory.com/registration",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Ory Network registration entry URL"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Is the selected Ory first-mile route Ory Network account creation or the local Ory Kratos Docker quickstart?",
+      "impact": "Network matches the account-creation and self-service web boundary; local Kratos has a clearer documented verified-session terminal but no SaaS account. The routes are not interchangeable for counts.",
+      "evidence_needed": "A corpus decision that either prioritizes the Network console path and documents its first authenticated terminal, or explicitly accepts local OSS quickstarts when a managed signup also exists."
+    },
+    {
+      "question": "What exact fields and post-signup steps does console.ory.com/registration require before a developer can run a first identity flow?",
+      "impact": "Without observed Network signup and first-project steps, the account-creation path cannot be verified.",
+      "evidence_needed": "Dated read-only walkthrough of Ory Network registration through the earliest official authenticated-app or hosted-flow success."
+    }
+  ],
+  "counts": null
+}

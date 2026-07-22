@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "New Relic",
+    "slug": "new-relic",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "affe051c39471657d5c7439e2de2e29d7c5387897d5a2c4121a975810c45eaed",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No New Relic account, license key, or instrumentation exists yet."
+    ]
+  },
+  "developer_goal": "Create a New Relic account and see first application or system telemetry in New Relic.",
+  "first_success": {
+    "outcome": "First telemetry for the selected data source appears in the New Relic UI.",
+    "observable_signal": "For the Node.js APM candidate, APM shows data for the configured application name after the instrumented app receives traffic.",
+    "source_ids": [
+      "S4",
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "New Relic self-service signup and Add data / agent quickstarts",
+    "rule": "Select the shortest complete signup-to-first-data route only after one telemetry source is fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Region-specific Guided install",
+        "status": "unresolved",
+        "reason": "General Get started recommends guided install, but the authenticated dynamic chooser steps are not fully published as a static public path."
+      },
+      {
+        "name": "Node.js manual APM agent install",
+        "status": "unresolved",
+        "reason": "Complete public candidate, but Node is not established as the platform-wide default over other agents."
+      },
+      {
+        "name": "Other APM languages, Infrastructure, Browser, Mobile, Kubernetes, OpenTelemetry, and Instant Observability quickstarts",
+        "status": "unresolved",
+        "reason": "Co-equal data-source routes with different credentials, installers, and success views."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free New Relic account from the public signup form.",
+      "required_fields": [
+        {
+          "label": "Company Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S9"
+          ]
+        },
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S9"
+          ]
+        },
+        {
+          "label": "Terms of Service and Services Privacy Notice agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S9"
+          ],
+          "notes": "Signup copy states that signing up constitutes agreement."
+        }
+      ],
+      "observable_result": "New Relic begins account provisioning for the submitted identity.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": [
+        "S3",
+        "S9"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Complete email confirmation / account setup from New Relic mail, then sign in.",
+      "required_fields": [
+        {
+          "label": "Email confirmation / setup controls",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3",
+            "S6"
+          ],
+          "notes": "Account-setup docs point to signup and login troubleshooting but do not publish the exact confirmation field list."
+        }
+      ],
+      "observable_result": "The developer can sign in to New Relic.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Choose a telemetry source and complete its install until first data appears.",
+      "required_fields": [
+        {
+          "label": "Telemetry source / install path",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S4"
+          ]
+        },
+        {
+          "label": "Ingest license key and source-specific configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S5",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "New Relic UI shows first data for the selected source.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S4",
+        "S8"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For the Node.js candidate: an existing supported Node.js server application and compatible OS/runtime.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Email confirmation must succeed before instrumentation can use the new account.",
+      "source_ids": [
+        "S3",
+        "S6"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "After instrumentation and traffic, New Relic may take a few minutes before APM or other UIs show data.",
+      "source_ids": [
+        "S4",
+        "S8"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Free forever tier includes ingest allowance and platform user entitlements described on signup.",
+      "source_ids": [
+        "S3",
+        "S9"
+      ]
+    },
+    {
+      "description": "Agents and guided install report telemetry into NRDB for UI exploration.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading New Relic University or conceptual intro pages",
+      "reason": "Learning content is not a required product action.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Social signup via Google, GitHub, GitLab, or Bitbucket",
+      "reason": "Peer alternatives to the observed Company Email + Name form.",
+      "source_ids": [
+        "S9"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Install the Node.js agent",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/installation-configuration/install-nodejs-agent/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Node.js manual install candidate steps"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get started with New Relic",
+      "url": "https://docs.newrelic.com/docs/new-relic-solutions/get-started/intro-new-relic/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Many capabilities",
+        "Guided install oriented onboarding"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign up for New Relic",
+      "url": "https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/create-your-new-relic-account/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free account positioning",
+        "Signup CTA",
+        "Next steps after signup"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Monitor your Node.js application",
+      "url": "https://docs.newrelic.com/docs/apm/agents/nodejs-agent/getting-started/monitor-your-nodejs-app/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multiple Node deploy paths",
+        "APM-oriented first monitoring"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "New Relic API keys",
+      "url": "https://docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "License and ingest key concepts"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Login troubleshooting",
+      "url": "https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/troubleshoot-new-relics-password-email-address-login-problems/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email/password login problem space"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Not seeing data",
+      "url": "https://docs.newrelic.com/docs/new-relic-solutions/solve-common-issues/troubleshooting/not-seeing-data/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Data delay and missing-data troubleshooting"
+      ]
+    },
+    {
+      "id": "S9",
+      "title": "New Relic signup",
+      "url": "https://newrelic.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Company Email",
+        "Name",
+        "Get Started Free",
+        "Terms agreement by signup",
+        "No credit card required"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which telemetry source should represent New Relic's shortest path to first success?",
+      "impact": "Credentials, installer, permissions, traffic generation, waits, and success UI vary by source; Guided install steps are not fully static in public docs.",
+      "evidence_needed": "Pick one bounded source (or capture a dated Guided install transcript for a fresh account) and verify the complete path to first UI data."
+    },
+    {
+      "question": "What exact email-confirmation fields complete New Relic account setup after signup?",
+      "impact": "Post-signup required actions and field counts remain incomplete.",
+      "evidence_needed": "A dated fresh-account email confirmation walkthrough."
+    }
+  ],
+  "counts": null
+}

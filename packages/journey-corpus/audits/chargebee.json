@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Chargebee",
+    "slug": "chargebee",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "89de0140a64a8d1cc2714e73860db27173917519f5c5988a0dc9ea3f0d4b1b35",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a valid business email they can access.",
+      "No Chargebee account, test site, API key, catalog, customer, or subscription exists yet.",
+      "Test-site work is in scope; live site go-live is out of scope."
+    ]
+  },
+  "developer_goal": "Create a Chargebee test site and complete the earliest official first-success path to an authenticated API result or sample subscription with invoice.",
+  "first_success": {
+    "outcome": "Unresolved among API Getting started list-or-create customer success and the tutorials Quickstart create-with-items subscription plus paid invoice.",
+    "observable_signal": "API docs treat retrieving customers (or creating one) as the first call, while the tutorials Quickstart ends when createWithItems returns an active subscription and paid invoice.",
+    "source_ids": ["S1", "S4"]
+  },
+  "route_selection": {
+    "surface": "Chargebee trial signup plus official API Getting started or API Quickstart tutorial",
+    "rule": "Select the shortest complete test-site account-to-first-success route only after first-success type, data center, onboarding branch, and SDK tab are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "API Getting started: Full-Access key then list customers (or create customer)",
+        "status": "unresolved",
+        "reason": "Official API Getting started confirms setup with a customers list and then create-customer examples, which is a shorter terminal than the subscription Quickstart."
+      },
+      {
+        "name": "Tutorials API Quickstart: SDK install through createWithItems subscription and invoice",
+        "status": "unresolved",
+        "reason": "The tutorials Quickstart explicitly ends at a created active subscription and generated invoice, but requires catalog setup and a chosen SDK tab."
+      },
+      {
+        "name": "Proceed versus Skip pricing-page onboarding after site claim",
+        "status": "unresolved",
+        "reason": "Site onboarding can generate catalog and branding work before API keys; Skip versus Proceed changes the measured path without a universal default."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete Chargebee trial signup with required business identity and data-center choice.",
+      "required_fields": [
+        {
+          "label": "Your name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Business email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Phone",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "What are you looking to monetize",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Number of employees",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Host my data in (US, EU, or AU Data Center)",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Terms of Service and Privacy Notice",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "Chargebee accepts the trial signup and begins account setup messaging.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the Complete Account Setup email, claim the account, and set password, site domain, and company name.",
+      "required_fields": [
+        {
+          "label": "Account setup email link",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Unique site domain",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Company name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "A Chargebee test site is available and the developer can sign in as owner or admin.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Full-Access API key for the test site.",
+      "required_fields": [
+        {
+          "label": "API key name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S4", "S5"]
+        },
+        {
+          "label": "Full-Access Key type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S4", "S5"]
+        }
+      ],
+      "observable_result": "A test-site API key is available for Basic Auth requests.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S4", "S5"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Complete the selected official first-success branch (customers list/create versus SDK Quickstart through createWithItems).",
+      "required_fields": [
+        {
+          "label": "First-success branch and SDK tab",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S4"],
+          "notes": "Tutorials Quickstart presents Node, Python, PHP, Go, Java, Ruby, and .NET as peer tabs."
+        },
+        {
+          "label": "Site name and API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S4"]
+        }
+      ],
+      "observable_result": "The selected branch reaches its documented observable terminal.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Owner or admin role on the Chargebee site is required to view and create API keys.",
+      "source_ids": ["S1", "S6"]
+    },
+    {
+      "description": "For the tutorials Quickstart, a local environment able to install the chosen official SDK.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account claim depends on receiving and opening the Complete Account Setup email.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Data-center choice at signup fixes where site data is hosted among US, EU, and AU.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Chargebee must deliver the account setup email before the site can be claimed.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Signup creates a test site automatically for API work.",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "description": "On the tutorials Quickstart branch, createWithItems returns subscription, customer, card, and invoice objects.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "On the API Getting started branch, authenticated customers list or create confirms API access.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional marketing mailing-list checkbox",
+      "reason": "Trial signup presents marketing communications as optional.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Live site configuration and production API keys",
+      "reason": "Getting started and Quickstart target the test site for development.",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "item": "Time Machine lifecycle simulation after first subscription",
+      "reason": "API Getting started presents Time Machine as further testing after initial API setup.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "API Quickstart Guide",
+      "url": "https://www.chargebee.com/tutorials/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Test site API key prerequisite",
+        "Multi-language SDK tabs",
+        "Customer with test card",
+        "Item family, item, and item price",
+        "createWithItems subscription and invoice terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Understanding Sites",
+      "url": "https://www.chargebee.com/docs/billing/2.0/getting-started/sites-intro",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Test versus live sites",
+        "Account claim and site domain context"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign Up - Get Your Free Sandbox",
+      "url": "https://www.chargebee.com/trial-signup/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Name, business email, phone",
+        "Monetization category",
+        "Employee count",
+        "US EU AU data center",
+        "Terms and Privacy acknowledgement"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Getting started (API docs)",
+      "url": "https://apidocs.chargebee.com/docs/api/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Automatic test site on signup",
+        "Full-Access API key steps",
+        "List customers first call",
+        "Create customer example"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "API Keys",
+      "url": "https://www.chargebee.com/docs/billing/2.0/site-configuration/api_keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key creation in site configuration"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Users & Roles",
+      "url": "https://www.chargebee.com/docs/billing/2.0/site-configuration/account_settings",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Owner or admin required for API keys"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Is first success the API Getting started customers call or the tutorials Quickstart active subscription with paid invoice?",
+      "impact": "These terminals differ by catalog setup, payment-method fields, SDK install, and action count.",
+      "evidence_needed": "A corpus policy choice of one bounded Chargebee developer goal against current official docs."
+    },
+    {
+      "question": "Which data center, Proceed versus Skip onboarding branch, and SDK tab are canonical?",
+      "impact": "Data center, onboarding, and SDK tabs change prerequisites and implementation steps without a single documented default.",
+      "evidence_needed": "Official recommendation of one signup and Quickstart combination for the shortest test-site path."
+    }
+  ],
+  "counts": null
+}

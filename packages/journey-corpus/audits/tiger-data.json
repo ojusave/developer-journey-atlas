@@ -1,0 +1,290 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Tiger Data",
+    "slug": "tiger-data",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "d98bc574a49e1cf0c62cc6066ab49233748503d77f07929e89055f4469c68839",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a browser and can receive email, or can run Docker for the self-hosted alternate.",
+      "No Tiger Cloud account, project, or service is assumed to exist yet."
+    ]
+  },
+  "developer_goal": "Reach an interactive SQL session against a Tiger Data Postgres database using the primary getting-started route.",
+  "first_success": {
+    "outcome": "A SQL client returns CURRENT_DATE or an equivalent connection proof against a running Tiger database.",
+    "observable_signal": "For Tiger Cloud console Data view or SQL editor, SELECT CURRENT_DATE returns the current date; for Docker, psql reaches an interactive prompt on the local TimescaleDB container.",
+    "source_ids": [
+      "S1",
+      "S4"
+    ]
+  },
+  "route_selection": {
+    "surface": "Tiger Cloud console self-service web, with self-hosted Docker as a documented alternate",
+    "rule": "Managed Tiger Cloud create-service docs begin at account creation and offer free or trial services without requiring marketplace billing; Docker is a complete no-account install path that conflicts with the account-creation boundary.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Tiger Cloud trial signup, create service, console Data view SELECT CURRENT_DATE",
+        "status": "unresolved",
+        "reason": "Create-service guide still documents a $1000-credit 30-day trial signup and plan selection, but signup field lists are missing and Free Plan messaging conflicts with trial framing."
+      },
+      {
+        "name": "Tiger Cloud Free Plan signup then console SQL editor",
+        "status": "unresolved",
+        "reason": "Blog and product copy describe a no-card unlimited Free Plan, while the create-service page still leads with trial signup details; when Free is chosen and which wizard fields apply are unclear."
+      },
+      {
+        "name": "AWS or Azure Marketplace linked signup",
+        "status": "not-selected",
+        "reason": "Adds marketplace purchase and account-linking steps beyond the standalone console route."
+      },
+      {
+        "name": "Self-hosted TimescaleDB Docker to psql",
+        "status": "unresolved",
+        "reason": "Fully documented no-account local path, but it is not the Tiger Cloud console journey and skips account creation."
+      },
+      {
+        "name": "Tiger CLI service creation",
+        "status": "not-selected",
+        "reason": "Adds CLI install and still opens browser OAuth or login for account access."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for Tiger Cloud and confirm the email address if the managed route is selected.",
+      "required_fields": [
+        {
+          "label": "Signup details",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S3"
+          ],
+          "notes": "Docs say add your details then Start your free trial; exact fields are not listed and the signup app shell does not expose them statically."
+        },
+        {
+          "label": "Email confirmation link",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Pricing plan selection",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Trial guide says select pricing plan after confirm; Free Plan availability and ordering versus trial are unresolved."
+        }
+      ],
+      "observable_result": "The developer is logged into Tiger Console.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Tiger Cloud service from the wizard and download the connection config.",
+      "required_fields": [
+        {
+          "label": "Service wizard configuration fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Docs say follow the wizard without enumerating every control for free versus standard."
+        }
+      ],
+      "observable_result": "The service reaches Running and config credentials are available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Connect with Data view or SQL editor and run SELECT CURRENT_DATE.",
+      "required_fields": [
+        {
+          "label": "Console connection surface",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Data view and SQL editor are peer console options; psql is a longer local alternate."
+        },
+        {
+          "label": "SELECT CURRENT_DATE",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The query returns the current date.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Docker is required only if the self-hosted container candidate is selected.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Managed signup requires email confirmation before Tiger Console use on the documented trial path.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Plan selection after signup may gate free versus trial entitlements.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Confirmation email delivery on the managed signup path.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Service construction takes a few seconds before Running.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Tiger Cloud provisions the service and issues connection configuration including passwords.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Marketplace AWS or Azure account linking",
+      "reason": "Longer billing-integrated branches than standalone console signup.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "psql install when using console Data view or SQL editor",
+      "reason": "Local psql is an alternate connection method after the service is Running.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Post-install TimescaleDB tutorials after Docker psql",
+      "reason": "Listed as next steps after the container is running.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Create a Tiger Cloud service",
+      "url": "https://www.tigerdata.com/docs/get-started/quickstart/create-service",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Trial signup framing",
+        "Email confirm",
+        "Plan selection",
+        "Service wizard",
+        "SELECT CURRENT_DATE terminals",
+        "Marketplace branches"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Introducing Agentic Postgres Free Plan",
+      "url": "https://www.tigerdata.com/blog/introducing-agentic-postgres-free-plan-experiment-ai-on-postgres",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free Plan no credit card no time limit positioning"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Tiger Cloud signup",
+      "url": "https://console.cloud.tigerdata.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup entry URL",
+        "Static shell does not enumerate required fields"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Install TimescaleDB from a Docker container",
+      "url": "https://docs.tigerdata.com/docs/self-hosted/latest/install/installation-docker",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Self-hosted Docker and psql alternate without Tiger Cloud account"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact fields, agreements, password rules, and authentication alternatives appear in current Tiger Cloud signup?",
+      "impact": "Account-creation actions cannot be counted for the managed route.",
+      "evidence_needed": "Fresh-account screenshots from console.cloud.tigerdata.com/signup through email confirmation and first console home."
+    },
+    {
+      "question": "At what point does a new account choose Free Plan versus the 30-day trial, and which create-service wizard fields follow each choice?",
+      "impact": "Plan choice changes entitlements, possible payment gates, and service configuration burden.",
+      "evidence_needed": "Reconcile create-service trial copy with Free Plan docs via a dated console walkthrough."
+    },
+    {
+      "question": "Should the atlas entry measure Tiger Cloud console first success or the self-hosted Docker psql path?",
+      "impact": "Docker skips account creation and changes the entire required_path.",
+      "evidence_needed": "Human judgment applying SELECTION-POLICY account-creation and self-service-web rules."
+    }
+  ],
+  "counts": null
+}

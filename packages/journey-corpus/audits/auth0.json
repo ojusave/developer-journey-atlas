@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Auth0",
+    "slug": "auth0",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "b52466d51042b5d310d818ef3f27ce87b5ce06735724a5680044959f8fa0af41",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email or social identity usable for Auth0 signup.",
+      "No Auth0 account, tenant, application, or framework quickstart has been selected yet."
+    ]
+  },
+  "developer_goal": "Create an Auth0 account and tenant, then reach the first authenticated application or protected-API success for a chosen architecture and framework.",
+  "first_success": {
+    "outcome": "The selected quickstart's first authentication or authorization behavior succeeds.",
+    "observable_signal": "Depends on the unresolved architecture; for example, a SPA sample showing Successfully authenticated and the user profile after login.",
+    "source_ids": ["S1", "S4"]
+  },
+  "route_selection": {
+    "surface": "Auth0 Dashboard self-service account, tenant, and Quickstarts",
+    "rule": "Select the shortest complete route only after one application architecture and framework are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Single-Page App quickstart",
+        "status": "unresolved",
+        "reason": "Auth0 lists SPA as a peer architecture class with many framework-specific guides."
+      },
+      {
+        "name": "Regular Web App quickstart",
+        "status": "unresolved",
+        "reason": "Server-rendered apps use different credential handling and callback mechanics than SPA or native routes."
+      },
+      {
+        "name": "Native or Mobile App quickstart",
+        "status": "unresolved",
+        "reason": "Native clients are a separate architecture with different SDKs and success checks."
+      },
+      {
+        "name": "Backend or API quickstart",
+        "status": "unresolved",
+        "reason": "Protecting an API is a different first-success outcome from interactive login."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create an Auth0 account using username or email or phone and password, or a social provider.",
+      "required_fields": [
+        {"label": "Signup method and identity credentials", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S2"], "notes": "Docs list password and social options but do not publish the exact current required form fields."}
+      ],
+      "observable_result": "Auth0 creates an account and continues into tenant creation.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create the first Auth0 tenant and choose a region locality.",
+      "required_fields": [
+        {"label": "Tenant name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S2"]},
+        {"label": "Region or locality", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2"]}
+      ],
+      "observable_result": "Auth0 provisions a tenant domain such as {name}.{locality}.auth0.com.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an Auth0 application of the selected type in the Dashboard.",
+      "required_fields": [
+        {"label": "Application name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Application type", "field_type": "select", "evidence_state": "documented", "source_ids": ["S3"], "notes": "Native, SPA, Regular Web, or Machine-to-Machine."}
+      ],
+      "observable_result": "Auth0 assigns a client ID for the new application.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Complete the selected framework quickstart through first authentication or API authorization success.",
+      "required_fields": [
+        {"label": "Framework-specific configuration and code", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S4"]}
+      ],
+      "observable_result": "The selected sample reaches its documented authenticated terminal state.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "An Auth0 account and tenant are required before applications can be registered.", "source_ids": ["S2"]},
+    {"description": "The developer must choose an application architecture before a single Quickstart path exists.", "source_ids": ["S1"]}
+  ],
+  "external_gates": [
+    {"description": "Social identity-provider authorization may be required when that signup method is chosen.", "source_ids": ["S2"]}
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {"description": "Auth0 creates the tenant domain and hosts authentication for the selected locality.", "source_ids": ["S2"]},
+    {"description": "Auth0 assigns a client ID when an application is created.", "source_ids": ["S3"]}
+  ],
+  "excluded": [
+    {"item": "Custom domains and multi-environment tenant strategy", "reason": "Custom domains are recommended for production and are not required for the first tenant getting-started path.", "source_ids": ["S2"]},
+    {"item": "Reading pricing pages as a measured step", "reason": "Commercial plan comparison is outside the developer required path.", "source_ids": ["S5"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Auth0 Quickstarts",
+      "url": "https://auth0.com/docs/quickstarts",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["SPA", "Regular Web", "Native/Mobile", "Backend/API peer architecture classes"]
+    },
+    {
+      "id": "S2",
+      "title": "Create Tenants",
+      "url": "https://auth0.com/docs/get-started/auth0-overview/create-tenants",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Account signup methods", "Tenant name rules", "Region localities", "Domain composition"]
+    },
+    {
+      "id": "S3",
+      "title": "Create Applications",
+      "url": "https://auth0.com/docs/get-started/auth0-overview/create-applications",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Create Application", "App type choices", "Client ID assignment"]
+    },
+    {
+      "id": "S4",
+      "title": "Add Login to Your JavaScript Application",
+      "url": "https://auth0.com/docs/quickstart/spa/vanillajs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["One example SPA login success signal among many framework routes"]
+    },
+    {
+      "id": "S5",
+      "title": "Auth0 Pricing",
+      "url": "https://auth0.com/pricing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Commercial plan context excluded from the measured path"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Auth0 application architecture and framework define the workshop first-success route?",
+      "impact": "Architecture choice changes credentials, callbacks, SDK work, and the observable success signal.",
+      "evidence_needed": "Choose one bounded Quickstart such as Vanilla JS SPA login, then verify signup, tenant, application, and sample steps on a fresh account."
+    },
+    {
+      "question": "What exact verification, consent, and anti-abuse fields appear on the current Auth0 signup UI?",
+      "impact": "Hidden signup fields would change required field counts and may add email or captcha waits.",
+      "evidence_needed": "A dated public-UI capture or fresh-account walkthrough of the current Auth0 signup screens."
+    }
+  ],
+  "counts": null
+}

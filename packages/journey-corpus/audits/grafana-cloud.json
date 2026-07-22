@@ -1,0 +1,273 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Grafana Cloud",
+    "slug": "grafana-cloud",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "c9f355e8a7a17492bc691324f0f0adc46ba7c04e66ec4116d26870c6e66af4c9",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can complete Grafana Cloud signup.",
+      "No Grafana Cloud account, stack, data source, collector, or monitored host exists yet."
+    ]
+  },
+  "developer_goal": "Create a Grafana Cloud account and view a first telemetry signal in Grafana Cloud.",
+  "first_success": {
+    "outcome": "A first real or connected data signal is visible in Grafana Cloud for the selected connect/send route.",
+    "observable_signal": "For the Linux integration candidate, recent metrics for the named host appear on the Nodes dashboard.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "Grafana Cloud Get started and Connections integrations",
+    "rule": "Select the shortest complete account-to-first-signal route only after one connect-or-send architecture is fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Send Linux host metrics via Grafana Alloy integration",
+        "status": "unresolved",
+        "reason": "Complete documented integration path, but Get started begins with multiple connect/send options and OS peers."
+      },
+      {
+        "name": "macOS or Windows OS integrations",
+        "status": "unresolved",
+        "reason": "Official integration quickstart states these are installed similarly to Linux and are peer OS routes."
+      },
+      {
+        "name": "Connect externally managed data source",
+        "status": "unresolved",
+        "reason": "Peer architecture that visualizes external data without sending into Grafana-managed storage."
+      },
+      {
+        "name": "Explore demo data",
+        "status": "not-selected",
+        "reason": "Avoids a real telemetry source and represents a learning outcome rather than the developer's systems."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free Grafana Cloud account and open the Cloud stack.",
+      "required_fields": [
+        {
+          "label": "Account creation method (SSO provider or email route)",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S6"
+          ],
+          "notes": "Public create-user page exposes Google, GitHub, Microsoft, and Amazon SSO plus Create my account."
+        },
+        {
+          "label": "Terms of Service / Master Services Agreement / Privacy Policy acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "label": "Email or SSO identity fields beyond the visible SSO buttons",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4",
+            "S6"
+          ],
+          "notes": "Create-account docs say follow the instructions without enumerating email/password controls."
+        }
+      ],
+      "observable_result": "The developer can access the Cloud Account Portal and a Grafana Cloud stack.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4",
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose whether to connect externally managed data or send telemetry into Grafana Cloud, then complete that route to a first visible signal.",
+      "required_fields": [
+        {
+          "label": "Connect vs send data architecture",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Integration or data-source specific configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "The selected route shows a first dashboard or explore signal.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For the Linux integration candidate: terminal and admin access on a Linux host with outbound HTTPS to *.grafana.net.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "SSO or identity-provider authorization if the developer uses a social signup option.",
+      "source_ids": [
+        "S6"
+      ]
+    },
+    {
+      "description": "Host administrator privileges are required to install Grafana Alloy for OS integrations.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "After Alloy starts, the first scrape interval must elapse before the Nodes dashboard is populated.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Account creation starts a 14-day unlimited trial that can transition to the free-forever plan.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "OS integrations install Grafana Alloy and provision preconfigured dashboards such as Nodes.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Grafana Cloud documentation",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Demo data exploration",
+      "reason": "Officially presented as an alternative that does not send the developer's telemetry.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started in Grafana Cloud",
+      "url": "https://grafana.com/docs/grafana-cloud/get-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account first",
+        "Connect externally managed data vs send data branches"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get started with monitoring using an integration",
+      "url": "https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/get-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Linux integration install via Connections",
+        "Hostname value",
+        "Alloy commands",
+        "Nodes dashboard verification",
+        "macOS/Windows similarity note"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Send metrics to Grafana Cloud",
+      "url": "https://grafana.com/docs/grafana-cloud/send-data/metrics/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Additional metrics send methods"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create a Grafana Cloud account",
+      "url": "https://grafana.com/docs/grafana-cloud/get-started/create-account/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free account",
+        "14-day trial then free-forever",
+        "Create free account steps without field enumeration"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Explore demo data",
+      "url": "https://grafana.com/docs/grafana-cloud/get-started/connect-send/explore-demo-data/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Demo data alternative"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Grafana Cloud create user signup",
+      "url": "https://grafana.com/auth/sign-up/create-user",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Google/GitHub/Microsoft/Amazon SSO options",
+        "Terms acknowledgement",
+        "Create my account control"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Grafana Cloud data architecture and source should define first success?",
+      "impact": "Credentials, collector install, firewall rules, waits, and dashboards all change across connect vs send and across integrations.",
+      "evidence_needed": "A corpus choice of one connect/send route and OS/integration, plus a cold-account walkthrough to the first dashboard signal."
+    },
+    {
+      "question": "What exact non-SSO email signup fields does the current create-user form require?",
+      "impact": "Required field counts cannot be finalized from the partially observed public page.",
+      "evidence_needed": "A dated capture of the email/password path on https://grafana.com/auth/sign-up/create-user."
+    }
+  ],
+  "counts": null
+}

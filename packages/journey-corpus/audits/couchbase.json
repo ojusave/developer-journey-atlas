@@ -1,0 +1,350 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Couchbase",
+    "slug": "couchbase",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "3592047c43e374be6c49a6115b6eac28d63b4ecd6df373fb79975400a337b344",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has an email address or a qualifying GitHub or Google account.",
+      "The developer does not yet have a Capella organization or free tier operational cluster.",
+      "Only one free tier operational cluster is available per organization."
+    ]
+  },
+  "developer_goal": "Create a Capella account, deploy a free tier operational cluster, and run Couchbase's documented first SQL++ query against travel-sample.",
+  "first_success": {
+    "outcome": "The free tier cluster's travel-sample data answers the official first SQL++ query.",
+    "observable_signal": "After Enter or Run, Capella displays the query results in JSON format.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "Couchbase Capella self-service web console",
+    "rule": "Start at Capella account creation, prefer the no-cost free tier operational cluster, then end at the explicitly named first Query-tab SQL++ procedure.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email signup, Getting Started free cluster, first SQL++ query",
+        "status": "unresolved",
+        "reason": "Email fields and the manual free-cluster form are documented, but GitHub and Google are peer signup methods and Capella also recommends Guided Setup for new users."
+      },
+      {
+        "name": "Email signup then Guided Setup with App Services",
+        "status": "unresolved",
+        "reason": "Official docs recommend Guided Setup for new users; it adds App Services and sample import while still producing an operational cluster with sample data."
+      },
+      {
+        "name": "Documents viewer edit of airport_1261",
+        "status": "not-selected",
+        "reason": "Same page offers this as an alternate data exercise; the page separately names Run Your First Query as the SQL++ procedure."
+      },
+      {
+        "name": "Paid operational cluster or SDK connection",
+        "status": "not-selected",
+        "reason": "Paid path adds billing and support configuration; SDK path adds credentials, IP allowlist, and client install after first query."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Capella account using email, GitHub, or Google.",
+      "required_fields": [
+        {
+          "label": "Signup method",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email, GitHub, and Google are peer options."
+        },
+        {
+          "label": "Full name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email route."
+        },
+        {
+          "label": "Email address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email route."
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "At least 12 characters with upper, lower, number, and special character on the email route."
+        },
+        {
+          "label": "Confirmation code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email route after Get Started."
+        },
+        {
+          "label": "Terms of Service and Privacy Policy agreement",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "Capella creates the account and an organization with default project My First Project.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Deploy the free tier operational cluster using Getting Started or Guided Setup.",
+      "required_fields": [
+        {
+          "label": "Setup method",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Guided Setup is recommended for new users; Getting Started is the manual free-cluster form."
+        },
+        {
+          "label": "Project",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Cluster option Free",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Cloud provider",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "CIDR block",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Default may be accepted."
+        }
+      ],
+      "observable_result": "A free tier operational cluster exists with travel-sample available for Data Tools.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open Query, paste the documented SQL++ statement, and press Enter or Run.",
+      "required_fields": [
+        {
+          "label": "SQL++ first-query statement",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "Query results display in JSON format.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Organization Owner or Project Creator permission is required to create or turn on an operational cluster.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "GitHub signup requires a verified public primary email before Capella accepts that branch.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account creation requires agreement to Terms of Service and Privacy Policy.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Email signup requires retrieving a confirmation code from outside Capella.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Couchbase must deliver the email confirmation code on the email signup route.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Free tier cluster deployment must finish before Query tools can run against travel-sample; exact readiness label and duration are not published on the free-tier guide.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Capella creates the organization and default My First Project after account creation.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "A free tier operational cluster includes the travel-sample bucket for Data Tools.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional marketing subscription checkbox",
+      "reason": "Documented as optional during Create Account.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Build Suggested index and iQ Insights after the first query",
+      "reason": "Presented after the first-query JSON result.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "item": "SDK connection, credentials, and IP allowlisting",
+      "reason": "Listed after first query in Capella get-started flow.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Welcome to Couchbase Capella",
+      "url": "https://docs.couchbase.com/cloud/get-started/intro.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Capella get-started entry"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create an Account and Deploy Your Free Tier Operational Cluster",
+      "url": "https://docs.couchbase.com/cloud/get-started/create-account.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email GitHub Google signup",
+        "Password rules",
+        "Confirmation code",
+        "Terms",
+        "Guided Setup versus Getting Started",
+        "Free cluster fields"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Explore Sample Data with Data Tools",
+      "url": "https://docs.couchbase.com/cloud/get-started/run-first-queries.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "travel-sample included",
+        "First SQL++ query",
+        "JSON result signal"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Connect To Your Cluster",
+      "url": "https://docs.couchbase.com/cloud/get-started/connect.html",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SDK and credential path ordered after first-query style exploration"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should the measured Capella route use email, GitHub, or Google signup?",
+      "impact": "Signup method changes required fields, GitHub email-public prerequisites, confirmation-code waits, and external OAuth steps.",
+      "evidence_needed": "Fresh-account walkthroughs of all three methods through the first authenticated Capella home screen."
+    },
+    {
+      "question": "Is Guided Setup or Getting Started the selected free-tier deployment route for first SQL++ success?",
+      "impact": "Guided Setup is recommended for new users but adds App Services; Getting Started is shorter for database-only first query but may differ in sample-data timing.",
+      "evidence_needed": "Apply lexicographic selection after fixing signup, or capture both flows' action lists to the same Query-tab JSON result."
+    }
+  ],
+  "counts": null
+}

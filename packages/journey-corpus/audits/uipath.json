@@ -1,0 +1,359 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "UiPath",
+    "slug": "uipath",
+    "category": "Data pipelines and workflow automation"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "29fb8e153f132473e248dab3ea3664ee66a201af5797696edfaacbf96d7c8c84",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "No UiPath account, Automation Cloud organization, tenant, Studio Web role, department or service preferences, template selection, application connection, project, robot configuration, workflow run, or published automation is assumed.",
+      "A supported web browser, working business email identity, and network connection are available.",
+      "No signup data was submitted, external identity or application account was connected, project was created, automation was run, or artifact was published during research."
+    ]
+  },
+  "developer_goal": "Create a UiPath Automation Cloud account, enter Studio Web, create an automation from a recommended template, run it on the default cloud robot, and verify a succeeded first workflow.",
+  "first_success": {
+    "outcome": "A project created from a UiPath template runs on the default Automation Cloud Serverless robot and reaches a succeeded run status.",
+    "observable_signal": "The Run output panel opens automatically, reports run status as succeeded, and successfully executed activities show green checkmarks in the designer.",
+    "source_ids": ["S1", "S3", "S4"]
+  },
+  "route_selection": {
+    "surface": "Studio Web browser-only template-guided first workflow",
+    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Studio Web template-guided cloud run",
+        "status": "unresolved",
+        "reason": "Studio Web overview recommends templates, requires no installation, and names running the first workflow before publishing, but it does not fix one universal template or the exact external connections that template needs."
+      },
+      {
+        "name": "Studio Web project from scratch",
+        "status": "unresolved",
+        "reason": "Creating a project documents a blank RPA Workflow path that requires trigger and activity choices without a canonical workflow outcome."
+      },
+      {
+        "name": "Studio Web Autopilot-generated project",
+        "status": "unresolved",
+        "reason": "This adds natural-language authoring and preview judgment before the same run terminal."
+      },
+      {
+        "name": "Studio Desktop Community or trial install",
+        "status": "unresolved",
+        "reason": "Studio Web is explicitly positioned as the browser-only starting point with no installation; Desktop adds MSI install, activation, and local Robot setup."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for Automation Cloud with work email and password.",
+      "required_fields": [
+        {
+          "label": "Work email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S5"],
+          "notes": "Trial organization creation requires a business email; personal email on Google or Microsoft social sign-in errors on the trial flow."
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S5"],
+          "notes": "At least eight characters with uppercase, lowercase, digit, and special character."
+        }
+      ],
+      "observable_result": "UiPath sends a verification code to the work email address.",
+      "evidence_state": "documented",
+      "source_ids": ["S5"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Enter the emailed verification code and continue.",
+      "required_fields": [
+        {
+          "label": "Verification code",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        }
+      ],
+      "observable_result": "UiPath creates the user account and shows the account profile continuation.",
+      "evidence_state": "documented",
+      "source_ids": ["S5"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete profile and organization details, then create the cloud organization.",
+      "required_fields": [
+        {
+          "label": "Display Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        },
+        {
+          "label": "Job Title",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        },
+        {
+          "label": "Country",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        },
+        {
+          "label": "State/Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        },
+        {
+          "label": "Business/Company Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        },
+        {
+          "label": "Organization name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        }
+      ],
+      "observable_result": "An Automation Cloud organization exists and the developer can continue into cloud services.",
+      "evidence_state": "documented",
+      "source_ids": ["S5"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open Studio Web and complete first-open department and service preferences so recommended templates appear.",
+      "required_fields": [
+        {
+          "label": "Department",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Services used",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "Recommended templates are displayed on the Templates page.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open an available recommended template, supply any required template configuration and application connections, and choose Use template.",
+      "required_fields": [
+        {
+          "label": "Template",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S2"],
+          "notes": "UiPath recommends choosing an available template but does not name one universal first template."
+        },
+        {
+          "label": "Template-specific required information and connections",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Some templates need no configuration; others require external app connections and advanced settings before Use template."
+        }
+      ],
+      "observable_result": "A project is created and the generated workflow opens in the designer.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select Debug on cloud to run the project on the default Automation Cloud Serverless robot.",
+      "required_fields": [],
+      "observable_result": "The Run output panel opens and the workflow builds, initializes the robot, transfers dependencies, and executes.",
+      "evidence_state": "documented",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Verify the cloud run completed successfully.",
+      "required_fields": [],
+      "observable_result": "Run status is succeeded and executed activities show green checkmarks.",
+      "evidence_state": "documented",
+      "source_ids": ["S3", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Use a web browser; Studio Web requires no installation for the cloud route.", "source_ids": ["S1"]},
+    {"description": "Have a UiPath account and Automation Cloud organization, or complete the linked free or trial signup.", "source_ids": ["S1", "S5"]},
+    {"description": "Hold a Studio Web Administrator, Studio Web Contributor, or Organization Template Author role; default invited users normally receive Contributor through the Everyone group.", "source_ids": ["S6"]},
+    {"description": "Have access to any external application accounts required by the selected template.", "source_ids": ["S2"]}
+  ],
+  "external_gates": [
+    {"description": "Trial organization creation requires a business email address.", "source_ids": ["S5"]},
+    {"description": "Template-required external application connections may need OAuth or credential authorization outside UiPath.", "source_ids": ["S2"]},
+    {"description": "Studio Web design and run permission depends on role assignment in the organization.", "source_ids": ["S6"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "UiPath must deliver the signup verification code by email.", "source_ids": ["S5"]},
+    {"description": "Each cloud run builds the project, initializes the robot machine, and transfers the project and dependencies before workflow execution.", "source_ids": ["S4"]}
+  ],
+  "platform_outcomes": [
+    {"description": "UiPath creates the user account after verification-code validation.", "source_ids": ["S5"]},
+    {"description": "UiPath creates the Automation Cloud organization after Create Organization.", "source_ids": ["S5"]},
+    {"description": "Studio Web creates a project from the selected template and opens the designer.", "source_ids": ["S2"]},
+    {"description": "Automation Cloud Serverless executes the debug run and reports succeeded when activities complete.", "source_ids": ["S3", "S4"]}
+  ],
+  "excluded": [
+    {"item": "Reading Studio Web overview and creating-project documentation", "reason": "Documentation is evidence for the path, not a counted product action.", "source_ids": ["S1", "S2"]},
+    {"item": "Publishing, deploying, scheduling, and managing published jobs", "reason": "The overview places publishing after running the first workflow.", "source_ids": ["S1"]},
+    {"item": "Debug on local machine with UiPath Assistant", "reason": "Cloud debug is the default and avoids local installation.", "source_ids": ["S3"]},
+    {"item": "Studio Desktop MSI installation and license activation", "reason": "Studio Web is the documented no-install starting surface for the same first-workflow goal family.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Studio Web - Overview",
+      "url": "https://docs.uipath.com/studio-web/automation-cloud/latest/user-guide/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Browser-only no-install surface",
+        "Free or trial signup link",
+        "Recommended template route",
+        "First-workflow run before publishing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Studio Web - Creating a project",
+      "url": "https://docs.uipath.com/studio-web/automation-cloud/latest/user-guide/creating-a-project",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First-open department and services",
+        "Template inventory and Use template",
+        "Variable required configuration and connections",
+        "Scratch and Autopilot alternatives"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Studio Web - Running a project",
+      "url": "https://docs.uipath.com/studio-web/automation-cloud/latest/user-guide/running-a-project",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Default Automation Cloud Serverless robot",
+        "Debug on cloud",
+        "Green checkmark success signal",
+        "Local Assistant alternative"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Studio Web - Viewing the run output",
+      "url": "https://docs.uipath.com/studio-web/automation-cloud/latest/user-guide/viewing-the-run-output",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Automatic Run output panel",
+        "Build and robot initialization wait",
+        "Succeeded run status"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Accessing the platform",
+      "url": "https://docs.uipath.com/automation-cloud/automation-cloud/latest/admin-guide/accessing-the-platform",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sign up entry",
+        "Work email and password fields",
+        "Verification code",
+        "Display Name and Job Title",
+        "Country, State/Region, and Business/Company Name",
+        "Organization name and Create Organization",
+        "Business email requirement for trial"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Studio Web - Managing access to Studio Web",
+      "url": "https://docs.uipath.com/studio-web/automation-cloud/latest/user-guide/managing-access-to-studio-web",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Studio Web roles",
+        "Default Contributor via Everyone",
+        "Design and run permissions"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "UiPath Automation Cloud register",
+      "url": "https://cloud.uipath.com/portal_/register?subscriptionPlan=trial",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Official trial registration URL",
+        "Client-rendered shell without independently readable field markup"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Studio Web sign-in",
+      "url": "https://studio.uipath.com/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public sign-in options including Google, Microsoft, LinkedIn, SSO, and Email",
+        "Sign up affordance for users without an account"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which single Studio Web template defines the universal first workflow, and what exact connections and fields does that template require?",
+      "impact": "Template choice changes required external authorizations, configuration fields, trigger shape, and whether the cloud run can succeed without extra apps.",
+      "evidence_needed": "Pick one currently recommended template with zero or minimal external connections, then capture its required fields and a succeeded Debug on cloud result from a fresh trial organization."
+    },
+    {
+      "question": "Do live trial registration screens match the documented work-email path, and which legal or plan screens appear before organization creation?",
+      "impact": "Action and field counts for account creation cannot be closed from docs alone while the register URL remains a client-rendered shell.",
+      "evidence_needed": "A dated read-only walkthrough of https://cloud.uipath.com/portal_/register?subscriptionPlan=trial with screenshots of every required control through Create Organization."
+    },
+    {
+      "question": "Should Studio Web remain the selected surface over Studio Desktop Community for the corpus-wide first-success comparison?",
+      "impact": "Desktop adds installer and activation steps and would change counts even if the workflow outcome is similar.",
+      "evidence_needed": "Confirm against current official starting-point language that Studio Web is the intended no-install first mile for peer comparison in this category."
+    }
+  ],
+  "counts": null
+}

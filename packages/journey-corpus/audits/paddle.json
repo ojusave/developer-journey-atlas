@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Paddle",
+    "slug": "paddle",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "e663dfb56338615876c35170db6049b3754a8650f4962da456b400bcfacc3f8b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can confirm.",
+      "No Paddle sandbox or live account, catalog, client-side token, API key, or notification destination exists yet.",
+      "Sandbox testing is acceptable; live website approval is out of scope."
+    ]
+  },
+  "developer_goal": "Create a Paddle sandbox account and complete the earliest official first-success path to a working sandbox checkout, webhook flow, or authenticated API result.",
+  "first_success": {
+    "outcome": "Unresolved among end-to-end Quickstart checkout-plus-webhooks, five-minute API /event-types success, and SDK or starter-kit first request.",
+    "observable_signal": "Get started presents peer Quickstart, SDK, AI-tool, and starter-kit paths; the end-to-end guide ends at Hookdeck webhook events while the API Quickstart ends at a successful /event-types response.",
+    "source_ids": ["S1", "S2", "S5"]
+  },
+  "route_selection": {
+    "surface": "Paddle Developer Get started plus sandbox account signup",
+    "rule": "Select the shortest complete sandbox account-to-first-success route only after the terminal outcome and implementation surface are fixed; do not invent a winner across unequal goals.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "End-to-end Quickstart: catalog, CodePen pricing page, checkout, Hookdeck webhooks",
+        "status": "unresolved",
+        "reason": "Get started promotes this walkthrough to a pricing page connected to Checkout with webhooks flowing, but it is longer than the API-only first request."
+      },
+      {
+        "name": "API Quickstart: create API key and GET /event-types",
+        "status": "unresolved",
+        "reason": "Official API Quickstart claims first call in about five minutes and returns data with no entities, but it is a different first-success type than a test payment."
+      },
+      {
+        "name": "Backend SDK language quickstarts, starter kits, or AI-tool routes",
+        "status": "unresolved",
+        "reason": "Get started lists Node.js, Python, Go, PHP, starter kits, and AI MCP paths as peer starting points without one corpus-wide default."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Paddle sandbox account from the official sandbox signup entry.",
+      "required_fields": [
+        {
+          "label": "Personal and business details",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S3", "S4"],
+          "notes": "Sandbox docs require personal and business details; the signup page did not expose a field-level form in the fetch."
+        },
+        {
+          "label": "Email confirmation",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Setup checklist instructs confirming the sandbox email address after signup."
+        }
+      ],
+      "observable_result": "The developer can open the Paddle sandbox dashboard.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the credentials required by the selected first-success branch (API key and/or client-side token).",
+      "required_fields": [
+        {
+          "label": "Credential type for selected branch",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S5"],
+          "notes": "API Quickstart needs an API key; end-to-end Quickstart needs a client-side token (and later a webhook destination)."
+        }
+      ],
+      "observable_result": "Sandbox credentials are available under Developer tools > Authentication.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S5"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Complete the selected official first-success branch through its documented terminal.",
+      "required_fields": [
+        {
+          "label": "First-success branch selection",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2", "S5"]
+        }
+      ],
+      "observable_result": "The selected branch reaches its documented observable terminal.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For the end-to-end Quickstart, a browser able to run the getting-started CodePen and an external webhook catcher such as Hookdeck Console.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "For the API Quickstart, a client able to call sandbox-api.paddle.com with Bearer authentication.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Live accounts require approval before real transactions; sandbox is the documented testing path.",
+      "source_ids": ["S3", "S5"]
+    },
+    {
+      "description": "End-to-end webhook preview depends on a third-party Hookdeck Console endpoint in the official walkthrough.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Sandbox email confirmation is required before the account is fully usable per setup checklist guidance.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Paddle provisions a sandbox environment separate from live credentials and data.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "On the end-to-end branch, overlay checkout accepts published test cards and can emit lifecycle webhooks.",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "description": "On the API branch, /event-types returns a data array when authentication succeeds.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Live account signup and go-live checklist",
+      "reason": "Official guidance recommends sandbox for testing; live requires approval.",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "item": "Enterprise product tier in the sample catalog",
+      "reason": "End-to-end Quickstart creates Starter and Pro only and treats Enterprise as contact-us.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Optional Create an entity customer POST in the API Quickstart",
+      "reason": "Docs label creating a customer optional after the /event-types verification request.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started",
+      "url": "https://developer.paddle.com/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Peer Quickstart, SDK, starter kit, and AI-tool paths"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Quickstart (end-to-end)",
+      "url": "https://developer.paddle.com/get-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox signup",
+        "Product and price catalog",
+        "Client-side token",
+        "CodePen pricing page",
+        "Default payment link",
+        "Test checkout",
+        "Hookdeck webhook destination"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sandbox",
+      "url": "https://developer.paddle.com/sdks/sandbox",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox versus live accounts",
+        "Personal and business details on signup",
+        "Test cards",
+        "Credential environment separation"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Paddle sandbox signup",
+      "url": "https://sandbox-login.paddle.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox signup entry URL",
+        "Form fields not enumerable without client-side rendering"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "API Quickstart",
+      "url": "https://developer.paddle.com/api-reference/about",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key creation",
+        "Sandbox base URL",
+        "/event-types first request",
+        "Optional customer create"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Get started path defines Paddle first success: end-to-end checkout and webhooks, API /event-types, an SDK language quickstart, or a starter kit?",
+      "impact": "These are peer official starts with different action counts, credentials, and observable terminals.",
+      "evidence_needed": "A corpus policy choice of one bounded developer goal, then verification that its current docs form a single complete sandbox path."
+    },
+    {
+      "question": "What personal and business fields are currently required on sandbox signup?",
+      "impact": "Required field counts cannot be verified without a complete public form enumeration.",
+      "evidence_needed": "A dated screenshot or read-only walkthrough of sandbox-login.paddle.com/signup field controls."
+    }
+  ],
+  "counts": null
+}

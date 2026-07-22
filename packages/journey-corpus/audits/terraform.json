@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Terraform",
+    "slug": "terraform",
+    "category": "API infrastructure and developer tooling"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "ad0d850dfe34857452e3fc2772d7c3873e54a5c6e432ed73bb8c0f3cf19e2e1b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported local machine and can install CLI tools.",
+      "No Terraform binary, provider credentials, working directory, or managed resource exists yet."
+    ]
+  },
+  "developer_goal": "Install Terraform, choose a Get Started provider route, and reach that route's first applied infrastructure success.",
+  "first_success": {
+    "outcome": "For the representative Get Started - Docker candidate, terraform apply creates the tutorial resources and localhost:8000 serves nginx.",
+    "observable_signal": "terraform apply reports resources added and localhost:8000 serves the started nginx container.",
+    "source_ids": ["S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "HashiCorp Terraform Get Started provider tutorials",
+    "rule": "Do not invent a winner among peer Get Started providers; select one only when the corpus names a provider and its account or credential boundary.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Get Started - Docker local nginx container",
+        "status": "unresolved",
+        "reason": "Documented end-to-end CLI path with a local success signal, but Terraform's homepage lists it as one peer beside AWS, Azure, GCP, Oracle Cloud, and HCP Terraform."
+      },
+      {
+        "name": "Get Started - AWS, Azure, GCP, or Oracle Cloud",
+        "status": "unresolved",
+        "reason": "Peer cloud tutorials require provider accounts and credentials and produce different first resources."
+      },
+      {
+        "name": "HCP Terraform hosted workflow",
+        "status": "unresolved",
+        "reason": "Homepage presents HCP Terraform as a distinct get-started and collaboration surface with its own account boundary."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create any provider or HCP account required by the selected Get Started route.",
+      "required_fields": [
+        {
+          "label": "Provider or HCP account fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S5"],
+          "notes": "Docker-local route may need no cloud account; AWS and HCP routes require external account creation whose fields are not fixed until the provider is chosen."
+        }
+      ],
+      "observable_result": "Credentials or local runtime prerequisites for the selected provider route are available.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S5"]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install the Terraform CLI for the selected operating system.",
+      "required_fields": [
+        {
+          "label": "Terraform install method",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "terraform -help or terraform version runs successfully.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "For the Docker candidate, install Docker, write main.tf, initialize, apply, and verify nginx.",
+      "required_fields": [
+        {
+          "label": "main.tf Docker provider configuration",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "terraform init",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "terraform apply approval",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Apply requires typing yes to approve the plan in the CLI tutorials."
+        }
+      ],
+      "observable_result": "Apply completes and localhost:8000 serves the nginx container.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For the Docker candidate, a working local Docker Engine or Desktop CLI is required before apply.",
+      "source_ids": ["S3", "S4"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Cloud Get Started routes require authenticated access to the chosen cloud provider account.",
+      "source_ids": ["S1", "S5"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "terraform init must download providers, and apply must pull images or provision remote resources before verification.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Terraform creates the declared Docker image and container resources and reports apply results.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Later Docker tutorial chapters on change, destroy, variables, and outputs",
+      "reason": "They occur after the first successful apply and nginx verification.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Reading Terraform conceptual overview pages without applying",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Terraform",
+      "url": "https://developer.hashicorp.com/terraform",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Peer Get Started providers",
+        "HCP Terraform positioning"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get Started - Docker",
+      "url": "https://developer.hashicorp.com/terraform/tutorials/docker-get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Docker tutorial collection and first-build positioning"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Build infrastructure with Docker",
+      "url": "https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "main.tf contents",
+        "Working directory setup",
+        "nginx on localhost:8000"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Install Terraform",
+      "url": "https://developer.hashicorp.com/terraform/tutorials/docker-get-started/install-cli",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "CLI install routes and Docker prerequisite mention"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Get Started - AWS create",
+      "url": "https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-create",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "AWS as a peer Get Started provider path"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Terraform Get Started provider or HCP route should represent first success?",
+      "impact": "Provider choice changes account creation, credentials, required actions, waits, and the observable resource.",
+      "evidence_needed": "An explicit corpus provider selection, then a fresh walkthrough of that tutorial from account or local runtime prerequisites through first apply verification."
+    },
+    {
+      "question": "If Docker is selected, what is the complete Docker install journey counted before terraform apply?",
+      "impact": "Docker Desktop versus Engine install burden can dominate the measured path and collide with the separate Docker platform audit.",
+      "evidence_needed": "A rule for whether Docker install steps are prerequisites or in-path actions for the Terraform Docker tutorial."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,252 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Snowflake",
+    "slug": "snowflake",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "cf904950cbb90f93e01c38538ec77d0c52e7078868d71f3e2e94b8edc415abf0",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a work or personal email address.",
+      "No Snowflake trial account, SnowSQL install, or tutorial objects exist yet."
+    ]
+  },
+  "developer_goal": "Create a Snowflake trial account and complete the official introductory hands-on tutorial to first query success.",
+  "first_success": {
+    "outcome": "Snowflake in 20 minutes completes through loading sample CSV data and running the final tutorial queries.",
+    "observable_signal": "The final DATEADD query returns employee names and calculated dates after earlier COPY and SELECT results succeed.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Snowflake self-service trial plus SnowSQL tutorial",
+    "rule": "Prefer the documented Snowflake in 20 minutes route once signup product choice and SnowSQL versus VS Code client are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Trial signup then Snowflake in 20 minutes with SnowSQL",
+        "status": "unresolved",
+        "reason": "This is the classic official introductory tutorial, but current signup surfaces introduce product choices and incomplete step-2 fields."
+      },
+      {
+        "name": "Trial signup then Snowflake in 20 minutes with VS Code Snowflake extension",
+        "status": "unresolved",
+        "reason": "Tutorial notes VS Code users might use the extension instead of SnowSQL, changing install and connect actions."
+      },
+      {
+        "name": "Snowflake CoCo for Developers versus AI Data Cloud enterprise trial entry",
+        "status": "unresolved",
+        "reason": "Public signup marketing presents separate developer and enterprise entry points before the trial form."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete the Snowflake trial signup form and select cloud platform, region, and Snowflake Edition.",
+      "required_fields": [
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Last name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Work email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Why are you signing up?",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Cloud platform, region, and Snowflake Edition",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S3"],
+          "notes": "Documented for trial signup; exact step-2 public controls beyond the observed first page were not fully captured."
+        }
+      ],
+      "observable_result": "A Snowflake trial account and user exist and welcome or account identifier details are available.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install SnowSQL for the developer's operating system and connect with account identifier and username.",
+      "required_fields": [
+        {
+          "label": "SnowSQL install command for selected OS",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S5"],
+          "notes": "Install steps differ by OS; VS Code alternate remains unresolved."
+        },
+        {
+          "label": "Account identifier",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "SnowSQL presents a prompt for the connected session.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Create the tutorial database, table, and X-Small warehouse; stage and load the five sample CSV files; then run the tutorial queries through the final DATEADD statement.",
+      "required_fields": [
+        {
+          "label": "Tutorial SQL statements and local sample file paths",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "Tutorial queries return the documented employee and date results.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A trial user with privileges to create database, table, and warehouse objects.",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "description": "Downloaded and unzipped getting-started.zip sample CSV files in the path expected by the tutorial.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Snowflake must finish creating the trial account and deliver welcome or account-identifier details before SnowSQL login.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Trial signup creates an account with free credits for up to 30 days or until balance exhaustion.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "COPY INTO loads the five staged CSV files into emp_basic when the warehouse is running.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Converting the trial to a paid account or adding a credit card",
+      "reason": "Trial docs state signup needs only a valid email; payment is for post-trial reactivation or conversion.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Dropping tutorial objects after success",
+      "reason": "Cleanup is after the tutorial terminal.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started",
+      "url": "https://docs.snowflake.com/en/user-guide-getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Entry to Snowflake in 20 minutes tutorial"]
+    },
+    {
+      "id": "S2",
+      "title": "Snowflake in 20 minutes",
+      "url": "https://docs.snowflake.com/en/user-guide/tutorials/snowflake-in-20minutes",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SnowSQL login",
+        "Create database table warehouse",
+        "Stage and load CSV",
+        "Tutorial queries including DATEADD",
+        "VS Code alternate note"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Trial accounts",
+      "url": "https://docs.snowflake.com/en/user-guide/admin-trial-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email-only trial signup",
+        "Cloud platform, region, Edition selection",
+        "No payment required to start"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Snowflake Trial signup",
+      "url": "https://signup.snowflake.com/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First name, Last name, Work email",
+        "Why are you signing up?",
+        "Continue on page 1 of 2",
+        "Enterprise versus developer marketing entries"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Installing SnowSQL",
+      "url": "https://docs.snowflake.com/en/user-guide/snowsql-install-config",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["OS-specific SnowSQL installation"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact fields appear on step 2 of the current trial signup form, and which product entry (CoCo versus AI Data Cloud) applies?",
+      "impact": "Unseen signup fields and product entry points change account-creation actions before the tutorial can start.",
+      "evidence_needed": "Complete dated capture of both signup pages and any post-submit email verification from a fresh trial registration."
+    },
+    {
+      "question": "Should the measured path require SnowSQL or the VS Code Snowflake extension?",
+      "impact": "Client choice changes install commands and connection steps while aiming at the same SQL terminal.",
+      "evidence_needed": "Select one client and verify the full tutorial from a fresh trial account on one OS."
+    }
+  ],
+  "counts": null
+}

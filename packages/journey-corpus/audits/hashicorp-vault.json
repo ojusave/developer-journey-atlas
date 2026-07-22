@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "HashiCorp Vault",
+    "slug": "hashicorp-vault",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "9b7c8647828e22272472ca0cfa5f6e8cfe6a4691fe11ac26c72d70b72c38edb3",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "No Vault server or client configuration exists yet.",
+      "The developer has not chosen Docker versus a local Vault binary, a client language, or HCP versus self-managed versus local dev mode.",
+      "There is no SaaS account creation step on the local developer quick start; account-like boundaries instead mean obtaining a runnable Vault and credentials."
+    ]
+  },
+  "developer_goal": "Start Vault and use a client library or CLI to store and retrieve a first secret value.",
+  "first_success": {
+    "outcome": "A first secret is written to and retrieved from Vault with the documented success confirmation.",
+    "observable_signal": "For the developer quick start sample languages, the program prints Access granted! after the retrieved password equals Hashi123.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Local Vault developer quick start",
+    "rule": "Select the shortest complete local path only after install method and client language are fixed; do not invent a winner among peer language tabs or HCP versus local ops routes.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Developer quick start with Docker and Go client",
+        "status": "unresolved",
+        "reason": "Go is the first documented client library option, but Docker versus binary and other languages remain peer choices."
+      },
+      {
+        "name": "Developer quick start with another supported language",
+        "status": "unresolved",
+        "reason": "Ruby, C#, Python, Java, Bash, and OpenAPI variants are presented as peer tabs with different install and code steps."
+      },
+      {
+        "name": "Operations quick start or HCP Vault Dedicated",
+        "status": "unresolved",
+        "reason": "Ops CLI and hosted HCP paths reach related secret outcomes through different surfaces and prerequisites."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "cli",
+      "action": "Obtain a runnable Vault by installing the binary or preparing Docker for the hashicorp/vault image.",
+      "required_fields": [
+        {"label": "Install method", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1", "S2"], "notes": "Exact package-manager or Docker Desktop prompts are OS-specific and unverified."}
+      ],
+      "observable_result": "The vault binary or Docker engine can run the documented start command.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Start Vault in non-production dev mode with the documented root token.",
+      "required_fields": [
+        {"label": "Dev root token id", "field_type": "command", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "Vault listens on HTTP port 8200.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Install the selected language client library and write the authenticate, store, and retrieve sample.",
+      "required_fields": [
+        {"label": "Client language and library install command", "field_type": "command", "evidence_state": "unverified", "source_ids": ["S1"]},
+        {"label": "Vault address and token in client code", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "Running the sample writes the secret and prints Access granted! after retrieval.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Docker or a local Vault binary is required before the developer quick start can start a server.", "source_ids": ["S1", "S2"]},
+    {"description": "A development environment for one of the listed languages is required for the client-library path.", "source_ids": ["S1"]}
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {"description": "First-time Docker image pull for hashicorp/vault may wait on network download before the server starts.", "source_ids": ["S1"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Dev-mode Vault starts unsealed in memory and accepts the configured root token.", "source_ids": ["S1"]},
+    {"description": "KV v2 accepts the written secret and returns it on read for the sample path.", "source_ids": ["S1"]}
+  ],
+  "excluded": [
+    {"item": "Production hardening and non-root auth methods", "reason": "The quick start explicitly labels dev mode insecure and points to other examples for production-like auth.", "source_ids": ["S1"]},
+    {"item": "Reading hello-vault demo repositories as a required path", "reason": "Those demos are presented as additional examples after first success.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developer quick start",
+      "url": "https://developer.hashicorp.com/vault/docs/get-started/developer-qs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Docker or binary prerequisite", "Dev server start", "Multiple language client tabs", "Write and retrieve first secret", "Access granted! signal"]
+    },
+    {
+      "id": "S2",
+      "title": "Install Vault",
+      "url": "https://developer.hashicorp.com/vault/install",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["OS package-manager install options for the Vault binary"]
+    },
+    {
+      "id": "S3",
+      "title": "Operations quick start",
+      "url": "https://developer.hashicorp.com/vault/docs/get-started/operations-qs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Alternate CLI-oriented first-secret route"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which install method and client language define the measured Vault first mile?",
+      "impact": "Docker versus binary and Go versus other language tabs change prerequisite actions and implementation fields.",
+      "evidence_needed": "Pick one bounded path such as Docker plus Go, then verify install through Access granted! on a clean workstation."
+    },
+    {
+      "question": "How should the corpus treat Vault's lack of a SaaS account-creation form relative to the account creation boundary?",
+      "impact": "Whether install counts as the account-equivalent first action affects comparability with hosted identity products.",
+      "evidence_needed": "A selection-policy decision for self-hosted CLIs with no vendor signup, plus a fresh-machine count of required install prompts."
+    }
+  ],
+  "counts": null
+}

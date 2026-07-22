@@ -1,0 +1,293 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Coralogix",
+    "slug": "coralogix",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "9639670cdd24c12fe0a2ff383d81151bdb45b1063fa8e0023890b31d0734df13",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "No Coralogix account, organization, team, region, Send-Your-Data API key, application or subsystem naming convention, ingested log, or saved query is assumed.",
+      "The downstream direct-log route assumes no existing Coralogix user shares the developer's work-email domain, matching the official new-organization procedure.",
+      "A work email inbox, browser, and terminal with `curl` or an equivalent HTTPS client are available.",
+      "No signup, email activation, organization or team creation, API-key generation, API request, or data ingestion was performed during research."
+    ]
+  },
+  "developer_goal": "Create a first Coralogix organization and team, send one log through the direct REST API, and find that log in Explore.",
+  "first_success": {
+    "outcome": "A log posted to the region-correct `/logs/v1/singles` endpoint appears in Explore.",
+    "observable_signal": "Downstream of the account gap, selecting Run in Explore would show a row whose application metadata and text match the submitted first-mile event.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Coralogix organization setup and direct REST API log ingestion",
+    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Coralogix organization setup and direct REST API log ingestion",
+        "status": "unresolved",
+        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+      },
+      {
+        "name": "OpenTelemetry Collector",
+        "status": "unresolved",
+        "reason": "The quick reference presents it as a vendor-neutral route for logs, metrics, and traces, but it adds collector installation and pipeline configuration."
+      },
+      {
+        "name": "Integration packages",
+        "status": "unresolved",
+        "reason": "Packages are described as an easy two-step route but require a human choice of source, cloud, or environment and can redirect to external infrastructure."
+      },
+      {
+        "name": "Fluent Bit, cloud, and Kubernetes integrations",
+        "status": "unresolved",
+        "reason": "Each route has environment-specific permissions, software, configuration, and verification actions."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete Coralogix account creation or trial signup at the official entry URL.",
+      "required_fields": [
+        {
+          "label": "Signup identity and required account fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
+        }
+      ],
+      "observable_result": "A new Coralogix account or trial session exists.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Complete any required email or identity verification for the new account.",
+      "required_fields": [
+        {
+          "label": "Verification challenge",
+          "field_type": "challenge",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The account becomes usable for developer onboarding.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the documented post-login setup for the selected Coralogix candidate through first success.",
+      "required_fields": [
+        {
+          "label": "Candidate-specific configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
+        }
+      ],
+      "observable_result": "Downstream of the account gap, selecting Run in Explore would show a row whose application metadata and text match the submitted first-mile event.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "{'order': 1, 'type': 'identity', 'requirement': 'A work email address and access to its verification inbox are required for the new-organization candidate.', 'required': True, 'source_ids': ['S2']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 2, 'type': 'configuration', 'requirement': 'A Coralogix organization and team must exist; a team is a platform environment with its own URL and settings.', 'required': True, 'source_ids': ['S2']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 3, 'type': 'permission', 'requirement': 'The user needs the permissions represented by the `SendData` role preset to create and view Send-Your-Data API keys.', 'required': True, 'source_ids': ['S4']}",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Account creation requires work-email activation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "An existing organization can require an Org Admin to grant access or create a team.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The new-organization procedure does not document the login, redirect, team URL, or authenticated state after CREATE NEW TEAM.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "View your logs, with all metadata fields, in your Coralogix dashboard.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "field filtering",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Templates analysis",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "grouping and aggregation",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "charts",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Coralogix Documentation | Coralogix Docs",
+      "url": "https://coralogix.com/docs/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary documented developer route and first-success framing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create an organization | Coralogix Docs",
+      "url": "https://coralogix.com/docs/user-guides/account-management/organization-management/create-an-organization/",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Create an organization | Coralogix Docs"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Quick reference | Coralogix Docs",
+      "url": "https://coralogix.com/docs/user-guides/getting-started/quick-reference/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Quick reference | Coralogix Docs"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "API keys | Coralogix Docs",
+      "url": "https://coralogix.com/docs/user-guides/account-management/api-keys/api-keys/",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for API keys | Coralogix Docs"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Coralogix REST API /singles | Coralogix Docs",
+      "url": "https://coralogix.com/docs/developer-portal/apis/log-ingestion/coralogix-rest-api-singles/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Coralogix REST API /singles | Coralogix Docs"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Get started with explore logs | Coralogix Docs",
+      "url": "https://coralogix.com/docs/user-guides/data_exploration/logs/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Get started with explore logs | Coralogix Docs"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which telemetry type and ingestion route should represent Coralogix's general first mile?",
+      "impact": "Logs, metrics, and traces and their direct API, OpenTelemetry, cloud, Kubernetes, or shipper routes have different credentials, permissions, software, configuration, and terminals.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The official docs home and quick reference present multiple peer routes without a universal default."
+    },
+    {
+      "question": "What authenticated state follows CREATE NEW TEAM in the new-organization procedure?",
+      "impact": "The no-account path cannot be connected to the later API-key and team-URL actions.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The source does not state a login, redirect, or resulting team URL for the new-organization case; its automatic-login sentence belongs to a separate existing-organization branch."
+    },
+    {
+      "question": "Will the work-email domain create a new organization or enter an existing organization's access policy?",
+      "impact": "The path can change from self-service organization and team creation to team selection, SSO, or an Org Admin approval dependency.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The result depends on prior registrations and administrator configuration outside the public docs."
+    },
+    {
+      "question": "What exact current required signup, identity, legal, and entitlement fields does Coralogix show for a new developer, and which peer route is the lexicographic shortest path?",
+      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
+      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+    }
+  ],
+  "counts": null
+}

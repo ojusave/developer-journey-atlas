@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Snyk",
+    "slug": "snyk",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "3bf200039dc11459e58b589efb2e741f2266996713f210080144032a0f47006e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser.",
+      "No Snyk account, Organization, product, SCM integration, or CLI scan target has been selected yet."
+    ]
+  },
+  "developer_goal": "Create a Snyk account and reach the first documented security scan result for a chosen product and integration interface.",
+  "first_success": {
+    "outcome": "The selected Snyk product and interface produce a first issue report for a Project or local target.",
+    "observable_signal": "Depends on the unresolved route; for CLI Open Source, the terminal displays the issue report and remediation guidance after snyk test.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "Snyk Web UI getting started and Snyk CLI",
+    "rule": "Select the shortest complete route only after product and integration interface are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Web UI SCM integration and Project import",
+        "status": "unresolved",
+        "reason": "Getting started makes repository integration conditional on the systems in use and treats SCM auth as a primary path."
+      },
+      {
+        "name": "CLI Open Source snyk test",
+        "status": "unresolved",
+        "reason": "Docs present CLI as an alternative that avoids repository authentication, with its own install and auth steps."
+      },
+      {
+        "name": "CLI Code, Container, or IaC scan",
+        "status": "unresolved",
+        "reason": "Start scanning documents peer commands with different prerequisites and result formats."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free Snyk account or sign in at snyk.io.",
+      "required_fields": [
+        {"label": "Snyk signup or SSO identity fields", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S5"], "notes": "Docs point to snyk.io and SSO or invitation flows but do not enumerate current required form fields."}
+      ],
+      "observable_result": "The developer is signed into the Snyk Web UI against an Organization.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose an integration path: authenticate an SCM integration or select CLI.",
+      "required_fields": [
+        {"label": "Integration method", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Repository access if SCM is selected", "field_type": "permission", "evidence_state": "unverified", "source_ids": ["S1"]}
+      ],
+      "observable_result": "Snyk is connected to a scan source or the developer proceeds with CLI authentication.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "verification",
+      "interface": "other",
+      "action": "Import a Project or run the selected CLI test command against a supported target.",
+      "required_fields": [
+        {"label": "Project or local manifest path", "field_type": "repository", "evidence_state": "unverified", "source_ids": ["S1", "S2"]},
+        {"label": "CLI auth token if using CLI", "field_type": "other", "evidence_state": "documented", "source_ids": ["S2", "S4"]}
+      ],
+      "observable_result": "Snyk displays or prints the first issue report for the selected product.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Supported languages, package managers, or frameworks are required for meaningful scans.", "source_ids": ["S1"]},
+    {"description": "CLI Open Source scans often require the Project to be built first.", "source_ids": ["S2"]}
+  ],
+  "external_gates": [
+    {"description": "Company SSO or Organization invitation may block a fresh personal signup from reaching the intended Organization.", "source_ids": ["S1"]},
+    {"description": "SCM integrations require granting repository access outside Snyk.", "source_ids": ["S1"]}
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {"description": "Importing a Project triggers a scan and schedules recurring tests.", "source_ids": ["S1"]},
+    {"description": "CLI test commands print vulnerability findings and remediation guidance for supported manifests.", "source_ids": ["S2"]}
+  ],
+  "excluded": [
+    {"item": "Optional getting-started walkthrough prompts after account creation", "reason": "Official docs label the guided process optional.", "source_ids": ["S1"]},
+    {"item": "Snyk Essentials setup", "reason": "Essentials is documented as Enterprise-plan only and is outside free first-scan success.", "source_ids": ["S1"]},
+    {"item": "Fixing issues after the first report", "reason": "Review and fix actions occur after the first scan result.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting started",
+      "url": "https://docs.snyk.io/discover-snyk/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Account creation", "SCM versus CLI integration choice", "Project import", "Result review by product"]
+    },
+    {
+      "id": "S2",
+      "title": "Getting started with the Snyk CLI",
+      "url": "https://docs.snyk.io/developer-tools/snyk-cli/getting-started-with-the-snyk-cli",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Install and authenticate", "snyk test Open Source path", "Peer product CLI commands"]
+    },
+    {
+      "id": "S3",
+      "title": "Start scanning",
+      "url": "https://docs.snyk.io/scan-with-snyk/start-scanning",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["snyk test", "snyk code test", "snyk container test", "snyk iac test"]
+    },
+    {
+      "id": "S4",
+      "title": "Authenticate to use the CLI",
+      "url": "https://docs.snyk.io/snyk-cli/authenticate-to-use-the-cli",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["CLI authentication requirement"]
+    },
+    {
+      "id": "S5",
+      "title": "Snyk app login or sign up",
+      "url": "https://app.snyk.io/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Public login or sign-up entry exists; required fields not fully enumerable without completing auth"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Snyk product and interface define the first-mile scan: Web UI SCM import versus CLI Open Source, Code, Container, or IaC?",
+      "impact": "The choice changes prerequisites, external permissions, commands, and the observable report format.",
+      "evidence_needed": "Choose one bounded route such as free-account CLI snyk test on a Node package.json, then verify signup through the terminal report."
+    },
+    {
+      "question": "What exact fields and identity-provider options appear on current Snyk signup?",
+      "impact": "Signup field counts and possible email or SSO waits remain unverified.",
+      "evidence_needed": "A dated fresh-account capture of app.snyk.io registration without relying on company SSO."
+    }
+  ],
+  "counts": null
+}

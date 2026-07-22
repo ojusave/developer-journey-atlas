@@ -1,0 +1,313 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Mistral AI",
+    "slug": "mistral-ai",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "40866606b8dbaf4b67c2c3c1e7c88b2dfec7ec96eb475767311b913b0e88c280",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and Python 3.9+ or Node.js 18+ if measuring the Developer API route.",
+      "No Mistral account, Studio activation, or API key exist yet.",
+      "No product among Vibe, Studio, or Admin has been preselected by the workshop."
+    ]
+  },
+  "developer_goal": "Choose a Mistral product first-success outcome, create a Mistral account, and complete that product's official first-use quickstart.",
+  "first_success": {
+    "outcome": "Depends on the unresolved product choice: for the Developer API route, the terminal prints a short model description of Mistral AI.",
+    "observable_signal": "For the documented first API request route, the terminal contains the short description rather than an authentication, billing, or rate-limit error.",
+    "source_ids": [
+      "S1",
+      "S4"
+    ]
+  },
+  "route_selection": {
+    "surface": "Mistral documentation quickstarts grouped by product",
+    "rule": "Official docs require picking Vibe, Studio, or Admin before a first-mile path exists; do not invent a cross-product winner.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Studio: Activate and generate an API key only",
+        "status": "unresolved",
+        "reason": "Official Studio quickstart ends at a working Free-mode API key."
+      },
+      {
+        "name": "Developer: Send your first API request",
+        "status": "unresolved",
+        "reason": "Separate quickstart that prints a chat completion; uses the key guide as a prerequisite."
+      },
+      {
+        "name": "Vibe Work or Vibe Code first task",
+        "status": "unresolved",
+        "reason": "Equal top-level product family with different first-success signals."
+      },
+      {
+        "name": "Studio playground test without SDK",
+        "status": "unresolved",
+        "reason": "Another Studio first-use quickstart with a UI terminal rather than a local terminal print."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "product-interaction",
+      "interface": "browser",
+      "action": "Choose the Mistral product and first-use outcome before continuing.",
+      "required_fields": [
+        {
+          "label": "Product and role choice",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "One product-scoped quickstart is selected.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or sign in to a Mistral account required by the selected product.",
+      "required_fields": [
+        {
+          "label": "Mistral account signup inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "The developer can open Studio or the selected product surface.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "If measuring Developer API: open Studio API keys, create a named key, and copy the secret.",
+      "required_fields": [
+        {
+          "label": "Key name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3",
+            "S4"
+          ]
+        },
+        {
+          "label": "Expiration date",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Connector access scope",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "A Free-mode API key is stored securely.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "If measuring first API request: export MISTRAL_API_KEY, install the SDK, create quickstart code, and run it.",
+      "required_fields": [
+        {
+          "label": "MISTRAL_API_KEY",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4"
+          ]
+        },
+        {
+          "label": "SDK install command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4"
+          ]
+        },
+        {
+          "label": "quickstart source file",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "The terminal prints a short description of Mistral AI.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Python 3.9+ or Node.js 18+ for the Developer API quickstart.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "Studio Free mode is enabled by default with no credit card required for limited API access.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A Mistral account is required before Studio API keys can be created.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ]
+    },
+    {
+      "description": "Some API failures return 402 Payment Required when no payment method is on the account.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Studio issues an API key that is shown only once.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "Chat Completions returns model text for a successful authenticated request.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Admin organization, SSO, and workspace administration quickstarts",
+      "reason": "Separate product family from Studio/Developer first API use.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Agent and RAG follow-on quickstarts",
+      "reason": "Documented as later foundations after the first API request.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Mistral AI Documentation",
+      "url": "https://docs.mistral.ai/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Vibe, Studio, Admin product choice",
+        "Grouped first-use quickstarts"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Platform overview",
+      "url": "https://docs.mistral.ai/getting-started/platform-overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Platform overview entry used by source record"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Activate Studio and generate an API key",
+      "url": "https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free mode",
+        "Create new key fields",
+        "Key shown once"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Send your first API request",
+      "url": "https://docs.mistral.ai/getting-started/quickstarts/developer/first-api-request",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and key prerequisites",
+        "SDK install",
+        "Chat completion success and error table"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Test a model in the API playground",
+      "url": "https://docs.mistral.ai/getting-started/quickstarts/studio/test-model-playground",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Alternate Studio first-use UI route"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Mistral product and role should the corpus measure for the company-level slug?",
+      "impact": "It changes the first-success boundary and the complete journey.",
+      "evidence_needed": "An explicit workshop choice among Vibe, Studio/Developer API, and Admin, with one named first-success quickstart."
+    },
+    {
+      "question": "If Developer API is chosen, does success stop at generating a Free-mode key or at printing the first model response?",
+      "impact": "These are separate official quickstarts with different terminal outcomes and field counts.",
+      "evidence_needed": "A decision between the Activate Studio key guide and Send your first API request as the terminal milestone."
+    },
+    {
+      "question": "What exact Mistral signup fields appear before Studio is available?",
+      "impact": "Signup controls remain unverified and block a verified account-creation count.",
+      "evidence_needed": "A dated fresh-account signup walkthrough into Studio API Keys."
+    }
+  ],
+  "counts": null
+}

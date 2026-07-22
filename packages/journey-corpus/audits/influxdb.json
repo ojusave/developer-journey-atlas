@@ -1,0 +1,271 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "InfluxDB",
+    "slug": "influxdb",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "b4d85a2e819321ed9f1b48188e39fe2c4bb6bfca23e9aa910ae49d1c0a6526bc",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
+    ]
+  },
+  "developer_goal": "Create a free InfluxDB Cloud Serverless account and write the official home-sensor sample to the default bucket in the UI.",
+  "first_success": {
+    "outcome": "The developer writes InfluxData's published home-sensor line protocol sample to the automatically created default bucket through the UI.",
+    "observable_signal": "After Write Data is selected, the UI confirms that the data has been written successfully.",
+    "source_ids": [
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "InfluxDB Cloud Serverless Free Plan through InfluxData signup and UI",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "InfluxData Free Plan email or social signup then UI write",
+        "status": "unresolved",
+        "reason": "Email versus Google or Microsoft signup changes fields; password rules and verification recovery are incompletely documented."
+      },
+      {
+        "name": "AWS Marketplace Usage-Based signup",
+        "status": "not-selected",
+        "reason": "Requires AWS billing and is not the no-card Free Plan route documented for getting started without marketplace entitlement."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for InfluxDB Cloud Serverless through InfluxData.",
+      "required_fields": [
+        {
+          "label": "Signup method",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Google, Microsoft, or email."
+        },
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Documented for email signup."
+        },
+        {
+          "label": "Email address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Complexity rules are not fully published."
+        }
+      ],
+      "observable_result": "An InfluxDB Cloud account is created and email verification is required for email signup.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "verification",
+      "interface": "email",
+      "action": "Verify the email address when using email signup.",
+      "required_fields": [
+        {
+          "label": "Email verification",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Cloud setup can continue.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete Cloud setup for the Free Plan organization and default resources.",
+      "required_fields": [
+        {
+          "label": "Organization or setup choices presented after signup",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "A default bucket and UI workspace are available.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Write the published home-sensor sample through the UI Write Data flow.",
+      "required_fields": [
+        {
+          "label": "Sample line-protocol write action",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "The UI confirms the sample was written successfully.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Free Plan users are limited to one organization.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Email verification delivery for email signup.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "InfluxDB Cloud creates the Free Plan organization and default bucket.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional influx CLI install",
+      "reason": "Signup guide labels CLI download optional.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Sign up for InfluxDB Cloud Serverless",
+      "url": "https://docs.influxdata.com/influxdb3/cloud-serverless/sign-up/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free Plan",
+        "Signup methods",
+        "Email verification"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Set up InfluxDB",
+      "url": "https://docs.influxdata.com/influxdb3/cloud-serverless/get-started/setup/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Post-signup setup"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Get started writing data",
+      "url": "https://docs.influxdata.com/influxdb3/cloud-serverless/get-started/write/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First UI write"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Get started with InfluxDB Cloud Serverless",
+      "url": "https://docs.influxdata.com/influxdb3/cloud-serverless/get-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Get-started overview"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "InfluxDB Cloud Serverless limits",
+      "url": "https://docs.influxdata.com/influxdb3/cloud-serverless/admin/billing/limits/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free Plan limits"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "InfluxDB Pricing",
+      "url": "https://www.influxdata.com/influxdb-pricing/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Plan positioning"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What password rules and post-signup setup fields appear for email versus social signup?",
+      "impact": "Missing controls block verified field counts and route selection.",
+      "evidence_needed": "Fresh-account capture of both signup methods through first successful UI write."
+    },
+    {
+      "question": "What exact name is assigned to the automatically created default bucket?",
+      "impact": "Affects whether the documented write path needs rename or selection steps.",
+      "evidence_needed": "Observed default bucket naming for a new Free Plan organization."
+    }
+  ],
+  "counts": null
+}
