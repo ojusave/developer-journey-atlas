@@ -2,7 +2,7 @@
 
 ## Bounded question
 
-For a named platform and one documented developer goal, reconstruct the official path from the documented entry point to an explicitly named or demonstrated first success.
+For a named platform and one bounded developer goal, reconstruct the shortest required self-service path from account creation to an explicitly named or demonstrated first success.
 
 This is documentation research. It is not telemetry, usability testing, conversion analysis, or proof of abandonment.
 
@@ -18,7 +18,8 @@ Search results and model memory can locate sources but cannot support a recorded
 
 ## Recording rules
 
-- Preserve official order, prerequisites, choices, branches, waits, and success signals.
+- Track every required screen, field, agreement, verification, permission, authorization, implementation action, wait, and success signal.
+- Exclude documentation reading, optional work, and automatic platform behavior from the developer action path while preserving them in their proper evidence fields.
 - Attach source IDs to evidence-bearing fields.
 - Record undocumented transitions as uncertainties.
 - Record only vendor-stated time.

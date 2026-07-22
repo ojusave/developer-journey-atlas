@@ -19,6 +19,10 @@ const requiredFiles = [
   "data/coverage.json",
   "data/coverage-summary.json",
   "data/record.schema.json",
+  "data/shortest-path-audit.schema.json",
+  "data/audit-status.json",
+  "data/audits/render.json",
+  "data/audits/zoom.json",
   "source/index.md",
 ];
 
@@ -45,9 +49,9 @@ assert.equal(manifest.schemaVersion, 1);
 assert.equal(manifest.records.length, 205);
 assert.equal(manifest.counts.recordsWithErrors, 0);
 assert.equal(manifest.sourceCode.license, "Apache-2.0");
-assert.equal(manifest.sourceCode.files.length, 14);
-assert.match(manifest.interpretation.join(" "), /extracted from official docs/);
-assert.match(manifest.interpretation.join(" "), /not a ranking/);
+assert.equal(manifest.sourceCode.files.length, 15);
+assert.match(manifest.interpretation.join(" "), /source record is evidence/);
+assert.match(manifest.interpretation.join(" "), /Only audits marked verified/);
 assert.doesNotMatch(manifest.interpretation.join(" "), /score/i);
 
 for (const source of manifest.sourceCode.files) {
@@ -57,8 +61,12 @@ for (const source of manifest.sourceCode.files) {
 }
 
 const fullContext = await readFile(path.join(publicRoot, "llms-full.txt"), "utf8");
-assert.match(fullContext, /# Platform catalog/);
-assert.match(fullContext, /# Canonical record schema/);
+assert.match(fullContext, /# Corpus audit status/);
+assert.match(fullContext, /# Verified Render shortest-path audit/);
+assert.match(fullContext, /# Unresolved Zoom shortest-path audit/);
+assert.match(fullContext, /# Audit catalog/);
+assert.match(fullContext, /# Shortest-path audit schema/);
+assert.match(fullContext, /# Preserved source-record schema/);
 assert.match(fullContext, /# Deployed source code/);
 assert.ok(fullContext.length > 100_000, "full context should contain the catalog, schema, and source");
 

@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const check = process.argv.includes("--check");
 
-const GENERATED = ["coverage.json", "catalog.md", "ds-quality.json", "selected-path-heuristic.json"];
+const GENERATED = ["coverage.json", "catalog.md", "ds-quality.json", "selected-path-heuristic.json", "audit-status.json"];
 
 const KNOWN_DETECTORS = new Set(["starting-state", "opaque-signup", "contradictory-success-label", "non-atomic-step"]);
 const COMPARABILITY_ENUM = new Set(["comparable", "conditional", "not-comparable", "unreviewed"]);
@@ -33,7 +33,10 @@ function fail(msg) {
   process.exit(1);
 }
 
-// 1. Validate records (also writes coverage.json). Nonzero exit on invalid.
+// 1. Validate shortest-path audits and their frozen source-record hashes.
+run(`node scripts/validate-shortest-path-audits.mjs${check ? " --check" : ""}`);
+
+// 2. Validate records (also writes coverage.json). Nonzero exit on invalid.
 try {
   execSync("node validate-records.mjs --write", { cwd: ROOT, stdio: ["ignore", "ignore", "inherit"] });
 } catch {
@@ -41,12 +44,12 @@ try {
 }
 console.log("validated records + wrote coverage.json");
 
-// 2-4. Generate catalog, ds-quality, selected-path.
+// 3-5. Generate catalog, ds-quality, selected-path.
 run("node build-catalog.mjs");
 run("node build-ds-quality.mjs");
 run("node build-selected-path.mjs");
 
-// 5. Validate ds-quality.json structure (enums, detector rules, coverage).
+// 6. Validate ds-quality.json structure (enums, detector rules, coverage).
 const roster = JSON.parse(fs.readFileSync(path.join(ROOT, "roster.json"), "utf8"));
 const dq = JSON.parse(fs.readFileSync(path.join(ROOT, "ds-quality.json"), "utf8"));
 const dqErrors = [];
@@ -72,7 +75,7 @@ for (const r of dq.records) {
 if (dqErrors.length) fail("ds-quality.json invalid:\n  - " + dqErrors.join("\n  - "));
 console.log("validated ds-quality.json structure");
 
-// 6. Validate records once more (belt and suspenders).
+// 7. Validate records once more.
 try {
   execSync("node validate-records.mjs", { cwd: ROOT, stdio: ["ignore", "ignore", "inherit"] });
 } catch {
@@ -80,7 +83,7 @@ try {
 }
 console.log("re-validated records");
 
-// 7. Dirty-diff gate.
+// 8. Dirty-diff gate.
 if (check) {
   const status = execSync(`git status --porcelain ${GENERATED.join(" ")}`, { cwd: ROOT }).toString().trim();
   if (status) fail(`generation left a dirty diff (stale committed artifacts):\n${status}`);

@@ -3,7 +3,7 @@ import type { DataStore, MetricRow, QualityRow } from "./ports.js";
 export const MIN_COMPARABLE_PEERS = 3;
 
 export interface LoadComponent {
-  key: "requiredActions" | "waits" | "decisions" | "gates";
+  key: "requiredActions" | "requiredFields" | "waits" | "gates";
   label: string;
   value: number;
   peerMedian: number;
@@ -64,6 +64,10 @@ function unavailable(row: MetricRow, reason: string, peerCount = 0): DocumentedO
  * with the median of qualified peers and stays independently inspectable.
  */
 export function buildDocumentedOnboardingLoad(row: MetricRow, store: DataStore): DocumentedOnboardingLoad {
+  const targetAudit = store.getAudit(row.slug);
+  if (!targetAudit || targetAudit.audit_status !== "verified" || !targetAudit.counts) {
+    return unavailable(row, "This platform has not passed the shortest-required-path audit, so no peer placement is shown.");
+  }
   const targetQuality = store.getQuality(row.slug);
   if (row.research_status !== "complete") {
     return unavailable(row, "This record is not marked complete, so no peer placement is shown.");
@@ -77,6 +81,7 @@ export function buildDocumentedOnboardingLoad(row: MetricRow, store: DataStore):
     .filter((candidate) => candidate.category === row.category)
     .filter((candidate) => candidate.first_success_type === row.first_success_type)
     .filter((candidate) => candidate.research_status === "complete")
+    .filter((candidate) => store.getAudit(candidate.slug)?.audit_status === "verified")
     .filter((candidate) => candidate.comparability_status !== "not-comparable")
     .map((candidate) => ({ row: candidate, quality: store.getQuality(candidate.slug) }))
     .filter((candidate): candidate is QualifiedRow => Boolean(candidate.quality))
@@ -94,26 +99,26 @@ export function buildDocumentedOnboardingLoad(row: MetricRow, store: DataStore):
     {
       key: "requiredActions" as const,
       label: "Required developer actions",
-      value: row.required_developer_action_count,
-      peerValues: peers.map((peer) => peer.row.required_developer_action_count),
+      value: targetAudit.counts.required_actions,
+      peerValues: peers.map((peer) => store.getAudit(peer.row.slug)?.counts?.required_actions ?? 0),
     },
     {
       key: "waits" as const,
       label: "Wait or async points",
-      value: row.wait_or_async_count,
-      peerValues: peers.map((peer) => peer.row.wait_or_async_count),
+      value: targetAudit.counts.unavoidable_waits,
+      peerValues: peers.map((peer) => store.getAudit(peer.row.slug)?.counts?.unavoidable_waits ?? 0),
     },
     {
-      key: "decisions" as const,
-      label: "Decision points",
-      value: targetQuality.decision_count,
-      peerValues: peers.map((peer) => peer.quality.decision_count),
+      key: "requiredFields" as const,
+      label: "Required fields",
+      value: targetAudit.counts.required_fields,
+      peerValues: peers.map((peer) => store.getAudit(peer.row.slug)?.counts?.required_fields ?? 0),
     },
     {
       key: "gates" as const,
       label: "Documented friction gates",
-      value: row.gate_count,
-      peerValues: peers.map((peer) => peer.row.gate_count),
+      value: targetAudit.counts.external_gates,
+      peerValues: peers.map((peer) => store.getAudit(peer.row.slug)?.counts?.external_gates ?? 0),
     },
   ];
 

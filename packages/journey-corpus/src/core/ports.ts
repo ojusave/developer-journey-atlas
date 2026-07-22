@@ -39,6 +39,50 @@ export interface DatasetMeta {
   scoreModelVersion: string | null;
   caveats: string[];
   totals: { platforms: number; steps: number; sources: number };
+  audits?: { verified: number; pending: number; blocked: number; needsHumanJudgment: number };
+}
+
+export interface AuditField {
+  label: string;
+  field_type: string;
+  evidence_state: "documented" | "observed-public-ui" | "unverified";
+  source_ids: string[];
+  notes?: string;
+}
+
+export interface ShortestPathAudit {
+  schema_version: "1.0";
+  platform: { name: string; slug: string; category: string };
+  audit_status: "verified" | "blocked" | "needs-human-judgment";
+  audited_at: string;
+  source_record_sha256: string;
+  starting_state: { boundary: "account creation"; assumptions: string[] };
+  developer_goal: string;
+  first_success: { outcome: string; observable_signal: string; source_ids: string[] };
+  route_selection: {
+    surface: string;
+    rule: string;
+    selected: string | null;
+    candidates: Array<{ name: string; status: string; reason: string }>;
+  };
+  required_path: Array<{
+    step_number: number;
+    kind: string;
+    interface: string;
+    action: string;
+    required_fields: AuditField[];
+    observable_result: string;
+    evidence_state: "documented" | "observed-public-ui" | "unverified";
+    source_ids: string[];
+  }>;
+  prerequisites: Array<{ description: string; source_ids: string[] }>;
+  external_gates: Array<{ description: string; source_ids: string[] }>;
+  unavoidable_waits: Array<{ description: string; source_ids: string[] }>;
+  platform_outcomes: Array<{ description: string; source_ids: string[] }>;
+  excluded: Array<{ item: string; reason: string; source_ids: string[] }>;
+  sources: Array<{ id: string; title: string; url: string; source_type: string; accessed_at: string }>;
+  uncertainties: Array<{ question: string; impact: string; evidence_needed: string }>;
+  counts: null | { required_actions: number; required_fields: number; external_gates: number; unavoidable_waits: number };
 }
 
 /** A canonical record from records/<slug>.json (only the fields we render). */
@@ -85,6 +129,8 @@ export interface DataStore {
   getRow(slug: string): MetricRow | undefined;
   /** Canonical record. May be absent even when a row exists (degrade gracefully). */
   getRecord(slug: string): PlatformRecord | undefined;
+  /** Verified or in-progress shortest-path audit. May be absent while re-audit is pending. */
+  getAudit(slug: string): ShortestPathAudit | undefined;
   getQuality(slug: string): QualityRow | undefined;
 }
 

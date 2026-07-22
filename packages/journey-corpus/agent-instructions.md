@@ -1,4 +1,12 @@
-# Parallel two-pass first-mile research instructions
+# Parallel two-pass source-record research instructions
+
+> This file governs reconstruction of the preserved `records/*.json` evidence
+> layer. A source record is not a publishable shortest-path audit and must never
+> supply public action counts, field counts, peer placement, or onboarding-load
+> comparisons. For the current account-creation-to-first-success contract, use
+> `../../docs/prompts/audit-shortest-required-onboarding-paths.md` and create a
+> checker-approved sidecar in `audits/<slug>.json`. Until that sidecar is
+> verified, the platform remains `pending re-audit` in public outputs.
 
 Each record covers exactly one roster entry. Work only within the roster entries
 assigned to your batch, and never edit another batch's records.
@@ -58,6 +66,10 @@ assigned to your batch, and never edit another batch's records.
    evidence-bearing field. Record missing or contradictory transitions as
    uncertainties.
 10. Stop at first success and list later material explicitly excluded.
+    This source record may retain platform events and documentation context for
+    provenance. The shortest-path audit must separately keep only required
+    developer actions in its ordered path and list every required field under
+    the action containing that field.
 11. Write only the assigned staging record with `apply_patch`. Never edit the
     canonical record directory before checker approval and parent integration.
 12. Run the record validator and correct deterministic

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import type { DataStore, DatasetMeta, MetricRow, PlatformRecord, QualityRow } from "../core/ports.js";
+import type { DataStore, DatasetMeta, MetricRow, PlatformRecord, QualityRow, ShortestPathAudit } from "../core/ports.js";
 
 interface HeuristicFile {
   score_model_version?: string;
@@ -19,6 +19,13 @@ interface QualityFile {
   records?: QualityRow[];
 }
 
+interface AuditStatusFile {
+  verified?: number;
+  pending?: number;
+  blocked?: number;
+  needs_human_judgment?: number;
+}
+
 function readJson<T>(file: string): T {
   return JSON.parse(readFileSync(file, "utf8")) as T;
 }
@@ -34,14 +41,17 @@ export class LocalDataStore implements DataStore {
   private readonly bySlug: Map<string, MetricRow>;
   private readonly metaValue: DatasetMeta;
   private readonly recordsDir: string;
+  private readonly auditsDir: string;
   private readonly qualityBySlug: Map<string, QualityRow>;
   private readonly recordCache = new Map<string, PlatformRecord | undefined>();
+  private readonly auditCache = new Map<string, ShortestPathAudit | undefined>();
 
   constructor(dataRoot: string) {
     const heuristic = readJson<HeuristicFile>(path.join(dataRoot, "selected-path-heuristic.json"));
     this.rows = heuristic.rows ?? [];
     this.bySlug = new Map(this.rows.map((r) => [r.slug, r]));
     this.recordsDir = path.join(dataRoot, "records");
+    this.auditsDir = path.join(dataRoot, "audits");
     const quality = readJson<QualityFile>(path.join(dataRoot, "ds-quality.json"));
     this.qualityBySlug = new Map((quality.records ?? []).map((record) => [record.slug, record]));
 
@@ -52,6 +62,12 @@ export class LocalDataStore implements DataStore {
       coverage = {};
     }
     const covRecords = coverage.records ?? [];
+    let auditStatus: AuditStatusFile = {};
+    try {
+      auditStatus = readJson<AuditStatusFile>(path.join(dataRoot, "audit-status.json"));
+    } catch {
+      auditStatus = {};
+    }
 
     this.metaValue = {
       count: this.rows.length,
@@ -62,6 +78,12 @@ export class LocalDataStore implements DataStore {
         platforms: coverage.roster_count ?? this.rows.length,
         steps: covRecords.reduce((t, r) => t + (r.steps ?? 0), 0),
         sources: covRecords.reduce((t, r) => t + (r.sources ?? 0), 0),
+      },
+      audits: {
+        verified: auditStatus.verified ?? 0,
+        pending: auditStatus.pending ?? this.rows.length,
+        blocked: auditStatus.blocked ?? 0,
+        needsHumanJudgment: auditStatus.needs_human_judgment ?? 0,
       },
     };
   }
@@ -88,6 +110,18 @@ export class LocalDataStore implements DataStore {
     }
     this.recordCache.set(slug, record);
     return record;
+  }
+
+  getAudit(slug: string): ShortestPathAudit | undefined {
+    if (this.auditCache.has(slug)) return this.auditCache.get(slug);
+    let audit: ShortestPathAudit | undefined;
+    try {
+      audit = readJson<ShortestPathAudit>(path.join(this.auditsDir, `${slug}.json`));
+    } catch {
+      audit = undefined;
+    }
+    this.auditCache.set(slug, audit);
+    return audit;
   }
 
   getQuality(slug: string): QualityRow | undefined {

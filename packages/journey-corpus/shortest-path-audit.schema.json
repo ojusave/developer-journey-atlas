@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer-journey-atlas.local/shortest-path-audit.schema.json",
+  "title": "Developer Journey Atlas shortest required path audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "platform",
+    "audit_status",
+    "audited_at",
+    "source_record_sha256",
+    "starting_state",
+    "developer_goal",
+    "first_success",
+    "route_selection",
+    "required_path",
+    "prerequisites",
+    "external_gates",
+    "unavoidable_waits",
+    "platform_outcomes",
+    "excluded",
+    "sources",
+    "uncertainties",
+    "counts"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "slug", "category"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "category": {"type": "string", "minLength": 1}
+      }
+    },
+    "audit_status": {"enum": ["verified", "blocked", "needs-human-judgment"]},
+    "audited_at": {"type": "string", "format": "date"},
+    "source_record_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "starting_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boundary", "assumptions"],
+      "properties": {
+        "boundary": {"const": "account creation"},
+        "assumptions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "developer_goal": {"type": "string", "minLength": 1},
+    "first_success": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "observable_signal", "source_ids"],
+      "properties": {
+        "outcome": {"type": "string", "minLength": 1},
+        "observable_signal": {"type": "string", "minLength": 1},
+        "source_ids": {"$ref": "#/$defs/sourceIds"}
+      }
+    },
+    "route_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "rule", "selected", "candidates"],
+      "properties": {
+        "surface": {"type": "string", "minLength": 1},
+        "rule": {"type": "string", "minLength": 1},
+        "selected": {"type": ["string", "null"]},
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "status", "reason"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "status": {"enum": ["selected", "not-selected", "unresolved"]},
+              "reason": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "required_path": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/action"}
+    },
+    "prerequisites": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "external_gates": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "unavoidable_waits": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "platform_outcomes": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "reason", "source_ids"],
+        "properties": {
+          "item": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "url", "source_type", "accessed_at", "evidence_supported"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^S[0-9]+$"},
+          "title": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "format": "uri"},
+          "source_type": {"enum": ["official-documentation", "official-support", "observed-public-ui"]},
+          "accessed_at": {"type": "string", "format": "date"},
+          "evidence_supported": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "impact", "evidence_needed"],
+        "properties": {
+          "question": {"type": "string", "minLength": 1},
+          "impact": {"type": "string", "minLength": 1},
+          "evidence_needed": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "counts": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required_actions", "required_fields", "external_gates", "unavoidable_waits"],
+          "properties": {
+            "required_actions": {"type": "integer", "minimum": 1},
+            "required_fields": {"type": "integer", "minimum": 0},
+            "external_gates": {"type": "integer", "minimum": 0},
+            "unavoidable_waits": {"type": "integer", "minimum": 0}
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"audit_status": {"const": "verified"}}, "required": ["audit_status"]},
+      "then": {
+        "properties": {
+          "required_path": {"minItems": 1},
+          "counts": {"type": "object"},
+          "uncertainties": {"maxItems": 0}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"audit_status": {"enum": ["blocked", "needs-human-judgment"]}}, "required": ["audit_status"]},
+      "then": {"properties": {"counts": {"type": "null"}, "uncertainties": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "sourceIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "pattern": "^S[0-9]+$"},
+      "uniqueItems": true
+    },
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "field_type", "evidence_state", "source_ids"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1},
+        "field_type": {"enum": ["text", "email", "password", "select", "checkbox", "agreement", "challenge", "code", "url", "repository", "permission", "command", "other"]},
+        "evidence_state": {"enum": ["documented", "observed-public-ui", "unverified"]},
+        "source_ids": {"$ref": "#/$defs/sourceIds"},
+        "notes": {"type": "string"}
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step_number", "kind", "interface", "action", "required_fields", "observable_result", "evidence_state", "source_ids"],
+      "properties": {
+        "step_number": {"type": "integer", "minimum": 1},
+        "kind": {"enum": ["account", "product-interaction", "external-authorization", "implementation", "verification"]},
+        "interface": {"enum": ["browser", "web-ui", "email", "external-system", "cli", "code", "ide", "api", "sdk", "other"]},
+        "action": {"type": "string", "minLength": 1},
+        "required_fields": {"type": "array", "items": {"$ref": "#/$defs/field"}},
+        "observable_result": {"type": "string", "minLength": 1},
+        "evidence_state": {"enum": ["documented", "observed-public-ui", "unverified"]},
+        "source_ids": {"$ref": "#/$defs/sourceIds"}
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "source_ids"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "source_ids": {"$ref": "#/$defs/sourceIds"}
+      }
+    }
+  }
+}

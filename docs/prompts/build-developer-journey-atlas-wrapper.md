@@ -34,6 +34,8 @@ If a platform is absent, let the visitor start source-grounded research, inspect
 
 ## Measurement and accuracy contract
 
+All public paths and comparisons must satisfy the canonical [shortest required onboarding path audit](audit-shortest-required-onboarding-paths.md). Source records remain the evidence archive. An unaudited source record must not be presented as a verified shortest path.
+
 Do not invent or imply observed user behavior.
 
 - Never present documentation-derived data as a drop-off rate, conversion rate, usability score, completion probability, or observed completion time.
@@ -160,4 +162,3 @@ Return only the consequential facts:
 - whether live research and draft GitHub contributions are enabled
 - verification results
 - any exact secret or user action still required
-

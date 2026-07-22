@@ -111,6 +111,19 @@ function readStrip() {
     </p>`;
 }
 
+function auditBanner(a) {
+  if (a.auditStatus === "verified") {
+    return `<div class="draft-banner"><strong>Shortest required path verified.</strong> Starts at account creation, ends at first success, includes every evidenced required field, and excludes optional work.</div>`;
+  }
+  if (a.auditStatus === "needs-human-judgment") {
+    return `<div class="draft-banner"><strong>Route not yet verified.</strong> Current evidence leaves a consequential route or field choice unresolved. Counts and peer comparison are withheld.</div>`;
+  }
+  if (a.auditStatus === "blocked") {
+    return `<div class="draft-banner"><strong>Audit blocked.</strong> A required transition or field is hidden from available evidence. Counts and peer comparison are withheld.</div>`;
+  }
+  return `<div class="draft-banner"><strong>Pending re-audit.</strong> The original evidence record is preserved, but it is not presented as a verified shortest path.</div>`;
+}
+
 function renderLoad(load) {
   if (!load || !load.available) {
     return `
@@ -157,10 +170,14 @@ function stepItem(s) {
     ? `<p class="step-signal"><strong>Success signal:</strong> ${esc(s.successSignal)}</p>`
     : "";
   const optional = s.required ? "" : '<span class="step-optional">optional</span>';
+  const fields = s.requiredFields && s.requiredFields.length
+    ? `<div class="step-fields"><strong>Required fields</strong><ul class="step-details">${s.requiredFields.map((field) => `<li>${esc(field.label)} <span class="step-tag">${esc(field.type)}</span>${field.notes ? `<br><span class="microcopy">${esc(field.notes)}</span>` : ""}</li>`).join("")}</ul></div>`
+    : "";
   return `
     <li class="step">
       <div class="step-head"><span class="step-num">${num(s.stepNumber)}</span>${meta}${optional}</div>
       <p class="step-action">${esc(s.action)}</p>
+      ${fields}
       ${details}
       ${signal}
     </li>`;
@@ -192,7 +209,7 @@ function renderAssessment(a) {
 
   const steps = a.steps.length
     ? `<ol class="steps-list">${a.steps.map(stepItem).join("")}</ol>`
-    : '<p class="lede">Open the full record for the documented steps.</p>';
+    : '<p class="lede">No shortest required path is published until this platform passes re-audit.</p>';
 
   const asOf = a.researchedAt
     ? ` Documented from official docs as of ${esc(a.researchedAt)}. Docs change.`
@@ -202,6 +219,19 @@ function renderAssessment(a) {
     ? `<ul class="prompt-list">${a.investigationPrompts.map((prompt) => `<li>${esc(prompt)}</li>`).join("")}</ul>`
     : '<p class="lede">No specific investigation prompts were derived from the documented route.</p>';
 
+  const signals = a.routeSignals
+    ? `<div class="signal-counters" aria-label="Verified shortest-path signals">
+          <div><strong>${num(a.routeSignals.requiredActions)}</strong><span>required actions</span></div>
+          <div><strong>${num(a.routeSignals.requiredFields)}</strong><span>required fields</span></div>
+          <div><strong>${num(a.routeSignals.waits)}</strong><span>unavoidable waits</span></div>
+          <div><strong>${num(a.routeSignals.gates)}</strong><span>external gates</span></div>
+        </div>`
+    : '<div class="signal-counters"><div><strong>Withheld</strong><span>until shortest-path audit passes</span></div></div>';
+
+  const comparison = a.auditStatus === "verified" ? renderLoad(a.onboardingLoad) : "";
+  const pathLabel = a.auditStatus === "verified" ? "Open the verified shortest required path" : "Review the current audit evidence";
+  const pathCount = a.pathStepCount == null ? "not verified" : `${num(a.pathStepCount)} actions`;
+
   return `
     <div class="card">
       <div class="assess-head">
@@ -210,6 +240,7 @@ function renderAssessment(a) {
       </div>
       <p class="lede">${esc(a.outcome)}</p>
       ${readStrip()}
+      ${auditBanner(a)}
 
       <div class="summary-grid">
         <div class="summary-block">
@@ -217,15 +248,10 @@ function renderAssessment(a) {
           <p class="summary-answer">${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</p>
           <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
         </div>
-        <div class="signal-counters" aria-label="Documented route signals">
-          <div><strong>${num(a.routeSignals.requiredActions)}</strong><span>required actions</span></div>
-          <div><strong>${num(a.routeSignals.waits)}</strong><span>waits</span></div>
-          <div><strong>${num(a.routeSignals.decisions)}</strong><span>decisions</span></div>
-          <div><strong>${num(a.routeSignals.gates)}</strong><span>gates</span></div>
-        </div>
+        ${signals}
       </div>
 
-      ${renderLoad(a.onboardingLoad)}
+      ${comparison}
 
       <section class="prompt-card" aria-labelledby="prompt-title">
         <p class="section-kicker">WHERE TO INVESTIGATE</p>
@@ -235,13 +261,13 @@ function renderAssessment(a) {
       </section>
 
       <details class="detail-panel">
-        <summary>Open the full documented route <span>${num(a.pathStepCount)} steps</span></summary>
+        <summary>${pathLabel} <span>${pathCount}</span></summary>
         <dl class="kv">
           <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
           <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
           <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
         </dl>
-        <h3 class="steps-heading">Documented steps <span class="steps-count">${num(a.pathStepCount)} steps</span></h3>
+        <h3 class="steps-heading">Account creation to first success <span class="steps-count">${pathCount}</span></h3>
         ${steps}
       </details>
 
@@ -251,6 +277,7 @@ function renderAssessment(a) {
       </details>
 
       <p class="dist-line"><a href="${esc(a.recordUrl)}" rel="noreferrer">Open the full evidence record (JSON)</a></p>
+      ${a.auditUrl ? `<p class="dist-line"><a href="${esc(a.auditUrl)}" rel="noreferrer">Open the shortest-path audit (JSON)</a></p>` : ""}
       <p class="dist-line note-line">${esc(a.note)}${asOf}</p>
     </div>`;
 }
