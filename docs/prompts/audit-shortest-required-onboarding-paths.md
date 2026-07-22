@@ -1,14 +1,13 @@
-# Cursor prompt: audit the shortest required developer onboarding paths
+# Full-corpus audit protocol
 
-## Where we are now
+## Current state
 
 You are working on Developer Journey Atlas.
 
 - Canonical GitHub repository: `https://github.com/ojusave/developer-journey-atlas`
-- Local repository: `/Users/ojusave/Desktop/Samples/work/workshops/devrelcon-first-mile/scanner-app`
 - Production: `https://developer-journey-atlas.onrender.com`
-- The canonical branch is `main`. Pull the latest `main` before creating a focused audit branch.
-- PR #5 established the new account-creation-to-first-success audit contract and is merged.
+- The canonical branch is `main`.
+- The account-creation-to-first-success audit contract is established in the schema, measurement contract, and selection policy.
 - The repository contains 205 preserved source-evidence records in `packages/journey-corpus/records/`.
 - Do not rewrite those records. Their exact SHA-256 hashes are checked by the audit validator.
 - The separate authoritative audit layer is `packages/journey-corpus/audits/`.
@@ -18,13 +17,11 @@ You are working on Developer Journey Atlas.
 - Zoom is `needs-human-judgment`. Its counts are correctly withheld because the exact app goal and a reported Marketplace terms screen remain unresolved.
 - The other 203 platforms are `pending` and their legacy step totals are correctly withheld from the UI, catalog, LLM artifacts, and peer comparison.
 - The live wrapper, API, human catalog, and LLM-readable files already enforce those states. Do not rebuild the product or invent a new scoring system.
-- An unrelated local file named `docs/prompts/migrate-atlas-research-to-render-workflows.md` may be untracked. Preserve it and do not stage, edit, delete, or include it in audit commits.
-
-Before editing, run `git status -sb`, inspect the current branch, fetch `atlas`, and confirm that you are based on the latest `atlas/main`. Never push to the legacy `origin` remote.
+Before editing, run `git status -sb`, inspect the current branch, fetch the canonical remote, and confirm that the work is based on the latest `main`.
 
 ## Where we want to be
 
-Complete the entire corpus re-audit in this assignment. Do not stop after a calibration set, category, batch, or progress report.
+Complete the entire corpus re-audit. A calibration set, category, batch, or progress report is not a terminal result.
 
 The terminal corpus state is:
 
@@ -85,22 +82,15 @@ Do not look for or claim observed drop-off, conversion, difficulty, completion t
 - Start from latest `atlas/main` and create a branch such as `research/audit-entire-corpus`.
 - Freeze the ordered roster and SHA-256 hash of every preserved source record before research begins.
 - Partition all 203 pending slugs into non-overlapping category-based shards.
-- You are explicitly authorized to spawn agents and nested subagents. Use the maximum safe parallelism available instead of processing the corpus serially.
-- Use a coordinator hierarchy when the agent runtime supports it:
-  - one parent coordinator owns the contract, roster, assignments, integration, and terminal state;
-  - category leads own mutually exclusive platform shards and monitor completeness;
-  - maker agents research and write only their assigned audit files;
-  - separate checker agents independently reopen sources and approve, correct, or downgrade each audit;
-  - verification agents run cross-corpus integrity, generated-artifact, API, UI, and production checks.
-- Agents may spawn subagents for official-source discovery, route reconstruction, field verification, and contradiction checks, but the assigning agent remains accountable for evidence completeness.
-- Assign one maker and one different checker to every shard or platform. No agent may verify its own work.
+- Use non-overlapping category-based shards when several researchers are available.
+- Assign one maker and one different checker to every shard or platform. No researcher may verify their own work.
 - Give each worker exclusive ownership of its assigned `audits/<slug>.json` files. Workers must not edit shared generated files, schemas, validators, source records, or another worker's audit.
-- Use isolated worktrees when available. If agents share one checkout, enforce exclusive file ownership and serialize integration writes.
+- Use isolated worktrees when available. If researchers share one checkout, enforce exclusive file ownership and serialize integration writes.
 - Run research and independent checking concurrently across shards. A checker must reopen the official sources and may not approve from the maker's narrative alone.
 - The parent owns the roster, assignment map, shared contract, conflict resolution, status generation, integration, tests, and publication.
 - Every worker return must include assigned slugs, final status per slug, official URLs inspected, unresolved evidence, files changed, validator result, and confirmation that preserved source records were untouched.
-- If subagents are unavailable, process the complete roster sequentially with a cold second pass per platform. Do not reduce scope.
-- Do not stop when one shard finishes. Continue until every assigned slug has a final audit status and `pending` reaches zero.
+- If independent researchers are unavailable, process the complete roster sequentially with a cold second pass per platform. Do not reduce scope.
+- Continue until every assigned slug has a final audit status and `pending` reaches zero.
 - Confirm throughout that no file under `packages/journey-corpus/records/` changes.
 
 Use internal checkpoints only to detect drift and rebalance work. Checkpoints are not completion. Report progress as `completed / 203`, but keep working until it reaches `203 / 203`.
@@ -109,7 +99,7 @@ Use internal checkpoints only to detect drift and rebalance work. Checkpoints ar
 
 Read completely:
 
-- this prompt;
+- this protocol;
 - `packages/journey-corpus/SELECTION-POLICY.md`;
 - `packages/journey-corpus/MEASUREMENT-CONTRACT.md`;
 - `packages/journey-corpus/shortest-path-audit.schema.json`;
@@ -377,8 +367,8 @@ Never expose an action count or comparison for a record whose audit status is no
 1. Freeze hashes for all canonical source records.
 2. Audit Render and Zoom as calibration cases.
 3. Run deterministic checks against the two cases and correct the contract if either path still includes documentation, optional actions, or platform events.
-4. Audit the entire remaining roster in parallel non-overlapping shards with one maker and one independent checker per record when independent agents are available.
-5. If independent agents are unavailable, use a cold review that reopens the original prompt, official sources, and audit record without relying on the maker's explanation.
+4. Audit the entire remaining roster in parallel non-overlapping shards with one maker and one independent checker per record when independent researchers are available.
+5. If independent researchers are unavailable, use a cold review that reopens this protocol, the official sources, and the audit record without relying on the maker's explanation.
 6. During execution, keep unaudited records visible as `pending re-audit`, but do not show their path count, peer placement, or onboarding-load comparison as verified. Do not finish the assignment until no pending records remain.
 7. Regenerate public and LLM-readable artifacts only from verified audit records.
 8. Confirm source-record hashes remain unchanged.
@@ -398,7 +388,7 @@ An audit passes only when:
 - schema validation, source-reference validation, generated-artifact checks, and regressions pass;
 - public UI wording does not imply observed drop-off, difficulty, completion time, or conversion.
 
-## Prompt failure simulations
+## Protocol integrity tests
 
 The checker must reject these cases:
 
