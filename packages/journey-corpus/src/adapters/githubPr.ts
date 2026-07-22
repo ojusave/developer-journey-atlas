@@ -1,4 +1,4 @@
-import type { PlatformRecord, RepoWriter } from "../core/ports.js";
+import type { PlatformRecord, RepoWriter, ShortestPathAudit } from "../core/ports.js";
 
 const API = "https://api.github.com";
 const TIMEOUT_MS = 30_000;
@@ -65,6 +65,33 @@ export class GitHubPrWriter implements RepoWriter {
     const raced = await this.openPrForBranch(branch);
     if (raced) return { url: raced, reused: true };
     return { url: await this.openPr(branch, slug, record), reused: false };
+  }
+
+  /** Draft PR for an audit sidecar. Never auto-merges. Branch: audit/<slug>. */
+  async openDraftAuditPR(audit: ShortestPathAudit): Promise<{ url: string; reused: boolean }> {
+    const slug = audit.platform.slug;
+    const branch = `audit/${slug}`;
+    const path = `packages/journey-corpus/audits/${slug}.json`;
+    const content = Buffer.from(`${JSON.stringify(audit, null, 2)}\n`, "utf8").toString("base64");
+
+    const existing = await this.openPrForBranch(branch);
+    if (existing) return { url: existing, reused: true };
+
+    const baseSha = await this.branchSha(this.baseBranch);
+    await this.ensureBranch(branch, baseSha);
+
+    const existingFileSha = await this.fileSha(path, branch);
+    await this.putFile(
+      path,
+      branch,
+      content,
+      existingFileSha,
+      `Update shortest-path audit: ${slug} (${audit.audit_status})`,
+    );
+
+    const raced = await this.openPrForBranch(branch);
+    if (raced) return { url: raced, reused: true };
+    return { url: await this.openAuditPr(branch, slug, audit), reused: false };
   }
 
   private headers(): Record<string, string> {
@@ -192,6 +219,38 @@ export class GitHubPrWriter implements RepoWriter {
       },
     );
     if (status !== 201 || !json.html_url) this.fail("open PR", status, json.message);
+    return json.html_url as string;
+  }
+
+  private async openAuditPr(branch: string, slug: string, audit: ShortestPathAudit): Promise<string> {
+    const body = [
+      `Machine-assisted shortest-path audit for **${audit.platform.name}** (\`${slug}\`).`,
+      "",
+      `Proposed status: **${audit.audit_status}**.`,
+      audit.audit_status === "verified"
+        ? "Deterministic eligibility checks passed on this draft. Still requires independent human review before merge."
+        : "Eligibility checks did not pass. Counts stay withheld. Resolve uncertainties before verifying.",
+      "",
+      "Does not rewrite frozen `records/*`. Review `audits/<slug>.json` against official sources.",
+      "Verified peer curves unlock only after enough verified audits merge (≥3 comparable peers).",
+      "",
+      `- Uncertainties: ${audit.uncertainties?.length ?? 0}`,
+      `- Required path steps: ${audit.required_path?.length ?? 0}`,
+      `- Counts: ${audit.counts ? JSON.stringify(audit.counts) : "null"}`,
+    ].join("\n");
+
+    const { status, json } = await this.request<{ html_url?: string; message?: string }>(
+      "POST",
+      `/repos/${this.repo}/pulls`,
+      {
+        title: `Audit ${slug}: ${audit.audit_status}`,
+        head: branch,
+        base: this.baseBranch,
+        body,
+        draft: true,
+      },
+    );
+    if (status !== 201 || !json.html_url) this.fail("open audit PR", status, json.message);
     return json.html_url as string;
   }
 }

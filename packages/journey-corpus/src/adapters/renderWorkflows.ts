@@ -2,6 +2,7 @@ import { createWorkflowsClient } from "@renderinc/sdk/workflows";
 import type {
   ResearchOutcome, ResearchTaskInput, RunPhase, RunStatusProjection, WorkflowRunner,
 } from "../workflows/contract.js";
+import type { VerifyOutcome } from "../core/runVerifyAudit.js";
 
 type Client = ReturnType<typeof createWorkflowsClient>;
 
@@ -9,12 +10,27 @@ const KNOWN_OUTCOMES = new Set<ResearchOutcome["outcome"]>([
   "known", "no_docs", "invalid_output", "source_grounding_failed", "search_failed", "model_failed", "completed",
 ]);
 
+const VERIFY_OUTCOMES = new Set<VerifyOutcome["outcome"]>([
+  "not_found", "unchanged", "invalid_output", "search_failed", "model_failed", "completed",
+]);
+
 /** Coerce a raw task result into a ResearchOutcome, or null if unrecognizable. */
 export function coerceOutcome(raw: unknown): ResearchOutcome | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const outcome = (raw as { outcome?: unknown }).outcome;
-  if (typeof outcome !== "string" || !KNOWN_OUTCOMES.has(outcome as ResearchOutcome["outcome"])) return null;
+  const obj = raw as { outcome?: unknown; assessment?: unknown; audit?: unknown };
+  if (typeof obj.outcome !== "string" || !KNOWN_OUTCOMES.has(obj.outcome as ResearchOutcome["outcome"])) return null;
+  // Verify completed also uses outcome:"completed" but carries audit, not assessment.
+  if (obj.outcome === "completed" && obj.audit && !obj.assessment) return null;
   return raw as ResearchOutcome;
+}
+
+export function coerceVerifyOutcome(raw: unknown): VerifyOutcome | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const obj = raw as { outcome?: unknown; audit?: unknown; assessment?: unknown };
+  if (typeof obj.outcome !== "string" || !VERIFY_OUTCOMES.has(obj.outcome as VerifyOutcome["outcome"])) return null;
+  if (obj.outcome === "completed" && obj.assessment && !obj.audit) return null;
+  if (obj.outcome === "completed" && !obj.audit) return null;
+  return raw as VerifyOutcome;
 }
 
 /**
@@ -31,7 +47,7 @@ export function projectRun(runId: string, details: {
   const retries = typeof details.retries === "number" ? details.retries : 0;
 
   let phase: RunPhase;
-  let result: ResearchOutcome | null = null;
+  let result: ResearchOutcome | VerifyOutcome | null = null;
   let message: string | null = null;
 
   switch (status) {
@@ -43,23 +59,26 @@ export function projectRun(runId: string, details: {
       phase = retries > 0 ? "retrying" : "running";
       break;
     case "succeeded":
-    case "completed":
-      result = coerceOutcome(details.results?.[0]);
+    case "completed": {
+      const research = coerceOutcome(details.results?.[0]);
+      const verify = coerceVerifyOutcome(details.results?.[0]);
+      result = research ?? verify;
       if (result) {
         phase = "completed";
       } else {
         phase = "failed";
-        message = "The research run finished but returned no usable result.";
+        message = "The run finished but returned no usable result.";
       }
       break;
+    }
     case "canceled":
       phase = "failed";
-      message = "The research run was canceled.";
+      message = "The run was canceled.";
       break;
     case "failed":
     default:
       phase = "failed";
-      message = "Research could not be completed. This is usually a temporary provider or infrastructure issue. Try again.";
+      message = "The run could not be completed. This is usually a temporary provider or infrastructure issue. Try again.";
       break;
   }
 
@@ -84,6 +103,11 @@ export class RenderWorkflowRunner implements WorkflowRunner {
 
   async start(input: ResearchTaskInput): Promise<{ runId: string }> {
     const run = await this.client.startTask(this.taskSlug, [input]);
+    return { runId: run.taskRunId };
+  }
+
+  async startNamedTask(taskSlug: string, input: unknown): Promise<{ runId: string }> {
+    const run = await this.client.startTask(taskSlug, [input]);
     return { runId: run.taskRunId };
   }
 

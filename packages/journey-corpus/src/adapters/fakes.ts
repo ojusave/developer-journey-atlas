@@ -84,6 +84,7 @@ export class FakeRepoWriter implements RepoWriter {
  */
 export class FakeWorkflowRunner implements WorkflowRunner {
   public started: ResearchTaskInput[] = [];
+  public namedStarts: Array<{ taskSlug: string; input: unknown }> = [];
   private index = 0;
   constructor(
     private readonly runId = "run-fake-1",
@@ -94,6 +95,12 @@ export class FakeWorkflowRunner implements WorkflowRunner {
   async start(input: ResearchTaskInput): Promise<{ runId: string }> {
     if (this.startError) throw this.startError;
     this.started.push(input);
+    return { runId: this.runId };
+  }
+
+  async startNamedTask(taskSlug: string, input: unknown): Promise<{ runId: string }> {
+    if (this.startError) throw this.startError;
+    this.namedStarts.push({ taskSlug, input });
     return { runId: this.runId };
   }
 

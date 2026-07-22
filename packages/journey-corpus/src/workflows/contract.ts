@@ -73,7 +73,7 @@ export interface RunStatusProjection {
   runId: string;
   phase: RunPhase;
   /** Present once the run reaches a terminal, successful state. */
-  result: ResearchOutcome | null;
+  result: ResearchOutcome | import("../core/runVerifyAudit.js").VerifyOutcome | null;
   /** User-safe message when the run itself failed (infrastructure/provider). */
   message: string | null;
 }
@@ -85,5 +85,7 @@ export interface RunStatusProjection {
  */
 export interface WorkflowRunner {
   start(input: ResearchTaskInput): Promise<{ runId: string }>;
+  /** Start an arbitrary registered task by slug (e.g. verifyPlatformAudit). */
+  startNamedTask(taskSlug: string, input: unknown): Promise<{ runId: string }>;
   status(runId: string): Promise<RunStatusProjection>;
 }

@@ -7,6 +7,7 @@ import { getBlockerMeta, getPlatformJourney } from "./journey.js";
 import { getPlatformCurve } from "./curve.js";
 import { searchPlatforms } from "./search.js";
 import { getResearchStatus, startResearch } from "./research.js";
+import { getVerifyStatus, startVerify } from "./verify.js";
 
 // Note: the cross-platform comparison endpoint (src/api/compare.ts +
 // src/core/comparison.ts) is intentionally NOT mounted. It computes a
@@ -28,6 +29,8 @@ export function createApiRouter(store: DataStore, runner: WorkflowRunner | null)
   // Async research: start a durable Workflow run, then poll its status by id.
   router.post("/research", startResearch(store, runner));
   router.get("/research/:runId", getResearchStatus(runner));
+  router.post("/verify", startVerify(store, runner));
+  router.get("/verify/:runId", getVerifyStatus(runner));
 
   return router;
 }
