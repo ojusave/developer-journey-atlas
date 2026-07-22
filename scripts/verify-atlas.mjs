@@ -270,12 +270,12 @@ if (
     approvalBasisCounts.byte_identical_history_import === 284 &&
     approvalBasisCounts.reviewed_license_metadata_change === 4 &&
     approvalBasisCounts.reviewed_non_data_omission === 1 &&
-    approvalBasisCounts.unchanged_blob_verified === 76 &&
-    approvalBasisCounts.path_only_hash_verified === 1 &&
+    approvalBasisCounts.unchanged_blob_verified === 77 &&
+    (approvalBasisCounts.path_only_hash_verified ?? 0) === 0 &&
     approvalBasisCounts.reviewed_compatibility_change === 6 &&
     approvalBasisCounts.reviewed_post_migration_change === 3
   ) {
-  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 76 unchanged, 1 path-only, 6 compatibility, and 3 post-migration mappings approved by evidence class");
+  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 77 unchanged, 6 compatibility, and 3 post-migration mappings approved by evidence class");
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
