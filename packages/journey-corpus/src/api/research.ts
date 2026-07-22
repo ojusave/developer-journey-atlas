@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { config } from "../config.js";
+import { config, researchConfigStatus } from "../config.js";
 import { sendError } from "./http.js";
 import { runResearch, type ResearchDeps } from "../core/researchPipeline.js";
 
@@ -27,11 +27,13 @@ function takeResearchSlot(ip: string, now = Date.now()): boolean {
 export function startResearch(deps: ResearchDeps | null) {
   return async (req: Request, res: Response): Promise<void> => {
     if (!config.researchEnabled) {
-      sendError(res, 503, "research_disabled", "Live research for unknown platforms is not enabled.");
+      const status = researchConfigStatus();
+      sendError(res, 503, "research_disabled", `Live research is not configured on this deployment. Set ${status.missing.join(", ")}.`);
       return;
     }
     if (!deps) {
-      sendError(res, 503, "research_unconfigured", "Research is enabled but not configured (missing search or LLM key).");
+      const status = researchConfigStatus();
+      sendError(res, 503, "research_unconfigured", `Live research is enabled but missing ${status.missing.join(", ")}.`);
       return;
     }
     const platform = typeof req.body?.platform === "string" ? req.body.platform.trim() : "";
