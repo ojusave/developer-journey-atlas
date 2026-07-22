@@ -119,6 +119,12 @@ export interface PlatformRecord {
   [key: string]: unknown;
 }
 
+/** Optional journey overlay with friction highlights (see journeyOverlay.ts). */
+export interface JourneyCapable {
+  getJourney(slug: string): import("./journeyOverlay.js").JourneyOverlay | undefined;
+  blockerReasonCount(): number;
+}
+
 /**
  * DataStore is the only capability the feature code needs to read the dataset.
  * Critical-path dependency: the app is meaningless without it.
@@ -132,6 +138,10 @@ export interface DataStore {
   /** Verified or in-progress shortest-path audit. May be absent while re-audit is pending. */
   getAudit(slug: string): ShortestPathAudit | undefined;
   getQuality(slug: string): QualityRow | undefined;
+  /** Joined journey + friction overlays when the store supports it. */
+  getJourney?(slug: string): import("./journeyOverlay.js").JourneyOverlay | undefined;
+  /** Count of catalog reason nodes (790 when fully seeded). */
+  blockerReasonCount?(): number;
 }
 
 /** A single documented onboarding signal for a platform (Phase 2 research output). */
