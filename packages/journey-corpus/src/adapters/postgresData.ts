@@ -26,7 +26,7 @@ export class PostgresDataStore implements DataStore {
   private readonly rows: MetricRow[];
   private readonly bySlug: Map<string, MetricRow>;
   private readonly qualityBySlug: Map<string, QualityRow>;
-  private readonly metaValue: DatasetMeta;
+  private metaValue: DatasetMeta;
   private readonly records = new Map<string, PlatformRecord>();
   private readonly audits = new Map<string, ShortestPathAudit>();
   private readonly gateIdsBySlug = new Map<string, Map<string, string>>();
@@ -228,6 +228,33 @@ export class PostgresDataStore implements DataStore {
   async ping(): Promise<boolean> {
     await this.prisma.$queryRaw`SELECT 1`;
     return true;
+  }
+
+  /**
+   * Hot-ingest a live research draft into the in-memory snapshot after Postgres
+   * persist, so search/journey work without a process restart.
+   */
+  ingestLive(record: PlatformRecord, row: MetricRow, audit: ShortestPathAudit): void {
+    const slug = record.platform.slug;
+    const existingIndex = this.rows.findIndex((item) => item.slug === slug);
+    if (existingIndex >= 0) this.rows[existingIndex] = row;
+    else this.rows.push(row);
+    this.bySlug.set(slug, row);
+    this.records.set(slug, record);
+    this.audits.set(slug, audit);
+    this.metaValue = {
+      ...this.metaValue,
+      count: this.rows.length,
+      totals: {
+        ...(this.metaValue.totals ?? { platforms: 0, steps: 0, sources: 0 }),
+        platforms: this.rows.length,
+      },
+    };
+  }
+
+  /** Shared Prisma client for durable writes from the web service. */
+  getPrisma(): PrismaClient {
+    return this.prisma;
   }
 }
 

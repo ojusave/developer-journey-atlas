@@ -277,6 +277,8 @@ function renderResearchError(message, query) {
 function renderResult(result, query) {
   if (result.outcome === "known") return showPlatform(result.slug);
   if (result.outcome === "completed") {
+    // Prefer the persisted journey (Postgres) once the status poll has saved it.
+    if (result.slug) return showPlatform(result.slug);
     el.result.innerHTML = renderAssessmentAsJourney(result.assessment);
     return;
   }
