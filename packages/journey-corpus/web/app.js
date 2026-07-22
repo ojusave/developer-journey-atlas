@@ -122,7 +122,7 @@ function renderLoad(load) {
       </section>`;
   }
 
-  const components = load.components.map((component) => `
+  const components = (load.components || []).map((component) => `
     <li class="signal-row">
       <span><strong>${num(component.value)}</strong> ${esc(component.label)}</span>
       <span class="position position-${esc(component.position)}">${esc(component.position)} peer median (${num(component.peerMedian)})</span>
@@ -143,6 +143,20 @@ function renderLoad(load) {
       <ul class="signal-list">${components}</ul>
       <p class="microcopy">${esc(load.note)}</p>
     </section>`;
+}
+
+/** Counts are null for non-verified audits; never dereference routeSignals blindly. */
+function renderSignals(routeSignals) {
+  if (!routeSignals) {
+    return '<p class="withheld">Counts withheld until this path is verified.</p>';
+  }
+  return `
+        <div class="signal-counters" aria-label="Documented route signals">
+          <div><strong>${num(routeSignals.requiredActions)}</strong><span>required actions</span></div>
+          <div><strong>${num(routeSignals.requiredFields ?? routeSignals.decisions)}</strong><span>required fields</span></div>
+          <div><strong>${num(routeSignals.waits)}</strong><span>waits</span></div>
+          <div><strong>${num(routeSignals.gates)}</strong><span>gates</span></div>
+        </div>`;
 }
 
 function stepItem(s) {
@@ -202,6 +216,8 @@ function renderAssessment(a) {
     ? `<ul class="prompt-list">${a.investigationPrompts.map((prompt) => `<li>${esc(prompt)}</li>`).join("")}</ul>`
     : '<p class="lede">No specific investigation prompts were derived from the documented route.</p>';
 
+  const stepLabel = a.pathStepCount == null ? "see record" : `${num(a.pathStepCount)} steps`;
+
   return `
     <div class="card">
       <div class="assess-head">
@@ -217,12 +233,7 @@ function renderAssessment(a) {
           <p class="summary-answer">${esc(a.firstSuccess.milestone || a.firstSuccess.normalizedOutcome || a.outcome)}</p>
           <p class="microcopy">Selected route: ${esc(a.selectedSurface)}</p>
         </div>
-        <div class="signal-counters" aria-label="Documented route signals">
-          <div><strong>${num(a.routeSignals.requiredActions)}</strong><span>required actions</span></div>
-          <div><strong>${num(a.routeSignals.waits)}</strong><span>waits</span></div>
-          <div><strong>${num(a.routeSignals.decisions)}</strong><span>decisions</span></div>
-          <div><strong>${num(a.routeSignals.gates)}</strong><span>gates</span></div>
-        </div>
+        ${renderSignals(a.routeSignals)}
       </div>
 
       ${renderLoad(a.onboardingLoad)}
@@ -235,13 +246,13 @@ function renderAssessment(a) {
       </section>
 
       <details class="detail-panel">
-        <summary>Open the full documented route <span>${num(a.pathStepCount)} steps</span></summary>
+        <summary>Open the full documented route <span>${esc(stepLabel)}</span></summary>
         <dl class="kv">
           <div><dt>Vendor time claim</dt><dd>${time}</dd></div>
           <div><dt>Prerequisites</dt><dd>${prereqs}</dd></div>
           <div><dt>Friction gates (descriptive)</dt><dd>${gates}</dd></div>
         </dl>
-        <h3 class="steps-heading">Documented steps <span class="steps-count">${num(a.pathStepCount)} steps</span></h3>
+        <h3 class="steps-heading">Documented steps <span class="steps-count">${esc(stepLabel)}</span></h3>
         ${steps}
       </details>
 
