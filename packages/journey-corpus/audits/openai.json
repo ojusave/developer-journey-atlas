@@ -1,0 +1,273 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "OpenAI",
+    "slug": "openai",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "61956e1ab52464245d26c0efcdd15d1ddfea5cd0f67d5b8eafe3a5e10309c5ae",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, terminal, and a runtime for one documented SDK tab.",
+      "No OpenAI Platform account, organization, API key, or project credentials exist yet.",
+      "The intended outcome is the Developer quickstart's first Responses API call."
+    ]
+  },
+  "developer_goal": "Create an OpenAI Platform account, obtain an API key, and run the official Developer quickstart until the first Responses API call prints model output.",
+  "first_success": {
+    "outcome": "A documented SDK or CLI client sends a Responses API request and prints the model-generated text.",
+    "observable_signal": "Running the quickstart example prints output text; the page then states Congrats on running a free test API request.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "OpenAI Platform Dashboard plus Developer quickstart",
+    "rule": "Lexicographic shortest complete route from account creation to the documented free test API request, after fixing language SDK and billing eligibility.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Dashboard API key + JavaScript Responses quickstart",
+        "status": "unresolved",
+        "reason": "Documented after an API key exists, but fresh-account signup fields and free-test eligibility are not publicly enumerated."
+      },
+      {
+        "name": "Dashboard API key + Python or other SDK tab",
+        "status": "unresolved",
+        "reason": "Equal consequential SDK tabs reach the same first-success type with different install and file steps; no recommended default is named."
+      },
+      {
+        "name": "Paid credits path before first call",
+        "status": "unresolved",
+        "reason": "Add credits appears after the free-test congrats text, but eligibility for that free test is undefined on the page."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or sign in to an OpenAI Platform account that can open the API keys dashboard.",
+      "required_fields": [
+        {
+          "label": "Account identity and authentication inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "platform.openai.com/signup did not expose a complete public field list without an authenticated or JS-complete session."
+        }
+      ],
+      "observable_result": "The developer can open the authenticated Platform dashboard used to create API keys.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key in the OpenAI dashboard and store it securely.",
+      "required_fields": [
+        {
+          "label": "API key creation controls",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Docs require creating a key in the dashboard but do not publish the exact form fields."
+        }
+      ],
+      "observable_result": "A secret API key value is available to the developer once.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export OPENAI_API_KEY in the terminal.",
+      "required_fields": [
+        {
+          "label": "OPENAI_API_KEY",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The shell environment exposes the key to the official SDK.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install the official SDK for the selected language tab.",
+      "required_fields": [
+        {
+          "label": "SDK install command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Exact package command depends on the unresolved language tab."
+        }
+      ],
+      "observable_result": "The OpenAI client library is available in the project.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Create the documented Responses API example file for the selected language.",
+      "required_fields": [
+        {
+          "label": "Example source file",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The project contains the quickstart example ready to run.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Run the example and confirm model output is printed.",
+      "required_fields": [
+        {
+          "label": "Run command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The terminal prints model-generated text for the free test request when the account is eligible.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A runtime matching the selected SDK tab (for example Node.js for the JavaScript example).",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Dashboard authentication and organization membership are required before an API key can be created.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Whether the free test API request is available without adding credits depends on undocumented account state.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "OpenAI issues an API key from the dashboard.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The Responses API returns model-generated text for a successful request.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading additional guides after the first API call",
+      "reason": "Analyze images, Agents SDK, and similar sections follow the named free-test congrats boundary.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Add credits billing flow",
+      "reason": "The quickstart places Go to billing after Congrats on running a free test API request.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developer quickstart",
+      "url": "https://developers.openai.com/api/docs/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key creation requirement",
+        "OPENAI_API_KEY export",
+        "SDK install and Responses example",
+        "Free-test congrats then Add credits"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "OpenAI Platform signup",
+      "url": "https://platform.openai.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public signup entry exists",
+        "Complete signup field list not available without authenticated or JS-complete session"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact signup, verification, organization, and API-key form fields does a brand-new Platform user complete?",
+      "impact": "These controls change required actions and fields before the documented quickstart begins.",
+      "evidence_needed": "A dated read-only walkthrough or screenshots from a fresh Platform signup through first API key creation."
+    },
+    {
+      "question": "Which account states receive the free test API request without adding credits, and which language SDK tab is the canonical shortest route?",
+      "impact": "Billing gates and SDK choice change action counts and whether first success is reachable without payment.",
+      "evidence_needed": "Official eligibility statement for the free test plus a named recommended language route, or a fresh-account confirmation of no billing gate."
+    }
+  ],
+  "counts": null
+}

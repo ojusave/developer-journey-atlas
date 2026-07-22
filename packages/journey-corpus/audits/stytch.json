@@ -1,0 +1,238 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Stytch",
+    "slug": "stytch",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "4691085844a49dc98c732eb59eaf04c79170d2443c23fb3b853cb734998dc040",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email address, and a local application workspace.",
+      "No Stytch account, workspace, project, or SDK integration exists yet."
+    ]
+  },
+  "developer_goal": "Create a Stytch account and project, implement an official authentication path, and complete a login or signup that produces an authenticated session.",
+  "first_success": {
+    "outcome": "The application completes a Stytch login or signup and receives session and user data.",
+    "observable_signal": "After the user completes the selected Stytch UI or API flow, the application can read an authenticated session and user object.",
+    "source_ids": ["S3"]
+  },
+  "route_selection": {
+    "surface": "Stytch Authentication Quickstart and Consumer login-or-signup guides",
+    "rule": "Select one implementation type, framework, and Consumer versus Multi-tenant project type only after those peer choices are fixed; do not invent a universal Stytch path.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Stytch UI with React Consumer Authentication",
+        "status": "unresolved",
+        "reason": "Prebuilt UI minimizes custom auth UI code, but the Quickstart still presents Stytch UI, Headless, and Backend-only as peer implementation types and Consumer versus Multi-tenant as peer project types."
+      },
+      {
+        "name": "Headless frontend SDK",
+        "status": "unresolved",
+        "reason": "Peer route for developers who own their UI; not ranked below Stytch UI by the general Quickstart."
+      },
+      {
+        "name": "Backend-only Consumer Authentication",
+        "status": "unresolved",
+        "reason": "Peer API/SDK route with different credentials and no frontend UI component path."
+      },
+      {
+        "name": "Multi-tenant Authentication",
+        "status": "unresolved",
+        "reason": "Peer project type for organization/member apps; changes dashboard configuration and SDK surfaces."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a Stytch account and create a project through the Stytch Dashboard.",
+      "required_fields": [
+        {
+          "label": "Dashboard signup and initial project fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S4"],
+          "notes": "API Keys docs require an account to obtain keys, but the public dashboard does not expose the signup field set in documentation."
+        }
+      ],
+      "observable_result": "The developer has a Stytch project with environment credentials.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Enable Frontend SDKs, authorize the local development domain, and copy the Test public token.",
+      "required_fields": [
+        {
+          "label": "Authorized domain",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "public_token",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"]
+        }
+      ],
+      "observable_result": "Frontend SDK calls from the local app domain are authorized.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Install the selected framework SDK, initialize the provider with the public token, and render the selected login or signup surface.",
+      "required_fields": [
+        {
+          "label": "Framework and implementation-specific config",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3"],
+          "notes": "React, Next.js, and other framework guides diverge after the shared public_token prerequisite."
+        }
+      ],
+      "observable_result": "The local app exposes a Stytch login or signup experience.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Complete a login or signup through the integrated Stytch experience and confirm session and user data.",
+      "required_fields": [
+        {
+          "label": "Auth-method-specific user inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S3"],
+          "notes": "Example configs include email magic links and OAuth providers; required inputs depend on enabled products."
+        }
+      ],
+      "observable_result": "The application receives authenticated session and user data.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A Stytch account is required before project credentials are available.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "A local application domain must be added to Authorized Domains for Frontend SDK flows.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Email magic link or OAuth provider flows introduce external mailbox or identity-provider authorization when those products are enabled.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email magic link authentication waits for message delivery when that product is selected.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Stytch issues project-scoped Test and Live credentials after project creation.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Successful login or signup yields session and user objects to the SDK.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Quickstart documentation as a measured action",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Migration guides",
+      "reason": "Migrations assume an existing identity system and are outside first-account success.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://stytch.com/docs/get-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Entry to authentication quickstart and implementation selection"]
+    },
+    {
+      "id": "S2",
+      "title": "API Keys",
+      "url": "https://stytch.com/docs/resources/workspace-management/api-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account required for API keys",
+        "project_id, secret, and public_token",
+        "Test versus Live environments"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Add login or signup",
+      "url": "https://stytch.com/docs/consumer-auth/build-auth/login-or-signup",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Frontend SDK prerequisites",
+        "Authorized Domains",
+        "Framework-specific Stytch UI install steps",
+        "Session and user data handling terminal"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Stytch Dashboard",
+      "url": "https://stytch.com/dashboard",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Authenticated dashboard entry; public signup field set not fully enumerable from docs"]
+    },
+    {
+      "id": "S5",
+      "title": "Migration overview",
+      "url": "https://stytch.com/docs/resources/migrations/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Migration is post-first-success work"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which implementation type, framework, Consumer versus Multi-tenant project type, and auth products define the selected Stytch first-success route?",
+      "impact": "These peer choices change dashboard configuration, SDK packages, required fields, external gates, and whether the terminal is Stytch UI session data or a backend API response.",
+      "evidence_needed": "Fix one bounded developer goal, then verify its complete current Quickstart against a fresh Dashboard project walkthrough."
+    },
+    {
+      "question": "What exact signup, verification, workspace, and initial-project fields does a fresh Stytch Dashboard account require?",
+      "impact": "Account-creation field counts and any email or plan gates remain unknown, so the path cannot be verified from account creation.",
+      "evidence_needed": "Dated screenshots or a read-only walkthrough of public signup through first project credentials."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,272 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Perplexity",
+    "slug": "perplexity",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "45b8aa57f380a5c2184edf3edd4a192cf5f4c4a433a879cdeaab58d863bf7b45",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email inbox, and payment card available.",
+      "No Perplexity account, API group, payment method, credits, API key, or SDK request exists yet."
+    ]
+  },
+  "developer_goal": "Create a Perplexity account and API group, fund API usage, generate a key, and run the official Python Agent API first call.",
+  "first_success": {
+    "outcome": "The Python Agent API request with the published low preset returns and prints web-grounded response text.",
+    "observable_signal": "The program prints response.output_text from client.responses.create.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Perplexity API Portal (console.perplexity.ai) plus official Quickstart Python Agent API",
+    "rule": "Use the documented prepaid API Portal path; do not treat Search or Embeddings first calls as interchangeable terminals without an explicit goal choice.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "API Portal: create group, add card, buy credits, Agent API Python first call",
+        "status": "unresolved",
+        "reason": "Official docs require payment method and prepaid credits, but the minimum purchase amount and exact Stripe fields remain unpublished."
+      },
+      {
+        "name": "Same account funding path ending at Search API or Embeddings first call",
+        "status": "unresolved",
+        "reason": "The Quickstart presents three peer APIs with different first-call code; choosing among them changes the terminal without a single documented default."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Perplexity account (sign up at perplexity.ai).",
+      "required_fields": [
+        {
+          "label": "Account identity fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Docs require an account but do not enumerate current signup controls."
+        }
+      ],
+      "observable_result": "The developer can open the API Portal while authenticated.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API group and complete organization settings required for billing.",
+      "required_fields": [
+        {
+          "label": "API group name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Organization name, address, and tax details",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "An API group exists with organization details for invoices.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add a payment method and buy prepaid API credits.",
+      "required_fields": [
+        {
+          "label": "Credit card / Stripe payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S4"]
+        },
+        {
+          "label": "Credit purchase amount",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S4"],
+          "notes": "Buy more credits is documented; minimum amount is not."
+        }
+      ],
+      "observable_result": "Billing shows a positive API credit balance.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate an API key from the API Keys tab.",
+      "required_fields": [],
+      "observable_result": "A new API key value is shown once and can be copied.",
+      "evidence_state": "documented",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install the Perplexity Python SDK and export PERPLEXITY_API_KEY.",
+      "required_fields": [
+        {
+          "label": "pip install perplexityai",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "PERPLEXITY_API_KEY",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The SDK can authenticate using the environment variable.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 6,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Run the published Agent API responses.create example and print output_text.",
+      "required_fields": [
+        {
+          "label": "preset and input",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The terminal prints the Agent API response text.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A credit card ready for payment setup is listed as a prerequisite for API group billing.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Admin permissions for billing and API key management are required for the group.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Stripe-managed payment method setup is required before buying credits.",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "description": "Prepaid API credits must be purchased before usage; keys are blocked when credits run out.",
+      "source_ids": ["S2", "S4"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "The Agent API returns a completed response with output_text for the submitted input.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Quickstart API-choice guidance",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Programmatic generate_auth_token after the first console key",
+      "reason": "Docs place console key creation before programmatic key management.",
+      "source_ids": ["S3"]
+    },
+    {
+      "item": "Auto reload configuration",
+      "reason": "Documented as recommended, not required for the first funded call.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://docs.perplexity.ai/docs/getting-started/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key generation pointer",
+        "SDK install",
+        "Agent API Python first call"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API Groups & Billing",
+      "url": "https://docs.perplexity.ai/docs/getting-started/api-groups",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account prerequisite",
+        "Organization details",
+        "Credit card prerequisite",
+        "Add payment method via Stripe",
+        "Buy more credits",
+        "Generate API key"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "API Key Management",
+      "url": "https://docs.perplexity.ai/docs/admin/api-key-management",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Create API group before keys",
+        "Keys shown only once"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "API settings",
+      "url": "https://www.perplexity.ai/help-center/en/articles/10352995-api-settings.html",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Add payment method",
+        "Buy more credits",
+        "Generate API Key sequence"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What minimum credit purchase amount does the live Billing console require before the first Agent API call succeeds?",
+      "impact": "The mandatory cash outlay and whether any free credit exists cannot be stated, so payment burden stays unresolved.",
+      "evidence_needed": "A dated Billing console observation or official pricing note stating the minimum Buy more credits amount for a new API group."
+    },
+    {
+      "question": "Which first-call API (Agent, Search, or Embeddings) is the selected Quickstart terminal when all three are presented as peer options?",
+      "impact": "Implementation code and observable success differ by API choice.",
+      "evidence_needed": "Confirm a single developer goal or an official default first-call path among the three Quickstart APIs."
+    },
+    {
+      "question": "What exact Perplexity account-creation fields and verification steps appear before the API Portal is usable?",
+      "impact": "Account actions and fields cannot be counted without inventing signup UI.",
+      "evidence_needed": "Observed cold signup walkthrough for perplexity.ai through console.perplexity.ai access."
+    }
+  ],
+  "counts": null
+}

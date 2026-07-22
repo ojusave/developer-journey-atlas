@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "ServiceNow",
+    "slug": "servicenow",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "57c2144fb92fb534f745c6cc85dc551d8372c65255c7c87bdb32ada380c19659",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an accessible email inbox.",
+      "No ServiceNow ID, Developer Site account, or Personal Developer Instance exists yet.",
+      "The developer has not preselected App Engine Studio, UI Builder, Flow Designer, or an external API client as the first surface."
+    ]
+  },
+  "developer_goal": "Create a ServiceNow Developer Program identity and reach the earliest meaningful first-success outcome on a chosen Now Platform development surface.",
+  "first_success": {
+    "outcome": "For the REST API Explorer candidate on a Personal Developer Instance: create a test incident through Table API v1 and retrieve that incident by sys_id.",
+    "observable_signal": "The POST response includes status and a Location header with sys_id; the following GET response body contains the inserted incident record.",
+    "source_ids": ["S1", "S3", "S4"]
+  },
+  "route_selection": {
+    "surface": "ServiceNow Developer Site with free Personal Developer Instance",
+    "rule": "Prefer the free Developer Program PDI path over production-customer entitlements when both can reach the selected developer outcome. Do not invent a winner among REST Explorer, App Engine, and other surfaces.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Developer Site signup, Admin-role PDI, REST API Explorer Table API create-and-read",
+        "status": "unresolved",
+        "reason": "Official for REST Explorer, but PDI release inventory and the Admin versus App Engine Studio Creator role choice change reachability."
+      },
+      {
+        "name": "App Engine Studio Creator role and App Engine first app",
+        "status": "unresolved",
+        "reason": "First-sign-in role choice can restrict the PDI away from unrestricted admin and REST Explorer access."
+      },
+      {
+        "name": "Customer or partner production/non-production instance instead of PDI",
+        "status": "not-selected",
+        "reason": "Requires organization entitlement outside the free Developer Program path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a ServiceNow ID from the Developer Site Get a ServiceNow ID signup form.",
+      "required_fields": [
+        {"label": "First name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Last name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Email", "field_type": "email", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Country", "field_type": "select", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Password confirmation", "field_type": "password", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "CAPTCHA", "field_type": "challenge", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Terms of Use acceptance", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S5"]}
+      ],
+      "observable_result": "ServiceNow accepts signup and sends the Developer Program welcome email.",
+      "evidence_state": "documented",
+      "source_ids": ["S5"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the Welcome to ServiceNow from Developer Program email and select Verify Email.",
+      "required_fields": [],
+      "observable_result": "The email address is verified and login becomes available.",
+      "evidence_state": "documented",
+      "source_ids": ["S5"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete first-sign-in role setup, including job-responsibility choice and Developer site terms acceptance.",
+      "required_fields": [
+        {"label": "Job responsibility choice", "field_type": "select", "evidence_state": "documented", "source_ids": ["S5"]},
+        {"label": "Developer site terms of use", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S5"]}
+      ],
+      "observable_result": "The Developer Site account is ready and a user role is assigned for PDI access.",
+      "evidence_state": "documented",
+      "source_ids": ["S5"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Request a Personal Developer Instance for an offered ServiceNow release and open it with Start Building.",
+      "required_fields": [
+        {"label": "ServiceNow release", "field_type": "select", "evidence_state": "documented", "source_ids": ["S6"]}
+      ],
+      "observable_result": "A PDI URL and credentials are assigned and the instance UI is reachable.",
+      "evidence_state": "unverified",
+      "source_ids": ["S6"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open REST API Explorer, create an incident with Table API v1, then GET the incident by sys_id.",
+      "required_fields": [
+        {"label": "API and endpoint selection", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2", "S3"]},
+        {"label": "Incident field values for create", "field_type": "other", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "POST and GET responses show the inserted incident record.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2", "S3", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "The rest_api_explorer role or admin role is required to use REST API Explorer.", "source_ids": ["S1", "S2"]},
+    {"description": "PDI access depends on keeping the Developer Site account active; inactivity can reclaim the instance.", "source_ids": ["S6"]}
+  ],
+  "external_gates": [
+    {"description": "Email verification is required before first Developer Site login.", "source_ids": ["S5"]},
+    {"description": "First-sign-in Admin versus App Engine Studio Creator role choice gates unrestricted PDI capabilities.", "source_ids": ["S5"]},
+    {"description": "PDI assignment depends on currently offered releases and available inventory.", "source_ids": ["S6"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "ServiceNow must deliver the verification email before login.", "source_ids": ["S5"]},
+    {"description": "PDI provisioning may wait until an instance is assigned after request.", "source_ids": ["S6"]}
+  ],
+  "platform_outcomes": [
+    {"description": "ServiceNow creates the Developer Site account after verified signup.", "source_ids": ["S5"]},
+    {"description": "A requested PDI receives a URL and admin credentials when inventory is available.", "source_ids": ["S6"]},
+    {"description": "REST API Explorer executes Table API create and read against the instance.", "source_ids": ["S3", "S4"]}
+  ],
+  "excluded": [
+    {"item": "Reading Now Platform conceptual documentation beyond the Explorer tutorial", "reason": "Documentation reading is not a product action.", "source_ids": ["S1"]},
+    {"item": "External REST clients outside REST API Explorer", "reason": "Alternate interface to the same Table API outcome.", "source_ids": ["S1"]},
+    {"item": "Production instance REST work", "reason": "Official Explorer guidance warns against production use and the free path uses a PDI.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Use the REST API Explorer", "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/use-REST-API-Explorer.html", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["REST API Explorer purpose", "rest_api_explorer role requirement"]},
+    {"id": "S2", "title": "Access the REST API Explorer", "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/t_GetStartedAccessExplorer.html", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["How to open Explorer and view API resources"]},
+    {"id": "S3", "title": "Create an incident with REST API Explorer", "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/t_GetStartedCreateInt.html", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Table API POST create path"]},
+    {"id": "S4", "title": "Read the inserted incident", "url": "https://www.servicenow.com/docs/r/api-reference/rest-api-explorer/t_GetStartedReadInt.html", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["GET by sys_id terminal"]},
+    {"id": "S5", "title": "Developer Site Account Guide", "url": "https://developer.servicenow.com/print_page.do?category=now-platform&identifier=DAG_UserRole&module=guide&release=yokohama", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["ServiceNow ID signup fields", "Email verification", "Role and terms setup"]},
+    {"id": "S6", "title": "Personal Developer Instance Guide", "url": "https://developer.servicenow.com/print_page.do?category=developer-program&identifier=obtaining-a-pdi&module=guide&release=yokohama", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Request Instance flow", "Release selection", "Start Building access", "Inactivity reclaim"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "Which ServiceNow development surface should represent the organization-wide first mile: REST API Explorer, App Engine Studio, UI Builder, Flow Designer, or another product API?",
+      "impact": "Each surface has a different first success and may require a different PDI role.",
+      "evidence_needed": "A bounded developer goal naming one surface, plus confirmation that the Admin-role PDI path is acceptable for that goal."
+    },
+    {
+      "question": "Which PDI releases and capacity will be available at request time, and how long does assignment take?",
+      "impact": "Unavailable inventory can block or delay the path before any Explorer work begins.",
+      "evidence_needed": "A dated PDI request attempt recording offered releases, wait time, and whether Start Building immediately yields Admin access."
+    },
+    {
+      "question": "Does selecting the App Engine Studio Creator path at first sign-in prevent the REST Explorer create-and-read terminal without an extra role change?",
+      "impact": "An early role choice can force a detour or a different first success.",
+      "evidence_needed": "Official guidance or a walkthrough showing Admin versus Creator consequences for REST API Explorer."
+    }
+  ],
+  "counts": null
+}

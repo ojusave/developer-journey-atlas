@@ -1,0 +1,233 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Zoom",
+    "slug": "zoom",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-21",
+  "source_record_sha256": "e2c523c5f7af86b4adb20b6fde27fe2b8a04ae7f87be5438616f260125c40c89",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can verify.",
+      "The developer is creating a free Zoom Basic account and will be that account's owner.",
+      "No Zoom app, OAuth endpoint, product choice, feature choice, or scopes exist yet."
+    ]
+  },
+  "developer_goal": "Create a Zoom account and reach the first local-test success for a new Zoom developer app.",
+  "first_success": {
+    "outcome": "A configured development app is authorized and added to the developer's own Zoom account for local testing.",
+    "observable_signal": "The Local Test flow completes after Add App Now and Allow.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Zoom App Marketplace self-service web flow",
+    "rule": "Select the shortest complete app-creation route only after the app's intended product, management type, feature path, and scopes are fixed.",
+    "selected": null,
+    "candidates": [
+      {"name": "General App, user-managed", "status": "unresolved", "reason": "The required features, URLs, and scopes depend on the intended app behavior."},
+      {"name": "General App, admin-managed", "status": "unresolved", "reason": "The management type changes who can add the app and which features and scopes are available."},
+      {"name": "Server-to-Server OAuth or SDK-specific app", "status": "unresolved", "reason": "These reach different developer outcomes and cannot be compared as one universal Zoom path."}
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter a birth year and continue from Zoom signup.",
+      "required_fields": [
+        {"label": "Birth year", "field_type": "text", "evidence_state": "observed-public-ui", "source_ids": ["S1", "S3"]}
+      ],
+      "observable_result": "Zoom displays the email step for an eligible age.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter an email address and continue.",
+      "required_fields": [
+        {"label": "Email address", "field_type": "email", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "Zoom sends a verification code to the email address.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "email",
+      "action": "Enter the emailed verification code and select Verify.",
+      "required_fields": [
+        {"label": "Verification code", "field_type": "code", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "Zoom displays the account details step.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter the required account details and continue.",
+      "required_fields": [
+        {"label": "Full name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S3"]},
+        {"label": "Password", "field_type": "password", "evidence_state": "documented", "source_ids": ["S3"]}
+      ],
+      "observable_result": "Zoom creates the Basic account.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 5,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign in to the Zoom App Marketplace with the account that has developer permissions.",
+      "required_fields": [],
+      "observable_result": "The Marketplace shows the Developer navigation item when the account has permission.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose Developer in the Marketplace navigation.",
+      "required_fields": [],
+      "observable_result": "The Created apps area opens.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 7,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose Develop > Build an app.",
+      "required_fields": [],
+      "observable_result": "The app creation screen opens.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 8,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select General app and choose Create.",
+      "required_fields": [
+        {"label": "App type", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2"], "notes": "The current source record selected General app, but the corpus-wide route policy must resolve whether this is the correct lowest-friction goal."}
+      ],
+      "observable_result": "Zoom creates the development app shell and generates development credentials.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 9,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the required Basic Info configuration for the selected General App route.",
+      "required_fields": [
+        {"label": "App management type", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2"]},
+        {"label": "Development OAuth redirect URL", "field_type": "url", "evidence_state": "documented", "source_ids": ["S2"]},
+        {"label": "OAuth allow-list URL", "field_type": "url", "evidence_state": "documented", "source_ids": ["S2"]}
+      ],
+      "observable_result": "The app has the management and OAuth values required for its selected development route.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 10,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select and configure the Zoom product and feature path required by the intended app.",
+      "required_fields": [
+        {"label": "Zoom product", "field_type": "select", "evidence_state": "unverified", "source_ids": ["S2"]},
+        {"label": "Feature-specific required settings", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S2"]}
+      ],
+      "observable_result": "The app has one complete feature path.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 11,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Add the minimum scopes required by the selected feature path and explain why each scope is needed.",
+      "required_fields": [
+        {"label": "Zoom product", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2"]},
+        {"label": "Scopes", "field_type": "permission", "evidence_state": "unverified", "source_ids": ["S2"]},
+        {"label": "Scope description", "field_type": "text", "evidence_state": "documented", "source_ids": ["S2"]}
+      ],
+      "observable_result": "The app requests the minimum permissions needed for its selected route.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 12,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open Local Test and choose Add App Now.",
+      "required_fields": [],
+      "observable_result": "Zoom displays the authorization request for the developer's account.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 13,
+      "kind": "external-authorization",
+      "interface": "web-ui",
+      "action": "Review the requested access and choose Allow.",
+      "required_fields": [
+        {"label": "Requested scopes authorization", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S2"]}
+      ],
+      "observable_result": "The development app is authorized and added for local testing.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "The account must be the owner, an admin, or assigned the Zoom for developers role with View and Edit permissions.", "source_ids": ["S2"]},
+    {"description": "A working OAuth redirect endpoint is required for the selected General App route.", "source_ids": ["S2"]}
+  ],
+  "external_gates": [
+    {"description": "Developer permissions determine whether the Marketplace displays the Developer navigation item.", "source_ids": ["S2"]},
+    {"description": "The chosen app management type changes who can authorize the app and which features and scopes are available.", "source_ids": ["S2"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Zoom must deliver the signup verification code by email.", "source_ids": ["S3"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Zoom creates the Basic account after the verified signup details are submitted.", "source_ids": ["S3"]},
+    {"description": "Zoom generates development credentials when the General App is created.", "source_ids": ["S2"]},
+    {"description": "Zoom authorizes and adds the configured development app after the developer selects Allow.", "source_ids": ["S2"]}
+  ],
+  "excluded": [
+    {"item": "Reading Key Concepts and build-flow documentation", "reason": "Reading is a documented prerequisite but not a product interaction in the measured path.", "source_ids": ["S2"]},
+    {"item": "Changing the generated app name", "reason": "The current official quickstart describes the name change as optional because Zoom generates a generic name.", "source_ids": ["S2"]},
+    {"item": "Strict Mode URL and Subdomain check", "reason": "The official quickstart labels both settings optional.", "source_ids": ["S2"]},
+    {"item": "Preview Your App Listing Page", "reason": "The official quickstart presents preview separately from adding the app for the developer's own account.", "source_ids": ["S2"]},
+    {"item": "Marketplace submission, agreement confirmation, review, and publishing", "reason": "The Marketplace Development Agreement is documented at app submission, after the selected local-test first success.", "source_ids": ["S4"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Zoom signup", "url": "https://zoom.us/signup", "source_type": "observed-public-ui", "accessed_at": "2026-07-21", "evidence_supported": ["Birth-year signup gate", "Free Basic account positioning"]},
+    {"id": "S2", "title": "Quick start guide", "url": "https://developers.zoom.us/docs/build-flow/quick-start-guide/", "source_type": "official-documentation", "accessed_at": "2026-07-21", "evidence_supported": ["Developer permission prerequisite", "Marketplace app creation controls", "General App fields", "Optional naming and URL checks", "Feature and scope configuration", "Local Test terminal"]},
+    {"id": "S3", "title": "Getting started guide for new users", "url": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0061316", "source_type": "official-support", "accessed_at": "2026-07-21", "evidence_supported": ["Birth year", "Email", "Verification code", "Full name", "Password", "Basic account creation"]},
+    {"id": "S4", "title": "Submit apps for review", "url": "https://developers.zoom.us/docs/build-flow/submitting-apps-for-review/", "source_type": "official-documentation", "accessed_at": "2026-07-21", "evidence_supported": ["Marketplace Development Agreement occurs during app submission"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Zoom app goal, product, management type, feature path, and minimum scopes define the selected first-success route?",
+      "impact": "These choices change required fields, permissions, implementation work, and whether the local-test terminal is reachable.",
+      "evidence_needed": "Choose one bounded developer goal, then verify its complete current General App or alternate app-type route against official docs and a fresh-account product walkthrough."
+    },
+    {
+      "question": "Does a fresh developer account currently show a required Marketplace terms-acceptance screen before app creation?",
+      "impact": "The user reports this step, but current public official documentation only places the Marketplace Development Agreement at app submission.",
+      "evidence_needed": "A dated screenshot or read-only walkthrough from a fresh authenticated Marketplace developer session."
+    }
+  ],
+  "counts": null
+}

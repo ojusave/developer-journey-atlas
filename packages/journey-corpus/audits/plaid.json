@@ -1,0 +1,284 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Plaid",
+    "slug": "plaid",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "8d3f2beb115de4c05696d002a5e11ac59027ce8504d9d0bb5d3474228a5efb2e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email address, Git, npm, and a Unix-capable terminal.",
+      "No Plaid team account, Client ID, or Sandbox secret exists yet.",
+      "Sandbox first success is acceptable; Production OAuth and paid-plan approval are later gates."
+    ]
+  },
+  "developer_goal": "Create a Plaid Dashboard account, run the official Quickstart in Sandbox, create a first Item through Link, and retrieve account data.",
+  "first_success": {
+    "outcome": "The Quickstart retrieves account names and balances for a Sandbox Item after Link and token exchange.",
+    "observable_signal": "The Quickstart shows /accounts/get data and the guide's Congratulations, you have completed the Plaid Quickstart message.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Plaid Dashboard signup plus main web Quickstart repository",
+    "rule": "Prefer Sandbox Quickstart over Production. Do not invent a winner among equal backend language tabs.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Main React Quickstart with Node backend",
+        "status": "unresolved",
+        "reason": "Official docs show Node first in several excerpts, but the repo and language tabs also support Python, Ruby, Go, and Java without naming one canonical backend."
+      },
+      {
+        "name": "Main React Quickstart with Python, Ruby, Go, or Java backend",
+        "status": "unresolved",
+        "reason": "Same frontend and terminal outcome, different install and runtime prerequisites; lexicographic action counts cannot be fixed without choosing one."
+      },
+      {
+        "name": "Postman Collection without cloning Quickstart",
+        "status": "unresolved",
+        "reason": "Official Quickstart offers Postman as a no-code alternative that reaches API success on a different interaction surface."
+      },
+      {
+        "name": "Product-specific quickstarts (Identity Verification, Income, Layer, CRA)",
+        "status": "not-selected",
+        "reason": "The main Quickstart page explicitly routes these products to separate starters with different outcomes."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for the Plaid Dashboard, verify email, and acknowledge required terms.",
+      "required_fields": [
+        {
+          "label": "Dashboard signup and team profile fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S4"],
+          "notes": "Quickstart requires Dashboard signup; exact current form fields are not enumerated in public docs."
+        },
+        {
+          "label": "Email verification",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer can open Dashboard API Keys and view Client ID and Sandbox secret.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Copy the team Client ID and Sandbox secret from Dashboard API Keys.",
+      "required_fields": [
+        {
+          "label": "Client ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Sandbox secret",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S3"]
+        }
+      ],
+      "observable_result": "Sandbox credentials are available for the Quickstart .env file.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Clone plaid/quickstart, configure .env, install dependencies, and start the selected backend plus React frontend.",
+      "required_fields": [
+        {
+          "label": "Backend language directory",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S5"]
+        },
+        {
+          "label": "PLAID_CLIENT_ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S5"]
+        },
+        {
+          "label": "PLAID_SECRET",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S5"]
+        }
+      ],
+      "observable_result": "The Quickstart is reachable on localhost.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S5"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Launch Link, select a Sandbox institution, and complete Sandbox login to create the first Item.",
+      "required_fields": [
+        {
+          "label": "Sandbox username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S5"],
+          "notes": "Typically user_good."
+        },
+        {
+          "label": "Sandbox password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S5"],
+          "notes": "Typically pass_good."
+        }
+      ],
+      "observable_result": "Link returns a public_token and the Quickstart has created an Item.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Use the Quickstart control that calls /accounts/get for the new Item.",
+      "required_fields": [],
+      "observable_result": "Account names and balances are displayed and the guide marks the Quickstart complete.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "npm and a Unix-capable shell are required for the main Quickstart setup instructions.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Production access, OAuth institution enablement, and paid pricing plans require separate Dashboard applications and approvals beyond Sandbox.",
+      "source_ids": ["S2", "S5"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email verification is required before some Trial and Dashboard flows proceed.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Plaid issues team Client ID and environment secrets in the Dashboard.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Sandbox Link creates Items and allows /accounts/get without live bank credentials.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production plan application and OAuth institution registration",
+      "reason": "Sandbox Quickstart completes first success without Production entitlement.",
+      "source_ids": ["S1", "S2", "S5"]
+    },
+    {
+      "item": "Optional OAuth redirect URI registration for localhost",
+      "reason": "Quickstart repo documents redirect URI setup as optional for the basic web flow.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with the Quickstart",
+      "url": "https://plaid.com/docs/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Dashboard signup for API keys",
+        "Multi-language Quickstart setup",
+        "Link Item creation",
+        "accounts/get completion"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Account pricing and billing",
+      "url": "https://plaid.com/docs/account/billing/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Trial plan email verification",
+        "Production pricing application",
+        "Plan entitlement gates"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sandbox Overview",
+      "url": "https://plaid.com/docs/sandbox/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox keys from Dashboard",
+        "Full Sandbox API and Link support"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Plaid Dashboard signup",
+      "url": "https://dashboard.plaid.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup URL exists",
+        "Field-level signup inventory not exposed in public fetch"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "plaid/quickstart repository",
+      "url": "https://github.com/plaid/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multi-language backends",
+        "Sandbox credentials user_good/pass_good",
+        "Production OAuth caveats"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which backend language defines the canonical Plaid Quickstart path?",
+      "impact": "Runtime prerequisites, dependency install, and build commands change while the React frontend and outcome stay the same.",
+      "evidence_needed": "Official designation of one default backend, or an explicit corpus policy choosing Node or another language."
+    },
+    {
+      "question": "What exact Plaid signup, team, business, use-case, and anti-abuse screens appear today?",
+      "impact": "Account-step field counts and possible pre-credential gates remain unverified.",
+      "evidence_needed": "A dated fresh-account Dashboard signup walkthrough with screenshots."
+    },
+    {
+      "question": "Should Postman count as an equal shortest route to first API success?",
+      "impact": "Choosing Postman removes clone/run actions and changes the measured surface.",
+      "evidence_needed": "Human judgment on whether the corpus requires the Quickstart app outcome or any Sandbox API success."
+    }
+  ],
+  "counts": null
+}

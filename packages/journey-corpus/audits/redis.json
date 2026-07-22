@@ -1,0 +1,304 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Redis",
+    "slug": "redis",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "e36614291cc0a3b28d48530ca93638a38677ddade54c360f62250f0e6163a23b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can access.",
+      "The developer does not yet have a Redis Cloud account or database.",
+      "The destination is a free Redis Cloud Essentials database eligible for Redis Insight web."
+    ]
+  },
+  "developer_goal": "Create a Redis Cloud account, provision a free database, and connect to it through the Redis Cloud quick start.",
+  "first_success": {
+    "outcome": "A free Redis Cloud database is active and opened through a documented connection method.",
+    "observable_signal": "For the browser Redis Insight route on Essentials, Launch Redis Insight web opens Redis Insight in a new tab for that database.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "Redis Cloud console self-service web onboarding",
+    "rule": "Start at account creation on Redis Cloud, the deployment option Redis marks fastest for new users, then choose the shortest complete connection method only after signup and database creation are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email signup form then Redis Insight web",
+        "status": "unresolved",
+        "reason": "Public signup exposes first name, last name, email, and agreement text, and Insight web is the fewest-action Essentials connection, but Google and GitHub signup are peer entry routes with different verification and field burdens."
+      },
+      {
+        "name": "Google or GitHub signup then Redis Insight web",
+        "status": "unresolved",
+        "reason": "Official docs list social signup beside the form; OAuth intermediates and whether activation email still applies are not fully enumerated."
+      },
+      {
+        "name": "Any signup then redis-cli or language client",
+        "status": "not-selected",
+        "reason": "These add local install or application code after the same database exists and are longer than Insight web for the free Essentials case."
+      },
+      {
+        "name": "Redis Open Source local install",
+        "status": "not-selected",
+        "reason": "General get-started docs call Redis Cloud the fastest deployment and point new users to the Cloud quick start."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Redis Cloud account using one of the documented signup methods on the Sign up page.",
+      "required_fields": [
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S3"
+          ],
+          "notes": "Visible on the email signup form; may not apply to Google or GitHub."
+        },
+        {
+          "label": "Last name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S3"
+          ],
+          "notes": "Visible on the email signup form; may not apply to Google or GitHub."
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Redis Insight License Terms and Privacy Policy agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": [
+            "S3"
+          ],
+          "notes": "Signup copy states that signing up constitutes agreement."
+        }
+      ],
+      "observable_result": "Redis accepts the signup attempt and, on the email route, sends an activation email.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the Redis activation email and select Activate account.",
+      "required_fields": [],
+      "observable_result": "The Redis Cloud console opens the Create your database page with the Free plan selected.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Keep the Free plan, choose Database version, Cloud vendor, and Region, then select Create database.",
+      "required_fields": [
+        {
+          "label": "Database version",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Cloud vendor",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "Redis processes the request and shows Database details with a pending or active status indicator.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open the connection wizard and launch the selected connection method for the free Essentials database.",
+      "required_fields": [
+        {
+          "label": "Connection method",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Insight web, desktop Insight, redis-cli, and language clients remain peer documented methods."
+        }
+      ],
+      "observable_result": "The selected client opens against the new database.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A browser and reachable email inbox, or a Google or GitHub identity usable for Redis Cloud signup.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Signup requires accepting Redis Insight License Terms and the Redis Privacy Policy.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "description": "Email activation is documented for the form signup route before database creation.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Redis must deliver the activation email on the form signup route.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Database creation shows a pending state before the active checkmark.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Redis Cloud creates the free database and moves it from pending to active.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Redis Cloud exposes default-user credentials and the connection wizard after the database exists.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Changing the generated database name",
+      "reason": "The quick start says Redis generates a name and changing it is optional.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Loading sample data inside Redis Insight",
+      "reason": "Sample data is presented after Insight opens and is not required to open the database.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Redis Open Source OS or container installs",
+      "reason": "They are alternate deployment surfaces; Cloud is the new-user quick start.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Redis Open Source",
+      "url": "https://redis.io/docs/latest/get-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Redis Cloud called fastest deployment",
+        "Cloud quick start linked for new users"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Redis Cloud quick start",
+      "url": "https://redis.io/docs/latest/operate/rc/rc-quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account creation and free database steps",
+        "Activation email",
+        "Vendor region and version fields",
+        "Connection wizard methods",
+        "Redis Insight web terminal for Essentials"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Redis Cloud try-free signup",
+      "url": "https://redis.com/try-free/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First name",
+        "Last name",
+        "Email",
+        "Google and GitHub signup options",
+        "Terms agreement copy"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which signup method is the selected shortest Redis Cloud account route: email form, Google, or GitHub?",
+      "impact": "The methods change required fields, external authorization, and whether activation email is required before Create database.",
+      "evidence_needed": "A dated fresh-account walkthrough of each signup method recording fields, verification, and the first Create database screen."
+    },
+    {
+      "question": "After password reveal, is Launch Redis Insight web the canonical first-success connection, or must redis-cli or a language client be treated as equal outcomes?",
+      "impact": "Connection choice changes required installs, code, and action count after the same free database exists.",
+      "evidence_needed": "Confirm whether Redis labels one connection method recommended for the free Essentials quick start, or fix Insight web as the measured terminal by policy."
+    }
+  ],
+  "counts": null
+}

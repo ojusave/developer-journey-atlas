@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Honeycomb",
+    "slug": "honeycomb",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "468363ff82c3c4eefee6cd9bd652043111bc448464a5376936550543c42c35ee",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No Honeycomb account, team, region, environment, or ingest API key exists yet."
+    ]
+  },
+  "developer_goal": "Create a Honeycomb account and open a first observable trace or equivalent first-success signal for a chosen start path.",
+  "first_success": {
+    "outcome": "Honeycomb shows a first trace (or the selected path's equivalent first success) from the developer's chosen instrumentation route.",
+    "observable_signal": "For the traces candidate, Honeycomb opens a trace view showing spans, durations, and any errors.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "Honeycomb Get Started self-service paths",
+    "rule": "Select the shortest complete account-to-first-signal route only after start path, telemetry type, and language are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Applications traces via OpenTelemetry (language-tabbed)",
+        "status": "unresolved",
+        "reason": "Official traces guide branches across JavaScript, Python, Java, .NET, Go, Ruby, and others without ranking one language."
+      },
+      {
+        "name": "Kubernetes start path",
+        "status": "unresolved",
+        "reason": "Explicit peer Get Started path for cluster telemetry."
+      },
+      {
+        "name": "Example applications",
+        "status": "unresolved",
+        "reason": "Peer path using pre-instrumented apps with separate repository instructions."
+      },
+      {
+        "name": "Honeycomb Sandbox / interactive demo",
+        "status": "not-selected",
+        "reason": "Explores vendor demo data without creating the developer's instrumentation path; does not require account telemetry send."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Choose US or EU data storage and create a free Honeycomb account and team.",
+      "required_fields": [
+        {
+          "label": "Data storage region (US or EU)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Account signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Traces guide links US/EU signup but does not enumerate form controls."
+        },
+        {
+          "label": "Team name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The developer has a Honeycomb team and can view or copy an ingest API key.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Copy the Honeycomb ingest API key for later instrumentation.",
+      "required_fields": [
+        {
+          "label": "Ingest API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Shown once at team creation; also available later in Environment Settings."
+        }
+      ],
+      "observable_result": "The API key is available to configure OpenTelemetry export.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Choose an application language path, add OpenTelemetry instrumentation, run the service, generate traffic, and open a trace.",
+      "required_fields": [
+        {
+          "label": "Language / framework tab",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S4"
+          ]
+        },
+        {
+          "label": "Language-specific dependencies, config, and run commands",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2",
+            "S3",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "Honeycomb displays a trace waterfall for a generated request.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Access to modify and run an application in a local development environment, or willingness to use an official example app.",
+      "source_ids": [
+        "S2",
+        "S5"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Region choice is made before account creation and determines which Honeycomb instance stores data.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "After the instrumented service emits spans, Honeycomb must ingest them before query and trace views populate.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Team creation reveals an ingest API key needed to send data.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "OpenTelemetry instrumentation builds spans that Honeycomb can query and open as traces.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading observability fundamentals docs",
+      "reason": "Educational content, not a required product action.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Honeycomb Sandbox demo without instrumentation",
+      "reason": "Different outcome that does not send the developer's telemetry.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started overview",
+      "url": "https://docs.honeycomb.io/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Choose your path",
+        "Applications, Kubernetes, Sandbox, example apps"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Get Started with Traces and Wide Events",
+      "url": "https://docs.honeycomb.io/get-started/start-building/application/traces",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "US/EU account creation",
+        "Team name",
+        "API key",
+        "Language-tabbed OpenTelemetry setup",
+        "Trace view success"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Send data Ruby OpenTelemetry SDK",
+      "url": "https://docs.honeycomb.io/send-data/ruby/opentelemetry-sdk/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Ruby-specific OpenTelemetry candidate details"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Send Data from Applications with OpenTelemetry",
+      "url": "https://docs.honeycomb.io/send-data/opentelemetry",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Many language instrumentation entry points",
+        "OTLP endpoint and API key headers"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Example Applications",
+      "url": "https://docs.honeycomb.io/get-started/start-building/example-applications/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Example-app alternative start path"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Honeycomb start path, telemetry type, and application language should define the measured route?",
+      "impact": "Required packages, config files, run commands, and even whether a trace waterfall is the terminal signal all change.",
+      "evidence_needed": "A corpus decision selecting one Get Started path and language tab, plus a cold-account walkthrough to that path's first success."
+    },
+    {
+      "question": "What exact fields appear on the current US and EU Honeycomb signup forms?",
+      "impact": "Account-creation field counts remain unverified.",
+      "evidence_needed": "Dated captures of the US and EU signup pages linked from the traces guide."
+    }
+  ],
+  "counts": null
+}

@@ -29,6 +29,6 @@ export function searchPlatforms(store: DataStore) {
       )
       .sort((a, b) => relevance(a, q) - relevance(b, q) || a.name.localeCompare(b.name));
 
-    sendData(res, matched.map(toSummary), { query: q, count: matched.length });
+    sendData(res, matched.map((row) => toSummary(row, store)), { query: q, count: matched.length });
   };
 }

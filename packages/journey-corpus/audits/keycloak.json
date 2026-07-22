@@ -1,0 +1,394 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Keycloak",
+    "slug": "keycloak",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "bc6dcf4749c209dfa062a4b84c4eee7d8718b567a4b96f37b7d1d791ae9e462e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has Docker installed and local port 8080 available.",
+      "No Keycloak server, realm, user, or OpenID Connect client exists yet.",
+      "Bootstrap administrator credentials will be created by the documented docker run environment variables."
+    ]
+  },
+  "developer_goal": "Start Keycloak, create the first realm and user, register the first OpenID Connect client, and authenticate to Keycloak's SPA testing application.",
+  "first_success": {
+    "outcome": "The developer signs in to Keycloak's SPA testing application through the locally running Keycloak server as the created realm user.",
+    "observable_signal": "https://www.keycloak.org/app/ completes Sign in against the local Keycloak instance with myuser.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Official Keycloak getting-started guides through first SPA sign-in",
+    "rule": "Select one deployment getting-started guide only after peer runtimes that reach the same Admin Console and SPA terminal are ranked under the lexicographic policy.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Docker getting started",
+        "status": "unresolved",
+        "reason": "Documents a complete path from docker run through realm, user, client, and SPA sign-in, but Keycloak publishes peer OpenJDK, Podman, Kubernetes, and OpenShift guides to the same conceptual first success."
+      },
+      {
+        "name": "OpenJDK getting started",
+        "status": "unresolved",
+        "reason": "Peer local install path with different prerequisites and install actions before the same Admin Console workflow."
+      },
+      {
+        "name": "Podman getting started",
+        "status": "unresolved",
+        "reason": "Peer container-runtime path rather than a ranked subordinate of Docker."
+      },
+      {
+        "name": "Kubernetes or OpenShift getting started",
+        "status": "unresolved",
+        "reason": "Peer cluster deployment paths that change prerequisites and install actions before administrative setup."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "cli",
+      "action": "Start Keycloak in development mode with bootstrap administrator credentials via docker run.",
+      "required_fields": [
+        {
+          "label": "KC_BOOTSTRAP_ADMIN_USERNAME",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Official example uses admin."
+        },
+        {
+          "label": "KC_BOOTSTRAP_ADMIN_PASSWORD",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Official example uses admin."
+        }
+      ],
+      "observable_result": "Keycloak listens on localhost:8080 with the bootstrap admin user available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open the Admin Console and log in with the bootstrap administrator credentials.",
+      "required_fields": [
+        {
+          "label": "Administrator username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Administrator password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The developer is authenticated to the Keycloak Admin Console.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create realm myrealm.",
+      "required_fields": [
+        {
+          "label": "Realm name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "myrealm appears as the current realm.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create user myuser with first and last name.",
+      "required_fields": [
+        {
+          "label": "Username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Last name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "myuser exists in myrealm.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Set the user password and toggle Temporary Off.",
+      "required_fields": [
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Temporary toggle Off",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Set password submit control",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "The guide describes filling the form and Temporary Off but does not name the exact submit control."
+        }
+      ],
+      "observable_result": "myuser can authenticate with a non-temporary password.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create OpenID Connect client myclient with redirect URI and web origin for the SPA test app.",
+      "required_fields": [
+        {
+          "label": "Client type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Client ID",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Valid redirect URIs",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Web origins",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "myclient is saved for the Keycloak SPA testing application.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open the SPA testing application, keep the default configuration, and Sign in as myuser.",
+      "required_fields": [
+        {
+          "label": "myuser credentials",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The SPA testing application completes authentication through the local Keycloak server.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Docker must be installed and the host must provide sufficient CPU and memory for Keycloak.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Local port 8080 must be usable for the documented docker run mapping.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "The first docker run may need to pull the Keycloak image before the server starts.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Keycloak creates the bootstrap admin user from the docker run environment variables.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The Admin Console and Account Console become available on localhost:8080.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Keycloak guides as measured actions",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "item": "Optional Account Console profile verification before client creation",
+      "reason": "The guide presents Account Console login as an optional verification before securing the first application.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Production database, SSL, and admin password hardening",
+      "reason": "The guide places these after the SPA testing first success.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Docker: Get started with Keycloak on Docker",
+      "url": "https://www.keycloak.org/getting-started/getting-started-docker",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "docker run bootstrap admin credentials",
+        "Realm myrealm creation",
+        "User myuser and password setup",
+        "OpenID Connect client myclient fields",
+        "SPA testing application Sign in terminal"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Keycloak Guides",
+      "url": "https://www.keycloak.org/guides",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multiple getting-started deployment guides"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Running Keycloak in a container",
+      "url": "https://www.keycloak.org/server/containers",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Container image publication and container runtime context"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which getting-started deployment guide is the selected shortest path among Docker, OpenJDK, Podman, Kubernetes, and OpenShift?",
+      "impact": "Peer install surfaces change prerequisites, commands, waits, and action counts before the shared Admin Console and SPA terminal.",
+      "evidence_needed": "Lexicographic comparison of complete required actions for each official getting-started guide to the same SPA sign-in outcome, or vendor ranking of a default first route."
+    },
+    {
+      "question": "Which exact control submits the Set password form after Temporary is toggled Off?",
+      "impact": "An omitted UI click would change the required action and field count in the user-credential step.",
+      "evidence_needed": "Current Admin Console observation or a guide update that names the submit control."
+    },
+    {
+      "question": "What exact post-login content in the SPA testing application proves success?",
+      "impact": "The observable signal can be described only as completed Sign in, not a precise label or field.",
+      "evidence_needed": "A dated screenshot or walkthrough of the SPA testing application after successful myuser authentication."
+    }
+  ],
+  "counts": null
+}

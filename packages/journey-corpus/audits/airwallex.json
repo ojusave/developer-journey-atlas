@@ -1,0 +1,295 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Airwallex",
+    "slug": "airwallex",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "a3bde769d9c99fbfd5188548e990d049293f96f2b0efac132fca714bb2095f6b",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a business email address.",
+      "No Airwallex sandbox account, Client ID, or API key exists yet.",
+      "Sandbox first success is acceptable; production keys are out of scope."
+    ]
+  },
+  "developer_goal": "Create an Airwallex sandbox account and complete the earliest official authenticated API first-success path.",
+  "first_success": {
+    "outcome": "Unresolved between obtaining a sandbox access token and calling a first product API after choosing admin versus scoped keys.",
+    "observable_signal": "Sandbox docs show authentication/login returning a bearer token, then optionally calling balances or other APIs; Manage API keys makes key type consequential.",
+    "source_ids": ["S2", "S3", "S4"]
+  },
+  "route_selection": {
+    "surface": "Airwallex sandbox signup plus Developer API keys and Authentication API",
+    "rule": "Select the shortest complete sandbox route only after API-key type, org versus account scope, and terminal success (token versus first product call) are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Sandbox admin API key then Obtain access token",
+        "status": "unresolved",
+        "reason": "Sandbox overview demonstrates Client ID and API key login to get a token, but admin versus scoped keys and whether token alone is first success remain open."
+      },
+      {
+        "name": "Sandbox scoped API key with least-privilege resources then Obtain access token",
+        "status": "unresolved",
+        "reason": "Manage API keys documents scoped keys with organization and account permission matrices that change required fields and later API reach."
+      },
+      {
+        "name": "Token plus first product call such as balances/current",
+        "status": "unresolved",
+        "reason": "Sandbox testing docs immediately show a follow-on authenticated balances request, which may be a stronger first-success signal than token issuance alone."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create an Airwallex sandbox account from the official sandbox signup form.",
+      "required_fields": [
+        {
+          "label": "Business email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2", "S6"]
+        },
+        {
+          "label": "Legal first name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S6"]
+        },
+        {
+          "label": "Legal last name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S6"]
+        },
+        {
+          "label": "Business headquarter / business country",
+          "field_type": "select",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2", "S6"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S2", "S6"]
+        },
+        {
+          "label": "Terms & Conditions and Privacy Policy agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S6"]
+        }
+      ],
+      "observable_result": "The sandbox account is ready and the developer can log in to the sandbox web app.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S6"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Log in to the sandbox web app with the new sandbox credentials.",
+      "required_fields": [
+        {
+          "label": "Sandbox email and password",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The developer can open Account Developer API keys.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate the selected sandbox API key type and copy Client ID and API key.",
+      "required_fields": [
+        {
+          "label": "API key type (admin versus scoped)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Scoped resources and account targets when scoped",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Login password confirmation",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "Sandbox Client ID and API key secret are available.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "api",
+      "action": "Call Obtain access token in the sandbox environment, then complete any selected first product request.",
+      "required_fields": [
+        {
+          "label": "x-client-id",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S4"]
+        },
+        {
+          "label": "x-api-key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S4"]
+        },
+        {
+          "label": "Optional x-login-as account targeting",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "Sandbox returns a bearer access token and any selected follow-on API succeeds.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Developer app access requires Owner, Admin, or Developer roles.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Connected Account APIs for Embedded Finance testing require contacting Airwallex Sales.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Sandbox account provisioning is described as instant after Create sandbox account.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Airwallex activates the sandbox account for immediate web app and API testing.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Authentication login returns a bearer access token valid for a limited period.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production API host and production key generation",
+      "reason": "Sandbox overview places production switch after sandbox testing.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Simulation APIs for deposits, payouts, issuing, and related products",
+      "reason": "Presented as next-step testing tools after authentication setup.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Developer Tools API overview",
+      "url": "https://www.airwallex.com/docs/developer-tools/api",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer tools entry to API and sandbox routes"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sandbox environment overview",
+      "url": "https://www.airwallex.com/docs/developer-tools/sandbox-environment",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox signup fields summary",
+        "API key generation",
+        "Obtain access token example",
+        "Optional balances call"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Manage API keys",
+      "url": "https://www.airwallex.com/docs/developer-tools/api/manage-api-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Admin versus scoped keys",
+        "Scope matrices",
+        "x-login-as behavior"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Getting started with the API",
+      "url": "https://www.airwallex.com/docs/api/2022-09-09/getting_started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Authentication getting-started context"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Sandbox settings",
+      "url": "https://www.airwallex.com/docs/developer-tools/sandbox-environment/sandbox-settings",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox configuration context"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Sandbox signup form",
+      "url": "https://demo.airwallex.com/signup/us/sandbox",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Business email",
+        "Legal first and last name",
+        "Business headquarter",
+        "Password",
+        "Terms agreement"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which API-key type and resource scope should define the canonical first authentication route?",
+      "impact": "Admin keys versus scoped org/account permissions change required form fields and which follow-on APIs the token can call.",
+      "evidence_needed": "Choose admin or a specific scoped matrix, then verify one sandbox walkthrough from signup through the chosen terminal."
+    },
+    {
+      "question": "Is Obtain access token itself first success, or must a follow-on product call such as balances/current be included?",
+      "impact": "The terminal outcome and whether implementation continues past authentication change action counts.",
+      "evidence_needed": "A corpus policy decision on authentication-only versus first authenticated resource read for Airwallex."
+    }
+  ],
+  "counts": null
+}

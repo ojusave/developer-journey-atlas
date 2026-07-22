@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Sinch",
+    "slug": "sinch",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "9315d2c5ac4897ccbce691d8e2418200f160b4ee262c41ca58fd356fb75040f4",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, a phone number for verification or test delivery, and Node.js with npm if using the CLI route.",
+      "No Sinch account, project, access key, Conversation app, or rented number exists yet."
+    ]
+  },
+  "developer_goal": "Create a Sinch Build account and reach the earliest official first outbound SMS success.",
+  "first_success": {
+    "outcome": "Unresolved between CLI-sent SMS to the developer's phone and Conversation API getting-started send after dashboard channel setup.",
+    "observable_signal": "Either the destination phone receives the SMS and the CLI prints a send result, or the Conversation API accepts a messages:send request.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "Sinch Build Dashboard with Conversation API or Sinch CLI quickstarts",
+    "rule": "Compare complete official routes to first outbound SMS; do not invent a winner when signup is opaque and CLI versus dashboard Conversation routes differ in billing and setup.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Sinch CLI quickstart: auth, rent number, conversation send",
+        "status": "unresolved",
+        "reason": "Official CLI quickstart terminates on a rented number and SMS to the developer's phone, and renting implies number cost."
+      },
+      {
+        "name": "Conversation API getting started: access, app, SMS channel, HTTP send",
+        "status": "unresolved",
+        "reason": "Dashboard Conversation docs require product terms, access keys, app creation, and SMS channel setup before messages:send."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a free Sinch Build Dashboard account.",
+      "required_fields": [
+        {
+          "label": "Signup and Sinch ID verification fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3", "S4"],
+          "notes": "Community articles mention mobile verification for testing and 2FA, but the live signup form sequence is not fully public."
+        }
+      ],
+      "observable_result": "The developer can sign in to the Sinch Build Dashboard.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Accept Conversation API terms if required and create an access key, recording key ID, secret, and project ID.",
+      "required_fields": [
+        {
+          "label": "Conversation API terms acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Access key credentials",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Project ID, access key, and secret are available for API or CLI auth.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Complete the unresolved CLI or Conversation API send route through first outbound SMS.",
+      "required_fields": [
+        {
+          "label": "Route-specific number, app, channel, and send steps",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"]
+        }
+      ],
+      "observable_result": "Depends on the unresolved first-SMS route.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Conversation API access on Sinch Build requires reviewing and accepting product terms.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "CLI auth requires Project ID, Key ID, and Key Secret from the dashboard.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Renting an SMS-capable number on the CLI route incurs a documented monthly number cost.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Phone verification during signup or delivery of the first SMS to a real handset is asynchronous.",
+      "source_ids": ["S4", "S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Sinch creates an account and user that can access the Build Dashboard after signup.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Conversation API or CLI documentation",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "item": "Additional channels, templates, OAuth production auth, and inbound callbacks",
+      "reason": "These occur after the first outbound SMS success.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Conversation API Getting started",
+      "url": "https://developers.sinch.com/docs/conversation/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Free Build Dashboard account", "Conversation terms", "Access key", "App and SMS channel", "messages:send"]
+    },
+    {
+      "id": "S2",
+      "title": "Sinch CLI Quickstart",
+      "url": "https://developers.sinch.com/docs/functions/cli/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["CLI install", "auth login", "Search and rent number", "conversation send to phone"]
+    },
+    {
+      "id": "S3",
+      "title": "Sinch Build Dashboard signup",
+      "url": "https://dashboard.sinch.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Official signup entry; interactive continuation not fully public"]
+    },
+    {
+      "id": "S4",
+      "title": "Creating an account on the Sinch Build Dashboard",
+      "url": "https://community.sinch.com/t5/Build-Dashboard/Creating-an-account-on-the-Sinch-Build-Dashboard/ta-p/13952",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Signup creates Sinch account and user for Dashboard access"]
+    },
+    {
+      "id": "S5",
+      "title": "Sinch Build Dashboard Authentication",
+      "url": "https://community.sinch.com/t5/Build-Dashboard/Sinch-Build-Dashboard-Authentication/ta-p/7201",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Phone verification and two-factor authentication context for Build Dashboard"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which official first-SMS route is canonical: Sinch CLI with number rental, or Conversation API dashboard plus HTTP send?",
+      "impact": "Action counts, billing gates, and whether a Conversation app and channel setup are required all change.",
+      "evidence_needed": "A workshop-owner product choice plus a fresh-account comparison of both complete routes to first received SMS."
+    },
+    {
+      "question": "What exact Sinch ID signup fields, phone verification, and post-submit states appear before Dashboard access?",
+      "impact": "The account segment cannot be reconstructed or counted from public docs alone.",
+      "evidence_needed": "Dated screenshots of dashboard.sinch.com/signup through first authenticated Dashboard session."
+    }
+  ],
+  "counts": null
+}

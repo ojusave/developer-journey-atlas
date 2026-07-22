@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Render",
+    "slug": "render",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "verified",
+  "audited_at": "2026-07-21",
+  "source_record_sha256": "57a6fa0c942e11dde129ec923b15f78b4a16dc202212368a3874009e515f187d",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "The developer has a GitHub account and an accessible repository containing an existing server-side web application.",
+      "The application already binds its HTTP server to 0.0.0.0 and has known build and start commands."
+    ]
+  },
+  "developer_goal": "Create a Render account, deploy an existing server-side application from GitHub through the Render Dashboard, and open the live application.",
+  "first_success": {
+    "outcome": "The web service is Live and its onrender.com URL serves the application's root content.",
+    "observable_signal": "Opening the service's onrender.com URL returns the application's root content after the deploy reaches Live.",
+    "source_ids": ["S2", "S4"]
+  },
+  "route_selection": {
+    "surface": "Self-service Render Dashboard",
+    "rule": "Use the shortest complete Dashboard path. Connect GitHub inside the service creation flow instead of taking the separate Account Settings detour.",
+    "selected": "Dashboard Web Service creation with in-flow GitHub connection",
+    "candidates": [
+      {
+        "name": "Dashboard with in-flow GitHub connection",
+        "status": "selected",
+        "reason": "Render documents that an unconnected Git provider can be connected directly from the service creation form."
+      },
+      {
+        "name": "Dashboard with Account Settings Git credential setup first",
+        "status": "not-selected",
+        "reason": "It reaches the same Dashboard deployment outcome but adds a separate navigation detour."
+      },
+      {
+        "name": "Render CLI or coding-agent deployment",
+        "status": "not-selected",
+        "reason": "These are different interaction surfaces from the requested account-creation-to-Dashboard-success path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Render account with the email and password route.",
+      "required_fields": [
+        {"label": "Email", "field_type": "email", "evidence_state": "observed-public-ui", "source_ids": ["S1"]},
+        {"label": "Password", "field_type": "password", "evidence_state": "observed-public-ui", "source_ids": ["S1"]},
+        {"label": "Terms of Service and Privacy Policy acknowledgement", "field_type": "agreement", "evidence_state": "observed-public-ui", "source_ids": ["S1"], "notes": "The signup page states that creating the account constitutes agreement; there is no separate visible checkbox."},
+        {"label": "hCaptcha challenge", "field_type": "challenge", "evidence_state": "observed-public-ui", "source_ids": ["S1"], "notes": "The challenge may be passive or interactive depending on risk signals."}
+      ],
+      "observable_result": "The developer has an authenticated Render Dashboard account.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "In the Render Dashboard, choose New > Web Service.",
+      "required_fields": [],
+      "observable_result": "The service creation flow opens with source options.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select Git Provider and choose GitHub from the service creation flow.",
+      "required_fields": [],
+      "observable_result": "Render redirects the developer to GitHub authorization.",
+      "evidence_state": "documented",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 4,
+      "kind": "external-authorization",
+      "interface": "external-system",
+      "action": "Authorize Render's GitHub integration to access the repository used for the deployment.",
+      "required_fields": [
+        {"label": "Repository access", "field_type": "permission", "evidence_state": "documented", "source_ids": ["S3"], "notes": "Access must include the repository being deployed."}
+      ],
+      "observable_result": "GitHub redirects back to Render and the repository list is available.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select the application repository and choose Connect.",
+      "required_fields": [
+        {"label": "Repository", "field_type": "repository", "evidence_state": "documented", "source_ids": ["S2", "S3", "S4"]}
+      ],
+      "observable_result": "The remainder of the Web Service creation form appears.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3", "S4"]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the required Web Service configuration.",
+      "required_fields": [
+        {"label": "Name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S4"]},
+        {"label": "Region", "field_type": "select", "evidence_state": "documented", "source_ids": ["S4"]},
+        {"label": "Branch", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2", "S4"]},
+        {"label": "Language", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2", "S4"]},
+        {"label": "Build Command", "field_type": "command", "evidence_state": "documented", "source_ids": ["S2", "S4"]},
+        {"label": "Start Command", "field_type": "command", "evidence_state": "documented", "source_ids": ["S2", "S4"]},
+        {"label": "Instance Type", "field_type": "select", "evidence_state": "documented", "source_ids": ["S2", "S4"], "notes": "The audited path selects Free."}
+      ],
+      "observable_result": "The form contains the source, runtime, build, start, location, name, and instance settings required to create the service.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 7,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select Deploy or Create Web Service to submit the service configuration.",
+      "required_fields": [],
+      "observable_result": "Render creates the service and starts its first build and deploy.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    },
+    {
+      "step_number": 8,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "After the deploy reaches Live, open the service's onrender.com URL.",
+      "required_fields": [],
+      "observable_result": "The browser displays the deployed application's root content.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "A GitHub account with access to a repository containing the server-side application.", "source_ids": ["S2", "S3", "S4"]},
+    {"description": "The application listens for HTTP requests on 0.0.0.0 and has known build and start commands.", "source_ids": ["S2", "S4"]}
+  ],
+  "external_gates": [
+    {"description": "GitHub authorization must grant Render access to the selected repository.", "source_ids": ["S3"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "Render must clone, build, start, and mark the first deploy Live before the application URL can be verified.", "source_ids": ["S2", "S4"]}
+  ],
+  "platform_outcomes": [
+    {"description": "Render creates the Web Service and starts the first deploy after submission.", "source_ids": ["S2", "S4"]},
+    {"description": "A successful deploy becomes Live and receives an onrender.com URL.", "source_ids": ["S2", "S4"]},
+    {"description": "The service returns the application's root content when the URL is opened.", "source_ids": ["S2", "S4"]}
+  ],
+  "excluded": [
+    {"item": "Reading or navigating Render documentation", "reason": "Documentation is evidence for the path, not a product action.", "source_ids": ["S2"]},
+    {"item": "Connecting GitHub through Account Settings before creating the service", "reason": "Render documents an in-flow connection from the service creation form, which removes the detour.", "source_ids": ["S2", "S3"]},
+    {"item": "Root Directory", "reason": "Required only for a monorepo, which is not assumed by this selected route.", "source_ids": ["S2"]},
+    {"item": "Environment variables and Advanced settings", "reason": "They are conditional on the application and are not required by the selected example route.", "source_ids": ["S2", "S4"]},
+    {"item": "Watching deploy logs", "reason": "The developer may watch logs, but no interaction is required while a successful deploy runs.", "source_ids": ["S2", "S4"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Render account registration", "url": "https://dashboard.render.com/register", "source_type": "observed-public-ui", "accessed_at": "2026-07-21", "evidence_supported": ["Visible email and password fields", "Terms and privacy acknowledgement", "hCaptcha protection", "Social identity alternatives"]},
+    {"id": "S2", "title": "Your First Render Deploy", "url": "https://render.com/docs/your-first-deploy", "source_type": "official-documentation", "accessed_at": "2026-07-21", "evidence_supported": ["Account creation boundary", "Dashboard service creation path", "Required deployment fields", "Deploy wait and Live state", "onrender.com verification"]},
+    {"id": "S3", "title": "Connect GitHub", "url": "https://render.com/docs/github", "source_type": "official-documentation", "accessed_at": "2026-07-21", "evidence_supported": ["In-flow GitHub connection", "GitHub authorization", "Repository selection and connection"]},
+    {"id": "S4", "title": "Web Services", "url": "https://render.com/docs/web-services", "source_type": "official-documentation", "accessed_at": "2026-07-21", "evidence_supported": ["New Web Service action", "Required service fields", "Free instance selection", "Create Web Service action", "First deploy and public URL"]}
+  ],
+  "uncertainties": [],
+  "counts": {
+    "required_actions": 8,
+    "required_fields": 13,
+    "external_gates": 1,
+    "unavoidable_waits": 1
+  }
+}

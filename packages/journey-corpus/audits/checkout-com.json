@@ -1,0 +1,233 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Checkout.com",
+    "slug": "checkout-com",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "9ad1767b5d4a06d81f7258fedf2f0c45db6434a1d20159c77672767696a76913",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, an email address, and a local web stack able to host a server and client page.",
+      "No Checkout.com sandbox account, API keys, or Flow integration exists yet.",
+      "Sandbox test cards are acceptable for first success."
+    ]
+  },
+  "developer_goal": "Create a Checkout.com sandbox account and complete the earliest official first successful test payment path.",
+  "first_success": {
+    "outcome": "A sandbox Flow payment completes after Payment Session creation and client mount, subject to unresolved signup-field evidence.",
+    "observable_signal": "Get started documents a successful Flow payment and Dashboard Payments status after using the documented test card.",
+    "source_ids": ["S1", "S2"]
+  },
+  "route_selection": {
+    "surface": "Checkout.com Get started Flow guide plus sandbox test-account signup",
+    "rule": "Prefer the documented Get started Flow sandbox path once account-creation fields are known; do not invent alternate Unified API terminals without an official shortest-path winner.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Get started Flow embedded checkout in sandbox",
+        "status": "unresolved",
+        "reason": "Official Get started centers Flow Payment Sessions and a test-card Pay step, but sandbox signup fields remain opaque and alternate API UIs are also marketed from the test-account page."
+      },
+      {
+        "name": "Other Unified API or Frames-style integrations",
+        "status": "unresolved",
+        "reason": "Create a test account copy references the Unified API without establishing whether any non-Flow route is shorter to first payment success."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Checkout.com sandbox test account from the official test-account signup entry.",
+      "required_fields": [
+        {
+          "label": "Sandbox signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3"],
+          "notes": "Support and marketing pages confirm signup exists, but public fetches did not expose the current required form fields, consents, or email verification steps."
+        }
+      ],
+      "observable_result": "The developer can open the sandbox Dashboard and create API keys.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a public key and a secret key with the scopes required by Flow.",
+      "required_fields": [
+        {
+          "label": "Public key scopes payment-sessions:pay and vault-tokenization",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Secret key scope payment-sessions",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Sandbox public and secret keys are available for Payment Sessions.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Configure a webhook endpoint for payment events and retrieve the account sandbox API prefix.",
+      "required_fields": [
+        {
+          "label": "Webhook endpoint",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Sandbox API prefix",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Webhook delivery and the account-specific sandbox base URL are available.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Create a Payment Session server-side, load Checkout Web Components, mount Flow, and complete a test-card payment.",
+      "required_fields": [
+        {
+          "label": "Payment Session request body fields",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Public key and sandbox environment",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Test card details",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Flow completes a sandbox payment and Dashboard Payments can show the result.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A Checkout.com test account is required before creating Flow keys.",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "description": "A reachable webhook receiver is required to receive payment-status events.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Additional payment methods beyond cards may require contacting a solutions engineer.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Webhook delivery of payment status may arrive after customer redirect.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Checkout.com returns a Payment Session token used to mount Flow.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Flow performs the payment request and related 3DS or redirect handling after Pay.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading customization, localization, and 3DS deep-dive docs",
+      "reason": "Get started treats these as next steps after the first test payment.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Optional sample-file download template",
+      "reason": "Get started labels the project template download optional.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started",
+      "url": "https://www.checkout.com/docs/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Flow Payment Session path",
+        "Required key scopes",
+        "Webhook prerequisite",
+        "Client mount steps",
+        "Test card details"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create a sandbox account",
+      "url": "https://support.checkout.com/hc/en-us/articles/14327083327890-Create-a-sandbox-account",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sandbox signup entry exists",
+        "Immediate card testing",
+        "APM testing may need solutions engineer"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create a test account",
+      "url": "https://www.checkout.com/get-test-account",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public test-account marketing and sign-in recovery states",
+        "No complete field inventory in fetched HTML"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact fields, consents, verification actions, and email transitions create a Checkout.com sandbox account today?",
+      "impact": "Required field counts and account-step actions cannot be verified, so the audit cannot become verified even if Flow implementation steps are documented.",
+      "evidence_needed": "A dated screenshot or read-only walkthrough of https://www.checkout.com/get-test-account through first Dashboard access."
+    },
+    {
+      "question": "Is Flow the sole official shortest first-payment route, or do other Unified API surfaces tie under the lexicographic rule?",
+      "impact": "A consequential alternate integration could change implementation actions before first payment success.",
+      "evidence_needed": "Official comparison or recommendation that names one canonical first sandbox payment route from account creation."
+    }
+  ],
+  "counts": null
+}

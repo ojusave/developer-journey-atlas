@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Slack",
+    "slug": "slack",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "d7ad9f44de4e6d14d11b01a5e2c19994fd7a8f69814a8171d72fac7ecf4f4ac9",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can install local tooling.",
+      "No Slack user account, development workspace, Slack CLI login, or app exist yet.",
+      "Workspace governance will allow the developer to create and install apps without an unresolved admin approval queue."
+    ]
+  },
+  "developer_goal": "Create Slack access for development, run the official Bolt getting-started app via the Slack CLI, and confirm it responds to hello and a button click.",
+  "first_success": {
+    "outcome": "The starter Bolt app runs locally, is installed into a development workspace, and responds to a hello message and button click in Slack.",
+    "observable_signal": "After slack run, sending hello and clicking Click Me produces the documented starter-app replies.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Slack developer docs quickstart with Slack CLI and Bolt",
+    "rule": "Prefer the vendor-recommended CLI and Bolt route; language tabs remain peer implementations of the same terminal.",
+    "selected": "Slack CLI with Bolt for Python quickstart",
+    "candidates": [
+      {
+        "name": "Slack CLI with Bolt for Python",
+        "status": "selected",
+        "reason": "The quickstart recommends the CLI and Bolt for simplicity; Python is the first language tab and declares the same hello / Click Me success."
+      },
+      {
+        "name": "Slack CLI with Bolt for JavaScript",
+        "status": "not-selected",
+        "reason": "Equivalent language tab with the same CLI flow and terminal; Python is listed first under the recommended route."
+      },
+      {
+        "name": "Browser app-settings / manifest route",
+        "status": "not-selected",
+        "reason": "The quickstart presents browser app settings as an alternative and recommends the CLI for the smoothest experience."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Slack user account and a development workspace (or sandbox) usable for app creation.",
+      "required_fields": [
+        {
+          "label": "Slack account and workspace creation fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "The quickstart assumes a workspace exists and recommends developer sandboxes; public get-started HTML did not expose the current signup field set."
+        }
+      ],
+      "observable_result": "The developer can authenticate into a workspace that permits app development.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install the Slack CLI and confirm it with slack version.",
+      "required_fields": [],
+      "observable_result": "The Slack CLI reports a version.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "external-authorization",
+      "interface": "cli",
+      "action": "Run slack login and authenticate the CLI to the development workspace.",
+      "required_fields": [
+        {
+          "label": "Slack CLI authentication",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The CLI is authenticated for subsequent create and run commands.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Create the Bolt for Python starter project from the documented template and enter its directory.",
+      "required_fields": [
+        {
+          "label": "slack create template command",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"],
+          "notes": "slack create first-bolt-app --template slack-samples/bolt-python-getting-started-app"
+        }
+      ],
+      "observable_result": "A local project with requirements.txt and Slack CLI config exists.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Create and activate a Python virtual environment, then install requirements.",
+      "required_fields": [
+        {
+          "label": "pip install -r requirements.txt",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Project dependencies are installed in the active virtual environment.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Run slack run and choose Create a new app for the intended workspace.",
+      "required_fields": [
+        {
+          "label": "Create a new app",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Target workspace",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The Bolt app reports that it is running.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 7,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Open a DM with the app or invite it to a public channel, send hello, then click Click Me.",
+      "required_fields": [],
+      "observable_result": "The app replies to hello and to the button click as documented.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Python 3.7 or later and Git are documented for the selected Python CLI route.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "A Slack workspace where development can happen; Slack recommends a developer sandbox.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Slack CLI login must authorize the CLI against the development workspace.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Workspace policy may require administrator approval before app creation or installation succeeds.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Slack creates and installs the app from the starter manifest when slack run selects Create a new app.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "The running Bolt app responds to the hello message and Click Me button.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Editing the app to respond to goodbye",
+      "reason": "The quickstart places farewell customization after the declared getting-started success.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Browser manifest, app-level token, and bot-token environment setup",
+      "reason": "That path is the non-recommended alternative to slack run.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Reading Slack documentation as a counted action",
+      "reason": "Documentation is evidence, not a product interaction.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart: Creating a Slack app",
+      "url": "https://docs.slack.dev/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "CLI and Bolt recommendation",
+        "Python and JavaScript language tabs",
+        "slack create, venv, slack run, and hello / Click Me terminal",
+        "Browser app-settings alternative"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Slack developer docs home",
+      "url": "https://docs.slack.dev/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Quickstart entry for building a first Slack app",
+        "Slack CLI recommended for scaffold, run, install, and lifecycle"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact Slack account and workspace-creation fields does a brand-new developer complete before slack login?",
+      "impact": "The audit boundary starts at account creation, but field counts for that gate remain unverified.",
+      "evidence_needed": "A dated walkthrough of Slack user signup and new workspace or sandbox creation through first CLI authentication."
+    },
+    {
+      "question": "Will the target workspace allow app creation and installation without administrator approval?",
+      "impact": "Enterprise or locked-down workspace policy can insert an approval gate before slack run succeeds.",
+      "evidence_needed": "Confirm the measured path assumes a developer-owned sandbox where the operator can create apps without approval, or document the approval gate explicitly."
+    }
+  ],
+  "counts": null
+}

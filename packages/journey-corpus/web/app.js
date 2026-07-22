@@ -305,10 +305,9 @@ function renderUnknown(query) {
   el.result.hidden = false;
   el.result.innerHTML = `
     <div class="card unknown-panel">
-      <p class="section-kicker">NEW PLATFORM</p>
-      <h2>"${esc(query)}" is not in the Atlas yet</h2>
-      <p class="lede">The Atlas researches its official docs, shows the draft here, then opens a draft GitHub contribution for human review. Nothing merges automatically.</p>
-      <p class="microcopy">Research runs on a durable Render Workflow. It keeps going even if you close this tab, and you can reload to resume.</p>
+      <p class="section-kicker">New platform</p>
+      <h2>${esc(query)} is not in the Atlas yet</h2>
+      <p class="lede">Researching official docs on a durable Workflow, then drafting a contribution for review.</p>
       <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
       <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
     </div>`;
@@ -327,9 +326,8 @@ function draftBanner(record) {
   const blob = URL.createObjectURL(new Blob([json], { type: "application/json" }));
   return `
     <div class="draft-banner">
-      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com and an OpenRouter model. It passed schema
-      validation but has not been human-reviewed. Treat it as a starting point, not a source of truth.
-      <a href="${blob}" download="${esc(record.platform.slug)}.json">Download the drafted record (JSON)</a>
+      <strong>Machine draft, unverified.</strong> Schema-valid from live research; not human-reviewed.
+      <a href="${blob}" download="${esc(record.platform.slug)}.json">Download JSON</a>
     </div>`;
 }
 
@@ -466,9 +464,9 @@ function resumeFromUrl() {
   el.result.hidden = false;
   el.result.innerHTML = `
     <div class="card unknown-panel">
-      <p class="section-kicker">NEW PLATFORM</p>
-      <h2>"${esc(query)}" is not in the Atlas yet</h2>
-      <p class="lede">Resuming your research run…</p>
+      <p class="section-kicker">New platform</p>
+      <h2>${esc(query)} is not in the Atlas yet</h2>
+      <p class="lede">Resuming research…</p>
       <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
       <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
     </div>`;

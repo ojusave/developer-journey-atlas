@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Django",
+    "slug": "django",
+    "category": "Frameworks, mobile, games, hardware, and creative ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "a4ff9044a476fbad12f4d2fcdb767e0559a1a1acef003ed0cb12272b8fd01b87",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "Django is an open-source framework with no vendor platform account, tenant, or dashboard signup.",
+      "The developer has a computer, shell, browser, and permission to install Python packages and create local files.",
+      "No Django project, polls app, or running development server exists yet."
+    ]
+  },
+  "developer_goal": "Install Django 6.0, create the official tutorial project and polls app, and verify the first polls view in a local browser.",
+  "first_success": {
+    "outcome": "A locally running Django development server routes /polls/ to the tutorial index view.",
+    "observable_signal": "Opening http://localhost:8000/polls/ displays: Hello, world. You're at the polls index.",
+    "source_ids": [
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "Official Django documentation: Quick install then Writing your first Django app, part 1",
+    "rule": "Use the vendor's documented first-app tutorial after minimal install; no self-service account surface exists.",
+    "selected": "Quick install + Writing your first Django app, part 1",
+    "candidates": [
+      {
+        "name": "Quick install + tutorial part 1",
+        "status": "selected",
+        "reason": "Official docs place quick install immediately before the first-app tutorial; part 1 ends at the polls view browser check."
+      },
+      {
+        "name": "Quick install only",
+        "status": "not-selected",
+        "reason": "Install alone does not create or run an application and directs the reader to the tutorial."
+      },
+      {
+        "name": "Django at a glance overview",
+        "status": "not-selected",
+        "reason": "Architectural overview rather than the named first-app path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install a compatible Python release if needed, then install an official Django release into the Python environment.",
+      "required_fields": [
+        {
+          "label": "Python install or verification",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Django package install",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "import django; print(django.get_version()) reports a Django 6.0-compatible version.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Run django-admin startproject mysite djangotutorial in the intended parent directory.",
+      "required_fields": [
+        {
+          "label": "django-admin startproject mysite djangotutorial",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "A djangotutorial directory containing manage.py and the mysite package is created.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "From djangotutorial, run python manage.py runserver and open http://127.0.0.1:8000/ to confirm the project scaffold.",
+      "required_fields": [
+        {
+          "label": "python manage.py runserver",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The development server starts and the browser shows the Django rocket landing page.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Run python manage.py startapp polls.",
+      "required_fields": [
+        {
+          "label": "python manage.py startapp polls",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "A polls application package is created.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Add the documented polls index view, polls/urls.py, and include polls.urls under polls/ in mysite/urls.py.",
+      "required_fields": [
+        {
+          "label": "polls/views.py index HttpResponse",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "polls/urls.py route to views.index",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "mysite/urls.py include polls.urls at polls/",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The project routes /polls/ to the index view.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "With runserver running, open http://localhost:8000/polls/.",
+      "required_fields": [],
+      "observable_result": "The browser displays Hello, world. You're at the polls index.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Python 3.12+ for Django 6.0, or another Python version compatible with the selected Django release.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "description": "Shell access and permission to install Python packages and write local project files.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "django-admin and startapp scaffold project and app packages.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "runserver serves the development site and returns the polls index response.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Django documentation beyond following the install and part 1 commands",
+      "reason": "Documentation reading is evidence, not a counted product action.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "item": "Tutorial parts 2 and later, including models, admin, and voting",
+      "reason": "Part 1 ends after the polls index browser verification and directs the reader onward.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Optional large-database engine setup",
+      "reason": "Quick install states this is unnecessary for SQLite during the introduction.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quick install guide",
+      "url": "https://docs.djangoproject.com/en/6.0/intro/install/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Python prerequisite",
+        "Django install options",
+        "Version verification",
+        "No account requirement",
+        "Forward to tutorial"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Writing your first Django app, part 1",
+      "url": "https://docs.djangoproject.com/en/6.0/intro/tutorial01/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "startproject",
+        "runserver",
+        "startapp polls",
+        "view and URL wiring",
+        "polls index browser terminal"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "How should the corpus account-creation starting boundary map for Django, which has no vendor platform account?",
+      "impact": "The schema forces starting_state.boundary to account creation, but the real first-success path begins at local install and project scaffolding. Counts cannot be published as verified under the account-creation contract.",
+      "evidence_needed": "A corpus policy decision that either (a) treats open-source no-account frameworks as an explicit exception with a different starting boundary, or (b) defines a synthetic account-equivalent start that reviewers accept."
+    }
+  ],
+  "counts": null
+}

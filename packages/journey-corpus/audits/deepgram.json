@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Deepgram",
+    "slug": "deepgram",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "746e5407e54e390bae3e724712dc49314e56353e8e369a0724fd8f9c2bbd5130",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and network access.",
+      "No Deepgram account, project, API key, or prior transcript is assumed."
+    ]
+  },
+  "developer_goal": "Reach Deepgram's earliest official first transcription success from the documented first-request routes.",
+  "first_success": {
+    "outcome": "A transcript is returned for sample or provided audio through Playground or an authenticated API request.",
+    "observable_signal": "Recognized text appears in the Playground Transcript panel, or a listen API response contains transcript results.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Deepgram first-request guide offering Playground and authenticated API routes",
+    "rule": "Prefer the shortest complete route without payment or unavailable entitlement; do not invent a winner when account-boundary and no-signup routes both claim first-request success.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Deepgram Playground with no signup",
+        "status": "unresolved",
+        "reason": "The official first-request guide presents Playground as a no-signup path to a transcript, which conflicts with an account-creation starting boundary."
+      },
+      {
+        "name": "Console signup, API key, and cURL or SDK listen request",
+        "status": "unresolved",
+        "reason": "The same guide requires a free account and API key for curl and SDK routes, but the Console signup form is not publicly enumerable."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Deepgram account through the Console signup linked from the first-request guide.",
+      "required_fields": [
+        {
+          "label": "Signup fields and identity-provider choices",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "Public docs state signup is free and includes credit, but do not list interactive form fields."
+        }
+      ],
+      "observable_result": "The developer can sign in to Deepgram Console with a project available.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the first API key in Deepgram Console and copy the secret.",
+      "required_fields": [
+        {
+          "label": "API key name or comment",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "API key role or permissions",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "Deepgram shows the key secret once for later authenticated requests.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "POST sample audio to the Deepgram listen endpoint with the API key.",
+      "required_fields": [
+        {
+          "label": "Authorization Token header with API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Audio URL or upload payload",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The listen endpoint returns transcript JSON for the sample audio.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "The first API key must be created in Deepgram Console before additional keys can be created via API.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Deepgram automatically creates the first project on signup.",
+      "source_ids": ["S3"]
+    },
+    {
+      "description": "Free signup includes promotional credit per the first-request guide.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Getting Started guides beyond the first listen request",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Streaming transcription, TTS, Voice Agent, and production key rotation",
+      "reason": "These occur after the documented first pre-recorded or Playground transcript.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Make Your First API Request",
+      "url": "https://developers.deepgram.com/guides/fundamentals/make-your-first-api-request",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Free signup claim", "Playground no-signup route", "cURL listen example", "API key prerequisite"]
+    },
+    {
+      "id": "S2",
+      "title": "Deepgram Console signup",
+      "url": "https://console.deepgram.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Client-rendered signup entry; form fields not exposed in the public HTML response"]
+    },
+    {
+      "id": "S3",
+      "title": "Creating API Keys",
+      "url": "https://developers.deepgram.com/docs/create-additional-api-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Automatic first project", "Console-required first key", "Key name and role fields"]
+    },
+    {
+      "id": "S4",
+      "title": "Deepgram Playground",
+      "url": "https://playground.deepgram.com/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["No-signup Playground surface referenced by the first-request guide"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should the corpus measure the no-signup Playground transcript or the account-creation-to-API-key listen request?",
+      "impact": "The two routes have different starting boundaries, action counts, and whether signup fields matter at all.",
+      "evidence_needed": "A policy decision that either treats Playground as out of scope for account-creation audits or selects the authenticated API route as canonical."
+    },
+    {
+      "question": "What exact signup fields, identity providers, terms, and verification steps appear in the current Deepgram Console?",
+      "impact": "The account segment of the authenticated route cannot be counted without inventing fields.",
+      "evidence_needed": "A dated fresh-account walkthrough or screenshots of console.deepgram.com/signup through first project access."
+    }
+  ],
+  "counts": null
+}

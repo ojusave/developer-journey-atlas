@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "HubSpot",
+    "slug": "hubspot",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "44ce3859a961222774d5fbbad3c802b8d23c6badf4312edd76e4987e49537984",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, email address, and a machine that can install Node.js 20+ and npm.",
+      "No HubSpot account, Personal Access Key, or local HubSpot CLI config exists yet.",
+      "The developer intends to use HubSpot's current developer-platform Quickstart rather than a Marketplace-published production app."
+    ]
+  },
+  "developer_goal": "Create a HubSpot account and reach the Quickstart first success of deploying and previewing the boilerplate Get Started App Card on a contact record.",
+  "first_success": {
+    "outcome": "The boilerplate app is built, deployed, installed, assigned to the default contact record view, and visibly rendered while local development is running.",
+    "observable_signal": "A contact's Overview tab displays Get Started App Card with the Developing locally badge while hs project dev is running.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "HubSpot developer-platform Quickstart with HubSpot CLI",
+    "rule": "Prefer the documented hs get-started Quickstart over the longer hs project create setup guide when both reach a first installed app card.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Quickstart via hs get-started on a free standard HubSpot account",
+        "status": "unresolved",
+        "reason": "Official recommended path, but account-signup fields and Developer tools permission granting remain incompletely evidenced from public docs."
+      },
+      {
+        "name": "Full create-an-app flow via hs project create with OAuth or static token choices",
+        "status": "not-selected",
+        "reason": "HubSpot documents this as the longer customization path after pointing newcomers to the Quickstart."
+      },
+      {
+        "name": "Install and test only inside a developer test account after standard-account setup",
+        "status": "unresolved",
+        "reason": "The Quickstart can install into the authenticated account or prompt for a test/sandbox account; which path is required for first success is not fixed."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a HubSpot account if one is not already available.",
+      "required_fields": [
+        {"label": "HubSpot account signup fields", "field_type": "other", "evidence_state": "unverified", "source_ids": ["S1", "S3"], "notes": "Quickstart links to account creation but does not enumerate the hosted signup form."}
+      ],
+      "observable_result": "The developer has an authenticated standard HubSpot account that can use developer tools.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Install the HubSpot CLI globally and authenticate with hs account auth.",
+      "required_fields": [
+        {"label": "Personal Access Key", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1", "S2", "S4"]},
+        {"label": "Default-account choice", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "The CLI stores account credentials in the local HubSpot CLI config.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2", "S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "cli",
+      "action": "Run hs get-started, select App, name the project, and upload it to initialize the first build and deploy.",
+      "required_fields": [
+        {"label": "Project type", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Project name", "field_type": "text", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Local directory", "field_type": "other", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "HubSpot builds and deploys the boilerplate project.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Install the unverified app, connect it, and assign Get Started App Card to the default contact record view.",
+      "required_fields": [
+        {"label": "Install unverified app confirmation", "field_type": "agreement", "evidence_state": "documented", "source_ids": ["S1"]},
+        {"label": "Get Started App Card location checkbox", "field_type": "checkbox", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "The app card is configured on the default contact Overview middle column.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Run hs project dev, select the testing account when prompted, and open a contact Overview tab.",
+      "required_fields": [
+        {"label": "Testing account selection", "field_type": "select", "evidence_state": "documented", "source_ids": ["S1"]}
+      ],
+      "observable_result": "Get Started App Card appears with the Developing locally badge.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {"description": "Node.js 20 or later and npm are required to install and run the HubSpot CLI.", "source_ids": ["S2"]},
+    {"description": "Personal Access Key scopes are limited by the HubSpot user's permissions, including Developer tools access for project upload.", "source_ids": ["S4"]}
+  ],
+  "external_gates": [
+    {"description": "A user without Developer tools access can create a Personal Access Key that still cannot upload developer projects.", "source_ids": ["S4"]},
+    {"description": "Installing an unverified app requires an explicit confirmation checkbox before Connect App.", "source_ids": ["S1"]}
+  ],
+  "unavoidable_waits": [
+    {"description": "HubSpot must complete the first project build and deploy before install and card setup continue.", "source_ids": ["S1"]}
+  ],
+  "platform_outcomes": [
+    {"description": "HubSpot creates and deploys the boilerplate project after hs get-started upload.", "source_ids": ["S1"]},
+    {"description": "Local hs project dev serves the card with a Developing locally badge on the contact record.", "source_ids": ["S1"]}
+  ],
+  "excluded": [
+    {"item": "Reading HubSpot conceptual docs beyond the Quickstart", "reason": "Documentation reading is not a product action.", "source_ids": ["S1"]},
+    {"item": "Marketplace submission and app review", "reason": "Occurs after local Quickstart success.", "source_ids": ["S1"]},
+    {"item": "Full hs project create customization with distribution and auth feature prompts", "reason": "HubSpot presents this as the longer path after the Quickstart.", "source_ids": ["S1"]}
+  ],
+  "sources": [
+    {"id": "S1", "title": "Quickstart", "url": "https://developers.hubspot.com/docs/getting-started/quickstart", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Account prerequisite", "CLI install and auth", "hs get-started flow", "Install and card location", "Local preview terminal"]},
+    {"id": "S2", "title": "Install the HubSpot CLI", "url": "https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/install-the-cli", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["npm install of @hubspot/cli", "hs account auth"]},
+    {"id": "S3", "title": "HubSpot Account Types", "url": "https://developers.hubspot.com/docs/getting-started/account-types", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Standard account as production environment", "Developer test account creation from a standard account"]},
+    {"id": "S4", "title": "Authenticate the CLI with personal access keys", "url": "https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/personal-access-key", "source_type": "official-documentation", "accessed_at": "2026-07-22", "evidence_supported": ["Personal Access Key scopes inherit user permissions", "Developer tools access required to upload projects"]}
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact forms, verification steps, and required fields create a new standard HubSpot account from a cold start?",
+      "impact": "Signup burden sits before CLI setup and cannot be counted without a public signup-field inventory.",
+      "evidence_needed": "A dated walkthrough of the current HubSpot account signup URL linked from the Quickstart, listing every required field and verification gate."
+    },
+    {
+      "question": "What administrator or permission flow grants Developer tools access so a Personal Access Key can upload projects?",
+      "impact": "Without that grant, authenticated CLI users still fail at project upload.",
+      "evidence_needed": "Official documentation or a product walkthrough that shows how Developer tools access is assigned in a fresh free account versus an existing team account."
+    },
+    {
+      "question": "Must first success use the standard account, a newly created developer test account, or either?",
+      "impact": "Test-account creation adds actions and may change which install path is shortest.",
+      "evidence_needed": "Confirm whether the Quickstart's Developing locally terminal is reachable by installing only into the authenticated standard account."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,346 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Vultr",
+    "slug": "vultr",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "cdeef516a937069c05b7d50c463629acb33fcf258e47e1c70303aa433470396e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet unless the goal explicitly requires an existing artifact."
+    ]
+  },
+  "developer_goal": "Create a Vultr account, provision a first Linux Cloud Compute instance, and verify interactive shell access.",
+  "first_success": {
+    "outcome": "A Cloud Compute instance is ready and the developer can open its Linux shell.",
+    "observable_signal": "An SSH or Vultr Console session accepts instance credentials and a shell command such as whoami runs.",
+    "source_ids": [
+      "S3",
+      "S4"
+    ]
+  },
+  "route_selection": {
+    "surface": "Vultr Console self-service registration and Cloud Compute provisioning",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email registration then Cloud Compute with OpenSSH",
+        "status": "unresolved",
+        "reason": "Payment verification is required before services, but plan, image, location, and credit eligibility are not fixed as one universal default."
+      },
+      {
+        "name": "GitHub or Google registration then Cloud Compute",
+        "status": "unresolved",
+        "reason": "Peer signup route exists; field burden versus email signup is not fully comparable from public prose alone."
+      },
+      {
+        "name": "Vultr Console browser shell instead of OpenSSH",
+        "status": "unresolved",
+        "reason": "Reaches shell access without a local SSH key but changes required connection steps."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Vultr account from the registration page.",
+      "required_fields": [
+        {
+          "label": "Email address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Terms of Service and Privacy Policy acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Signup identity method",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Email versus GitHub or Google remains unresolved."
+        }
+      ],
+      "observable_result": "Vultr creates the account shell and sends email verification for the email route.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "verification",
+      "interface": "email",
+      "action": "Complete email verification when using the email registration route.",
+      "required_fields": [
+        {
+          "label": "Email verification",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The Billing page opens for payment verification.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Add a payment method required for account verification.",
+      "required_fields": [
+        {
+          "label": "Payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Credit card can use a $0.00 link-only path; other methods require a deposit."
+        },
+        {
+          "label": "Terms of Service agreement at payment",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Vultr marks the account ready to deploy services.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Deploy the first Cloud Compute instance with unresolved plan, image, and location defaults.",
+      "required_fields": [
+        {
+          "label": "Server plan",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Linux image",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "Location",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3"
+          ]
+        },
+        {
+          "label": "SSH key or password authentication choice",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S3",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "Vultr provisions the instance.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Open an interactive shell on the instance and verify the logged-in user.",
+      "required_fields": [
+        {
+          "label": "SSH or console connection command",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "whoami or an equivalent shell prompt confirms access.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A payment instrument is required for Vultr account verification before Cloud Compute can be used.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Payment-provider authorization or deposit verification outside Vultr.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email verification delivery for the email signup route.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Cloud Compute provisioning until the instance is ready to connect.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Vultr creates the account after registration and verification.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Vultr provisions the Cloud Compute instance after deploy.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading documentation before acting",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Optional promotional coupon entry",
+      "reason": "Official account guide labels promotional coupons optional.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "How to Create a Vultr Account",
+      "url": "https://docs.vultr.com/platform/create-an-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email signup fields",
+        "Email verification",
+        "Payment verification"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create a New Vultr Account with GitHub or Google",
+      "url": "https://docs.vultr.com/create-a-new-vultr-account-with-github-or-google",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Social signup peer route"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "How to Provision Vultr Cloud Compute Instances",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/provisioning",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Instance provisioning"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How to Connect with OpenSSH",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/connection/openssh",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH connection"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "How to Connect with Vultr Console",
+      "url": "https://docs.vultr.com/products/compute/instances/cloud-compute/connection/vultr-console",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Browser console peer path"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which signup method, instance plan, Linux image, location, and shell path define the selected shortest route?",
+      "impact": "These choices change required fields, payment gates, and connection steps.",
+      "evidence_needed": "A dated fresh-account walkthrough that fixes one route and records every required control."
+    },
+    {
+      "question": "Which promotional credit, if any, applies universally at signup?",
+      "impact": "Credits change whether payment verification still blocks first deploy.",
+      "evidence_needed": "Current official coupon eligibility text for every signup entry point."
+    }
+  ],
+  "counts": null
+}

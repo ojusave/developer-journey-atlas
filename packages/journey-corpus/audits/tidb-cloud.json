@@ -1,0 +1,235 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "TiDB Cloud",
+    "slug": "tidb-cloud",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "17690fc460d2eac93bb1decf21ebbd7364e117254fa547838ae87c2bc376aca6",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet."
+    ]
+  },
+  "developer_goal": "Create a TiDB Cloud account and reach first SQL success on a Starter instance, or confirm whether the no-account local TiUP route is the selected first mile.",
+  "first_success": {
+    "outcome": "Either a TiDB Cloud Starter instance accepts SQL in the console, or a local TiUP Playground cluster accepts tiup client, depending on the selected route.",
+    "observable_signal": "SQL Editor or tiup client shows a successful connection to TiDB.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "TiDB Cloud console Starter quickstart versus TiDB Self-Managed TiUP local quickstart",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "TiDB Cloud Starter console quickstart with automatic Instance0",
+        "status": "unresolved",
+        "reason": "Cloud signup fields behind auth are incomplete; automatic Instance0 and SQL Editor path compete with local TiUP."
+      },
+      {
+        "name": "TiDB Self-Managed local TiUP Playground without an account",
+        "status": "unresolved",
+        "reason": "Lexicographic policy can prefer no-account local routes, but the corpus goal for this slug is TiDB Cloud; human judgment is required to pick the product boundary."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a TiDB Cloud account with email or SSO, if the Cloud route is selected.",
+      "required_fields": [
+        {
+          "label": "Signup method",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "notes": "Email/password or Google, GitHub, or Microsoft SSO."
+        },
+        {
+          "label": "Email and password or SSO consent",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The developer can sign in to TiDB Cloud.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Use the automatic Instance0 Starter instance or create a Starter instance.",
+      "required_fields": [
+        {
+          "label": "Instance name, cloud provider, and region when creating manually",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "A TiDB Cloud Starter instance is ready.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Run SQL in the AI-assisted SQL Editor or connect with a client.",
+      "required_fields": [
+        {
+          "label": "SQL statement or connection credentials",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "A successful SQL result is returned.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "TiDB Cloud Starter availability differs by cloud provider; AWS is the documented generally available path in the quickstart.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [
+    {
+      "description": "Starter instance provisioning, documented around 30 seconds for manual create.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "TiDB Cloud may automatically create default Instance0 for new signups.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "TiDB Playground browser sandbox without signup",
+      "reason": "Optional try-out surface, not the selected Cloud first-success path until route judgment resolves.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "TiDB Cloud Quick Start",
+      "url": "https://docs.pingcap.com/tidbcloud/tidb-cloud-quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup options",
+        "Instance0",
+        "SQL Editor"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Password Authentication",
+      "url": "https://docs.pingcap.com/tidbcloud/tidb-cloud-password-authentication/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email password auth"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Standard SSO Authentication",
+      "url": "https://docs.pingcap.com/tidbcloud/tidb-cloud-sso-authentication/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSO options"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Select a Plan",
+      "url": "https://docs.pingcap.com/tidbcloud/select-cluster-tier/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Plan selection"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Create a TiDB Cloud Starter or Essential Instance",
+      "url": "https://docs.pingcap.com/tidbcloud/create-tidb-cluster-serverless/?plan=starter",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Starter create"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "TiDB Cloud Services Agreement",
+      "url": "https://www.pingcap.com/legal/tidb-cloud-services-agreement/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Legal agreement context"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should the TiDB Cloud slug measure the Cloud Starter console path or the no-account local TiUP path?",
+      "impact": "The product boundary changes whether account creation is even in the required path.",
+      "evidence_needed": "Explicit corpus decision on Cloud versus Self-Managed first-mile for this slug."
+    },
+    {
+      "question": "What exact email signup fields and verification recovery states appear today?",
+      "impact": "Blocks verified field enumeration.",
+      "evidence_needed": "Fresh-account signup walkthrough evidence."
+    }
+  ],
+  "counts": null
+}

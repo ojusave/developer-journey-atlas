@@ -1,0 +1,246 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Intercom",
+    "slug": "intercom",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "c8eb816f55966d3f19c0c182d797c779689f4900d437da2603459eeef5f2adbe",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "No Intercom account, region, paid or development workspace, app audience choice, Developer Hub access, app, installation, access token, OAuth configuration, contact, or prior API call is assumed.",
+      "A browser and terminal with cURL are available.",
+      "No signup, terms acceptance, workspace or app creation, token retrieval, OAuth authorization, contact creation, or API request was performed during research."
+    ]
+  },
+  "developer_goal": "Choose whether the integration is public or private, obtain the corresponding Intercom workspace, create and pre-install an app, copy its access token, and make the guide's first contact-creation API call.",
+  "first_success": {
+    "outcome": "The intended terminal is a successful `POST https://api.intercom.io/contacts` for the guide's sample email using the app's token and API version 2.11.",
+    "observable_signal": "The response is a contact object containing a generated contact ID, the selected workspace ID, role `user`, and the submitted email address.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Intercom workspace and app setup through the first Contacts API call",
+    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Intercom workspace and app setup through the first Contacts API call",
+        "status": "unresolved",
+        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+      },
+      {
+        "name": "Public app OAuth installation",
+        "status": "unresolved",
+        "reason": "OAuth is required when a public app accesses other customers' data, while the getting-started guide first creates and pre-installs the developer's app in the developer's own workspace and uses its token for the first call."
+      },
+      {
+        "name": "Messenger app",
+        "status": "unresolved",
+        "reason": "The workspace guide lists Messenger app work as a later next step after the first Contacts API call."
+      },
+      {
+        "name": "Inbox app",
+        "status": "unresolved",
+        "reason": "The workspace guide lists Inbox app work after the initial workspace, app, and API call sequence."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete Intercom account creation or trial signup at the official entry URL.",
+      "required_fields": [
+        {
+          "label": "Signup identity and required account fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
+        }
+      ],
+      "observable_result": "A new Intercom account or trial session exists.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Complete any required email or identity verification for the new account.",
+      "required_fields": [
+        {
+          "label": "Verification challenge",
+          "field_type": "challenge",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The account becomes usable for developer onboarding.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the documented post-login setup for the selected Intercom candidate through first success.",
+      "required_fields": [
+        {
+          "label": "Candidate-specific configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
+        }
+      ],
+      "observable_result": "The response is a contact object containing a generated contact ID, the selected workspace ID, role `user`, and the submitted email address.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "{'order': 1, 'type': 'configuration', 'requirement': \"Decide whether the app is public for multiple customers or private for the developer's own paid workspace.\", 'required': True, 'source_ids': ['S1', 'S2']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 2, 'type': 'account', 'requirement': 'For a public app, create an Intercom developer account and a free development workspace; for a private app, have a paid Intercom workspace and sign in.', 'required': True, 'source_ids': ['S1', 'S3', 'S4']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 3, 'type': 'region', 'requirement': 'Use compatible workspace regions; development workspaces are US-only and apps cannot be installed across regions.', 'required': True, 'source_ids': ['S1', 'S4']}",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Public and private app intent changes the required workspace and later authentication model.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Developer signup requests work email, full name, password, and company name, or Google authentication.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Submitting developer signup agrees to Intercom's Terms of Service, Developer Terms, and Privacy Policy.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Step 3: Make your first API Call by creating a new Intercom contact.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Customer-facing OAuth installation, app review and App Store publication, Messenger or Inbox UI, webhooks, additional contacts, production secret rotation, regional rollout, and paid-workspace product",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Set up a Workspace | Intercom and Fin Developer Platform",
+      "url": "https://developers.intercom.com/docs/build-an-integration/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary documented developer route and first-success framing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Authentication | Intercom and Fin Developer Platform",
+      "url": "https://developers.intercom.com/docs/build-an-integration/learn-more/authentication",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Authentication | Intercom and Fin Developer Platform"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Intercom | The easiest way to see and talk to your users",
+      "url": "https://app.intercom.com/admins/sign_up/developer",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Intercom | The easiest way to see and talk to your users"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Intercom | The easiest way to see and talk to your users",
+      "url": "https://app.intercom.com/admins/sign_in",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Intercom | The easiest way to see and talk to your users"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Intercom",
+      "url": "https://app.intercom.com/developers/_",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Intercom"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact current required signup, identity, legal, and entitlement fields does Intercom show for a new developer, and which peer route is the lexicographic shortest path?",
+      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
+      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+    }
+  ],
+  "counts": null
+}

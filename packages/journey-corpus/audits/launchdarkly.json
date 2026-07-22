@@ -1,0 +1,298 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "LaunchDarkly",
+    "slug": "launchdarkly",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "2eafba45598596ebc35e19c745f7a49fb6cd5e5333862254d41df4aad8f8edec",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can verify.",
+      "The developer is creating an individual free-trial account rather than joining an existing organization via invitation.",
+      "No LaunchDarkly project, environment, flag, SDK, or context exists yet."
+    ]
+  },
+  "developer_goal": "Create a LaunchDarkly trial account, integrate an SDK, evaluate a first feature flag, and observe a visible toggle change.",
+  "first_success": {
+    "outcome": "An application evaluates a first flag for a context and visibly changes when the flag is toggled and saved in LaunchDarkly.",
+    "observable_signal": "After Review and save, the application immediately reflects the corresponding flag variation.",
+    "source_ids": [
+      "S1",
+      "S2"
+    ]
+  },
+  "route_selection": {
+    "surface": "LaunchDarkly self-service trial and SDK quickstart",
+    "rule": "Select the shortest complete account-to-first-flag route only after one SDK and sample application stack is fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "In-app Quickstart with developer-chosen SDK",
+        "status": "unresolved",
+        "reason": "Official getting-started and setting-up docs require choosing among server-side, client-side, mobile, and edge SDKs; credential type and code differ."
+      },
+      {
+        "name": "LaunchDarkly CLI setup",
+        "status": "unresolved",
+        "reason": "Presented as an alternative guided route to the in-app Quickstart with a different interaction surface."
+      },
+      {
+        "name": "Per-SDK onboarding guides (.NET, Go, Java, JavaScript, Node, Python, React, Vue, mobile, and others)",
+        "status": "unresolved",
+        "reason": "The onboarding index lists many co-equal SDK guides without ranking one canonical first path."
+      },
+      {
+        "name": "Product-manager UI-only flag toggle",
+        "status": "not-selected",
+        "reason": "It reaches a dashboard toggle without the developer SDK evaluation outcome named by the software-developer getting-started path."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open the LaunchDarkly signup page, complete the signup form, and submit it to start a free trial.",
+      "required_fields": [
+        {
+          "label": "Signup form fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S5"
+          ],
+          "notes": "Official join-account docs say to complete and submit the signup form but do not enumerate required controls. The public signup URL did not expose field labels in the fetched page body."
+        }
+      ],
+      "observable_result": "LaunchDarkly sends a verification email to the address provided.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S5",
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the verification link from the LaunchDarkly email.",
+      "required_fields": [],
+      "observable_result": "The trial account is verified and the developer can access LaunchDarkly when domain matching does not redirect into a join-request flow.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Choose one SDK, install it, initialize with the matching environment credential, evaluate a first flag for a context, and verify a toggle in the Test environment.",
+      "required_fields": [
+        {
+          "label": "SDK / language selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S3",
+            "S4"
+          ]
+        },
+        {
+          "label": "SDK credential (SDK key, client-side ID, or mobile key)",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2",
+            "S4"
+          ]
+        },
+        {
+          "label": "Feature flag key and evaluation code",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S2"
+          ],
+          "notes": "Exact files, package commands, and run steps depend on the unresolved SDK choice."
+        }
+      ],
+      "observable_result": "The selected application evaluates the flag and reflects a saved targeting change.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "An email address that can receive LaunchDarkly verification mail.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "description": "A runnable application stack matching the eventually selected SDK.",
+      "source_ids": [
+        "S2",
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Email verification must succeed before the trial account is usable.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "description": "EU free trials require contacting Sales rather than the self-service US signup path.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "LaunchDarkly must deliver the signup verification email.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "A completed individual signup without domain matching creates a 14-day trial that later converts to the free developer tier plan.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ]
+    },
+    {
+      "description": "SDK evaluation uses local state so flags continue to resolve offline after initialization.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading LaunchDarkly documentation and role-routing pages",
+      "reason": "Documentation is evidence for the path, not a measured product action.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "item": "Joining an existing organization by admin invitation or domain-matching request",
+      "reason": "That path assumes a prior tenant and administrator rather than creating a new trial account.",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "item": "Federal instance signup",
+      "reason": "Free trials are not available on the federal instance.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started",
+      "url": "https://launchdarkly.com/docs/home/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free trial signup boundary",
+        "Install SDK, create flag, evaluate, target audience sequence",
+        "Trial converts to free developer tier"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Setting up an SDK",
+      "url": "https://launchdarkly.com/docs/home/getting-started/setting-up",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multiple SDK types",
+        "Install, initialize, credential, evaluate, shutdown steps",
+        "Quickstart and CLI alternatives"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Getting started in different roles",
+      "url": "https://launchdarkly.com/docs/home/getting-started/roles",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Software developer SDK-first path",
+        "Quickstart and CLI as guided options",
+        "Product manager UI-first alternative"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Onboarding",
+      "url": "https://launchdarkly.com/docs/home/onboarding",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Many co-equal SDK onboarding guides",
+        "Distinct credential types by SDK"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Joining an account",
+      "url": "https://launchdarkly.com/docs/home/getting-started/join-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup form submission",
+        "Email verification link",
+        "Domain matching versus new trial account"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Create Your Free Account",
+      "url": "https://app.launchdarkly.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public signup URL exists",
+        "Field labels were not recoverable from the fetched page body"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which LaunchDarkly SDK and sample application stack should define the measured shortest path?",
+      "impact": "Package install, credential type, source files, initialization, context model, run command, and verification all change by SDK.",
+      "evidence_needed": "A corpus-level choice of one SDK (or confirmation that in-app Quickstart picks a default) plus a dated walkthrough of that complete route from trial signup through toggle verification."
+    },
+    {
+      "question": "What exact fields and challenges does the current public signup form require?",
+      "impact": "Required field counts and possible CAPTCHA or SSO alternatives cannot be finalized.",
+      "evidence_needed": "A dated read-only capture of https://app.launchdarkly.com/signup listing every required control for the email/password trial route."
+    }
+  ],
+  "counts": null
+}

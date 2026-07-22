@@ -1,0 +1,280 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "PlanetScale",
+    "slug": "planetscale",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "4f625990d56629d0a33213affb3d9be92e26bcf568e6e190fd970a627f66ef8e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, an email address or GitHub identity, and a non-prepaid debit or credit card.",
+      "No PlanetScale account, organization, database, or default role exists yet."
+    ]
+  },
+  "developer_goal": "Create a PlanetScale account, provision a first database, and obtain usable connection credentials.",
+  "first_success": {
+    "outcome": "A PlanetScale database with a main branch is provisioned and connection credentials for the default role are visible.",
+    "observable_signal": "The Connect flow shows host, username, password, database, port, and generated connection strings after Create default role.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "PlanetScale Dashboard",
+    "rule": "Prefer Dashboard over CLI when both reach the same database-ready outcome; resolve Postgres versus Vitess only when the developer goal fixes an engine.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Dashboard PlanetScale Postgres quickstart",
+        "status": "unresolved",
+        "reason": "Strong official Postgres path, but engine choice versus Vitess remains consequential and signup/org field completeness is incomplete."
+      },
+      {
+        "name": "Dashboard Vitess / MySQL quickstart",
+        "status": "unresolved",
+        "reason": "Official Vitess quickstart is a peer database-engine path with different password/role mechanics."
+      },
+      {
+        "name": "PlanetScale CLI pscale signup and database create",
+        "status": "not-selected",
+        "reason": "CLI is documented as an automation alternative to the Dashboard path, not the primary self-service web surface."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a PlanetScale account from the sign-up surface and complete any required confirmation.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Password confirmation",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Terms of Service agreement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "The developer can open the PlanetScale dashboard and create or select an organization.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create or select the organization that will own the database.",
+      "required_fields": [
+        {
+          "label": "Organization details",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1"],
+          "notes": "Quickstart says new accounts are prompted to create an organization but does not enumerate the form fields."
+        }
+      ],
+      "observable_result": "An organization context is active in the dashboard.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "external-authorization",
+      "interface": "web-ui",
+      "action": "Add a valid debit or credit card on Organization Settings > Billing.",
+      "required_fields": [
+        {
+          "label": "Payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "All plans require a valid payment method; prepaid cards are not accepted."
+        }
+      ],
+      "observable_result": "The organization has a payment method on file.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Click New database, choose an engine, configure the cluster, and create the database.",
+      "required_fields": [
+        {
+          "label": "Database engine",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1", "S3"],
+          "notes": "Postgres versus Vitess remains an unresolved route choice."
+        },
+        {
+          "label": "Database name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Cluster configuration",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "PlanetScale provisions the database with a main branch.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open Connect, create the Default role, and record the connection details.",
+      "required_fields": [
+        {
+          "label": "Default role creation",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Host, username, password, database, port, and connection strings are available.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A valid non-prepaid debit or credit card for organization billing.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Payment method on file is required for all plans before database usage.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "GitHub authorization when Continue with GitHub is chosen for signup.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "PlanetScale must provision the Postgres or Vitess cluster and main branch after Create database.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Card pre-authorization holds may appear when adding a billing method or creating a database.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Create database provisions the cluster, main branch, default databases, monitoring, and HA settings.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Create default role issues one-time-visible credentials and connection string helpers.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Creating additional non-default application roles",
+      "reason": "Quickstart recommends creating another role after first success but does not require it for credential visibility.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "CLI pscale database create path",
+      "reason": "Documented as an automation alternative to Dashboard creation.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "PlanetScale Postgres quickstart",
+      "url": "https://planetscale.com/docs/postgres/tutorials/planetscale-postgres-quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Account and organization prerequisite",
+        "Postgres versus Vitess engine choice",
+        "Name, region, cluster configuration",
+        "Create database and default role Connect flow"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Billing",
+      "url": "https://planetscale.com/docs/billing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "All plans require a valid payment method",
+        "Debit or credit card, no prepaid",
+        "Pre-authorization holds"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "PlanetScale Vitess quickstart guide",
+      "url": "https://planetscale.com/docs/vitess/tutorials/planetscale-quick-start-guide",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Peer Vitess/MySQL dashboard onboarding path"]
+    },
+    {
+      "id": "S4",
+      "title": "PlanetScale sign-up",
+      "url": "https://auth.planetscale.com/sign-up",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email, Password, Password confirmation",
+        "Terms of Service checkbox",
+        "Continue with GitHub"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Is the canonical first database Postgres or Vitess when the developer goal only says PlanetScale?",
+      "impact": "Engine choice changes create-form options, credential APIs, and which quickstart terminal applies.",
+      "evidence_needed": "Bound the goal to one engine, or confirm a vendor-default engine for brand-new organizations."
+    },
+    {
+      "question": "What exact organization-creation fields and email-confirmation steps occur after signup?",
+      "impact": "Missing org fields or confirmation steps change required-action and required-field counts before billing and New database.",
+      "evidence_needed": "Dated walkthrough from auth.planetscale.com/sign-up through first organization ready state."
+    }
+  ],
+  "counts": null
+}

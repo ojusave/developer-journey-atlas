@@ -1,0 +1,233 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Supabase",
+    "slug": "supabase",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "6f62c49d7a576aed62d357e989595f81239956b93044d16acc388b245c5f8d4f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser, Node.js/npm, and an email address or GitHub identity.",
+      "No Supabase account, organization, or project exists yet.",
+      "No framework or workflow is preselected."
+    ]
+  },
+  "developer_goal": "Create a Supabase account and reach the earliest meaningful hosted-project query success from an official getting-started route.",
+  "first_success": {
+    "outcome": "A local app or documented client displays sample rows queried from the hosted Supabase project.",
+    "observable_signal": "For the React quickstart, http://localhost:5173 shows violin, viola, and cello from the instruments table.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "Supabase Dashboard signup plus a framework or local quickstart",
+    "rule": "Getting Started lists many peer framework quickstarts and alternate local or AI workflows; do not invent a canonical winner when consequential routes remain tied.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Hosted project with React Vite quickstart",
+        "status": "unresolved",
+        "reason": "React appears first among framework quickstarts and documents instruments sample data through localhost:5173, but peer frameworks reach equivalent outcomes with different install and code steps."
+      },
+      {
+        "name": "Hosted project with Next.js, Nuxt, Vue, or another framework quickstart",
+        "status": "unresolved",
+        "reason": "Official Getting Started presents these as peer framework quickstarts with the same project-and-sample-data pattern."
+      },
+      {
+        "name": "Local Development CLI path",
+        "status": "not-selected",
+        "reason": "Local development is a different surface from the hosted Dashboard project quickstarts."
+      },
+      {
+        "name": "AI tools / MCP-first path",
+        "status": "not-selected",
+        "reason": "Getting Started lists AI tooling separately from framework quickstarts."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Supabase account from the Dashboard sign-up surface.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"],
+          "notes": "Visible on the email signup form; Continue with GitHub is an alternate control."
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Terms of Service and Privacy Policy acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S3"],
+          "notes": "Signup states that continuing constitutes agreement and consent to periodic emails."
+        }
+      ],
+      "observable_result": "The developer can open the Supabase Dashboard.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a new hosted Supabase project from an organization the developer belongs to.",
+      "required_fields": [
+        {
+          "label": "Project creation fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2"],
+          "notes": "Quickstart says create a project from the Dashboard but does not enumerate name, region, database password, or plan fields."
+        }
+      ],
+      "observable_result": "A Supabase project is available with API URL and keys.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create and populate the sample instruments table in the SQL Editor.",
+      "required_fields": [
+        {
+          "label": "Sample SQL for instruments",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The instruments table contains violin, viola, and cello.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Scaffold the selected framework app, install supabase-js, set env vars, add the query code, and run the dev server.",
+      "required_fields": [
+        {
+          "label": "Framework scaffold and npm install commands",
+          "field_type": "command",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "Exact commands depend on which framework quickstart is selected."
+        },
+        {
+          "label": "Project URL and publishable key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The local app queries Supabase and shows the sample instruments.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Node.js and npm for framework quickstarts that use Vite or equivalent scaffolds.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "GitHub authorization when Continue with GitHub is chosen for signup.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Supabase must finish provisioning the new project database before SQL and API steps can succeed.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Creating a project provisions a hosted Postgres database and API credentials.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Getting Started catalog pages",
+      "reason": "Documentation browsing is evidence for route selection, not a counted action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Optional Agent Skills install in the React quickstart",
+      "reason": "The React quickstart labels Agent Skills optional.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting Started",
+      "url": "https://supabase.com/docs/guides/getting-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Peer framework quickstarts",
+        "Local development and AI tools listed separately"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Use Supabase with React",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/reactjs",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Create hosted project",
+        "Sample instruments SQL",
+        "Vite React scaffold",
+        "supabase-js and env vars",
+        "localhost:5173 instruments list"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Supabase Dashboard sign-up",
+      "url": "https://supabase.com/dashboard/sign-up",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Continue with GitHub",
+        "Email and Password fields",
+        "Password complexity hints",
+        "Terms and Privacy acknowledgement"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which official Supabase framework or workflow should define the canonical first-success route?",
+      "impact": "Peer quickstarts change scaffold commands, files edited, and verification URL while sharing the same hosted project pattern.",
+      "evidence_needed": "Choose one bounded framework or local goal, then verify its complete current quickstart including project-creation fields."
+    },
+    {
+      "question": "What exact required fields appear on the current new-project form, and is email verification required after Dashboard signup?",
+      "impact": "Project form fields and any verification step change required-action and required-field counts.",
+      "evidence_needed": "Dated screenshots of organization and new-project flows from a fresh Supabase account."
+    }
+  ],
+  "counts": null
+}

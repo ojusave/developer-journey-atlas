@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Adyen",
+    "slug": "adyen",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "d243e2150fc4c87b30878f83985be1799e877ee4e7acad4bb03032259232c35e",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No Adyen test Customer Area account, API credential, or client key exists yet.",
+      "Test-account payments are in scope; live-account sales approval, contract, and PCI attestation are later gates."
+    ]
+  },
+  "developer_goal": "Create an Adyen test account and reach the earliest official online-payments first-success outcome in test.",
+  "first_success": {
+    "outcome": "Unresolved among test-account readiness, first API credential availability, and a completed Authorised Sessions-flow payment with webhook.",
+    "observable_signal": "Get started emphasizes test-account creation and integration choice; online Sessions guides demonstrate Authorised payments and webhooks without a single platform-wide terminal.",
+    "source_ids": ["S1", "S3", "S4"]
+  },
+  "route_selection": {
+    "surface": "Adyen test-account signup plus Customer Area and online payments docs",
+    "rule": "Prefer test account over live approval. Do not invent a winner among integration families or Sessions versus Advanced flows.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Online payments Sessions flow Web Drop-in",
+        "status": "unresolved",
+        "reason": "Sessions is documented as the default recommended server-side flow, but Web/mobile packaging and language libraries still fork the path."
+      },
+      {
+        "name": "Online payments Advanced flow",
+        "status": "unresolved",
+        "reason": "Supports more use cases with more API requests; not comparable as the same shortest path without a fixed goal."
+      },
+      {
+        "name": "In-person payments, Adyen for Platforms, or plugins",
+        "status": "unresolved",
+        "reason": "Get started presents these as peer integration families with different actors, hardware, and terminals."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a free Adyen test account from the official signup entry.",
+      "required_fields": [
+        {
+          "label": "Test account signup fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S6"],
+          "notes": "Signup page confirms developer test accounts exist; required field inventory is not publicly enumerated."
+        },
+        {
+          "label": "Terms and conditions acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S6"]
+        }
+      ],
+      "observable_result": "The developer can access the test Customer Area.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Obtain or generate API credentials and client-side authentication material required by the selected integration.",
+      "required_fields": [
+        {
+          "label": "API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S5"]
+        },
+        {
+          "label": "Client-side key / allowed origins",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "Server and client credentials for the test company or merchant account are available.",
+      "evidence_state": "documented",
+      "source_ids": ["S4", "S5"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Build the selected online integration branch through a successful test payment result.",
+      "required_fields": [
+        {
+          "label": "Integration family and flow selection",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3"]
+        }
+      ],
+      "observable_result": "The selected official test payment terminal is observed.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Customer Area roles such as Manage API credentials or Merchant admin are required to create or manage API credentials.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Live account requires eligibility review, Sales contact, detailed KYC checks, signed contract, and possible PCI data security attestation.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "A test account does not guarantee approval as an Adyen customer for live processing.",
+      "source_ids": ["S1", "S6"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Live-account application review and contract countersign are asynchronous human approval waits after test development.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Test Customer Area access enables test payments, team invites, live application, and integration building.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Accounts include default API credentials that can be managed in Customer Area.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Live account application, contract signing, and go-live checklists",
+      "reason": "Official Get started places live approval after test-account development.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Reading webinars and optional sales qualification before test signup",
+      "reason": "Optional discovery; not required to create a test account.",
+      "source_ids": ["S1", "S6"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Adyen",
+      "url": "https://docs.adyen.com/get-started-with-adyen",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free test account",
+        "Integration family choices",
+        "Live KYC and contract gates"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Integration checklist",
+      "url": "https://docs.adyen.com/online-payments/integration-checklist",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Online payments integration prerequisites"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Build your integration",
+      "url": "https://docs.adyen.com/online-payments/build-your-integration",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sessions versus Advanced flows",
+        "Sessions as default recommendation"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Sessions flow integration guide",
+      "url": "https://docs.adyen.com/online-payments/build-your-integration/sessions-flow?platform=Web&integration=Drop-in&version=6.5.0",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Web Drop-in Sessions path branches"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "API credentials",
+      "url": "https://docs.adyen.com/development-resources/api-credentials",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API credential structure",
+        "Role requirements",
+        "Generate API key steps"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Sign up for an Adyen test account",
+      "url": "https://www.adyen.com/signup",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Developer test-account positioning",
+        "Terms acknowledgement",
+        "No live-approval guarantee"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Adyen integration family and first-success terminal define the corpus route?",
+      "impact": "Online, in-person, Platforms, and plugins change account structure, credentials, implementation, and success signals.",
+      "evidence_needed": "Human selection of one bounded goal, then a fresh test-account walkthrough of that route."
+    },
+    {
+      "question": "What exact fields and verification checks appear on the current Adyen test-account signup?",
+      "impact": "Account-step field counts remain unverified.",
+      "evidence_needed": "Dated screenshots of www.adyen.com/signup completed as a new developer."
+    },
+    {
+      "question": "If online Sessions Web Drop-in is selected, which server language and client packaging are canonical?",
+      "impact": "Install and configuration steps fork across documented library and loading options.",
+      "evidence_needed": "Official default combination or an explicit corpus language choice."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,284 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Hetzner Cloud",
+    "slug": "hetzner-cloud",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "095083ca4da9fcb319c6a6cc24a2a257e960454c340f473e36415e650cb5b710",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can receive email when the selected route requires it.",
+      "No platform account, tenant, credentials, or product resources exist yet unless the goal explicitly requires an existing artifact."
+    ]
+  },
+  "developer_goal": "Create a Hetzner customer account and Cloud project, provision a first public Linux Cloud server, and open its root shell with an SSH key.",
+  "first_success": {
+    "outcome": "Hetzner Cloud has created the first public Linux server and the developer has authenticated to its root shell.",
+    "observable_signal": "After ssh root@<server-IP> and any host-authenticity confirmation, an interactive root shell opens.",
+    "source_ids": [
+      "S5"
+    ]
+  },
+  "route_selection": {
+    "surface": "Hetzner accounts registration and Cloud Console server creation",
+    "rule": "Reconstruct complete official candidate routes, prefer no payment/admin/approval when possible, then minimize required actions; leave consequential ties unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Register Hetzner account then create Cloud server with SSH key",
+        "status": "unresolved",
+        "reason": "Exact registration fields, fraud review, and whether payment is mandatory before first server remain incompletely enumerated."
+      },
+      {
+        "name": "Payment or ID verification branch before first Cloud order",
+        "status": "unresolved",
+        "reason": "Fraud-prevention docs show some accounts need extra verification that can block or delay first success."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Register a Hetzner account from accounts.hetzner.com and confirm email.",
+      "required_fields": [
+        {
+          "label": "Registration identity and contact fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Docs require email, contact details, and billing address but do not enumerate every current form control."
+        },
+        {
+          "label": "Email confirmation",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The developer can log in to the new Hetzner account.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete any required payment or verification steps before Cloud resources.",
+      "required_fields": [
+        {
+          "label": "Payment method or verification details",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2",
+            "S3"
+          ]
+        }
+      ],
+      "observable_result": "The account is allowed to create Cloud servers.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Cloud project and first public Linux server with unresolved defaults.",
+      "required_fields": [
+        {
+          "label": "Location",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "label": "Image",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "label": "Type",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S5"
+          ]
+        },
+        {
+          "label": "SSH key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "Hetzner Cloud creates the server and assigns a public IP.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Connect as root with the selected private key.",
+      "required_fields": [
+        {
+          "label": "ssh root@<server-IP>",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "An interactive root shell opens.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Valid email, contact details, and billing address are required to create an account.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Fraud-prevention review, optional phone verification, and payment-provider checks can gate first orders.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email confirmation link delivery after registration.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Server provisioning until SSH is available.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Hetzner creates the customer account after email confirmation.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Hetzner Cloud provisions the server.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Enabling two-factor authentication",
+      "reason": "Documented as a common next step, not required for first server success.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Hetzner Account Getting Started",
+      "url": "https://docs.hetzner.com/general/billing-and-account-management/account-getting-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Registration requirements",
+        "Email confirmation"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Fraud prevention FAQ",
+      "url": "https://docs.hetzner.com/general/security-and-identify/fraud-prevention-faq/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Verification and rejection risks"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Payment Overview",
+      "url": "https://docs.hetzner.com/general/billing-and-account-management/billing-at-hetzner/payment-overview/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Payment methods"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Creating a Server",
+      "url": "https://docs.hetzner.com/cloud/servers/getting-started/creating-a-server/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Server create and SSH"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Cloud Servers Overview",
+      "url": "https://docs.hetzner.com/cloud/servers/overview/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Cloud server product overview"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which exact fields and agreement controls appear in the current direct registration form?",
+      "impact": "Missing fields prevent a verified required_fields count.",
+      "evidence_needed": "Dated screenshots or DOM capture of accounts.hetzner.com Register now for a fresh user."
+    },
+    {
+      "question": "Is adding a stored payment method mandatory before every first Cloud server?",
+      "impact": "This changes external gates and path length.",
+      "evidence_needed": "Official confirmation for current Cloud first-order payment policy by region."
+    }
+  ],
+  "counts": null
+}

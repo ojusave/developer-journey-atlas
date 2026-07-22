@@ -1,0 +1,309 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Arize AI",
+    "slug": "arize-ai",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "924a32d5f5b3436f47b80eda922513c9090a60addd0d8090baa0a73769aec896",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a Python or TypeScript LLM app, or will use the companion notebook.",
+      "No Arize AX account, tracing project, Space ID, or API key exist yet.",
+      "The app is not yet instrumented for Arize AX."
+    ]
+  },
+  "developer_goal": "Create an Arize AX account and tracing project, instrument an LLM app, and see the first request trace in the project.",
+  "first_success": {
+    "outcome": "A request through the instrumented app produces a trace visible in the selected Arize AX project.",
+    "observable_signal": "The AX project lists one trace per handled request; opening one displays the span tree with model, prompt, response, latency, and token counts.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Arize AX self-service web onboarding plus Get Started tracing guide",
+    "rule": "Select the shortest complete account-to-first-trace route only after signup fields, instrumentation method, and LLM stack are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "New Tracing Project + Instrument Manually with OpenAI Python",
+        "status": "unresolved",
+        "reason": "Documented code path, but AX signup fields and whether Agent Setup is shorter remain unresolved."
+      },
+      {
+        "name": "New Tracing Project + Arize Skills agent instrumentation",
+        "status": "unresolved",
+        "reason": "Default Agent Setup / Skills path is a different interaction surface with its own CLI and editor steps."
+      },
+      {
+        "name": "Manual instrumentation for Anthropic, LangChain, or other integrations",
+        "status": "unresolved",
+        "reason": "Thirty-plus integrations change packages and instrumentors without a single required default beyond the OpenAI example."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a free Arize AX account and sign in.",
+      "required_fields": [
+        {
+          "label": "AX signup and authentication inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Docs require a free AX account but do not publish the signup form fields."
+        }
+      ],
+      "observable_result": "The developer is authenticated in Arize AX.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a tracing project from Projects, New Tracing Project, and copy Space ID plus API key.",
+      "required_fields": [
+        {
+          "label": "Tracing project name",
+          "field_type": "text",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Space ID",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "API key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Project credentials required by register() are available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install arize-otel, the LLM provider SDK, and the matching OpenInference instrumentor for the selected stack.",
+      "required_fields": [
+        {
+          "label": "pip install packages",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "Tracing packages for the chosen integration are installed.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Register the tracer provider with Space ID, API key, and project name, then invoke the instrumentor before any LLM call.",
+      "required_fields": [
+        {
+          "label": "space_id",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "api_key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "project_name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Region endpoint if not US",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The app is instrumented to export traces to the AX project.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Run representative requests through the instrumented app and open a trace in the AX project.",
+      "required_fields": [],
+      "observable_result": "At least one trace appears with expandable span details.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "An LLM application in Python or TypeScript, or the companion Colab notebook.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Credentials for the LLM provider being instrumented.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "A free Arize AX account is required before project credentials exist.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The underlying LLM provider account and key remain external dependencies of the instrumented app.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Trace ingestion delay after a request completes is not quantified in the quickstart.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Arize AX creates Space ID and API key credentials for the tracing project.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "AX stores and displays request traces with span trees and token metrics.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading later Get Started series parts after first trace",
+      "reason": "Part 1 ends when traces are visible in the project.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Manual instrumentation deep dives beyond the selected integration",
+      "reason": "Optional once one working instrumentor path is chosen.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Instrument your agent",
+      "url": "https://arize.com/docs/ax/get-started/get-started-tracing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Free AX account",
+        "New Tracing Project credentials",
+        "Skills vs Code paths",
+        "OpenAI instrumentor example",
+        "Trace visibility success"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Auto-Instrumentation",
+      "url": "https://arize.com/docs/ax/instrument/set-up-tracing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Skills and Code setup",
+        "Multi-language install snippets"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "OpenAI integration",
+      "url": "https://arize.com/docs/ax/integrations/llm-providers/openai",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "OpenAI-specific instrumentation reference"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact Arize AX signup fields and New Tracing Project form controls does a fresh user complete?",
+      "impact": "Unverified account and project fields prevent a verified action and field count from account creation.",
+      "evidence_needed": "A dated fresh-account walkthrough from AX signup through Space ID and API key copy."
+    },
+    {
+      "question": "Is Agent Setup / Arize Skills or Instrument Manually the lexicographically shortest required route, and which LLM instrumentor is canonical?",
+      "impact": "These choices change interfaces, packages, and whether an AI coding agent is required.",
+      "evidence_needed": "An explicit route selection between Skills and Code plus one named integration for first success."
+    }
+  ],
+  "counts": null
+}

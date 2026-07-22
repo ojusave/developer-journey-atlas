@@ -1,0 +1,422 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "PagerDuty",
+    "slug": "pagerduty",
+    "category": "Observability, testing, and release engineering"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "4522cb042c059e9b159503de9dc217229d809c4d0da25d6fac2988a81fc97adb",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an eligible work email address.",
+      "The developer does not already have a PagerDuty account.",
+      "No PagerDuty subdomain, service, or integration exists yet."
+    ]
+  },
+  "developer_goal": "Create a PagerDuty trial account and finish the official trial onboarding flow into the account.",
+  "first_success": {
+    "outcome": "Trial onboarding completes and the developer is directed into the new PagerDuty account with the first service available.",
+    "observable_signal": "After the final Connect With Your Chat Tools step is completed or skipped, the guide states the developer is directed to the PagerDuty account.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "PagerDuty trial signup and Trial Account Onboarding",
+    "rule": "Use the documented new-account onboarding surface; skip optional onboarding sections when the guide provides Skip step.",
+    "selected": "Trial Account Onboarding with optional integrations, schedule, and chat steps skipped where documented",
+    "candidates": [
+      {
+        "name": "Trial Account Onboarding (skip optional steps)",
+        "status": "selected",
+        "reason": "Official Getting Started guide for brand-new trial accounts from work-email signup through redirect into the account."
+      },
+      {
+        "name": "Services and Integrations after an existing account",
+        "status": "not-selected",
+        "reason": "Assumes an existing account, role, and notification model."
+      },
+      {
+        "name": "REST API access keys or Events API v2",
+        "status": "not-selected",
+        "reason": "Developer API routes require an existing account and usually a service integration key created after onboarding."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "On the PagerDuty signup page, enter a work email and choose Get Started.",
+      "required_fields": [
+        {
+          "label": "Work Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S4"
+          ],
+          "notes": "Consumer domains such as gmail.com are rejected."
+        }
+      ],
+      "observable_result": "PagerDuty advances to the profile details step.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter First Name, Last Name, Company, and Country, then continue.",
+      "required_fields": [
+        {
+          "label": "First Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Last Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Company",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Country",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "PagerDuty advances to password creation.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Enter a password and continue.",
+      "required_fields": [
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S4"
+          ],
+          "notes": "Exact password composition rules are not published on the onboarding guide."
+        }
+      ],
+      "observable_result": "PagerDuty advances to subdomain and region setup.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Choose a unique subdomain, select USA or EU service region, accept Terms and Privacy Policy, and create the account.",
+      "required_fields": [
+        {
+          "label": "Subdomain",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S4"
+          ],
+          "notes": "At least five characters and not already in use; signup page also documents 5-40 character rules."
+        },
+        {
+          "label": "Service Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        },
+        {
+          "label": "Terms of Service and Privacy Policy acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1",
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "The trial account is created and trial onboarding begins.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Enter a Service Name for the first service and continue.",
+      "required_fields": [
+        {
+          "label": "Service Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Onboarding advances to inbound integrations.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Skip Configure Inbound Integrations.",
+      "required_fields": [],
+      "observable_result": "Onboarding advances without adding an integration.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 7,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Skip Configure Notification Methods.",
+      "required_fields": [],
+      "observable_result": "Onboarding advances without testing notification channels.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 8,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the Download the Mobile App onboarding step.",
+      "required_fields": [
+        {
+          "label": "Mobile app download or continue control",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Guide documents Download and Next but, unlike neighboring steps, does not document a Skip control."
+        }
+      ],
+      "observable_result": "Onboarding advances to the schedule step.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 9,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Skip Configure an On-Call Schedule.",
+      "required_fields": [],
+      "observable_result": "Onboarding advances without inviting schedule users.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 10,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Skip Connect With Your Chat Tools and finish onboarding.",
+      "required_fields": [],
+      "observable_result": "PagerDuty directs the developer into the account.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "An eligible work email address; common consumer email domains are rejected.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Work-email eligibility gate on trial signup.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Unique subdomain availability on *.pagerduty.com.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ]
+    },
+    {
+      "description": "Possible mobile-app install requirement if the onboarding step cannot be skipped.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Create Account provisions the trial tenant on the chosen region and subdomain.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Completing or skipping the final chat-tools step redirects into the PagerDuty account.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Adding inbound integrations during onboarding",
+      "reason": "Official guide provides Skip step.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Configuring and testing notification methods during onboarding",
+      "reason": "Official guide provides Skip step.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Creating an on-call schedule and inviting users during onboarding",
+      "reason": "Official guide provides Skip step.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Connecting Slack or Microsoft Teams during onboarding",
+      "reason": "Official guide provides Skip step.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Creating REST API keys",
+      "reason": "Downstream developer route after an account exists.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Trial Account Onboarding",
+      "url": "https://support.pagerduty.com/main/docs/trial-account-onboarding",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Work email signup fields",
+        "Subdomain and region",
+        "Terms checkbox",
+        "Service Name",
+        "Skip controls for integrations, notifications, schedule, and chat",
+        "Mobile app Download and Next",
+        "Final redirect into account"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Services and Integrations",
+      "url": "https://support.pagerduty.com/main/docs/services-and-integrations",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Post-account service creation path",
+        "Role prerequisites"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "API Access Keys",
+      "url": "https://support.pagerduty.com/main/docs/api-access-keys",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "REST API key generation assumes existing account and admin permissions"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "PagerDuty sign up",
+      "url": "https://www.pagerduty.com/sign-up/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Work email gate",
+        "Profile and password steps",
+        "Subdomain validation hints",
+        "USA/EU region",
+        "Terms checkbox"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Can the current trial onboarding mobile-app step be skipped without installing the iOS or Android app?",
+      "impact": "If download is mandatory, the shortest path gains an external-store handoff and possibly a blocked route for developers without a mobile device.",
+      "evidence_needed": "A dated fresh-trial walkthrough showing whether Skip exists or whether Next works without installing the app."
+    },
+    {
+      "question": "What password composition rules does the live signup form enforce?",
+      "impact": "Rejected passwords can add correction loops before subdomain selection.",
+      "evidence_needed": "Capture of the current password validation messaging on https://www.pagerduty.com/sign-up/."
+    }
+  ],
+  "counts": null
+}

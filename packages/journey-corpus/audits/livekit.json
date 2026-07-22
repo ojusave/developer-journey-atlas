@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "LiveKit",
+    "slug": "livekit",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "5f5104fdaa5e87c96c1d949636f3f777ab672564cf9d8b866b07751f079041b6",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and, for Agents SDK routes, a supported language runtime such as Python 3.10+ or Node.js 20+.",
+      "No LiveKit Cloud account, project, API keys, CLI link, or running agent exists yet."
+    ]
+  },
+  "developer_goal": "Create a LiveKit Cloud account and reach the earliest official first voice or realtime agent success.",
+  "first_success": {
+    "outcome": "Unresolved between no-code Agent Builder, Voice AI SDK quickstart spoken response, and rooms SDK join flows.",
+    "observable_signal": "Candidates include a browser Agent Builder session, an Agent Console spoken response from a local starter agent, or a rooms client joining a LiveKit room.",
+    "source_ids": ["S1", "S3"]
+  },
+  "route_selection": {
+    "surface": "LiveKit Cloud with Agents quickstarts or realtime SDK docs",
+    "rule": "Prefer routes without payment or unavailable entitlement, then minimize actions; leave unresolved when Cloud signup is opaque and multiple official first-success surfaces remain.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "LiveKit Agent Builder in the browser",
+        "status": "unresolved",
+        "reason": "Official Voice AI docs present Agent Builder as a no-code browser path that may be shorter than CLI starter projects."
+      },
+      {
+        "name": "Voice AI quickstart with Python or Node starter via LiveKit CLI",
+        "status": "unresolved",
+        "reason": "The Voice AI quickstart assumes a free Cloud account, CLI auth, starter init, and a spoken agent response, with Python and Node variants."
+      },
+      {
+        "name": "Self-hosted open-source LiveKit server",
+        "status": "not-selected",
+        "reason": "The Cloud quickstart can be adapted for self-hosting, but that is a different operations surface from LiveKit Cloud signup."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a LiveKit Cloud account and free project from the Cloud login or signup entry.",
+      "required_fields": [
+        {
+          "label": "Cloud signup or identity-provider fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2"],
+          "notes": "Docs assume a free Cloud account and project; the login page does not publicly enumerate registration continuation states."
+        }
+      ],
+      "observable_result": "The developer has a LiveKit Cloud project with API credentials available.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "other",
+      "action": "Complete the unresolved Agent Builder or CLI starter route through first spoken or realtime success.",
+      "required_fields": [
+        {
+          "label": "Route-specific CLI, starter, or Builder steps",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S3"]
+        }
+      ],
+      "observable_result": "Depends on the unresolved LiveKit first-success route.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "The Voice AI quickstart assumes a free LiveKit Cloud account with a project and API keys.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "CLI-linked Cloud projects require installing the LiveKit CLI and running cloud auth for starter flows.",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "LiveKit Cloud provides hosted agent deployment, model inference, and realtime media transport on the free project path described in the quickstart.",
+      "source_ids": ["S1", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Production agent deploy with lk agent create and custom frontends",
+      "reason": "Deployment and custom clients occur after the local or Builder first-success demonstration.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Reading LiveKit conceptual docs before choosing a route",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Voice AI quickstart",
+      "url": "https://docs.livekit.io/agents/start/voice-ai/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Agent Builder alternative", "Cloud account assumption", "CLI install and cloud auth", "Python and Node starters"]
+    },
+    {
+      "id": "S2",
+      "title": "LiveKit Cloud sign in",
+      "url": "https://cloud.livekit.io/login?r=%2F",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Cloud login entry; registration continuation states not fully public"]
+    },
+    {
+      "id": "S3",
+      "title": "LiveKit Cloud overview",
+      "url": "https://docs.livekit.io/intro/cloud/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Cloud versus self-host positioning", "Agents and realtime platform surfaces"]
+    },
+    {
+      "id": "S4",
+      "title": "LiveKit CLI project commands",
+      "url": "https://docs.livekit.io/reference/developer-tools/livekit-cli/projects/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["CLI project linking and credential management"]
+    },
+    {
+      "id": "S5",
+      "title": "Quotas and limits",
+      "url": "https://docs.livekit.io/deploy/admin/quotas-and-limits/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Cloud free-project quota context"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which LiveKit first success is canonical: Agent Builder, Voice AI CLI starter spoken response, or a rooms SDK join?",
+      "impact": "Required actions, runtimes, and whether Cloud CLI auth is mandatory all change.",
+      "evidence_needed": "A workshop-owner route choice plus a fresh Cloud account walkthrough of that exact official path."
+    },
+    {
+      "question": "What exact sign-in, email-link, identity-provider, terms, and first-project creation states appear between cloud.livekit.io/login and a ready free project?",
+      "impact": "Account creation is currently one opaque step, so field and wait counts cannot be verified.",
+      "evidence_needed": "Dated screenshots of LiveKit Cloud registration from empty state through first project credentials."
+    }
+  ],
+  "counts": null
+}

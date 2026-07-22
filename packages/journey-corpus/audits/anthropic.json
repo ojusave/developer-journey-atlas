@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Anthropic",
+    "slug": "anthropic",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "cfe54558c82555e93785459b0226457e319e0c5ecba0209d577511607cf05382",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and a terminal capable of running cURL or a documented SDK.",
+      "No Claude Console account, organization, payment method, usage credits, or API key exist yet.",
+      "The developer intends the direct Claude Messages API rather than claude.ai consumer chat alone."
+    ]
+  },
+  "developer_goal": "Create a Claude Console organization, fund prepaid usage credits, create an API key, and complete the official Get started Messages API call.",
+  "first_success": {
+    "outcome": "The quickstart renewable-energy prompt is sent to the Claude Messages API and Claude returns an assistant message.",
+    "observable_signal": "The response JSON has type message, role assistant, a text content block, stop_reason end_turn, and token usage; SDK routes print the equivalent assistant text.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Claude Console plus Get started with Claude",
+    "rule": "Select the shortest complete Console-to-first-Messages-call route only after signup UI fields and one client tab are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Console account + prepaid credits + API key + cURL Messages call",
+        "status": "unresolved",
+        "reason": "cURL is the first documented tab with a full response example, but Console signup screens are unpublished and other tabs are equal clients."
+      },
+      {
+        "name": "Console + credits + API key + Python/TypeScript SDK",
+        "status": "unresolved",
+        "reason": "Adds project scaffolding and package installs versus cURL without a named recommended default."
+      },
+      {
+        "name": "Anthropic CLI with browser OAuth",
+        "status": "unresolved",
+        "reason": "Different authentication surface (OAuth vs API key export) reaching the same Messages outcome."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or log in to a Claude Console account and create or join a Console organization.",
+      "required_fields": [
+        {
+          "label": "Console identity and organization creation inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1",
+            "S3",
+            "S5"
+          ],
+          "notes": "Support docs require a Console organization but do not publish the full signup UI sequence."
+        }
+      ],
+      "observable_result": "The developer has an authenticated Console organization.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1",
+        "S3",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Fill out the requested organization and use-case information.",
+      "required_fields": [
+        {
+          "label": "Organization and use-case information",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S5"
+          ]
+        }
+      ],
+      "observable_result": "Console allows the billing and credits flow to continue.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S5"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Enter payment details and purchase prepaid usage credits on the Billing page.",
+      "required_fields": [
+        {
+          "label": "Payment method",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4",
+            "S5"
+          ]
+        },
+        {
+          "label": "Credit purchase amount",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4"
+          ]
+        }
+      ],
+      "observable_result": "The organization has a positive prepaid credit balance.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create an API key in Console and store it securely.",
+      "required_fields": [
+        {
+          "label": "API key creation controls",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Get started lists an API key prerequisite without publishing the key-form fields."
+        }
+      ],
+      "observable_result": "A secret API key value is available.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export ANTHROPIC_API_KEY for the selected non-CLI client, or complete CLI auth login for the CLI tab.",
+      "required_fields": [
+        {
+          "label": "ANTHROPIC_API_KEY or CLI OAuth authorization",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The selected client can authenticate to the Messages API.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 6,
+      "kind": "verification",
+      "interface": "cli",
+      "action": "Send the documented renewable-energy Messages request and verify the assistant response.",
+      "required_fields": [
+        {
+          "label": "Messages request payload or SDK call",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "Claude returns an assistant message completing the quickstart call.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Access subject to Anthropic Commercial Terms of Service and regional availability.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Prepaid usage credits must be purchased before API and Workbench usage.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "description": "Payment method and organization profile information are required to fund the account.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Purchased credits become immediately available on the Billing page.",
+      "source_ids": [
+        "S4"
+      ]
+    },
+    {
+      "description": "The Messages API returns an assistant message with usage metadata.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Workbench experimentation beyond the first API call",
+      "reason": "Get started terminal is the Messages API response, not Workbench UI exploration.",
+      "source_ids": [
+        "S1",
+        "S3"
+      ]
+    },
+    {
+      "item": "Custom rate limits or sales-assisted enterprise setup",
+      "reason": "Documented as a contact-sales path after self-serve credits.",
+      "source_ids": [
+        "S5"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with Claude",
+      "url": "https://platform.claude.com/docs/en/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Console and API key prerequisites",
+        "cURL/CLI/SDK tabs",
+        "Messages success response"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API overview",
+      "url": "https://platform.claude.com/docs/en/api/overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API surface reference"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "How can I access the Claude API?",
+      "url": "https://support.claude.com/en/articles/8114521-how-can-i-access-the-claude-api",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Console account for keys and billing",
+        "Commercial Terms"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "How do I pay for my Claude API usage?",
+      "url": "https://support.claude.com/en/articles/8977456-how-do-i-pay-for-my-claude-api-usage",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Prepaid credits",
+        "Buy credits flow",
+        "Auto-reload"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "I created a Claude Console organization: how do I start using the Claude API?",
+      "url": "https://support.claude.com/en/articles/8114531-i-created-a-claude-console-organization-how-do-i-start-using-the-claude-api",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Organization info",
+        "Payment details",
+        "Fund credits before API use"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact identity, email-verification, and organization-creation screens does a brand-new Console user encounter?",
+      "impact": "These screens can add steps or waiting before organization information and billing.",
+      "evidence_needed": "A dated fresh Console signup walkthrough through organization creation."
+    },
+    {
+      "question": "Which Get started client tab is the canonical shortest route: cURL, CLI OAuth, or an SDK?",
+      "impact": "Authentication surface and install steps differ while reaching the same Messages outcome.",
+      "evidence_needed": "An official recommended client default, or an explicit workshop selection among the documented tabs."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,292 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Klarna",
+    "slug": "klarna",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "41ca6cac9b8d2b69cebd1755171b2d59446e1d4e9ae8a236346789aa8e705ebc",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address they can activate.",
+      "No Klarna playground Merchant portal account or API keys exist yet.",
+      "Playground test data is used; production contracts are out of scope."
+    ]
+  },
+  "developer_goal": "Create a Klarna playground account, obtain test API credentials, and complete the earliest official Klarna Payments first-success path.",
+  "first_success": {
+    "outcome": "Unresolved among in-line widget one-time payment order creation, hosted payment page redirect, and other playground products such as On-site messaging or Express Checkout.",
+    "observable_signal": "Payments docs show session initiation through order creation after widget authorize, but peer products and integration shapes define different terminals.",
+    "source_ids": ["S1", "S2", "S3", "S5"]
+  },
+  "route_selection": {
+    "surface": "Klarna Docs playground signup plus Payments web integration guides",
+    "rule": "Select the shortest complete playground route only after product and integration shape (in-line widget versus HPP redirect) are fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Klarna Payments in-line widget one-time payment",
+        "status": "unresolved",
+        "reason": "Official prerequisites recommend the in-line widget, but one-time versus recurring intents and later authorize/create-order steps still branch the path."
+      },
+      {
+        "name": "Klarna Payments browser redirect / HPP",
+        "status": "unresolved",
+        "reason": "Official prerequisites present HPP as a peer integration type with a different front-end surface and docs set."
+      },
+      {
+        "name": "On-site messaging or Express Checkout playground testing",
+        "status": "unresolved",
+        "reason": "Before you test lists these as separate testing solutions with client identifiers and different first-success outcomes."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up for a Klarna playground Merchant portal account from Klarna Docs login.",
+      "required_fields": [
+        {
+          "label": "Credential region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Environment Playground",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Email address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Klarna sends a confirmation email to activate the account.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Open the confirmation email and choose Activate account.",
+      "required_fields": [
+        {
+          "label": "Activation link",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Klarna opens the finish-setup screens for the playground account.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 3,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Accept Terms & Conditions, set a password, enter a name, and log in to the Merchant portal.",
+      "required_fields": [
+        {
+          "label": "Terms & Conditions acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The developer is logged into the playground Merchant portal.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Generate Klarna API keys from Payment settings and download the credentials file.",
+      "required_fields": [
+        {
+          "label": "Key ID (API username)",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "Secret (API password)",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "Playground API username and password are available once.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 5,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Integrate the selected Klarna Payments web path through session, checkout, and order creation.",
+      "required_fields": [
+        {
+          "label": "Integration shape (in-line widget versus HPP)",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Payment intent and session fields",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        },
+        {
+          "label": "Authorize and create-order follow-through",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S4", "S5"],
+          "notes": "Later steps depend on the selected intent and integration shape; a single field inventory was not frozen for one route."
+        }
+      ],
+      "observable_result": "The selected Payments route reaches its documented order or authorization terminal.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3", "S4", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Playground testing requires Merchant portal access and test API keys.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Sample customer and payment data must be used instead of real personal data.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Production product availability may differ from playground based on contract.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Klarna must deliver the signup confirmation email before account activation.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Klarna creates a playground Merchant portal account after activation and password setup.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Create-session returns session_id and client_token for widget launch.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Demo store browsing without the developer's MID",
+      "reason": "Before you test states Demo store data is not linked to the merchant MID.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Order management after first order creation",
+      "reason": "Payments prerequisites point order handling to a later Order management section.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Before you test",
+      "url": "https://docs.klarna.com/resources/developer-tools/testing-payments/before-you-test/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Playground signup steps",
+        "API key generation",
+        "Sample data guidance",
+        "Other playground products"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Klarna payments integration options",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/prerequisites/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "In-line widget versus browser redirect",
+        "Recommended widget path"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Step 1 initiate a payment",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-1-initiate-a-payment/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Session create parameters",
+        "Intent variants",
+        "client_token response"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Step 2 checkout",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-2-checkout/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Checkout and widget authorize stage"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Step 3 create an order",
+      "url": "https://docs.klarna.com/acquirer/klarna/web-payments/integrate-with-klarna-payments/integrate-via-sdk/step-3-create-an-order/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Order creation after authorization"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Klarna playground product and Payments integration shape define the corpus first-success route?",
+      "impact": "In-line widget, HPP redirect, On-site messaging, and Express Checkout change required implementation work and the observable terminal.",
+      "evidence_needed": "Choose one bounded product and integration shape, then verify the complete current docs path from playground signup through that terminal."
+    },
+    {
+      "question": "Are the docs under the acquirer/klarna web-payments tree the correct merchant self-serve route for all playground accounts?",
+      "impact": "If acquirer versus merchant trees diverge, required steps and credentials may differ.",
+      "evidence_needed": "Official confirmation that the opened Payments SDK guide is the current self-serve merchant playground path."
+    }
+  ],
+  "counts": null
+}

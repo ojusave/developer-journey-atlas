@@ -1,0 +1,216 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Cerebras Inference",
+    "slug": "cerebras-inference",
+    "category": "AI, ML, and agents"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "cf40df4f3bf2f318da28d02e66252277623fa1797a473588edaaee420d87c8eb",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can run Python and pip locally.",
+      "The developer meets Cerebras minimum-age requirements stated in the Website Terms of Use.",
+      "No Cerebras account, API key, payment method, or chat-completion request exists yet."
+    ]
+  },
+  "developer_goal": "Create a Cerebras Cloud account and API key, then run the official Python Quickstart until a chat-completion message is printed.",
+  "first_success": {
+    "outcome": "The Cerebras Python SDK returns and prints a gpt-oss-120b chat completion.",
+    "observable_signal": "The terminal prints answer text for Why is fast inference important?.",
+    "source_ids": ["S1"]
+  },
+  "route_selection": {
+    "surface": "Cerebras Cloud Console plus official Inference Quickstart Python SDK",
+    "rule": "Use the Cloud Console self-service path named by the Quickstart; do not treat partner marketplaces as the primary account-creation route.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Cloud Console signup, create API key, Python SDK first request",
+        "status": "unresolved",
+        "reason": "Quickstart only says sign up or log in; the public console does not expose a static registration field contract."
+      },
+      {
+        "name": "Partner access via AWS Marketplace, OpenRouter, Hugging Face, or Vercel",
+        "status": "not-selected",
+        "reason": "Pricing page lists these as alternate access paths with different account and billing boundaries."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up or log in through the Cerebras Cloud Console.",
+      "required_fields": [
+        {
+          "label": "Cloud Console signup fields and agreements",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S4"],
+          "notes": "Official docs do not enumerate registration controls."
+        }
+      ],
+      "observable_result": "The developer has an authenticated Cloud Console session.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open API Keys, create a key, and copy it.",
+      "required_fields": [],
+      "observable_result": "An API key value is available to export as CEREBRAS_API_KEY.",
+      "evidence_state": "documented",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "step_number": 3,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export CEREBRAS_API_KEY, confirm it with echo, and install cerebras_cloud_sdk.",
+      "required_fields": [
+        {
+          "label": "export CEREBRAS_API_KEY",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        },
+        {
+          "label": "pip install --upgrade cerebras_cloud_sdk",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The SDK is installed and the key is present in the shell.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "code",
+      "action": "Run the published chat.completions.create example and print the message content.",
+      "required_fields": [
+        {
+          "label": "messages and model",
+          "field_type": "code",
+          "evidence_state": "documented",
+          "source_ids": ["S1"]
+        }
+      ],
+      "observable_result": "The terminal prints the chat-completion content.",
+      "evidence_state": "documented",
+      "source_ids": ["S1"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Local Python and pip are available for the Quickstart SDK install.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Website Terms of Use apply through access or use and include minimum-age and accuracy requirements.",
+      "source_ids": ["S5"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Cerebras returns a chat completion for the Quickstart model and messages.",
+      "source_ids": ["S1"]
+    },
+    {
+      "description": "Pricing states $5 in free credits after making an account for the Free Trial tier.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Playground experimentation",
+      "reason": "Quickstart presents playground as an optional alternate for users already familiar with LLM APIs.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Paid Developer tier starting at $10",
+      "reason": "Only required if free-trial limits are insufficient; not established as mandatory for first success.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart",
+      "url": "https://inference-docs.cerebras.ai/quickstart",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sign up or log in via Cloud Console",
+        "Create API key",
+        "CEREBRAS_API_KEY export",
+        "Python first request"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "API Keys",
+      "url": "https://inference-docs.cerebras.ai/console/api-keys",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API key management destination referenced by Quickstart"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Pricing",
+      "url": "https://www.cerebras.ai/pricing",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "$5 free credits after making an account",
+        "Developer tier payment starting at $10"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Cloud Console",
+      "url": "https://cloud.cerebras.ai/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Public console entry for signup or login"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Terms of Service",
+      "url": "https://www.cerebras.ai/terms-of-service",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Website Terms of Use apply to access or use"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What fields, authentication alternatives, agreements, verification actions, and submission states appear in current Cerebras Cloud signup?",
+      "impact": "The required account path cannot be reconstructed or counted from public documentation alone.",
+      "evidence_needed": "A dated fresh-account walkthrough of cloud.cerebras.ai registration through first authenticated API Keys access."
+    },
+    {
+      "question": "Does the $5 free-credit Free Trial require a payment method before the first Inference request succeeds?",
+      "impact": "A hidden billing gate would add payment fields and change lexicographic route comparison against paid tiers.",
+      "evidence_needed": "Official Free Trial prerequisites or a cold-account observation of whether the first chat completion works with zero payment method on file."
+    }
+  ],
+  "counts": null
+}

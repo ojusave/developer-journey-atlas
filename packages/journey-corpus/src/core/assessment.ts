@@ -1,4 +1,4 @@
-import type { MetricRow, PlatformRecord } from "./ports.js";
+import type { MetricRow, PlatformRecord, ShortestPathAudit } from "./ports.js";
 import type { DocumentedOnboardingLoad } from "./onboardingLoad.js";
 
 // Guardrail copy kept consistent with MEASUREMENT-CONTRACT.md and the site.
@@ -19,6 +19,8 @@ export interface StepView {
   successSignal: string | null;
   required: boolean;
   sourceIds: string[];
+  requiredFields: Array<{ label: string; type: string; evidenceState: string; notes: string | null }>;
+  evidenceState: string | null;
 }
 
 export interface Assessment {
@@ -30,6 +32,8 @@ export interface Assessment {
   selectedSurface: string;
   researchedAt: string | null;
   recordAvailable: boolean;
+  auditStatus: "verified" | "blocked" | "needs-human-judgment" | "pending";
+  auditUrl: string | null;
   firstSuccess: {
     milestone: string | null;
     normalizedOutcome: string | null;
@@ -41,14 +45,14 @@ export interface Assessment {
   frictionGates: Array<{ atStep: number | null; type: string; description: string }>;
   steps: StepView[];
   timeToFirstSuccess: { vendorClaim: boolean; value: string } | null;
-  pathStepCount: number;
+  pathStepCount: number | null;
   sources: Array<{ id: string | null; title: string; url: string }>;
   sourceCount: number;
   uncertaintyCount: number;
-  routeSignals: {
+  routeSignals: null | {
     requiredActions: number;
+    requiredFields: number;
     waits: number;
-    decisions: number;
     gates: number;
   };
   investigationPrompts: string[];
@@ -67,20 +71,29 @@ export function buildAssessment(
   row: MetricRow,
   record?: PlatformRecord,
   onboardingLoad: DocumentedOnboardingLoad | null = null,
+  audit?: ShortestPathAudit,
 ): Assessment {
   const fs = record?.documented_first_success;
   const ttfs = record?.time_to_first_success;
+  const verified = audit?.audit_status === "verified";
 
-  const steps: StepView[] = (record?.primary_path ?? []).map((s) => ({
+  const steps: StepView[] = (audit?.required_path ?? []).map((s) => ({
     stepNumber: s.step_number,
-    phase: s.phase ?? null,
-    actor: s.actor ?? null,
+    phase: s.kind ?? null,
+    actor: "developer",
     interface: s.interface ?? null,
     action: s.action,
-    details: s.details ?? [],
-    successSignal: s.success_signal ?? null,
-    required: s.required !== false,
+    details: [],
+    successSignal: s.observable_result ?? null,
+    required: true,
     sourceIds: s.source_ids ?? [],
+    requiredFields: (s.required_fields ?? []).map((field) => ({
+      label: field.label,
+      type: field.field_type,
+      evidenceState: field.evidence_state,
+      notes: field.notes ?? null,
+    })),
+    evidenceState: s.evidence_state ?? null,
   }));
 
   return {
@@ -89,51 +102,54 @@ export function buildAssessment(
     organization: record?.platform?.organization ?? null,
     category: row.category,
     outcome: row.outcome,
-    selectedSurface: row.selected_surface,
-    researchedAt: record?.researched_at ?? null,
+    selectedSurface: audit?.route_selection.selected ?? audit?.route_selection.surface ?? row.selected_surface,
+    researchedAt: audit?.audited_at ?? record?.researched_at ?? null,
     recordAvailable: Boolean(record),
+    auditStatus: audit?.audit_status ?? "pending",
+    auditUrl: audit ? `/data/audits/${row.slug}.json` : null,
     firstSuccess: {
-      milestone: fs?.official_milestone ?? null,
-      normalizedOutcome: fs?.normalized_outcome ?? null,
-      completionSignal: fs?.observable_completion_signal ?? null,
+      milestone: audit?.first_success.outcome ?? fs?.official_milestone ?? null,
+      normalizedOutcome: audit?.first_success.outcome ?? fs?.normalized_outcome ?? null,
+      completionSignal: audit?.first_success.observable_signal ?? fs?.observable_completion_signal ?? null,
       boundaryType: fs?.boundary_evidence?.type ?? null,
     },
-    prerequisites: (record?.prerequisites ?? []).map((p) => ({
-      type: p.type,
-      requirement: p.requirement,
-      required: p.required,
-    })),
-    frictionGates: (record?.friction_gates ?? []).map((g) => ({
-      atStep: g.at_step ?? null,
-      type: g.type ?? "gate",
-      description: g.description ?? g.requirement ?? "",
-    })),
+    prerequisites: audit
+      ? audit.prerequisites.map((p) => ({ type: "required", requirement: p.description, required: true }))
+      : [],
+    frictionGates: audit
+      ? [
+          ...audit.external_gates.map((gate) => ({ atStep: null, type: "external gate", description: gate.description })),
+          ...audit.unavoidable_waits.map((wait) => ({ atStep: null, type: "wait", description: wait.description })),
+        ]
+      : [],
     steps,
     timeToFirstSuccess:
       ttfs && ttfs.value
         ? { vendorClaim: Boolean(ttfs.vendor_claim), value: ttfs.value }
         : null,
-    pathStepCount: record?.primary_path?.length ?? steps.length,
-    sources: (record?.sources ?? []).map((s) => ({ id: s.id ?? null, title: s.title, url: s.url })),
-    sourceCount: record?.sources?.length ?? 0,
-    uncertaintyCount: record?.uncertainties?.length ?? 0,
-    routeSignals: {
-      requiredActions: row.required_developer_action_count,
-      waits: row.wait_or_async_count,
-      decisions: (record?.friction_gates ?? []).filter((gate) => gate.type === "choice").length,
-      gates: row.gate_count,
-    },
-    investigationPrompts: [
-      ...(record?.friction_gates ?? []).map((gate) => {
-        const location = gate.at_step ? `At step ${gate.at_step}, ` : "";
-        return `${location}review the documented ${gate.type ?? "friction"} gate: ${gate.description ?? gate.requirement ?? "Details are not specified."}`;
-      }),
-      ...(record?.prerequisites ?? [])
-        .filter((prerequisite) => prerequisite.required)
-        .map((prerequisite) => `Check whether developers can identify and satisfy this required prerequisite before starting: ${prerequisite.requirement}`),
-    ].slice(0, 3),
-    onboardingLoad,
+    pathStepCount: verified ? audit.required_path.length : null,
+    sources: (audit?.sources ?? record?.sources ?? []).map((s) => ({ id: s.id ?? null, title: s.title, url: s.url })),
+    sourceCount: (audit?.sources ?? record?.sources ?? []).length,
+    uncertaintyCount: audit?.uncertainties.length ?? record?.uncertainties?.length ?? 0,
+    routeSignals: verified && audit.counts
+      ? {
+          requiredActions: audit.counts.required_actions,
+          requiredFields: audit.counts.required_fields,
+          waits: audit.counts.unavoidable_waits,
+          gates: audit.counts.external_gates,
+        }
+      : null,
+    investigationPrompts: audit
+      ? [
+          ...audit.uncertainties.map((uncertainty) => `${uncertainty.question} Evidence needed: ${uncertainty.evidence_needed}`),
+          ...audit.external_gates.map((gate) => `Check this required external gate: ${gate.description}`),
+          ...audit.prerequisites.map((prerequisite) => `Confirm this required starting condition: ${prerequisite.description}`),
+        ].slice(0, 3)
+      : ["This platform is pending a shortest-required-path re-audit. Legacy source evidence remains available, but its action counts are withheld."],
+    onboardingLoad: verified ? onboardingLoad : null,
     recordUrl: `/data/records/${row.slug}.json`,
-    note: MEASUREMENT_NOTE,
+    note: verified
+      ? `${MEASUREMENT_NOTE} This path starts at account creation, excludes optional work, and lists required fields under each action.`
+      : "This source record has not passed the shortest-required-path audit. Counts and peer comparison are withheld until it does.",
   };
 }

@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Stream",
+    "slug": "stream",
+    "category": "Communications, media, and social"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "b159bcc59102f56a3879d2e645c2c19c0363af9982e57b177b6eceffa8117cbc",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address.",
+      "No Stream organization, app, API key, product selection, or SDK integration exists yet."
+    ]
+  },
+  "developer_goal": "Create a Stream account and reach the earliest official first-success outcome for a Stream product.",
+  "first_success": {
+    "outcome": "Unresolved: Chat, Video & Audio, Activity Feeds, Moderation, and Vision Agents each define a different observable first success.",
+    "observable_signal": "Product-specific signals such as a ready chat WebSocket, joined call participants, or a created feed activity cannot be unified without choosing one product.",
+    "source_ids": ["S1", "S2", "S3", "S4"]
+  },
+  "route_selection": {
+    "surface": "Stream Dashboard and product docs after shared account creation",
+    "rule": "Lexicographic shortest complete route only after one product and implementation surface is fixed; equal consequential product outcomes stay unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Chat Messaging client quickstart",
+        "status": "unresolved",
+        "reason": "Official Chat docs define a chat-ready WebSocket and rendered ready state that does not match Video or Feeds terminals."
+      },
+      {
+        "name": "Video & Audio client quickstart",
+        "status": "unresolved",
+        "reason": "Video quickstarts terminate on a joined call with rendered participants, a different outcome from Chat or Feeds."
+      },
+      {
+        "name": "Activity Feeds quickstart",
+        "status": "unresolved",
+        "reason": "Feeds docs terminate on creating a feed and adding an activity, not a chat or call session."
+      },
+      {
+        "name": "Dashboard versus Stream CLI / agent scaffolding",
+        "status": "unresolved",
+        "reason": "The official getting-started guide presents Dashboard setup and CLI/agent scaffolding as alternate paths after the same account."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create a Stream account with email and password or an identity provider.",
+      "required_fields": [
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "Google and GitHub signup are also documented; exact live form controls were not independently observed in this audit."
+        }
+      ],
+      "observable_result": "Stream continues onboarding and asks which main product to use.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Select the main Stream product for the application during signup onboarding.",
+      "required_fields": [
+        {
+          "label": "Main product",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "Choosing Chat, Feeds, Video, Moderation, or Vision Agents changes the later path and first-success signal."
+        }
+      ],
+      "observable_result": "The developer reaches the Stream Dashboard for the selected product context.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the unresolved product-specific credential and first-success route.",
+      "required_fields": [
+        {
+          "label": "Product-specific credentials and implementation steps",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S1", "S2", "S3"]
+        }
+      ],
+      "observable_result": "Depends on the unresolved product route.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A Stream account is shared across Chat, Feeds, Video, Moderation, and Vision Agents.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "external_gates": [],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Stream creates an organization and default app credentials after account creation.",
+      "source_ids": ["S4", "S5"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading product documentation before choosing a route",
+      "reason": "Documentation reading is not a counted developer action.",
+      "source_ids": ["S1", "S2", "S3"]
+    },
+    {
+      "item": "Post-success channel lists, reactions, recording, or production hardening",
+      "reason": "These occur after each product's first documented success signal.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Chat Messaging Docs",
+      "url": "https://getstream.io/chat/docs/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Chat product entry and client connection success framing"]
+    },
+    {
+      "id": "S2",
+      "title": "Video & Audio Docs",
+      "url": "https://getstream.io/video/docs/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Video product entry and call-oriented success framing"]
+    },
+    {
+      "id": "S3",
+      "title": "Activity Feeds Docs",
+      "url": "https://getstream.io/activity-feeds/docs/node/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Feeds product entry and activity-creation success framing"]
+    },
+    {
+      "id": "S4",
+      "title": "Guide to Getting Started with Stream",
+      "url": "https://getstream.io/blog/stream-getting-started-guide/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Shared account creation", "Product selection during signup", "Dashboard versus CLI paths"]
+    },
+    {
+      "id": "S5",
+      "title": "How to Register for Stream Chat",
+      "url": "https://support.getstream.io/hc/en-us/articles/4403179975959-Get-up-and-Running-With-Stream-Chat-How-to-Register",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Default app and API key or secret creation after registration"]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Stream product and implementation route defines the corpus-wide first mile?",
+      "impact": "The first-success outcome, credentials, SDK steps, and action counts all change with the product choice.",
+      "evidence_needed": "A workshop-owner decision that fixes one product and one official quickstart, then a fresh-account walkthrough of that route."
+    },
+    {
+      "question": "What exact current signup fields, anti-abuse checks, and organization controls appear in the live Stream account flow?",
+      "impact": "Account-step field counts cannot be verified from the blog-level signup description alone.",
+      "evidence_needed": "Dated screenshots or a read-only walkthrough of the current getstream.io account-creation UI."
+    }
+  ],
+  "counts": null
+}

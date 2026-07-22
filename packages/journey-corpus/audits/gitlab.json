@@ -1,0 +1,270 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "GitLab",
+    "slug": "gitlab",
+    "category": "API infrastructure and developer tooling"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "db058fa43c09dcca811b3805d9cdc4a52b38c0b433d1fd357750b334cff83b37",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can install Git and OpenSSH locally if a CLI path is selected.",
+      "No GitLab account, project, SSH key, commit, or merge exists yet."
+    ]
+  },
+  "developer_goal": "Create GitLab access and reach the first observable repository success for one declared GitLab workflow.",
+  "first_success": {
+    "outcome": "For the representative first-Git-commit tutorial candidate, the project README shows the tutorial text and the Last commit column shows the tutorial commit message.",
+    "observable_signal": "The project README displays Hello world! I'm using Git! and the Last commit column displays I added text to the README file.",
+    "source_ids": ["S2"]
+  },
+  "route_selection": {
+    "surface": "GitLab getting-started index with Make your first Git commit as one documented candidate",
+    "rule": "Select one Get started workflow and one GitLab offering only after official docs declare a single comparison path; otherwise leave peer workflows unresolved.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Tutorial: Make your first Git commit on GitLab.com",
+        "status": "unresolved",
+        "reason": "Fully mapped local Git plus SSH plus project plus merge path, but the getting-started index presents many peer workflows and the offering may be GitLab.com or another instance."
+      },
+      {
+        "name": "Get started with GitLab CI/CD, projects, Duo, or other index workflows",
+        "status": "unresolved",
+        "reason": "docs.gitlab.com/user/get_started lists multiple first workflows with different success signals and required tools."
+      },
+      {
+        "name": "GitLab Self-Managed or Dedicated admin-created users",
+        "status": "unresolved",
+        "reason": "Official create-users docs focus on Self-Managed and Dedicated admin flows, which are not the same as public GitLab.com self-registration."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Create or obtain access to a GitLab account and sign in.",
+      "required_fields": [
+        {
+          "label": "First name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"],
+          "notes": "Visible on gitlab.com/users/sign_up for the GitLab.com candidate."
+        },
+        {
+          "label": "Last name",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"]
+        },
+        {
+          "label": "Username",
+          "field_type": "text",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"]
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"]
+        },
+        {
+          "label": "Terms of Use acknowledgement",
+          "field_type": "agreement",
+          "evidence_state": "observed-public-ui",
+          "source_ids": ["S7"],
+          "notes": "Signup states that clicking Continue or registering through a third party accepts Terms of Use and acknowledges Privacy and Cookie policies."
+        }
+      ],
+      "observable_result": "The developer can sign in to a GitLab instance that can host the selected tutorial project.",
+      "evidence_state": "observed-public-ui",
+      "source_ids": ["S2", "S5", "S7"]
+    },
+    {
+      "step_number": 2,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Install Git and configure SSH access to the GitLab host used by the first-commit tutorial.",
+      "required_fields": [
+        {
+          "label": "SSH public key",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"]
+        }
+      ],
+      "observable_result": "Git and SSH can authenticate to the GitLab host.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the sample project with an initialized README.",
+      "required_fields": [
+        {
+          "label": "Project name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Tutorial uses My sample project."
+        },
+        {
+          "label": "Initialize repository with a README",
+          "field_type": "checkbox",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The project exists with a cloneable repository and README.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Clone the project, create a branch, edit the README, commit, push, and merge according to the tutorial.",
+      "required_fields": [
+        {
+          "label": "git clone URL",
+          "field_type": "url",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Branch, commit message, and merge actions",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "The tutorial commit lands on the default branch and the README shows the tutorial text.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Local Git installation and OpenSSH client 6.5 or later for the first-commit tutorial path.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "SSH key registration on the GitLab account is required before the tutorial clone and push over SSH.",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "description": "Whether the developer can merge directly to the default branch depends on project push and merge permissions.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "GitLab creates the project repository and records the pushed commit after merge.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading the full Get started index before choosing a workflow",
+      "reason": "Index reading is route selection evidence, not a product action in the measured path.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "GitLab CI/CD quick start",
+      "reason": "A peer workflow with a different first-success signal from the first-Git-commit tutorial.",
+      "source_ids": ["S1", "S6"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get started with GitLab",
+      "url": "https://docs.gitlab.com/user/get_started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Multiple peer getting-started workflows"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Tutorial: Make your first Git commit",
+      "url": "https://docs.gitlab.com/tutorials/make_first_git_commit/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Git and SSH prerequisites",
+        "Project creation",
+        "Clone, branch, commit, push, merge, and README verification"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Use SSH keys to communicate with GitLab",
+      "url": "https://docs.gitlab.com/user/ssh/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "SSH key creation and GitLab registration"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Create users",
+      "url": "https://docs.gitlab.com/user/profile/account/create_accounts/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Self-Managed and Dedicated account-creation methods"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Get started with GitLab CI/CD",
+      "url": "https://docs.gitlab.com/ci/quick_start/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "CI/CD as an alternate first workflow"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "GitLab.com sign up",
+      "url": "https://gitlab.com/users/sign_up",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "First name, last name, username, email, password",
+        "Terms acknowledgement",
+        "Google and GitHub continue options"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which GitLab workflow and offering should define first success for the comparison?",
+      "impact": "CI/CD, project planning, Duo, and first-commit paths have different tools, permissions, and completion signals; GitLab.com versus Self-Managed changes account creation.",
+      "evidence_needed": "A bounded goal that names one Get started workflow and one offering, plus confirmation that a fresh account can complete the merge step on the default branch."
+    }
+  ],
+  "counts": null
+}

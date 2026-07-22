@@ -1,0 +1,321 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Railway",
+    "slug": "railway",
+    "category": "Cloud and application runtimes"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "c3037b658dbaeeaa0853095e720419a223fe113e08c86533381571286ba81b4f",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer can use a browser and accept Railway Terms of Service.",
+      "No Railway account or project exists yet.",
+      "A GitHub account is available if the GitHub deploy candidate is selected."
+    ]
+  },
+  "developer_goal": "Create a Railway account, deploy a first web application, and observe a running deployment.",
+  "first_success": {
+    "outcome": "Railway has built and started the selected service and the initial deployment is ready on the Project Canvas.",
+    "observable_signal": "The deployment reaches Active / ready state after the initial deploy completes.",
+    "source_ids": [
+      "S2",
+      "S3"
+    ]
+  },
+  "route_selection": {
+    "surface": "Railway Dashboard self-service web flow",
+    "rule": "Quick Start presents GitHub, CLI, Docker image, and template as peer deploy options; lexicographic winner is unresolved while signup fields remain unverified.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Dashboard deploy from GitHub (NextJS sample fork)",
+        "status": "unresolved",
+        "reason": "Recommended first-code path in Quick Start, but signup and verification order are not public."
+      },
+      {
+        "name": "Deploy a template",
+        "status": "unresolved",
+        "reason": "Peer Quick Start path that may avoid forking sample code but still needs account and any template variables."
+      },
+      {
+        "name": "CLI railway init + railway up",
+        "status": "not-selected",
+        "reason": "Different interaction surface from the Dashboard-first account journey unless CLI is chosen as the goal."
+      },
+      {
+        "name": "Docker image service",
+        "status": "unresolved",
+        "reason": "Peer Dashboard path with empty project plus image name."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Sign up or log in at Railway and accept Terms for a new account.",
+      "required_fields": [
+        {
+          "label": "GitHub or email login choice",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S4",
+            "S5"
+          ]
+        },
+        {
+          "label": "New-account verification and Terms controls",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S4",
+            "S5",
+            "S8"
+          ]
+        }
+      ],
+      "observable_result": "The developer reaches an authenticated Railway dashboard or trial state.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a New Project and choose the selected deploy source (GitHub repo, template, or Docker image).",
+      "required_fields": [
+        {
+          "label": "Deploy source selection",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "Railway opens the project creation flow for that source.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "external-authorization",
+      "interface": "external-system",
+      "action": "If using GitHub, link and authorize the GitHub account and select the repository to deploy.",
+      "required_fields": [
+        {
+          "label": "GitHub account link and repository access",
+          "field_type": "permission",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Repository",
+          "field_type": "repository",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "The repository is available to Railway for Deploy Now.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Choose Deploy Now (or Deploy for non-GitHub peers) to start the initial deployment.",
+      "required_fields": [],
+      "observable_result": "Railway creates the project and kicks off the first build and deploy.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 5,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "On the Project Canvas, confirm the initial deployment completed and is ready.",
+      "required_fields": [],
+      "observable_result": "The deployment view shows the service ready/Active after the initial deploy.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "One Railway account per person; Free Trial provides a one-time credit grant.",
+      "source_ids": [
+        "S4",
+        "S5"
+      ]
+    },
+    {
+      "description": "GitHub-linked path needs a fork or accessible repo such as the Quick Start NextJS sample.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "GitHub authorization is required for the GitHub deploy option.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Trial verification based on GitHub account age and activity can limit features until verify completes.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Railway must queue, build, and start the container before the initial deployment is ready.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Deploy Now creates the project and starts the first deployment.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "A successful initial deployment becomes ready/Active on the Project Canvas.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Quick Start documentation",
+      "reason": "Documentation is evidence, not a product action.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Add variables path instead of Deploy Now",
+      "reason": "Quick Start directs Deploy Now for brevity.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "item": "Generating a public domain after Active",
+      "reason": "Quick Start marks the app ready when the initial deployment completes; domain may be extra for browser output.",
+      "source_ids": [
+        "S2"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Railway Docs",
+      "url": "https://docs.railway.com/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Docs entry"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Quick Start Tutorial",
+      "url": "https://docs.railway.com/quick-start",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "GitHub CLI Docker template peers",
+        "New Project",
+        "Deploy Now",
+        "Project Canvas"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Deployments",
+      "url": "https://docs.railway.com/deployments/reference",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Deployment lifecycle states"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Free Trial",
+      "url": "https://docs.railway.com/pricing/free-trial",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Trial credits",
+        "GitHub verification"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Accounts",
+      "url": "https://docs.railway.com/access/accounts",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "One account per person",
+        "Identity verification classes"
+      ]
+    },
+    {
+      "id": "S8",
+      "title": "Railway Terms of Service",
+      "url": "https://railway.com/legal/terms",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Terms acceptance and age requirement"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What is the current browser signup, identity choice, Terms, and verification order for a new Railway user?",
+      "impact": "Account-segment action and field counts cannot be verified from public docs alone.",
+      "evidence_needed": "Fresh-account signup walkthrough with dated screenshots of Login and post-signup verification screens."
+    },
+    {
+      "question": "Among GitHub sample, template, and Docker image Dashboard peers, which is the lexicographic shortest route to first success?",
+      "impact": "External gates and required fields differ; template may avoid forking while GitHub is the documented first-code recommendation.",
+      "evidence_needed": "Human judgment applying SELECTION-POLICY to the Quick Start peer options with a fixed first-success definition (Active vs public URL)."
+    }
+  ],
+  "counts": null
+}

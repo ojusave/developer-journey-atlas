@@ -9,12 +9,13 @@ import { sendData, sendError } from "./http.js";
  * score, count, or comparability field: the public surface never ranks or
  * orders platforms against each other.
  */
-export function toSummary(row: MetricRow) {
+export function toSummary(row: MetricRow, store?: DataStore) {
   return {
     name: row.name,
     slug: row.slug,
     category: row.category,
     outcome: row.outcome,
+    auditStatus: store?.getAudit(row.slug)?.audit_status ?? "pending",
   };
 }
 
@@ -22,7 +23,7 @@ export function listPlatforms(store: DataStore) {
   return (_req: Request, res: Response): void => {
     const rows = store.listRows();
     const categories = [...new Set(rows.map((r) => r.category))].sort();
-    sendData(res, rows.map(toSummary), { count: rows.length, categories });
+    sendData(res, rows.map((row) => toSummary(row, store)), { count: rows.length, categories });
   };
 }
 
@@ -34,7 +35,7 @@ export function getPlatform(store: DataStore) {
       sendError(res, 404, "not_found", `No platform found for "${slug}".`);
       return;
     }
-    const assessment = buildAssessment(row, store.getRecord(slug), buildDocumentedOnboardingLoad(row, store));
+    const assessment = buildAssessment(row, store.getRecord(slug), buildDocumentedOnboardingLoad(row, store), store.getAudit(slug));
     sendData(res, assessment, { recordAvailable: assessment.recordAvailable });
   };
 }

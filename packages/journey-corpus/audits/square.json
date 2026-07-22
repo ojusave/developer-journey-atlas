@@ -1,0 +1,236 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Square",
+    "slug": "square",
+    "category": "Payments, fintech, and commerce"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "cd20e5733f03ed159364da8897e1044c828de899d9f7f6dac1badb5343f2f7ad",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and email address.",
+      "No Square account or Developer Console application exists yet.",
+      "Sandbox CreatePayment is acceptable; production activation is a later gate."
+    ]
+  },
+  "developer_goal": "Create a Square developer account and application, then complete the official Get Started path to the first successful Sandbox payment verification.",
+  "first_success": {
+    "outcome": "Unresolved between API Explorer CreatePayment status COMPLETED and the seller Dashboard Verify the Payment step.",
+    "observable_signal": "Make your First API Call treats COMPLETED as success; the four-step Get Started sequence continues through Verify the Payment in the seller Dashboard.",
+    "source_ids": ["S1", "S3", "S5"]
+  },
+  "route_selection": {
+    "surface": "Square Developer signup and Developer Console Get Started",
+    "rule": "Use the documented self-service Get Started sequence. Do not invent a winner when the terminal verification step is ambiguous.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Get Started through CreatePayment COMPLETED in API Explorer",
+        "status": "unresolved",
+        "reason": "This is the first authenticated payment success signal, but the platform journey still lists Verify the Payment as a later numbered step."
+      },
+      {
+        "name": "Get Started through seller Dashboard payment verification",
+        "status": "unresolved",
+        "reason": "Matches the official four-step page order, but adds Dashboard navigation and date-filter interaction after the API already succeeded."
+      },
+      {
+        "name": "SDK language quickstarts instead of API Explorer",
+        "status": "not-selected",
+        "reason": "Get Started's first call path uses API Explorer with a prefilled Sandbox token rather than a language SDK sample."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete Square Developer sign-up and register the first application.",
+      "required_fields": [
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Email address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Country",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Terms, Privacy Policy, and E-Sign Consent",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Business name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        },
+        {
+          "label": "Application name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S2"]
+        }
+      ],
+      "observable_result": "Square opens the new application in the Developer Console.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Open the prepopulated CreatePayment request in API Explorer from the application banner.",
+      "required_fields": [],
+      "observable_result": "API Explorer shows a Sandbox CreatePayment request with access token prefilled.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "Choose Run Request and confirm the Payment response status is COMPLETED.",
+      "required_fields": [],
+      "observable_result": "Square returns a Payment object with status COMPLETED.",
+      "evidence_state": "documented",
+      "source_ids": ["S3"]
+    },
+    {
+      "step_number": 4,
+      "kind": "verification",
+      "interface": "web-ui",
+      "action": "If the selected terminal includes seller verification, open the Sandbox seller Dashboard and locate the test payment.",
+      "required_fields": [],
+      "observable_result": "The test payment is visible in the seller-facing Sandbox Dashboard.",
+      "evidence_state": "unverified",
+      "source_ids": ["S5"]
+    }
+  ],
+  "prerequisites": [],
+  "external_gates": [
+    {
+      "description": "Taking payments in production requires activating the Square account at squareup.com/activation.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [],
+  "platform_outcomes": [
+    {
+      "description": "Sign-up creates the developer account and registers the first application.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "API Explorer prefills Sandbox access token and CreatePayment fields for the Get Started exercise.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Optional signup preference questions for samples and help content",
+      "reason": "Official create-account docs label preferences optional.",
+      "source_ids": ["S2"]
+    },
+    {
+      "item": "Production account activation",
+      "reason": "Documented only when ready to take live payments, after Sandbox Get Started.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started",
+      "url": "https://developer.squareup.com/docs/square-get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Four-step Get Started sequence",
+        "Create account through Verify the Payment"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create an Account and Application",
+      "url": "https://developer.squareup.com/docs/get-started/create-account-and-application",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Signup field inventory",
+        "Application name",
+        "Production activation note"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Make your First API Call",
+      "url": "https://developer.squareup.com/docs/get-started/make-api-request",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API Explorer CreatePayment",
+        "COMPLETED status success signal"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "View the API Logs",
+      "url": "https://developer.squareup.com/docs/get-started/view-log",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "API Logs step in Get Started sequence"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Verify the Payment",
+      "url": "https://developer.squareup.com/docs/get-started/verify-transaction-in-seller-dashboard",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Seller Dashboard verification as final Get Started step"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Does first success end at CreatePayment COMPLETED, or must Verify the Payment in the seller Dashboard also complete?",
+      "impact": "Including Dashboard verification adds actions after the API already succeeded and changes counts.",
+      "evidence_needed": "Human judgment on the corpus terminal against the four-step Get Started page versus the COMPLETED response wording."
+    },
+    {
+      "question": "Are View the API Logs required before first success, or only instructional?",
+      "impact": "The middle Get Started step may or may not be a required developer action.",
+      "evidence_needed": "Clarify whether logs are mandatory confirmation or optional observation after COMPLETED."
+    },
+    {
+      "question": "Do current signup prompts add fields beyond the documented name, email, password, country, agreements, business name, and application name?",
+      "impact": "Field counts could rise if anti-abuse or email verification screens appear.",
+      "evidence_needed": "A dated fresh-account Developer signup walkthrough."
+    }
+  ],
+  "counts": null
+}

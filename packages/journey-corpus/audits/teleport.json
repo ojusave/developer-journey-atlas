@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Teleport",
+    "slug": "teleport",
+    "category": "Identity, security, and networking"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "0b21da9d3f453cccb2941f74a91af40a645b2dc0577d37ae52f79a11a9b268df",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and either local Docker tooling or access to Teleport Enterprise Cloud signup.",
+      "No Teleport cluster or Teleport Cloud tenant exists yet."
+    ]
+  },
+  "developer_goal": "Launch a Teleport evaluation environment and reach the earliest official checkpoint that proves Teleport is running and accessible.",
+  "first_success": {
+    "outcome": "Either a local Community Edition deployment serves the Teleport Web UI welcome screen, or a Teleport Enterprise Cloud trial tenant reaches its documented first evaluation checkpoint.",
+    "observable_signal": "For Community local Docker: opening https://localhost:3080 shows the Teleport welcome screen after Community Edition terms. For Cloud: unresolved until the selected Cloud first-success checkpoint is fixed.",
+    "source_ids": ["S1", "S4"]
+  },
+  "route_selection": {
+    "surface": "Teleport Get Started edition choice",
+    "rule": "Enterprise Cloud, Enterprise Self-Hosted, and Community Edition are consequential peers on the official Get Started page; select one only after lexicographic ranking of payment, actions, and vendor-recommended evaluation guidance.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Enterprise Cloud quick evaluation",
+        "status": "unresolved",
+        "reason": "Get Started recommends Cloud when evaluating quickly without provisioning infrastructure, and signup offers a free trial, but it is a different surface from local Community Edition and the complete Cloud first-success path after signup is not reconstructed here."
+      },
+      {
+        "name": "Community Edition local Docker welcome screen",
+        "status": "unresolved",
+        "reason": "Documents a free local path to a welcome-screen checkpoint without Cloud signup, while Get Started also points evaluators to Cloud and the Community guide itself suggests Cloud when local prerequisites are unmet."
+      },
+      {
+        "name": "Community Edition remote Linux VM",
+        "status": "unresolved",
+        "reason": "Peer Community path requiring a Linux host, DNS, and TLS prerequisites that change action count versus local Docker."
+      },
+      {
+        "name": "Enterprise Self-Hosted",
+        "status": "not-selected",
+        "reason": "Requires a valid license and contacting Teleport; adds payment or sales entitlement before first success."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "other",
+      "action": "Create the Teleport control plane required by the selected edition: Cloud signup or local Community bootstrap.",
+      "required_fields": [
+        {
+          "label": "Edition-specific signup or bootstrap inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S2", "S3", "S4"],
+          "notes": "Cloud signup fields are not fully enumerated from the public marketing signup page; Community local Docker uses mkcert and container bootstrap instead of SaaS signup."
+        }
+      ],
+      "observable_result": "A Teleport Auth/Proxy control plane exists for the selected edition.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S2", "S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "verification",
+      "interface": "browser",
+      "action": "Open the selected edition's first Web UI checkpoint and confirm Teleport is running.",
+      "required_fields": [
+        {
+          "label": "Community Edition terms acceptance when prompted",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "Applies to the Community Web UI path; Cloud terms/fields remain unresolved."
+        }
+      ],
+      "observable_result": "The selected official checkpoint confirms Teleport is accessible.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Community local Docker requires mkcert, Docker, and ability to trust a local CA.",
+      "source_ids": ["S4"]
+    },
+    {
+      "description": "Enterprise Cloud requires completing Teleport trial signup.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Enterprise Self-Hosted requires a valid license and contact with Teleport.",
+      "source_ids": ["S1"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Container image pulls and Teleport process start precede the local welcome-screen checkpoint.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "A healthy Community Edition deployment serves the Teleport Web UI over HTTPS.",
+      "source_ids": ["S4"]
+    },
+    {
+      "description": "Enterprise Cloud provides a managed .teleport.sh tenant after successful trial activation.",
+      "source_ids": ["S1", "S2"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Get Started documentation as a measured action",
+      "reason": "Documentation reading is evidence, not a product action.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Connecting infrastructure, RBAC, and auditing after the first running checkpoint",
+      "reason": "The Community guide places those after the welcome-screen checkpoint.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Get Started with Teleport",
+      "url": "https://goteleport.com/docs/get-started/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Enterprise Cloud, Enterprise Self-Hosted, and Community Edition choice framing",
+        "Cloud recommended for quick evaluation without infrastructure"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Step 1 - Sign up for Teleport Enterprise Cloud",
+      "url": "https://goteleport.com/docs/get-started/deploy-cloud/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Cloud deploy path entry after signup"]
+    },
+    {
+      "id": "S3",
+      "title": "Signup for Teleport Enterprise",
+      "url": "https://goteleport.com/signup/",
+      "source_type": "observed-public-ui",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["14-day Enterprise trial signup positioning"]
+    },
+    {
+      "id": "S4",
+      "title": "Step 1 - Deploy Teleport Community Edition",
+      "url": "https://goteleport.com/docs/get-started/deploy-community/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Local Docker mkcert and container steps",
+        "Remote Linux VM alternative",
+        "Suggestion to use Enterprise Cloud when prerequisites are unmet",
+        "Welcome screen verification framing"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Get Started edition is the selected shortest path: Enterprise Cloud trial or Community Edition local Docker?",
+      "impact": "Cloud matches quick-evaluation guidance and account creation; Community is free/local with a documented welcome-screen checkpoint. Counts and gates are not comparable until one route is chosen.",
+      "evidence_needed": "Lexicographic ranking that resolves vendor quick-evaluation guidance against the no-payment and minimize-actions rules, plus a complete Cloud post-signup first-success walkthrough if Cloud wins."
+    },
+    {
+      "question": "What exact fields and post-submit steps does the current Teleport Enterprise trial signup require?",
+      "impact": "Cloud account-creation field counts and any email or approval waits remain unverified.",
+      "evidence_needed": "Dated observation of goteleport.com/signup through the first authenticated Cloud Web UI checkpoint."
+    }
+  ],
+  "counts": null
+}

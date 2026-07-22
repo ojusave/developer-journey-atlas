@@ -1,0 +1,377 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "CockroachDB",
+    "slug": "cockroachdb",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "eb3adb299b8fb96798ceeef3ced7ee07e12a41f0f0c0062a688407d10e954576",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can complete CockroachDB Cloud registration.",
+      "The developer does not yet have a CockroachDB Cloud organization or cluster.",
+      "The developer can use a terminal, Git, and a language runtime required by the chosen sample."
+    ]
+  },
+  "developer_goal": "Create a CockroachDB Cloud account, deploy a Standard trial cluster, and run the official quickstart sample until first queries succeed.",
+  "first_success": {
+    "outcome": "A Standard trial cluster and SQL user exist, and the selected language sample connects, writes, reads, and prints success.",
+    "observable_signal": "For the Java sample, the terminal prints Hello world! and BUILD SUCCESSFUL after ./gradlew run.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "CockroachDB Cloud console plus official Quickstart sample",
+    "rule": "Use the Cloud Quickstart self-service path that deploys Standard with trial credits, then select one fully specified sample language only after registration method is fixed.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Email registration then Java sample",
+        "status": "unresolved",
+        "reason": "Email signup fields and post-verify name, company, and survey steps are documented, but GitHub, Google, and Microsoft SSO are peer registration methods with different external gates."
+      },
+      {
+        "name": "SSO registration then Java sample",
+        "status": "unresolved",
+        "reason": "Docs present GitHub, Google, and Microsoft as peer SSO options and recommend SSO for security; the three providers are equal consequential branches."
+      },
+      {
+        "name": "Any registration then Node.js sample",
+        "status": "unresolved",
+        "reason": "Node.js is a documented peer language tab in the same quickstart and reaches the same first-query outcome with different local commands."
+      },
+      {
+        "name": "Basic cluster or self-hosted local cluster",
+        "status": "not-selected",
+        "reason": "The general Quickstart currently selects Standard with sample code; Basic and self-hosted are separate guides."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Register a CockroachDB Cloud account using email or a supported SSO provider.",
+      "required_fields": [
+        {
+          "label": "Authentication method",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email versus GitHub, Google, or Microsoft SSO remains unresolved."
+        },
+        {
+          "label": "Email",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Required on the email route."
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Required on the email route."
+        },
+        {
+          "label": "Terms of Service and Privacy Policy acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "label": "Name and company details",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Documented after email verification on the email route; SSO post-auth profile fields are not fully enumerated."
+        },
+        {
+          "label": "Onboarding survey answers",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ],
+          "notes": "Email route Finish Setup survey; whether SSO skips or alters this is unverified."
+        }
+      ],
+      "observable_result": "The developer can sign in to CockroachDB Cloud and reach Get Started or Clusters.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "If using email signup, open the verification email and select Verify my email.",
+      "required_fields": [
+        {
+          "label": "Email verification link",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S2"
+          ]
+        }
+      ],
+      "observable_result": "Registration continues to name, company, and survey steps on the email route.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create a Standard cluster with cloud provider and region, then create a SQL user and save the generated password.",
+      "required_fields": [
+        {
+          "label": "Plan",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Cloud provider",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Region",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Cluster name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "SQL username",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "Generated SQL password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The cluster exists and the Connect to cluster dialog provides a sample connection string.",
+      "evidence_state": "documented",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 4,
+      "kind": "implementation",
+      "interface": "cli",
+      "action": "Export the connection environment variable, clone the quickstart samples, and run the selected language sample.",
+      "required_fields": [
+        {
+          "label": "Sample language",
+          "field_type": "select",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Java and Node.js are peer tabs."
+        },
+        {
+          "label": "JDBC_DATABASE_URL or DATABASE_URL",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "label": "./gradlew run or npm install and npm start equivalent",
+          "field_type": "command",
+          "evidence_state": "documented",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The sample prints the documented success output for the chosen language.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Git and a terminal are required to clone and run the official sample repository.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The Java sample implies a local Java toolchain usable by the Gradle wrapper; the exact version is not stated in the quickstart.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Registration requires acceptance of Terms of Service and Privacy Policy.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "SSO registration requires authorizing CockroachDB Cloud at the identity provider.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Cluster creation without an active free trial may require adding a payment method.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email verification must arrive before email registration can finish.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "description": "Cluster creation takes a vendor-stated few seconds before the SQL-user dialog.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "First organizations receive free trial credits usable for the Standard quickstart cluster.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "CockroachDB Cloud provisions the cluster and generates the SQL user password once.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Self-hosted local cluster quick starts",
+      "reason": "Listed as alternative ways to get started after the Cloud sample path.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "item": "Multi-region Add region configuration",
+      "reason": "Optional beyond the single-region quickstart path.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Quickstart with CockroachDB",
+      "url": "https://www.cockroachlabs.com/docs/cockroachcloud/quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Standard trial cluster steps",
+        "SQL user creation",
+        "Java and Node.js samples",
+        "Hello world success output",
+        "Payment note when no active trial"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Create a CockroachDB Cloud account",
+      "url": "https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email and SSO registration methods",
+        "Terms acceptance",
+        "Email verification",
+        "Name company and survey steps"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "CockroachDB Cloud Documentation",
+      "url": "https://www.cockroachlabs.com/docs/cockroachcloud/index",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Cloud documentation entry to Quickstart"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which registration method is the selected shortest CockroachDB Cloud account route among email, GitHub, Google, and Microsoft?",
+      "impact": "Auth choice changes required fields, external authorization, verification waits, and whether name, company, and survey steps appear.",
+      "evidence_needed": "Fresh-account walkthroughs for email and each SSO provider with screenshots of every required field and post-auth screen."
+    },
+    {
+      "question": "Is Java or Node.js the selected sample language when both tabs reach the same first-query outcome?",
+      "impact": "Language choice changes local prerequisites, commands, and action count after cluster creation.",
+      "evidence_needed": "Apply the lexicographic route rule explicitly once registration is fixed, or obtain a vendor statement that one sample is the default measured path."
+    },
+    {
+      "question": "What billing screen appears if the new organization has no active free trial credits?",
+      "impact": "A payment gate may be required before Create cluster and would change external_gates and possibly route eligibility.",
+      "evidence_needed": "Official documentation or a fresh-account capture of the no-trial Finalize page."
+    }
+  ],
+  "counts": null
+}

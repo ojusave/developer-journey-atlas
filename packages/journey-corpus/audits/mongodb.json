@@ -1,0 +1,245 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "MongoDB",
+    "slug": "mongodb",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "2eadd540cffef7e155f67b3afff6ef51c502a4faf83be3e9a7c22b0af27273be",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and can install CLI tools if a CLI route is selected.",
+      "No Atlas account, organization, project, or cluster exists yet.",
+      "No MongoDB deployment product or interaction surface is preselected."
+    ]
+  },
+  "developer_goal": "Create a MongoDB Atlas account and reach the earliest meaningful first Atlas data-platform result.",
+  "first_success": {
+    "outcome": "A free Atlas cluster is created with access configured and a documented ready or connect signal.",
+    "observable_signal": "Either the Atlas UI Overview is available after Security Quickstart, or the Atlas CLI prints the mongosh connection command and cluster-created message.",
+    "source_ids": ["S2", "S3"]
+  },
+  "route_selection": {
+    "surface": "MongoDB Atlas self-service (UI or CLI unresolved)",
+    "rule": "Prefer self-service web when a complete web path exists; do not invent a winner when UI and CLI reach different terminals with consequential setup differences.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Atlas UI Deploy a Free Cluster",
+        "status": "unresolved",
+        "reason": "Matches the self-service web preference and documents M0, provider, region, name, database user, and IP access list, but the terminal is Overview rather than a printed connection command."
+      },
+      {
+        "name": "Atlas CLI atlas setup quickstart",
+        "status": "unresolved",
+        "reason": "Official CLI quickstart bundles cluster, sample data, IP allow list, database user, and printed mongosh connect command, but it is a different interaction surface with local install prerequisites."
+      },
+      {
+        "name": "Local Atlas deployment or driver-specific application path",
+        "status": "not-selected",
+        "reason": "Get Started documents local and cloud deployments plus application connect steps as separate products from a single Atlas free-cluster first success."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Register an Atlas account with email, GitHub, or Google and complete the selected identity flow.",
+      "required_fields": [
+        {
+          "label": "Email Address",
+          "field_type": "email",
+          "evidence_state": "documented",
+          "source_ids": ["S4"],
+          "notes": "Required for the email registration tab; OAuth routes use provider identity instead."
+        },
+        {
+          "label": "First Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Last Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Password",
+          "field_type": "password",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Terms of Service and Privacy Policy acceptance",
+          "field_type": "agreement",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        },
+        {
+          "label": "Robot verification",
+          "field_type": "challenge",
+          "evidence_state": "documented",
+          "source_ids": ["S4"]
+        }
+      ],
+      "observable_result": "The developer can sign in to Atlas.",
+      "evidence_state": "documented",
+      "source_ids": ["S4"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Use or create the Atlas organization and project that will contain the first cluster.",
+      "required_fields": [
+        {
+          "label": "Organization and project context",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S3", "S4"],
+          "notes": "Docs say first login may skip steps and auto-create context; exact required fields when manual creation is needed are not fully enumerated here."
+        }
+      ],
+      "observable_result": "A project is available for cluster deployment.",
+      "evidence_state": "unverified",
+      "source_ids": ["S3", "S4"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "other",
+      "action": "Create and secure the first free cluster using the still-unresolved UI or CLI surface.",
+      "required_fields": [
+        {
+          "label": "Cluster tier, provider, region, and name, or atlas setup defaults",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"]
+        },
+        {
+          "label": "Database user username and password",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"]
+        },
+        {
+          "label": "IP access list entry",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2", "S3"]
+        }
+      ],
+      "observable_result": "The free cluster is ready and connection details are available on the selected surface.",
+      "evidence_state": "unverified",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "If the CLI route is selected, Atlas CLI and mongosh must be installed and authenticated.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "GitHub signup requires a public email address on the GitHub profile.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "GitHub or Google authorization when those signup methods are chosen.",
+      "source_ids": ["S4"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Atlas must finish creating the free cluster before it is ready to use; UI docs state under about 15 seconds.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Atlas creates the M0 cluster and, on the CLI quickstart, can load sample data and emit a connection string.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading MongoDB documentation home and comparing all products",
+      "reason": "Documentation reading is not a product action in the measured path.",
+      "source_ids": ["S1"]
+    },
+    {
+      "item": "Paid Flex or Dedicated cluster checkout",
+      "reason": "The free M0 path is documented without requiring paid tiers for the first cluster.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "MongoDB Documentation",
+      "url": "https://www.mongodb.com/docs/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": ["Cross-product documentation entry without a single universal first surface"]
+    },
+    {
+      "id": "S2",
+      "title": "Create and Configure an Atlas Cluster",
+      "url": "https://www.mongodb.com/docs/atlas/cli/current/atlas-cli-quickstart/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "atlas setup modes",
+        "Cluster, sample data, IP allow list, database user",
+        "Printed mongosh connection command"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Deploy a Free Cluster",
+      "url": "https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Atlas UI M0 create flow",
+        "Provider, region, name",
+        "Security Quickstart user and IP steps",
+        "Sub-15-second ready claim"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Create an Atlas Account",
+      "url": "https://www.mongodb.com/docs/atlas/tutorial/create-atlas-account/",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email, GitHub, or Google registration",
+        "Email form fields and Terms checkbox",
+        "Robot verification",
+        "Organization and project next steps"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Should MongoDB's shortest path use Atlas UI, Atlas CLI, local Atlas, or a driver application path?",
+      "impact": "Each surface changes prerequisites, required actions, first-success signal, and whether local installs count.",
+      "evidence_needed": "Choose one bounded surface and verify its complete current route from a fresh Atlas account against official docs and a product walkthrough."
+    },
+    {
+      "question": "Does a fresh Atlas account always auto-create organization and project, or must the developer create them manually?",
+      "impact": "Manual organization or project creation would add actions and fields before the first cluster.",
+      "evidence_needed": "A dated walkthrough from a brand-new Atlas registration through first project context."
+    }
+  ],
+  "counts": null
+}

@@ -1,0 +1,251 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Airtable",
+    "slug": "airtable",
+    "category": "B2B SaaS and enterprise ecosystems"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "e9ab8e405672e4cfef807776746320cee713399d96f748e71124bebadf185f0a",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "No Airtable account, workspace, base, table, record, collaborator role, developer-hub access, personal access token, base ID, or prior API request is assumed.",
+      "A browser and terminal capable of sending an HTTPS request are available.",
+      "No signup, identity authorization, workspace or base creation, token creation, or API request was performed during research."
+    ]
+  },
+  "developer_goal": "Create an Airtable account, obtain or create a workspace and base with a table, create a scoped personal access token, and make the documented first list-records request.",
+  "first_success": {
+    "outcome": "The intended terminal is an authenticated request to `https://api.airtable.com/v0/{baseId}/{tableName}` that returns the first page under the `records` key.",
+    "observable_signal": "The response contains a `records` array and, when more pages exist, an `offset`; an empty array is not proof that expected base data was retrieved.",
+    "source_ids": [
+      "S1"
+    ]
+  },
+  "route_selection": {
+    "surface": "Airtable Web API list-records path with a personal access token",
+    "rule": "Select the lexicographically shortest complete official route to the same first-success outcome after fixing product intent; if peer routes remain consequential, mark needs-human-judgment.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Airtable Web API list-records path with a personal access token",
+        "status": "unresolved",
+        "reason": "Recorded as a reconstructable candidate, but public evidence does not close signup-field opacity and/or peer-route lexicographic selection for a verified count."
+      },
+      {
+        "name": "OAuth integration",
+        "status": "unresolved",
+        "reason": "Airtable directs individual use to a personal access token and third-party integrations to OAuth."
+      },
+      {
+        "name": "Create a base through the API",
+        "status": "unresolved",
+        "reason": "The support guide demonstrates listing records as the first request, while API base creation requires broader write permissions and does not remove the account and workspace prerequisites."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Complete Airtable account creation or trial signup at the official entry URL.",
+      "required_fields": [
+        {
+          "label": "Signup identity and required account fields",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Public evidence does not establish the complete current required field set behind the client-rendered or authenticated signup surface."
+        }
+      ],
+      "observable_result": "A new Airtable account or trial session exists.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 2,
+      "kind": "account",
+      "interface": "email",
+      "action": "Complete any required email or identity verification for the new account.",
+      "required_fields": [
+        {
+          "label": "Verification challenge",
+          "field_type": "challenge",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ]
+        }
+      ],
+      "observable_result": "The account becomes usable for developer onboarding.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the documented post-login setup for the selected Airtable candidate through first success.",
+      "required_fields": [
+        {
+          "label": "Candidate-specific configuration",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": [
+            "S1"
+          ],
+          "notes": "Exact fields depend on unresolved product, auth, or framework selection."
+        }
+      ],
+      "observable_result": "The response contains a `records` array and, when more pages exist, an `offset`; an empty array is not proof that expected base data was retrieved.",
+      "evidence_state": "unverified",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "{'order': 1, 'type': 'account', 'requirement': 'Have an Airtable account, which is the personal login used to create and manage Airtable resources.', 'required': True, 'source_ids': ['S3', 'S5']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 2, 'type': 'access', 'requirement': 'Have an accessible workspace, base, and table containing the records to list.', 'required': True, 'source_ids': ['S1', 'S5']}",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "{'order': 3, 'type': 'permission', 'requirement': \"Have user permissions for the selected workspace and base; token scopes and resources cannot exceed the user's access.\", 'required': True, 'source_ids': ['S1', 'S2']}",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "The no-account signup application does not expose its complete public transition.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "Workspace, base, and token capabilities depend on the user's collaborator role and organization settings.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "description": "The developer must configure `data.records:read` and the target base resource before the PAT can list records there.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Email or identity-provider verification delivery when the selected account route requires it.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Make the first Airtable Web API request to list records from a table.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Pagination after the first page, record creation or updates, base schema calls, OAuth applications, webhooks, automations, production secret management, and higher-volume rate handling occur after the",
+      "reason": "Listed as excluded after success in the source record.",
+      "source_ids": [
+        "S1"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Getting started with Airtable's Web API | Airtable Support",
+      "url": "https://support.airtable.com/docs/getting-started-with-airtables-web-api",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Primary documented developer route and first-success framing"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Creating personal access tokens | Airtable Support",
+      "url": "https://support.airtable.com/docs/creating-personal-access-tokens",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Creating personal access tokens | Airtable Support"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Sign up - Airtable",
+      "url": "https://airtable.com/signup",
+      "source_type": "official-support",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Sign up - Airtable"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Airtable Web API",
+      "url": "https://airtable.com/developers/web/api/introduction",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Airtable Web API"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Creating, managing and deleting Airtable workspaces",
+      "url": "https://support.airtable.com/docs/creating-and-deleting-airtable-workspaces",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Supporting official evidence for Creating, managing and deleting Airtable workspaces"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "What exact current signup, identity, verification, legal, workspace, and initial-base sequence reaches the Airtable home screen for a new user?",
+      "impact": "The required predecessor to token and API use cannot be counted or reproduced from public official evidence.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The live signup response is client-rendered and the official API and account guides assume an account and resources already exist."
+    },
+    {
+      "question": "What base and table are created, joined, or selected for a brand-new self-service user before the first list-records request?",
+      "impact": "The request URL, record-read permission, and expected response content depend on these resources.",
+      "evidence_needed": "Resolve against current official docs and a dated fresh-account or cold walkthrough: The public signup-to-home transition and initial resource state are not documented."
+    },
+    {
+      "question": "What exact current required signup, identity, legal, and entitlement fields does Airtable show for a new developer, and which peer route is the lexicographic shortest path?",
+      "impact": "Without those fields and a closed route choice, action and field counts cannot be verified for peer comparison.",
+      "evidence_needed": "A dated read-only walkthrough of the live signup and the selected post-login first-success path, with screenshots of required fields and confirmation that peer routes are longer or gated."
+    }
+  ],
+  "counts": null
+}

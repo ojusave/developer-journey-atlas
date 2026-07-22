@@ -1,0 +1,246 @@
+{
+  "schema_version": "1.0",
+  "platform": {
+    "name": "Elastic",
+    "slug": "elastic",
+    "category": "Data, databases, and search"
+  },
+  "audit_status": "needs-human-judgment",
+  "audited_at": "2026-07-22",
+  "source_record_sha256": "a3e46fdd6ad8ec013d6f59820d1d35e44e7ce1b997fb4d0dbf7ce25ccff5ec4a",
+  "starting_state": {
+    "boundary": "account creation",
+    "assumptions": [
+      "The developer has a supported browser and an email address or Google or Microsoft identity.",
+      "No Elastic Cloud organization, trial deployment, or serverless project exists yet.",
+      "No solution use case (search, observability, or security) or deployment model is preselected."
+    ]
+  },
+  "developer_goal": "Create an Elastic Cloud account and reach the earliest meaningful first-success outcome for a selected Elastic solution.",
+  "first_success": {
+    "outcome": "A selected Elastic solution path returns its documented first searchable or console result.",
+    "observable_signal": "For the Elasticsearch Console index-and-search route, the expected document appears under hits.hits with its original _source JSON.",
+    "source_ids": ["S4", "S5"]
+  },
+  "route_selection": {
+    "surface": "Elastic Cloud self-service trial",
+    "rule": "Select a complete official candidate only after solution and deployment model are fixed; otherwise mark unresolved under the lexicographic route rule.",
+    "selected": null,
+    "candidates": [
+      {
+        "name": "Elasticsearch Serverless project plus Console index-and-search basics",
+        "status": "unresolved",
+        "reason": "Official get-started materials recommend Serverless Elasticsearch for speed, but Observability and Security are peer solutions with different terminals."
+      },
+      {
+        "name": "Elastic Observability get-started",
+        "status": "unresolved",
+        "reason": "Solutions overview presents Observability as an equal recommended path for monitoring and telemetry."
+      },
+      {
+        "name": "Elastic Security get-started",
+        "status": "unresolved",
+        "reason": "Solutions overview presents Security as an equal recommended path for SIEM and threat workflows."
+      },
+      {
+        "name": "Elastic Cloud Hosted trial deployment",
+        "status": "unresolved",
+        "reason": "Trial docs include one hosted deployment alongside three Serverless projects; hosted versus serverless changes required configuration and later steps."
+      }
+    ]
+  },
+  "required_path": [
+    {
+      "step_number": 1,
+      "kind": "account",
+      "interface": "web-ui",
+      "action": "Open Elastic Cloud Sign Up and create an organization with a supported signup method.",
+      "required_fields": [
+        {
+          "label": "Email and password, or Google or Microsoft identity",
+          "field_type": "other",
+          "evidence_state": "documented",
+          "source_ids": ["S2"],
+          "notes": "Docs list email/password, Google, Microsoft, or Marketplace subscribe. Exact public form controls were not fully readable from the registration page fetch."
+        }
+      ],
+      "observable_result": "An Elastic Cloud organization exists and the developer is authenticated under a 14-day trial.",
+      "evidence_state": "documented",
+      "source_ids": ["S2"]
+    },
+    {
+      "step_number": 2,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Create the deployment or serverless project type required by the still-unresolved solution route.",
+      "required_fields": [
+        {
+          "label": "Project or deployment type",
+          "field_type": "select",
+          "evidence_state": "documented",
+          "source_ids": ["S3", "S6"],
+          "notes": "Serverless requires choosing Elasticsearch, Observability, or Security. Hosted trial uses a different create-deployment flow."
+        },
+        {
+          "label": "Name",
+          "field_type": "text",
+          "evidence_state": "documented",
+          "source_ids": ["S3"]
+        }
+      ],
+      "observable_result": "A usable Elastic Cloud resource is available for the selected solution.",
+      "evidence_state": "documented",
+      "source_ids": ["S2", "S3"]
+    },
+    {
+      "step_number": 3,
+      "kind": "product-interaction",
+      "interface": "web-ui",
+      "action": "Complete the selected solution's first ingest and query or console steps through its documented first-success signal.",
+      "required_fields": [
+        {
+          "label": "Solution-specific Console or UI inputs",
+          "field_type": "other",
+          "evidence_state": "unverified",
+          "source_ids": ["S4", "S5"],
+          "notes": "Index-and-search basics document Console requests for a books index when that route is chosen; Observability and Security paths differ."
+        }
+      ],
+      "observable_result": "The selected route's documented terminal signal is visible.",
+      "evidence_state": "unverified",
+      "source_ids": ["S1", "S4", "S5"]
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "A supported browser that can reach cloud.elastic.co and related Elastic Cloud domains.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "external_gates": [
+    {
+      "description": "Google, Microsoft, or Marketplace identity flows, when chosen, require authorization outside Elastic.",
+      "source_ids": ["S2"]
+    }
+  ],
+  "unavoidable_waits": [
+    {
+      "description": "Elastic must provision the chosen hosted deployment or serverless project before Console or solution UI work can proceed.",
+      "source_ids": ["S3"]
+    }
+  ],
+  "platform_outcomes": [
+    {
+      "description": "Signing up creates an Elastic Cloud organization and starts a free 14-day trial.",
+      "source_ids": ["S2"]
+    },
+    {
+      "description": "Creating a serverless project or hosted deployment makes Elasticsearch and Kibana endpoints available.",
+      "source_ids": ["S2", "S3"]
+    }
+  ],
+  "excluded": [
+    {
+      "item": "Reading Solutions overview and deployment-options documentation",
+      "reason": "Documentation is evidence for route selection, not a counted product action.",
+      "source_ids": ["S1", "S6"]
+    },
+    {
+      "item": "Subscribing or adding billing to remove trial limits",
+      "reason": "Trial signup docs state no credit card is required to start; paid conversion is after the measured first success.",
+      "source_ids": ["S2", "S7"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Solutions overview",
+      "url": "https://www.elastic.co/docs/get-started/introduction",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Three peer solutions: Elasticsearch, Observability, Security",
+        "Each solution available as Serverless, Hosted, or self-managed"
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Sign up and create an organization",
+      "url": "https://www.elastic.co/docs/deploy-manage/deploy/elastic-cloud/create-an-organization",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Email/password, Google, Microsoft, or Marketplace signup",
+        "Organization and 14-day trial",
+        "One hosted deployment and three Serverless projects in trial"
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Create a serverless project",
+      "url": "https://www.elastic.co/docs/deploy-manage/deploy/elastic-cloud/create-serverless-project",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "New-user trial signup to create serverless projects",
+        "Project type selection"
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Get started with the Elasticsearch solution/project type",
+      "url": "https://www.elastic.co/docs/solutions/elasticsearch-solution-project/get-started",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Serverless Elasticsearch signup link",
+        "Choose Elasticsearch project type and name"
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Index and search basics",
+      "url": "https://www.elastic.co/docs/solutions/search/get-started/index-basics",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Console create index, index documents, and search",
+        "Snow Crash sample document path"
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Elastic Cloud Serverless",
+      "url": "https://www.elastic.co/docs/deploy-manage/deploy/elastic-cloud/serverless",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Three serverless solutions: Elasticsearch, Observability, Security"
+      ]
+    },
+    {
+      "id": "S7",
+      "title": "Elastic Cloud Trial overview",
+      "url": "https://www.elastic.co/cloud/cloud-trial-overview",
+      "source_type": "official-documentation",
+      "accessed_at": "2026-07-22",
+      "evidence_supported": [
+        "Sign up with no credit card required",
+        "Create deployment then ingest and explore"
+      ]
+    }
+  ],
+  "uncertainties": [
+    {
+      "question": "Which Elastic solution and deployment model define the canonical first-mile journey?",
+      "impact": "Elasticsearch, Observability, and Security, plus Hosted versus Serverless, change required actions, fields, and the observable first-success signal.",
+      "evidence_needed": "A bounded developer goal naming one solution and one deployment model, then a complete walkthrough of that route from a fresh trial account."
+    },
+    {
+      "question": "What exact fields appear on the current Elastic Cloud registration form for email versus OAuth signup?",
+      "impact": "Required-field counts for account creation cannot be finalized without public UI or authenticated walkthrough evidence.",
+      "evidence_needed": "Dated screenshots or a read-only capture of https://cloud.elastic.co/registration and serverless-registration for each signup method."
+    }
+  ],
+  "counts": null
+}
