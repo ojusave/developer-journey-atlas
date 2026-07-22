@@ -3,34 +3,40 @@ import path from "node:path";
 /** Central, env-driven configuration with production-safe defaults. */
 export const config = {
   port: Number(process.env.PORT ?? 3000),
-  // Render runs the start command from the repo root, so cwd holds the data files.
+  // Render runs the start command from the root directory, so cwd holds the data files.
   dataRoot: path.resolve(process.env.DATA_ROOT ?? process.cwd()),
   get publicDir(): string {
     return path.join(this.dataRoot, "public");
   },
   githubRepoUrl: "https://github.com/ojusave/developer-journey-atlas",
-  // owner/repo slug derived from the URL; used by the PR writer.
-  githubRepoSlug: "ojusave/developer-journey-atlas",
-  // Live research is part of the normal product path. It is always on when
-  // the provider credentials are configured.
-  researchEnabled: true,
-  // Phase 2 search provider (You.com Web Search API). YDC_API_KEY is the
-  // canonical env var name across You.com's docs and SDKs.
+  // owner/repo slug; used by the PR writer. Overridable so the contribution
+  // target is not a hard-coded constant.
+  githubRepoSlug: process.env.GITHUB_REPO_SLUG ?? "ojusave/developer-journey-atlas",
+
+  // --- Web service: starts and reads Workflow runs (server-side only) ---
+  // Secret Render API key used by @renderinc/sdk. Never exposed to the browser.
+  renderApiKey: process.env.RENDER_API_KEY ?? "",
+  // Registered task slug, e.g. developer-journey-atlas-workflows/researchPlatform.
+  workflowTaskSlug: process.env.RENDER_WORKFLOW_TASK_SLUG ?? "",
+
+  // --- Workflow service: provider credentials for the research tasks ---
+  // You.com Web Search API. YDC_API_KEY is You.com's canonical env var name.
   youApiKey: process.env.YDC_API_KEY ?? "",
-  // Phase 2 LLM provider (OpenRouter). Model is overridable per deployment.
+  // OpenRouter LLM provider. The model is optional: when unset, no model is sent
+  // and OpenRouter uses the account/payer default.
   openRouterApiKey: process.env.OPENROUTER_API_KEY ?? "",
-  openRouterModel: process.env.OPENROUTER_MODEL ?? "openai/gpt-4.1-mini",
-  // Phase 2 auto-PR. Optional: when absent, research still runs and displays,
-  // and the UI offers the drafted record for manual submission.
+  openRouterModel: process.env.OPENROUTER_MODEL ?? "",
+  // Auto-PR token. Optional: without it, research still runs and the drafted
+  // record is offered for manual submission.
   githubToken: process.env.GITHUB_TOKEN ?? "",
 };
 
-export function researchConfigStatus(): { enabled: boolean; configured: boolean; missing: string[] } {
+/** Whether the web service can start research runs (Workflow wiring present). */
+export function researchAvailability(): { available: boolean; missing: string[] } {
   const missing: string[] = [];
-  if (!config.researchEnabled) missing.push("RESEARCH_ENABLED=true");
-  if (!config.youApiKey) missing.push("YDC_API_KEY");
-  if (!config.openRouterApiKey) missing.push("OPENROUTER_API_KEY");
-  return { enabled: config.researchEnabled, configured: missing.length === 0, missing };
+  if (!config.renderApiKey) missing.push("RENDER_API_KEY");
+  if (!config.workflowTaskSlug) missing.push("RENDER_WORKFLOW_TASK_SLUG");
+  return { available: missing.length === 0, missing };
 }
 
 /** Canonical Render signup URL with fixed campaign UTMs; only utm_content varies. */

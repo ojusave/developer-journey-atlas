@@ -268,30 +268,58 @@ async function showPlatform(slug) {
   }
 }
 
+// A monotonically increasing token so a new submission (or reload) cancels any
+// in-flight polling loop from a previous one.
+let activePoll = 0;
+const POLL_INTERVAL_MS = 2500;
+const MAX_POLLS = 160; // ~6.5 minutes, then we stop polling but research continues.
+
+const PHASE_TEXT = {
+  queued: "Queued. Research will start shortly…",
+  running: "Researching official documentation…",
+  retrying: "A step hit a transient error and is being retried…",
+};
+
+const OUTCOME_MESSAGE = {
+  no_docs: "No official documentation was found for that platform, so nothing could be drafted.",
+  search_failed: "The documentation search provider was unavailable. Nothing was submitted. Try again shortly.",
+  model_failed: "The model provider was unavailable while reconstructing the record. Nothing was submitted. Try again shortly.",
+  invalid_output: "The model could not produce a schema-valid record from the official docs, so nothing was submitted.",
+  source_grounding_failed: "The draft cited sources that were not returned by the official-docs search, so it was rejected. Nothing was submitted.",
+};
+
+function setUrlState(query, runId) {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (runId) params.set("research", runId);
+  const suffix = params.toString();
+  history.replaceState(null, "", suffix ? `?${suffix}` : location.pathname);
+}
+
+function setStatus(text) {
+  const statusEl = document.querySelector("#research-status");
+  if (statusEl) statusEl.textContent = text;
+}
+
 function renderUnknown(query) {
   el.result.hidden = false;
   el.result.innerHTML = `
     <div class="card unknown-panel">
       <p class="section-kicker">NEW PLATFORM</p>
       <h2>"${esc(query)}" is not in the Atlas yet</h2>
-      <p class="lede">Research its official docs, show the draft here, then open a draft GitHub contribution for human review.</p>
-      <p class="microcopy">The Atlas will research this platform automatically from official documentation and prepare a draft contribution for human review.</p>
+      <p class="lede">The Atlas researches its official docs, shows the draft here, then opens a draft GitHub contribution for human review. Nothing merges automatically.</p>
+      <p class="microcopy">Research runs on a durable Render Workflow. It keeps going even if you close this tab, and you can reload to resume.</p>
+      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
       <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
-      <ol class="research-log" id="research-log" hidden></ol>
     </div>`;
-  document.querySelector("#research-btn").addEventListener("click", () => researchPlatform(query));
+  wireRetry(query);
   el.result.scrollIntoView({ behavior: "smooth", block: "start" });
   researchPlatform(query);
 }
 
-function logStep(text, cls) {
-  const logEl = document.querySelector("#research-log");
-  if (!logEl) return;
-  logEl.hidden = false;
-  const li = document.createElement("li");
-  if (cls) li.className = cls;
-  li.textContent = text;
-  logEl.appendChild(li);
+function wireRetry(query) {
+  const btn = document.querySelector("#research-btn");
+  if (btn) btn.addEventListener("click", () => researchPlatform(query));
 }
 
 function draftBanner(record) {
@@ -299,79 +327,123 @@ function draftBanner(record) {
   const blob = URL.createObjectURL(new Blob([json], { type: "application/json" }));
   return `
     <div class="draft-banner">
-      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com and OpenRouter. It passed schema
+      <strong>Machine-drafted, unverified.</strong> Generated live from official docs via You.com and an OpenRouter model. It passed schema
       validation but has not been human-reviewed. Treat it as a starting point, not a source of truth.
       <a href="${blob}" download="${esc(record.platform.slug)}.json">Download the drafted record (JSON)</a>
     </div>`;
 }
 
-// Parse a Server-Sent Events stream from a fetch Response body.
-async function* readSse(res) {
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const chunks = buffer.split("\n\n");
-    buffer = chunks.pop() ?? "";
-    for (const chunk of chunks) {
-      const dataLine = chunk.split("\n").find((l) => l.startsWith("data:"));
-      if (dataLine) {
-        try {
-          yield JSON.parse(dataLine.slice(5).trim());
-        } catch {
-          /* ignore malformed frame */
-        }
-      }
-    }
+function renderContribution(contribution) {
+  if (!contribution) return "";
+  if (contribution.status === "opened") {
+    const reused = contribution.reused ? " An existing open contribution was reused." : "";
+    return `<div class="card"><p class="dist-line"><strong>Draft contribution opened for human review:</strong> <a href="${esc(contribution.url)}" rel="noreferrer">${esc(contribution.url)}</a>${reused}</p></div>`;
   }
+  return `<div class="card"><p class="dist-line">${esc(contribution.reason)}</p></div>`;
 }
 
+// Render a terminal error outcome with a keyboard-accessible retry control.
+function renderResearchError(message, query) {
+  el.result.hidden = false;
+  el.result.innerHTML = `
+    <div class="card unknown-panel">
+      <p class="section-kicker">RESEARCH</p>
+      <h2>"${esc(query)}"</h2>
+      <p class="lede">${esc(message)}</p>
+      <button class="btn btn-secondary" id="research-btn" type="button">Try research again</button>
+    </div>`;
+  wireRetry(query);
+}
+
+function renderResult(result, query) {
+  if (result.outcome === "known") return showPlatform(result.slug);
+  if (result.outcome === "completed") {
+    el.result.innerHTML =
+      draftBanner(result.record) + renderAssessment(result.assessment) + renderContribution(result.contribution);
+    return;
+  }
+  renderResearchError(OUTCOME_MESSAGE[result.outcome] || "Research could not be completed.", query);
+}
+
+// Start research and poll for its result. Safe to call on retry or on reload.
 async function researchPlatform(query) {
   const btn = document.querySelector("#research-btn");
   if (btn) btn.disabled = true;
-  logStep("Starting…");
+  setStatus("Starting…");
   try {
     const res = await fetch("/api/research", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ platform: query }),
     });
-    if (!res.ok || !res.body) {
-      const body = await res.json().catch(() => ({}));
-      logStep(body.error ? body.error.message : `Research unavailable (${res.status}).`, "err");
-      if (btn) btn.disabled = false;
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      renderResearchError(body.error ? body.error.message : `Research is unavailable right now (${res.status}).`, query);
       return;
     }
-
-    let resultHtml = "";
-    for await (const ev of readSse(res)) {
-      if (ev.type === "status") logStep(ev.message);
-      else if (ev.type === "known") return showPlatform(ev.slug);
-      else if (ev.type === "result") {
-        resultHtml = draftBanner(ev.record) + renderAssessment(ev.assessment);
-        el.result.innerHTML = resultHtml;
-      } else if (ev.type === "pr") {
-        el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line"><strong>Draft PR opened:</strong> <a href="${esc(ev.url)}" rel="noreferrer">${esc(ev.url)}</a></p></div>`;
-      } else if (ev.type === "pr_skipped") {
-        el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line">${esc(ev.reason)}</p></div>`;
-      } else if (ev.type === "error") {
-        if (resultHtml) el.result.innerHTML = resultHtml + `<div class="card"><p class="dist-line err">${esc(ev.message)}</p></div>`;
-        else logStep(ev.message, "err");
-      }
+    if (body.data && body.data.known) return showPlatform(body.data.slug);
+    const runId = body.data && body.data.runId;
+    if (!runId) {
+      renderResearchError("Research could not be started right now. Try again shortly.", query);
+      return;
     }
+    setUrlState(query, runId);
+    setStatus(PHASE_TEXT[body.data.phase] || PHASE_TEXT.queued);
+    pollRunStatus(runId, query);
   } catch {
-    logStep("Lost connection to the research service.", "err");
-  } finally {
-    if (btn) btn.disabled = false;
+    renderResearchError("Could not reach the research service. Check your connection and try again.", query);
   }
+}
+
+// Poll server-side run status. A dropped connection never cancels the research;
+// the run continues on Render and the browser resumes on the next poll.
+async function pollRunStatus(runId, query) {
+  const token = ++activePoll;
+  let networkErrors = 0;
+  for (let i = 0; i < MAX_POLLS; i += 1) {
+    if (token !== activePoll) return; // superseded by a newer run
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    if (token !== activePoll) return;
+    let body;
+    try {
+      const res = await fetch(`/api/research/${encodeURIComponent(runId)}`);
+      body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 404 && i < 3) continue; // run may not be visible yet
+        renderResearchError(body.error ? body.error.message : "Lost track of this research run.", query);
+        return;
+      }
+      networkErrors = 0;
+    } catch {
+      networkErrors += 1;
+      setStatus("Reconnecting to the research service… (your research is still running)");
+      if (networkErrors > 8) {
+        renderResearchError("Could not reach the research service. Your research may still be running: reload to resume.", query);
+        return;
+      }
+      continue;
+    }
+
+    const projection = body.data;
+    if (!projection) continue;
+    if (projection.phase === "completed" && projection.result) {
+      setUrlState(query, null);
+      renderResult(projection.result, query);
+      return;
+    }
+    if (projection.phase === "failed") {
+      renderResearchError(projection.message || "Research could not be completed. Try again shortly.", query);
+      return;
+    }
+    setStatus(PHASE_TEXT[projection.phase] || PHASE_TEXT.running);
+  }
+  setStatus("Research is taking longer than expected. It is still running: reload this page to resume.");
 }
 
 async function submitQuery(q) {
   const query = q.trim();
   if (!query) return;
+  activePoll += 1; // cancel any previous polling loop
   try {
     const { data } = await api(`/api/search?q=${encodeURIComponent(query)}`);
     const exact = data.find((r) => r.name.toLowerCase() === query.toLowerCase());
@@ -382,6 +454,28 @@ async function submitQuery(q) {
     el.result.hidden = false;
     el.result.innerHTML = `<div class="state-message">${esc(err.message)}</div>`;
   }
+}
+
+// Resume an in-flight research run after a page reload using the URL state.
+function resumeFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const runId = params.get("research");
+  const query = params.get("q");
+  if (!runId || !query) return false;
+  el.input.value = query;
+  el.result.hidden = false;
+  el.result.innerHTML = `
+    <div class="card unknown-panel">
+      <p class="section-kicker">NEW PLATFORM</p>
+      <h2>"${esc(query)}" is not in the Atlas yet</h2>
+      <p class="lede">Resuming your research run…</p>
+      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-secondary" id="research-btn" type="button">Retry research</button>
+    </div>`;
+  wireRetry(query);
+  setStatus("Resuming…");
+  pollRunStatus(runId, query);
+  return true;
 }
 
 /* ---------- Events ---------- */
@@ -422,6 +516,7 @@ async function init() {
   } catch {
     /* leave the static fallback count */
   }
+  resumeFromUrl();
 }
 
 init();

@@ -114,5 +114,7 @@ export interface LLMProvider {
 }
 
 export interface RepoWriter {
-  openDraftRecordPR(record: PlatformRecord): Promise<{ url: string }>;
+  /** Opens (or reuses) a draft PR for the record. `reused` is true when an
+   * already-open PR for the same platform was returned instead of a new one. */
+  openDraftRecordPR(record: PlatformRecord): Promise<{ url: string; reused: boolean }>;
 }

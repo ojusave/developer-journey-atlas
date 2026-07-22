@@ -1,44 +1,22 @@
 import express from "express";
 import path from "node:path";
-import { config, researchConfigStatus } from "./config.js";
+import { config, researchAvailability } from "./config.js";
 import { LocalDataStore } from "./adapters/localData.js";
 import { createApiRouter } from "./api/router.js";
 import { sendError } from "./api/http.js";
-import { createRecordValidator } from "./core/validate.js";
-import { YouSearchProvider } from "./adapters/youSearch.js";
-import { OpenRouterProvider } from "./adapters/openRouter.js";
-import { GitHubPrWriter } from "./adapters/githubPr.js";
-import type { ResearchDeps } from "./core/researchPipeline.js";
-import type { PlatformRecord, MetricRow } from "./core/ports.js";
-import { selectedPathRow } from "../lib/measure.mjs";
-import { readFileSync } from "node:fs";
+import { RenderWorkflowRunner } from "./adapters/renderWorkflows.js";
+import type { WorkflowRunner } from "./workflows/contract.js";
 
-// Build Phase 2 research dependencies from config. Returns null when research is
-// off or the required search/LLM keys are absent, so the API degrades cleanly.
-function buildResearchDeps(store: LocalDataStore): ResearchDeps | null {
-  if (!config.researchEnabled) return null;
-  if (!config.youApiKey || !config.openRouterApiKey) {
-    console.warn("RESEARCH_ENABLED is on but YDC_API_KEY or OPENROUTER_API_KEY is missing; research disabled.");
+// Build the Workflow runner from config. Returns null when the Render API key or
+// task slug is absent, so the research endpoints degrade cleanly. The web
+// service never runs research itself: it starts and reads durable Workflow runs.
+function buildWorkflowRunner(): WorkflowRunner | null {
+  const { available, missing } = researchAvailability();
+  if (!available) {
+    console.warn(`Live research disabled: missing ${missing.join(", ")}.`);
     return null;
   }
-  const schemaPath = path.join(config.dataRoot, "record.schema.json");
-  const schemaText = readFileSync(schemaPath, "utf8");
-  const validate = createRecordValidator(schemaPath);
-
-  const categories = [...new Set(store.listRows().map((r) => r.category))].sort();
-  const search = new YouSearchProvider(config.youApiKey);
-  const llm = new OpenRouterProvider(config.openRouterApiKey, config.openRouterModel, validate, schemaText, categories);
-  const repo = config.githubToken
-    ? new GitHubPrWriter(config.githubToken, config.githubRepoSlug)
-    : undefined;
-
-  return {
-    search,
-    llm,
-    repo,
-    store,
-    buildRow: (record: PlatformRecord): MetricRow => selectedPathRow(record),
-  };
+  return new RenderWorkflowRunner(config.workflowTaskSlug, config.renderApiKey);
 }
 
 // Composition root: build the concrete adapter, wire it into the API, and mount
@@ -53,7 +31,7 @@ function main(): void {
     return;
   }
 
-  const researchDeps = buildResearchDeps(store);
+  const runner = buildWorkflowRunner();
 
   const app = express();
   app.disable("x-powered-by");
@@ -64,7 +42,7 @@ function main(): void {
     res.json({ status: "ok", platforms: store.meta().count });
   });
 
-  app.use("/api", createApiRouter(store, researchDeps));
+  app.use("/api", createApiRouter(store, runner));
 
   // Unknown API routes return the JSON envelope, not the SPA shell.
   app.use("/api", (_req, res) => sendError(res, 404, "not_found", "Unknown API route."));

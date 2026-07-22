@@ -5,6 +5,18 @@ const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const TIMEOUT_MS = 90_000;
 const MAX_ATTEMPTS = 2;
 
+/**
+ * Deterministic terminal failure: the model could not produce a schema-valid
+ * record within the bounded repair policy. This is NOT transient, so callers
+ * must treat it as a final outcome rather than retrying it.
+ */
+export class SchemaRepairError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SchemaRepairError";
+  }
+}
+
 interface ChatChoice {
   message?: { content?: string };
 }
@@ -40,6 +52,7 @@ function docsBlock(docs: DocHit[]): string {
 export class OpenRouterProvider implements LLMProvider {
   constructor(
     private readonly apiKey: string,
+    /** Optional. When empty, no model is sent and OpenRouter uses the account default. */
     private readonly model: string,
     private readonly validate: RecordValidator,
     private readonly schemaText: string,
@@ -83,7 +96,9 @@ export class OpenRouterProvider implements LLMProvider {
       }
     }
 
-    throw new Error(`Model could not produce a schema-valid record: ${lastErrors.slice(0, 5).join("; ")}`);
+    throw new SchemaRepairError(
+      `Model could not produce a schema-valid record: ${lastErrors.slice(0, 5).join("; ")}`,
+    );
   }
 
   private async call(messages: Array<{ role: string; content: string }>): Promise<string> {
@@ -99,7 +114,9 @@ export class OpenRouterProvider implements LLMProvider {
           "X-Title": "Developer Journey Atlas",
         },
         body: JSON.stringify({
-          model: this.model,
+          // Omit `model` entirely when unset so OpenRouter falls back to the
+          // account/payer default instead of a pinned, possibly stale model.
+          ...(this.model ? { model: this.model } : {}),
           messages,
           temperature: 0.2,
           response_format: { type: "json_object" },
