@@ -7,8 +7,11 @@ export interface BlockerHypothesisRef {
   kind: string;
   label: string;
   diagnosticEligibility: string | null;
-  linkSource: "soft-map" | "curated";
+  linkSource: "soft-map" | "curated" | "openrouter";
   note: string;
+  confidence?: string | null;
+  similarity?: number | null;
+  rationale?: string | null;
 }
 
 export interface JourneyGateView {
@@ -48,7 +51,20 @@ export interface JourneyOverlay {
 const HYPOTHESIS_NOTE =
   "Documented friction may relate to this blocker family. It is a hypothesis, not a confirmed drop-off cause.";
 
+const MODEL_LINK_NOTE =
+  "OpenRouter retrieve-then-confirm linked this catalog reason as a hypothesis only. Not observed drop-off.";
+
 type FamilyLookup = (familyId: string) => { id: string; label: string; kind: string; diagnosticEligibility: string | null } | null;
+
+export interface ModelLinkInput {
+  gateKey: string;
+  reasonId: string;
+  label: string;
+  diagnosticEligibility: string | null;
+  confidence: string | null;
+  similarity: number | null;
+  rationale: string | null;
+}
 
 /**
  * Build a readable journey from a platform record, attaching soft-mapped blocker families to gates.
@@ -58,8 +74,16 @@ export function buildJourneyOverlay(
   options: {
     familyLookup: FamilyLookup;
     gateIds?: Map<string, string>;
+    modelLinks?: ModelLinkInput[];
   },
 ): JourneyOverlay {
+  const modelByGateKey = new Map<string, ModelLinkInput[]>();
+  for (const link of options.modelLinks ?? []) {
+    const list = modelByGateKey.get(link.gateKey) ?? [];
+    list.push(link);
+    modelByGateKey.set(link.gateKey, list);
+  }
+
   const gates = (record.friction_gates ?? []).map((gate, index) => {
     const type = gate.type ?? "other";
     const familyId = familyIdForGateType(type);
@@ -75,6 +99,19 @@ export function buildJourneyOverlay(
           note: HYPOTHESIS_NOTE,
         }]
       : [];
+    for (const link of modelByGateKey.get(key) ?? []) {
+      hypotheses.push({
+        id: link.reasonId,
+        kind: "reason",
+        label: link.label,
+        diagnosticEligibility: link.diagnosticEligibility,
+        linkSource: "openrouter",
+        note: MODEL_LINK_NOTE,
+        confidence: link.confidence,
+        similarity: link.similarity,
+        rationale: link.rationale,
+      });
+    }
     return {
       id: options.gateIds?.get(key) ?? null,
       atStep: gate.at_step ?? null,

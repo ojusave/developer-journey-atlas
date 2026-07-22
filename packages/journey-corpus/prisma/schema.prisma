@@ -135,11 +135,25 @@ model GateBlockerLink {
   blockerReasonId String
   linkSource      String
   confidence      String?
+  model           String?
+  similarity      Float?
+  rationale       String?
 
   gate FrictionGate @relation(fields: [frictionGateId], references: [id], onDelete: Cascade)
 
   @@unique([frictionGateId, blockerReasonId, linkSource])
   @@index([blockerReasonId])
+}
+
+/// Cached embeddings for catalog reason nodes (790). Keyed by reason id.
+model CatalogEmbedding {
+  reasonId    String   @id
+  model       String
+  contentHash String
+  embedding   Json
+  updatedAt   DateTime @updatedAt
+
+  @@index([model])
 }
 
 model DatasetMeta {

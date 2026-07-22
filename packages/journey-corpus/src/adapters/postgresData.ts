@@ -7,8 +7,7 @@ import type {
   QualityRow,
   ShortestPathAudit,
 } from "../core/ports.js";
-import { familyIdForGateType } from "../db/gateTypeFamilyMap.js";
-import { buildJourneyOverlay, type JourneyOverlay } from "../core/journeyOverlay.js";
+import { buildJourneyOverlay, type JourneyOverlay, type ModelLinkInput } from "../core/journeyOverlay.js";
 
 interface FamilyInfo {
   id: string;
@@ -31,6 +30,7 @@ export class PostgresDataStore implements DataStore {
   private readonly records = new Map<string, PlatformRecord>();
   private readonly audits = new Map<string, ShortestPathAudit>();
   private readonly gateIdsBySlug = new Map<string, Map<string, string>>();
+  private readonly modelLinksBySlug = new Map<string, ModelLinkInput[]>();
   private readonly families = new Map<string, FamilyInfo>();
   private readonly reasonCount: number;
 
@@ -42,6 +42,7 @@ export class PostgresDataStore implements DataStore {
     records: Map<string, PlatformRecord>;
     audits: Map<string, ShortestPathAudit>;
     gateIdsBySlug: Map<string, Map<string, string>>;
+    modelLinksBySlug: Map<string, ModelLinkInput[]>;
     families: Map<string, FamilyInfo>;
     reasonCount: number;
   }) {
@@ -53,13 +54,14 @@ export class PostgresDataStore implements DataStore {
     this.records = args.records;
     this.audits = args.audits;
     this.gateIdsBySlug = args.gateIdsBySlug;
+    this.modelLinksBySlug = args.modelLinksBySlug;
     this.families = args.families;
     this.reasonCount = args.reasonCount;
   }
 
   /** Load the full serving snapshot from Postgres. */
   static async create(prisma = new PrismaClient()): Promise<PostgresDataStore> {
-    const [metrics, qualities, platforms, audits, gates, families, reasonCount, metaRow] =
+    const [metrics, qualities, platforms, audits, gates, families, reasonCount, metaRow, openrouterLinks] =
       await Promise.all([
         prisma.metric.findMany(),
         prisma.quality.findMany(),
@@ -69,6 +71,7 @@ export class PostgresDataStore implements DataStore {
         prisma.catalogNode.findMany({ where: { kind: "universal_family" } }),
         prisma.catalogNode.count({ where: { kind: "reason" } }),
         prisma.datasetMeta.findUnique({ where: { id: "singleton" } }),
+        prisma.gateBlockerLink.findMany({ where: { linkSource: "openrouter" } }),
       ]);
 
     if (metrics.length === 0) {
@@ -106,6 +109,7 @@ export class PostgresDataStore implements DataStore {
     }
 
     const gateIdsBySlug = new Map<string, Map<string, string>>();
+    const gateKeyById = new Map<string, { slug: string; key: string }>();
     for (const [slug, record] of records) {
       const dbGates = gatesBySlug.get(slug) ?? [];
       const idMap = new Map<string, string>();
@@ -117,9 +121,37 @@ export class PostgresDataStore implements DataStore {
               row.atStep === (gate.at_step ?? null) &&
               row.description === (gate.description ?? ""),
           ) ?? dbGates[index];
-        if (match) idMap.set(`${gate.at_step ?? "x"}:${gate.type ?? "other"}:${index}`, match.id);
+        if (match) {
+          const key = `${gate.at_step ?? "x"}:${gate.type ?? "other"}:${index}`;
+          idMap.set(key, match.id);
+          gateKeyById.set(match.id, { slug, key });
+        }
       });
       gateIdsBySlug.set(slug, idMap);
+    }
+
+    const reasonIds = [...new Set(openrouterLinks.map((link) => link.blockerReasonId))];
+    const reasonNodes = reasonIds.length
+      ? await prisma.catalogNode.findMany({ where: { id: { in: reasonIds } } })
+      : [];
+    const reasonById = new Map(reasonNodes.map((node) => [node.id, node]));
+
+    const modelLinksBySlug = new Map<string, ModelLinkInput[]>();
+    for (const link of openrouterLinks) {
+      const gateRef = gateKeyById.get(link.frictionGateId);
+      const reason = reasonById.get(link.blockerReasonId);
+      if (!gateRef || !reason) continue;
+      const list = modelLinksBySlug.get(gateRef.slug) ?? [];
+      list.push({
+        gateKey: gateRef.key,
+        reasonId: reason.id,
+        label: reason.label,
+        diagnosticEligibility: reason.diagnosticEligibility,
+        confidence: link.confidence,
+        similarity: link.similarity,
+        rationale: link.rationale,
+      });
+      modelLinksBySlug.set(gateRef.slug, list);
     }
 
     const familyMap = new Map<string, FamilyInfo>();
@@ -148,6 +180,7 @@ export class PostgresDataStore implements DataStore {
       records,
       audits: auditMap,
       gateIdsBySlug,
+      modelLinksBySlug,
       families: familyMap,
       reasonCount,
     });
@@ -177,12 +210,13 @@ export class PostgresDataStore implements DataStore {
     return this.qualityBySlug.get(slug);
   }
 
-  /** Joined journey with friction highlights and soft-mapped blocker families. */
+  /** Joined journey with friction highlights, soft-map families, and OpenRouter links. */
   getJourney(slug: string): JourneyOverlay | undefined {
     const record = this.records.get(slug);
     if (!record) return undefined;
     return buildJourneyOverlay(record, {
       gateIds: this.gateIdsBySlug.get(slug),
+      modelLinks: this.modelLinksBySlug.get(slug) ?? [],
       familyLookup: (familyId) => this.families.get(familyId) ?? null,
     });
   }
