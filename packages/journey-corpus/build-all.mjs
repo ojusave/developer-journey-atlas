@@ -18,7 +18,6 @@ const check = process.argv.includes("--check");
 
 const GENERATED = [
   "coverage.json",
-  "catalog.txt",
   "ds-quality.json",
   "selected-path-heuristic.json",
   "audit-status.json",
