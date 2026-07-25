@@ -11,6 +11,7 @@ let activeSuggestion = -1;
 let searchController = null;
 let searchGeneration = 0;
 let comparisonGeneration = 0;
+let evidenceGeneration = 0;
 let activePoll = 0;
 let researchPending = false;
 
@@ -270,9 +271,28 @@ function peerResultItem(peer) {
   const values = peer.measurements;
   return `
     <li>
-      <strong>${esc(peer.name)}</strong>
-      <span>${esc(values.requiredActions)} actions, ${esc(values.requiredFields)} fields, ${esc(values.externalGates)} gates, ${esc(values.unavoidableWaits)} waits</span>
+      <button class="peer-inspect" type="button" data-peer-slug="${esc(peer.slug)}">
+        <strong>${esc(peer.name)}</strong>
+        <span>${esc(values.requiredActions)} actions, ${esc(values.requiredFields)} fields, ${esc(values.externalGates)} gates, ${esc(values.unavoidableWaits)} waits</span>
+      </button>
     </li>
+  `;
+}
+
+function renderPeerSelection(peer) {
+  const selection = document.querySelector("#peer-selection");
+  if (!selection || !peer) return;
+  const values = peer.measurements;
+  selection.innerHTML = `
+    <p class="section-kicker">Selected peer</p>
+    <h4>${esc(peer.name)}</h4>
+    <dl class="peer-measurements">
+      <div><dt>Required actions</dt><dd>${esc(values.requiredActions)}</dd></div>
+      <div><dt>Required fields</dt><dd>${esc(values.requiredFields)}</dd></div>
+      <div><dt>External gates</dt><dd>${esc(values.externalGates)}</dd></div>
+      <div><dt>Unavoidable waits</dt><dd>${esc(values.unavoidableWaits)}</dd></div>
+    </dl>
+    <a class="btn btn-secondary" href="/platform/${encodeURIComponent(peer.slug)}">Open route</a>
   `;
 }
 
@@ -329,6 +349,7 @@ function renderAvailableComparison(comparison) {
       <input id="peer-search" type="search" autocomplete="off" placeholder="Search by platform or organization">
       <p id="peer-search-status" class="microcopy" role="status" aria-live="polite"></p>
       <ul id="peer-results" class="peer-results"></ul>
+      <section id="peer-selection" class="peer-selection" aria-live="polite"></section>
     </div>
     <p class="microcopy">${esc(comparison.note)}</p>
     ${comparisonCriteria(comparison.criteria)}
@@ -339,8 +360,14 @@ function wirePeerComparison(comparison, slug) {
   if (comparison.available) {
     const input = document.querySelector("#peer-search");
     renderPeerResults(comparison.peers);
+    renderPeerSelection(comparison.peers[0]);
     input?.addEventListener("input", (event) => {
       renderPeerResults(comparison.peers, event.target.value);
+    });
+    document.querySelector("#peer-results")?.addEventListener("click", (event) => {
+      const trigger = event.target.closest(".peer-inspect");
+      if (!trigger) return;
+      renderPeerSelection(comparison.peers.find((peer) => peer.slug === trigger.dataset.peerSlug));
     });
   }
   document.querySelector(".comparison-retry")?.addEventListener("click", () => {
@@ -383,6 +410,58 @@ async function loadPeerComparison(slug) {
   }
 }
 
+function renderEvidence(evidence) {
+  const sources = evidence.sources.map((source) => `
+    <li class="evidence-source">
+      <div class="evidence-source-head">
+        <h4>${esc(source.title)}</h4>
+        <span>${esc(source.officialDomain)}</span>
+      </div>
+      <p><strong>Supports:</strong> ${source.claimOrRouteElements.map(esc).join("; ")}</p>
+      <p><strong>Section or locator:</strong> ${source.locators.map(esc).join("; ")}</p>
+      <p><strong>Retrieved:</strong> ${esc(source.retrievedAt || "Date unavailable")}</p>
+      <a href="${esc(source.url)}" target="_blank" rel="noopener noreferrer">Open official source</a>
+    </li>
+  `).join("");
+  return `
+    <p>${esc(evidence.derivationNote)}</p>
+    <ul class="evidence-list">${sources}</ul>
+  `;
+}
+
+async function loadOfficialEvidence(slug) {
+  const mount = document.querySelector("#official-evidence-content");
+  if (!mount) return;
+  const generation = ++evidenceGeneration;
+  mount.setAttribute("aria-busy", "true");
+  mount.innerHTML = '<p role="status">Loading official evidence…</p>';
+  try {
+    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/evidence`);
+    const activeJourney = document.querySelector(".journey-card");
+    if (generation !== evidenceGeneration || activeJourney?.dataset.platformSlug !== slug) return;
+    mount.innerHTML = renderEvidence(data);
+  } catch (error) {
+    if (generation !== evidenceGeneration) return;
+    mount.innerHTML = `
+      <p role="alert">Official evidence could not be loaded. The documented route remains available.</p>
+      <button class="btn btn-secondary evidence-retry" type="button">Try evidence again</button>
+    `;
+    mount.querySelector(".evidence-retry")?.addEventListener("click", () => loadOfficialEvidence(slug));
+  } finally {
+    if (generation === evidenceGeneration) mount.setAttribute("aria-busy", "false");
+  }
+}
+
+function wireEvidenceDisclosure(journey) {
+  const disclosure = document.querySelector("#official-evidence");
+  disclosure?.addEventListener("toggle", () => {
+    if (disclosure.open && disclosure.dataset.loaded !== "true") {
+      disclosure.dataset.loaded = "true";
+      loadOfficialEvidence(journey.slug);
+    }
+  });
+}
+
 function renderJourney(journey) {
   const prerequisites = Array.isArray(journey.prerequisites) && journey.prerequisites.length
     ? `
@@ -418,6 +497,7 @@ function renderJourney(journey) {
       ${routeOverview(journey.routeScope)}
       ${prerequisites}
       <div class="result-actions">
+        ${journey.startingUrl ? `<a class="btn btn-primary" id="official-start" href="${esc(journey.startingUrl)}" target="_blank" rel="noopener noreferrer">Open official starting point</a>` : ""}
         <button class="btn btn-secondary" type="button" id="share-route">Copy share link</button>
         <a class="btn btn-secondary" id="correct-route" href="${esc(correctionUrl(journey))}" target="_blank" rel="noopener noreferrer">Suggest a correction</a>
       </div>
@@ -425,6 +505,10 @@ function renderJourney(journey) {
       <section class="peer-comparison" id="peer-comparison" aria-labelledby="peer-comparison-title" aria-busy="true">
         <p class="comparison-loading">Checking qualified peers…</p>
       </section>
+      <details class="official-evidence" id="official-evidence">
+        <summary>View official evidence</summary>
+        <div id="official-evidence-content"></div>
+      </details>
       <h3 class="steps-heading">Detailed route</h3>
       ${steps}
     </article>
@@ -449,6 +533,7 @@ function wireJourneyActions(journey) {
   document.querySelector("#correct-route")?.addEventListener("click", () => {
     announce("Opening a prefilled GitHub correction form. Nothing has been submitted.");
   });
+  wireEvidenceDisclosure(journey);
 }
 
 function setClientMetadata(journey) {
@@ -473,6 +558,18 @@ function setRootMetadata() {
   document.querySelector('meta[property="og:url"]')?.setAttribute("content", location.origin + "/");
 }
 
+function setNotFoundMetadata(slug) {
+  const title = "Route not found | Developer Journey Atlas";
+  const description = "This platform does not have a published source-grounded route.";
+  const canonicalUrl = `${location.origin}/platform/${encodeURIComponent(slug)}`;
+  document.title = title;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+  document.querySelector('link[rel="canonical"]')?.setAttribute("href", canonicalUrl);
+  document.querySelector('meta[property="og:url"]')?.setAttribute("content", canonicalUrl);
+}
+
 function pushPlatformRoute(slug) {
   const target = `/platform/${encodeURIComponent(slug)}`;
   if (location.pathname !== target) history.pushState({ slug }, "", target);
@@ -481,6 +578,7 @@ function pushPlatformRoute(slug) {
 async function showPlatform(slug, { push = true, focus = true } = {}) {
   activePoll += 1;
   comparisonGeneration += 1;
+  evidenceGeneration += 1;
   researchPending = false;
   cancelSuggestions();
   el.result.hidden = false;
@@ -511,7 +609,7 @@ function renderNotFound(slug, detail = "") {
       <a class="btn btn-secondary" href="/" id="back-to-search">Back to search</a>
     </section>
   `;
-  setRootMetadata();
+  setNotFoundMetadata(slug);
   document.querySelector("#not-found-title")?.focus();
   announce("No published route was found. Research did not start.");
 }

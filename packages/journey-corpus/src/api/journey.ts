@@ -28,6 +28,24 @@ export function getPlatformJourney(store: DataStore) {
   };
 }
 
+/** GET /api/platforms/:slug/evidence: progressive official-source disclosure. */
+export function getPlatformEvidence(store: DataStore) {
+  return async (req: Request, res: Response): Promise<void> => {
+    const slug = String(req.params.slug);
+    const row = await ensurePublicRow(store, slug);
+    if (!row) {
+      sendError(res, 404, "not_found", `No platform found for "${slug}".`);
+      return;
+    }
+    const evidence = store.getJourneyEvidence?.(slug);
+    if (!evidence || evidence.sources.length === 0) {
+      sendError(res, 404, "not_found", `No public evidence disclosure found for "${slug}".`);
+      return;
+    }
+    sendData(res, evidence);
+  };
+}
+
 /** GET /api/blockers/meta: public evaluation status only. */
 export function getBlockerMeta(store: DataStore) {
   return (_req: Request, res: Response): void => {

@@ -11,7 +11,7 @@ import {
 } from "../../dist/core/sourceAuthority.js";
 import { validateJourneyGraph } from "../../dist/core/journeyGraph.js";
 import { LocalDataStore } from "../../dist/adapters/localData.js";
-import { getPlatformJourney } from "../../dist/api/journey.js";
+import { getPlatformEvidence, getPlatformJourney } from "../../dist/api/journey.js";
 import { getPlatformCurve } from "../../dist/api/curve.js";
 import { getPlatform, listPlatforms } from "../../dist/api/platforms.js";
 import { config } from "../../dist/config.js";
@@ -260,6 +260,24 @@ test("public handlers expose only the eligible graph route and no metric or bloc
   assert.equal("peers" in curveRes.body.data, false);
   assert.equal("dimensions" in curveRes.body.data, false);
 
+  const evidenceRes = fakeRes();
+  await getPlatformEvidence(store)(fakeReq({ params: { slug: "render" } }), evidenceRes);
+  assert.equal(evidenceRes.statusCode, 200);
+  assert.ok(evidenceRes.body.data.sources.length > 0);
+  assert.equal(evidenceRes.body.data.evidenceClass, "documented_fact");
+  for (const source of evidenceRes.body.data.sources) {
+    assert.ok(source.title);
+    assert.ok(source.officialDomain);
+    assert.match(source.url, /^https:\/\//);
+    assert.match(source.retrievedAt, /^\d{4}-\d{2}-\d{2}/);
+    assert.ok(source.claimOrRouteElements.length > 0);
+    assert.ok(source.locators.length > 0);
+  }
+  assert.doesNotMatch(
+    JSON.stringify(evidenceRes.body),
+    /audit_status|needs-human-judgment|provider_payload/,
+  );
+
   const platformRes = fakeRes();
   await getPlatform(store)(fakeReq({ params: { slug: "render" } }), platformRes);
   assert.deepEqual(Object.keys(platformRes.body.data).sort(), [
@@ -276,6 +294,10 @@ test("public handlers expose only the eligible graph route and no metric or bloc
   const hiddenRes = fakeRes();
   await getPlatform(store)(fakeReq({ params: { slug: "stripe" } }), hiddenRes);
   assert.equal(hiddenRes.statusCode, 404);
+
+  const hiddenEvidenceRes = fakeRes();
+  await getPlatformEvidence(store)(fakeReq({ params: { slug: "stripe" } }), hiddenEvidenceRes);
+  assert.equal(hiddenEvidenceRes.statusCode, 404);
 });
 
 test("verification start is disabled without a secret and rejects a wrong secret before workflow access", async () => {

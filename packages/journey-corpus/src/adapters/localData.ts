@@ -3,6 +3,7 @@ import path from "node:path";
 import type { DataStore, DatasetMeta, MetricRow, PlatformRecord, QualityRow, ShortestPathAudit } from "../core/ports.js";
 import { buildJourneyOverlay, buildJourneyOverlayFromGraph, type JourneyOverlay } from "../core/journeyOverlay.js";
 import type { JourneyGraph } from "../core/journeyGraph.js";
+import { buildJourneyEvidence, type JourneyEvidence } from "../core/journeyEvidence.js";
 import { resolveCatalogPath } from "../db/catalogPath.js";
 import { PublicationGate, type CorpusHealthReport } from "../core/publicationGate.js";
 
@@ -198,6 +199,13 @@ export class LocalDataStore implements DataStore {
     }
     this.journeyGraphCache.set(slug, graph);
     return graph;
+  }
+
+  getJourneyEvidence(slug: string): JourneyEvidence | undefined {
+    const record = this.getRecord(slug);
+    const graph = this.getJourneyGraph(slug);
+    if (!record || !graph) return undefined;
+    return buildJourneyEvidence(record, graph);
   }
 
   blockerReasonCount(): number {

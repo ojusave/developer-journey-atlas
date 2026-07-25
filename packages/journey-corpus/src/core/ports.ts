@@ -128,7 +128,14 @@ export interface PlatformRecord {
     vendor_claim?: boolean;
     value?: string;
   };
-  sources?: Array<{ id: string; title: string; url: string }>;
+  sources?: Array<{
+    id: string;
+    title: string;
+    url: string;
+    accessed_at?: string;
+    sections_used?: string[];
+    evidence_supported?: string[];
+  }>;
   uncertainties?: Array<{ question: string }>;
   journey_graph?: import("./journeyGraph.js").JourneyGraph;
   [key: string]: unknown;
@@ -160,6 +167,8 @@ export interface DataStore {
   getJourney?(slug: string): import("./journeyOverlay.js").JourneyOverlay | undefined;
   /** Reviewed graph used for direct route measurements and explicit cohort matching. */
   getJourneyGraph?(slug: string): import("./journeyGraph.js").JourneyGraph | undefined;
+  /** Public official-source disclosure derived from the same reviewed graph. */
+  getJourneyEvidence?(slug: string): import("./journeyEvidence.js").JourneyEvidence | undefined;
   /** Count of catalog reason nodes (790 when fully seeded). */
   blockerReasonCount?(): number;
 }

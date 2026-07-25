@@ -26,6 +26,7 @@ The public API is fail-closed:
 GET /api/meta
 GET /api/platforms
 GET /api/platforms/render/journey
+GET /api/platforms/render/evidence
 GET /api/search?q=render
 GET /healthz
 ```
@@ -41,9 +42,13 @@ npm run build:data
 npm run build:app
 npm run test:app
 npm test
+npm run review:corpus
+npm run reason:lab -- inspect G001
 ```
 
 `build:data` regenerates the publication health and evaluation foundations, builds the machine-readable public surface, publishes the active web source snapshot, and checks that only eligible routes are included.
+
+`review:corpus` reports one deterministic disposition for all 224 records and the next coherent cohort-review action. `reason:lab` operates the private two-reviewer labeling workflow. Candidate cohort inclusion never makes a route public or comparison-qualified.
 
 ## Deploying a personal copy
 

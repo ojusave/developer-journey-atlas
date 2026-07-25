@@ -3,7 +3,7 @@ import type { DataStore } from "../core/ports.js";
 import type { WorkflowRunner } from "../workflows/contract.js";
 import { sendData } from "./http.js";
 import { getPlatform, listPlatforms } from "./platforms.js";
-import { getBlockerMeta, getPlatformJourney } from "./journey.js";
+import { getBlockerMeta, getPlatformEvidence, getPlatformJourney } from "./journey.js";
 import { getPlatformCurve } from "./curve.js";
 import { searchPlatforms } from "./search.js";
 import { getResearchStatus, startResearch } from "./research.js";
@@ -33,6 +33,7 @@ export function createApiRouter(store: DataStore, runner: WorkflowRunner | null)
   router.get("/blockers/meta", getBlockerMeta(store));
   router.get("/platforms", listPlatforms(store));
   router.get("/platforms/:slug/journey", getPlatformJourney(store));
+  router.get("/platforms/:slug/evidence", getPlatformEvidence(store));
   router.get("/platforms/:slug/curve", getPlatformCurve(store));
   router.get("/platforms/:slug", getPlatform(store));
   router.get("/search", searchPlatforms(store));

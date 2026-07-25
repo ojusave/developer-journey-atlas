@@ -41,13 +41,20 @@ function pageOrigin(req: express.Request): string {
 
 function renderPage(
   template: string,
-  values: { title: string; description: string; canonicalUrl: string; socialImageUrl: string },
+  values: {
+    title: string;
+    description: string;
+    canonicalUrl: string;
+    socialImageUrl: string;
+    coverage: string;
+  },
 ): string {
   return template
     .replaceAll("__PAGE_TITLE__", escapeHtml(values.title))
     .replaceAll("__PAGE_DESCRIPTION__", escapeHtml(values.description))
     .replaceAll("__CANONICAL_URL__", escapeHtml(values.canonicalUrl))
-    .replaceAll("__SOCIAL_IMAGE_URL__", escapeHtml(values.socialImageUrl));
+    .replaceAll("__SOCIAL_IMAGE_URL__", escapeHtml(values.socialImageUrl))
+    .replaceAll("__PUBLIC_COVERAGE__", escapeHtml(values.coverage));
 }
 
 // Composition root: choose Local vs Postgres DataStore, wire API, mount static assets.
@@ -93,6 +100,10 @@ async function main(): Promise<void> {
 
   const webDir = path.join(config.dataRoot, "web");
   const pageTemplate = await readFile(path.join(webDir, "index.html"), "utf8");
+  const publicRecords = store.meta().publicRecords ??
+    store.listRows().filter((row) => store.isPublicEligible(row.slug)).length;
+  const reviewedRecords = store.meta().reviewedCorpusRecords ?? store.meta().totals.platforms;
+  const coverage = `${publicRecords} of ${reviewedRecords} corpus records currently publish a reviewed route`;
 
   app.get("/", (req, res) => {
     const origin = pageOrigin(req);
@@ -102,6 +113,7 @@ async function main(): Promise<void> {
         "Search a reviewed developer platform and inspect its source-grounded route from account creation to first success.",
       canonicalUrl: `${origin}/`,
       socialImageUrl: `${origin}/social-preview.svg`,
+      coverage,
     }));
   });
 
@@ -115,6 +127,7 @@ async function main(): Promise<void> {
         description: "This platform does not have a published source-grounded route.",
         canonicalUrl: `${origin}/platform/${encodeURIComponent(slug)}`,
         socialImageUrl: `${origin}/social-preview.svg`,
+        coverage,
       }));
       return;
     }
@@ -123,6 +136,7 @@ async function main(): Promise<void> {
       description: `Inspect ${row.name}'s source-grounded route from account creation to first developer success.`,
       canonicalUrl: `${origin}/platform/${encodeURIComponent(row.slug)}`,
       socialImageUrl: `${origin}/social-preview.svg`,
+      coverage,
     }));
   });
 

@@ -99,6 +99,10 @@ for (const forbidden of [
 const app = await readFile(path.join(projectRoot, "web/app.js"), "utf8");
 assert.doesNotMatch(app, /renderOnboardingScore|onboardingScore|curvePlacement|score-card|percentile|leaderboard/i);
 assert.match(app, /Comparable peers/);
+assert.match(app, /Open official starting point/);
+assert.match(app, /View official evidence/);
+assert.match(app, /Open route/);
+assert.match(app, /setNotFoundMetadata/);
 assert.match(app, /What counts as comparable\?/);
 assert.match(app, /qualified peers are currently available/);
 assert.match(app, /Start research/);
@@ -111,6 +115,7 @@ assert.equal((html.match(/<h1\b/g) || []).length, 1);
 assert.match(html, /href="\/project-mark\.svg"/);
 assert.doesNotMatch(html, /render\.com\/favicon/);
 assert.match(html, /Independent community project, not an official Render product/);
+assert.match(html, /Reviewed coverage: __PUBLIC_COVERAGE__/);
 assert.match(html, /paid Render resources/i);
 assert.match(html, /Starter web service and Basic-256mb Postgres/);
 assert.match(html, /current Render pricing/);
