@@ -117,11 +117,11 @@ export async function runVerifyAudit(
     docs = await steps.searchDocs({
       platform: deps.platformName(input.slug) ?? record.platform.name,
     });
-  } catch (err) {
+  } catch {
     return {
       outcome: "search_failed",
       slug: input.slug,
-      message: err instanceof Error ? err.message : "search failed",
+      message: "Official-source discovery failed.",
     };
   }
 
@@ -134,11 +134,11 @@ export async function runVerifyAudit(
       docs,
       sourceSha256,
     });
-  } catch (err) {
+  } catch {
     return {
       outcome: "model_failed",
       slug: input.slug,
-      message: err instanceof Error ? err.message : "model failed",
+      message: "Audit reconstruction failed.",
     };
   }
 

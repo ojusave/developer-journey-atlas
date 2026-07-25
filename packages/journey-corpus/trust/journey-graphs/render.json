@@ -1,0 +1,475 @@
+{
+  "schemaVersion": "1.0",
+  "platformSlug": "render",
+  "startingState": {
+    "boundary": "account_creation",
+    "assumptions": [
+      "The developer has a GitHub account.",
+      "A GitHub repository contains a deployable web app.",
+      "The app binds its public HTTP server to 0.0.0.0 on the port Render provides."
+    ],
+    "availableInputs": [
+      "render_signup_url"
+    ]
+  },
+  "comparisonBasis": {
+    "developerJobKey": "deploy-existing-server-side-web-app-from-git",
+    "startingBoundaryKey": "account-creation-with-git-account-and-deployable-repository",
+    "firstSuccessOutcomeClass": "meaningful_result",
+    "firstSuccessBoundaryKey": "public-live-url-serves-application-root-content",
+    "routeGranularityVersion": "journey-graph-1.0-atomic-events",
+    "categoryKey": "cloud-application-runtime",
+    "evidenceFreshnessDate": "2026-07-25",
+    "organizationKey": "render",
+    "documentationSetKey": "render-first-deploy-web-service-github"
+  },
+  "prerequisites": [
+    {
+      "id": "github-account",
+      "type": "account",
+      "requirement": "A GitHub account that can authorize access to the application repository.",
+      "required": true,
+      "produces": ["github_account"],
+      "evidence": [{"sourceId": "S2", "locator": "Your First Render Deploy, prerequisites"}]
+    },
+    {
+      "id": "application-repository",
+      "type": "access",
+      "requirement": "A GitHub repository containing the web app to deploy.",
+      "required": true,
+      "produces": ["app_repository"],
+      "evidence": [{"sourceId": "S2", "locator": "Your First Render Deploy, prerequisites"}]
+    },
+    {
+      "id": "deployable-web-app",
+      "type": "software",
+      "requirement": "A server-side web app that listens for HTTP requests on Render's provided port and host.",
+      "required": true,
+      "produces": ["deployable_web_app"],
+      "evidence": [{"sourceId": "S4", "locator": "Web Services, port binding"}]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "create-render-account",
+      "kind": "developer_action",
+      "phase": "account",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Create a Render account with email and password.",
+      "required": true,
+      "requiredFields": [
+        {"label": "Email", "fieldType": "email", "required": true, "evidence": [{"sourceId": "S7", "locator": "Create an account form, Email"}]},
+        {"label": "Password", "fieldType": "password", "required": true, "evidence": [{"sourceId": "S7", "locator": "Create an account form, Password"}]}
+      ],
+      "inputs": ["render_signup_url"],
+      "outputs": ["render_account", "dashboard_session"],
+      "successSignal": "The Render Dashboard opens.",
+      "evidence": [
+        {"sourceId": "S2", "locator": "Your First Render Deploy, Sign up"},
+        {"sourceId": "S7", "locator": "Create an account form"}
+      ],
+      "requiresFieldInventory": true
+    },
+    {
+      "id": "open-git-credentials",
+      "kind": "developer_action",
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open Git Deployment Credentials in Account Settings.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["dashboard_session"],
+      "outputs": ["git_credentials_view"],
+      "successSignal": "Git Deployment Credentials is visible.",
+      "evidence": [{"sourceId": "S2", "locator": "2. Connect your Git provider"}],
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "add-git-credential",
+      "kind": "developer_action",
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Click Add credential.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["git_credentials_view"],
+      "outputs": ["git_provider_choices"],
+      "successSignal": "Git provider choices are visible.",
+      "evidence": [{"sourceId": "S2", "locator": "2. Connect your Git provider"}],
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "choose-github",
+      "kind": "decision",
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Choose GitHub as the Git provider.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["git_provider_choices", "github_account"],
+      "outputs": ["github_authorization_request"],
+      "successSignal": "GitHub authorization opens.",
+      "evidence": [{"sourceId": "S5", "locator": "Setup, step 2"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "authorize-render-github",
+      "kind": "developer_action",
+      "phase": "authenticate",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Authorize Render to access the required GitHub repositories.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["github_authorization_request", "app_repository"],
+      "outputs": ["linked_github_credential", "available_repository_list"],
+      "successSignal": "The Render Dashboard lists the authorized repositories.",
+      "evidence": [{"sourceId": "S5", "locator": "Setup, steps 2 and 3"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "open-new-service-menu",
+      "kind": "developer_action",
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Open the New menu.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["dashboard_session", "linked_github_credential"],
+      "outputs": ["service_type_choices"],
+      "successSignal": "The service type menu is visible.",
+      "evidence": [{"sourceId": "S2", "locator": "Deploy your code, step 1"}],
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "choose-web-service",
+      "kind": "decision",
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Choose Web Service.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["service_type_choices"],
+      "outputs": ["web_service_repository_picker"],
+      "successSignal": "The repository picker opens for a Web Service.",
+      "evidence": [{"sourceId": "S2", "locator": "Deploy your code, step 1"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "select-repository",
+      "kind": "developer_action",
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Select the application repository.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["web_service_repository_picker", "available_repository_list", "app_repository"],
+      "outputs": ["selected_repository"],
+      "successSignal": "The intended repository is selected.",
+      "evidence": [{"sourceId": "S5", "locator": "Setup, successful link paragraph"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "connect-repository",
+      "kind": "developer_action",
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Click Connect for the selected repository.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["selected_repository"],
+      "outputs": ["web_service_form"],
+      "successSignal": "The Web Service form opens.",
+      "evidence": [{"sourceId": "S5", "locator": "Setup, successful link paragraph"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "complete-service-form",
+      "kind": "developer_action",
+      "phase": "configure",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Complete the Web Service form.",
+      "required": true,
+      "requiredFields": [
+        {"label": "Name", "fieldType": "text", "required": true, "evidence": [{"sourceId": "S4", "locator": "Deploy your own code, Name field"}]},
+        {"label": "Region", "fieldType": "choice", "required": true, "evidence": [{"sourceId": "S4", "locator": "Deploy your own code, Region field"}]},
+        {"label": "Branch", "fieldType": "text", "required": true, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Branch"}]},
+        {"label": "Root Directory", "fieldType": "text", "required": false, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Root Directory"}]},
+        {"label": "Language", "fieldType": "choice", "required": true, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Language"}]},
+        {"label": "Build Command", "fieldType": "command", "required": true, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Build Command"}]},
+        {"label": "Start Command", "fieldType": "command", "required": true, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Start Command"}]},
+        {"label": "Instance Type", "fieldType": "choice", "required": true, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Instance Type"}]},
+        {"label": "Environment variables required by the app", "fieldType": "key-value", "required": false, "evidence": [{"sourceId": "S2", "locator": "Web service fields, Environment Variables"}]}
+      ],
+      "inputs": ["web_service_form", "selected_repository", "deployable_web_app"],
+      "outputs": ["completed_service_form"],
+      "successSignal": "The Deploy Web Service action is available.",
+      "evidence": [{"sourceId": "S2", "locator": "2. Configure deployment, Web service fields"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": true
+    },
+    {
+      "id": "start-deploy",
+      "kind": "developer_action",
+      "phase": "execute",
+      "actor": "developer",
+      "interface": "web-ui",
+      "action": "Click Deploy Web Service.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["completed_service_form"],
+      "outputs": ["deploy_started"],
+      "successSignal": "Build and deploy logs are visible.",
+      "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "wait-for-deploy",
+      "kind": "passive_wait",
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-ui",
+      "action": "Render builds and deploys the Web Service.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["deploy_started"],
+      "outputs": ["deploy_finished"],
+      "successSignal": "The deploy process finishes.",
+      "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "service-live",
+      "kind": "platform_outcome",
+      "phase": "wait",
+      "actor": "platform",
+      "interface": "web-ui",
+      "action": "The service reaches Live status.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["deploy_finished"],
+      "outputs": ["live_service", "onrender_url"],
+      "successSignal": "The Dashboard shows Live status.",
+      "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "open-service-url",
+      "kind": "developer_action",
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Open the assigned onrender.com URL.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["onrender_url"],
+      "outputs": ["root_response"],
+      "successSignal": "The browser receives the deployed app's root content.",
+      "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "confirm-root-content",
+      "kind": "developer_action",
+      "phase": "verify",
+      "actor": "developer",
+      "interface": "browser",
+      "action": "Confirm the deployed app's root content.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["root_response"],
+      "outputs": ["first_success_confirmed"],
+      "successSignal": "The expected root content is visible.",
+      "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    },
+    {
+      "id": "first-success",
+      "kind": "terminal_outcome",
+      "phase": "verify",
+      "actor": "platform",
+      "interface": "browser",
+      "action": "The first Web Service deploy is Live and serves its root content.",
+      "required": true,
+      "requiredFields": [],
+      "inputs": ["first_success_confirmed", "live_service"],
+      "outputs": [],
+      "successSignal": "Live status and expected root content are both observed.",
+      "evidence": [
+        {"sourceId": "S2", "locator": "3. Deploy"},
+        {"sourceId": "S4", "locator": "Deploy a web service"}
+      ],
+      "branchId": "github-dashboard-route",
+      "requiresFieldInventory": false
+    }
+  ],
+  "edges": [
+    {"from": "create-render-account", "to": "open-git-credentials", "evidence": [{"sourceId": "S2", "locator": "Sign up to Connect your Git provider"}]},
+    {"from": "open-git-credentials", "to": "add-git-credential", "evidence": [{"sourceId": "S2", "locator": "2. Connect your Git provider"}]},
+    {"from": "add-git-credential", "to": "choose-github", "condition": "GitHub route selected", "evidence": [{"sourceId": "S5", "locator": "Setup"}]},
+    {"from": "choose-github", "to": "authorize-render-github", "evidence": [{"sourceId": "S5", "locator": "Setup, step 2"}]},
+    {"from": "authorize-render-github", "to": "open-new-service-menu", "evidence": [{"sourceId": "S5", "locator": "Setup, successful link paragraph"}]},
+    {"from": "open-new-service-menu", "to": "choose-web-service", "condition": "Server-side web app route selected", "evidence": [{"sourceId": "S2", "locator": "Deploy your code"}]},
+    {"from": "choose-web-service", "to": "select-repository", "evidence": [{"sourceId": "S2", "locator": "Deploy your code"}]},
+    {"from": "select-repository", "to": "connect-repository", "evidence": [{"sourceId": "S5", "locator": "Setup, successful link paragraph"}]},
+    {"from": "connect-repository", "to": "complete-service-form", "evidence": [{"sourceId": "S2", "locator": "2. Configure deployment"}]},
+    {"from": "complete-service-form", "to": "start-deploy", "evidence": [{"sourceId": "S2", "locator": "2. Configure deployment to 3. Deploy"}]},
+    {"from": "start-deploy", "to": "wait-for-deploy", "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}]},
+    {"from": "wait-for-deploy", "to": "service-live", "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}]},
+    {"from": "service-live", "to": "open-service-url", "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}]},
+    {"from": "open-service-url", "to": "confirm-root-content", "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}]},
+    {"from": "confirm-root-content", "to": "first-success", "evidence": [{"sourceId": "S2", "locator": "3. Deploy"}]}
+  ],
+  "externalGates": [
+    {
+      "id": "render-account-required",
+      "type": "account",
+      "description": "The Dashboard deployment route requires a Render account.",
+      "atNodeId": "create-render-account",
+      "required": true,
+      "evidence": [{"sourceId": "S2", "locator": "Your First Render Deploy, Sign up"}]
+    },
+    {
+      "id": "render-terms",
+      "type": "terms",
+      "description": "Creating an account requires agreement to Render's terms of service and privacy policy.",
+      "atNodeId": "create-render-account",
+      "required": true,
+      "evidence": [{"sourceId": "S7", "locator": "Create an account form, terms agreement"}]
+    },
+    {
+      "id": "signup-challenge",
+      "type": "verification",
+      "description": "The signup surface is protected by hCaptcha and may require a challenge.",
+      "atNodeId": "create-render-account",
+      "required": false,
+      "evidence": [{"sourceId": "S7", "locator": "Create an account form, hCaptcha protection"}]
+    },
+    {
+      "id": "github-authorization",
+      "type": "permission",
+      "description": "GitHub authorization must grant Render access to the repository used for deployment.",
+      "atNodeId": "authorize-render-github",
+      "required": true,
+      "evidence": [{"sourceId": "S5", "locator": "Connect GitHub, Setup steps 2 and 3"}]
+    },
+    {
+      "id": "service-type-choice",
+      "type": "choice",
+      "description": "The selected route chooses Web Service for a server-side web application.",
+      "atNodeId": "choose-web-service",
+      "required": true,
+      "evidence": [{"sourceId": "S2", "locator": "Your First Render Deploy, Choose a service type"}]
+    }
+  ],
+  "candidateRoutes": [
+    {
+      "id": "github-dashboard-web-service",
+      "status": "selected",
+      "nodeIds": [
+        "create-render-account",
+        "open-git-credentials",
+        "add-git-credential",
+        "choose-github",
+        "authorize-render-github",
+        "open-new-service-menu",
+        "choose-web-service",
+        "select-repository",
+        "connect-repository",
+        "complete-service-form",
+        "start-deploy",
+        "wait-for-deploy",
+        "service-live",
+        "open-service-url",
+        "confirm-root-content",
+        "first-success"
+      ],
+      "selectionBasis": "The official first-deploy tutorial documents the Dashboard route, and the Web Service branch reaches live root content for a server-side web app.",
+      "condition": "The app runs server-side code, the repository is on GitHub, and the developer chooses the Dashboard deployment method.",
+      "routeSummary": "Create a Dashboard Web Service from the authorized GitHub repository, deploy it, and confirm its root content.",
+      "effectOnFirstSuccess": "Reaches a Live Web Service that serves the expected root content.",
+      "reasonNotSelected": null,
+      "branchAtNodeId": null,
+      "evidence": [
+        {"sourceId": "S2", "locator": "Your First Render Deploy, Dashboard route"},
+        {"sourceId": "S4", "locator": "Web Services, Deploy your own code"}
+      ]
+    },
+    {
+      "id": "github-dashboard-static-site",
+      "status": "considered",
+      "nodeIds": [],
+      "selectionBasis": "The same official tutorial documents a Dashboard Static Site branch.",
+      "condition": "The app consists entirely of static content.",
+      "routeSummary": "Create a Dashboard Static Site and supply its static-site build and publish settings.",
+      "effectOnFirstSuccess": "Reaches the same live-root-content boundary through a different service type and field inventory.",
+      "reasonNotSelected": "The selected journey job is deploying a server-side web app, so the Static Site branch is not causally compatible.",
+      "branchAtNodeId": "choose-web-service",
+      "evidence": [{"sourceId": "S2", "locator": "Your First Render Deploy, Static Site alternative"}]
+    },
+    {
+      "id": "render-cli-web-service",
+      "status": "considered",
+      "nodeIds": [],
+      "selectionBasis": "The same official tutorial documents a CLI Web Service deployment method.",
+      "condition": "The developer chooses the Render CLI deployment method.",
+      "routeSummary": "Install and authorize the Render CLI, then create and monitor a Web Service from the command line.",
+      "effectOnFirstSuccess": "Adds CLI installation and authorization before reaching the same live-root-content boundary.",
+      "reasonNotSelected": "The Dashboard route is presented first and avoids adding CLI installation to the selected first-deploy path.",
+      "branchAtNodeId": "create-render-account",
+      "evidence": [{"sourceId": "S2", "locator": "Your First Render Deploy, CLI alternative"}]
+    }
+  ],
+  "uncertainties": [],
+  "firstSuccessBoundary": {
+    "nodeId": "first-success",
+    "outcomeClass": "meaningful_result",
+    "officialRouteContinues": false,
+    "evidence": [
+      {"sourceId": "S2", "locator": "Your First Render Deploy, Open your app"},
+      {"sourceId": "S4", "locator": "Web Services, public URL"}
+    ]
+  },
+  "selectedRoute": {
+    "id": "github-dashboard-web-service",
+    "nodeIds": [
+      "create-render-account",
+      "open-git-credentials",
+      "add-git-credential",
+      "choose-github",
+      "authorize-render-github",
+      "open-new-service-menu",
+      "choose-web-service",
+      "select-repository",
+      "connect-repository",
+      "complete-service-form",
+      "start-deploy",
+      "wait-for-deploy",
+      "service-live",
+      "open-service-url",
+      "confirm-root-content",
+      "first-success"
+    ],
+    "policy": "Select the official Dashboard Web Service route using GitHub, from account creation through Live root content.",
+    "unresolvedReason": null
+  }
+}

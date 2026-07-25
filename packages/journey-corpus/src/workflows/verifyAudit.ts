@@ -7,8 +7,9 @@ import { OpenRouterAuditProposer } from "../adapters/openRouterAudit.js";
 import { GitHubApiError, GitHubPrWriter } from "../adapters/githubPr.js";
 import type { DocHit, ShortestPathAudit } from "../core/ports.js";
 import { hashRecordJson, runVerifyAudit, type VerifyOutcome, type VerifyTaskInput } from "../core/runVerifyAudit.js";
-import { getRepoWriter, getSearchProvider, getStore } from "./deps.js";
+import { getPlatformIdentities, getRepoWriter, getSearchProvider, getStore } from "./deps.js";
 import { config } from "../config.js";
+import { resolvePlatformIdentity } from "../core/sourceAuthority.js";
 
 function parseVerifyInput(raw: unknown): VerifyTaskInput {
   if (!raw || typeof raw !== "object") throw new Error("verifyPlatformAudit requires { slug }");
@@ -26,7 +27,9 @@ export const refreshAuditEvidence = task(
     retry: { maxRetries: 2, waitDurationMs: 2_000, backoffScaling: 2 },
   },
   async function refreshAuditEvidence(input: { platform: string }): Promise<DocHit[]> {
-    return getSearchProvider().findOfficialDocs(input.platform);
+    const resolved = resolvePlatformIdentity(input.platform, getPlatformIdentities());
+    if (resolved.outcome !== "resolved") return [];
+    return getSearchProvider().findOfficialDocs(input.platform, resolved.identity);
   },
 );
 
@@ -86,7 +89,7 @@ export const draftAuditContribution = task(
       return { status: "opened", url: result.url, reused: result.reused };
     } catch (err) {
       if (err instanceof GitHubApiError && !err.transient) {
-        return { status: "skipped", reason: err.message };
+        return { status: "skipped", reason: `GitHub rejected the draft audit contribution (${err.status}).` };
       }
       throw err;
     }

@@ -23,6 +23,79 @@ function draftRecord(overrides = {}) {
     time_to_first_success: { vendor_claim: false, value: "not documented" },
     sources: [{ id: "S1", title: "Docs", url: "https://acme.com/docs" }],
     uncertainties: [],
+    journey_graph: {
+      schemaVersion: "1.0",
+      platformSlug: "acme",
+      startingState: {
+        boundary: "account_creation",
+        assumptions: [],
+        availableInputs: ["api_endpoint"],
+      },
+      prerequisites: [],
+      nodes: [
+        {
+          id: "send-request",
+          kind: "developer_action",
+          phase: "execute",
+          actor: "developer",
+          interface: "api",
+          action: "Send a request.",
+          required: true,
+          requiredFields: [],
+          inputs: ["api_endpoint"],
+          outputs: ["api_response"],
+          successSignal: "The API returns a response.",
+          evidence: [{ sourceId: "S1", locator: "Quickstart request" }],
+          requiresFieldInventory: false,
+        },
+        {
+          id: "first-success",
+          kind: "terminal_outcome",
+          phase: "verify",
+          actor: "platform",
+          interface: "api",
+          action: "The first API call succeeds.",
+          required: true,
+          requiredFields: [],
+          inputs: ["api_response"],
+          outputs: [],
+          successSignal: "The response status is 200.",
+          evidence: [{ sourceId: "S1", locator: "Quickstart response" }],
+          requiresFieldInventory: false,
+        },
+      ],
+      edges: [{
+        from: "send-request",
+        to: "first-success",
+        evidence: [{ sourceId: "S1", locator: "Quickstart request and response" }],
+      }],
+      externalGates: [],
+      candidateRoutes: [{
+        id: "hosted-api",
+        status: "selected",
+        nodeIds: ["send-request", "first-success"],
+        selectionBasis: "Use the documented hosted API route.",
+        condition: "The developer uses the hosted API.",
+        routeSummary: "Send the documented API request.",
+        effectOnFirstSuccess: "The API returns a successful response.",
+        reasonNotSelected: null,
+        branchAtNodeId: null,
+        evidence: [{ sourceId: "S1", locator: "Quickstart hosted API route" }],
+      }],
+      uncertainties: [],
+      firstSuccessBoundary: {
+        nodeId: "first-success",
+        outcomeClass: "meaningful_result",
+        officialRouteContinues: false,
+        evidence: [{ sourceId: "S1", locator: "Quickstart response status" }],
+      },
+      selectedRoute: {
+        id: "hosted-api",
+        nodeIds: ["send-request", "first-success"],
+        policy: "Use the documented hosted API route.",
+        unresolvedReason: null,
+      },
+    },
     ...overrides,
   };
 }
@@ -34,7 +107,20 @@ function store() {
 }
 
 function ctx() {
-  return { store: store(), buildRow: selectedPathRow };
+  return {
+    store: store(),
+    buildRow: selectedPathRow,
+    identities: [{
+      slug: "acme",
+      canonicalName: "Acme",
+      organization: "Acme Inc",
+      aliases: [],
+      officialRootDomain: "acme.com",
+      documentationDomains: ["acme.com"],
+      applicationDomains: [],
+      approvedGithubOrganizations: [],
+    }],
+  };
 }
 
 function inputFor(platform) {
@@ -45,7 +131,24 @@ async function run(platform, deps, context = ctx()) {
   return runResearchPipeline(inputFor(platform), stepsFromAdapters(deps), context);
 }
 
-const hits = [{ title: "Acme Docs", url: "https://acme.com/docs", content: "Getting started" }];
+const hits = [{
+  title: "Acme Docs",
+  url: "https://acme.com/docs",
+  content: "Quickstart hosted API route. Quickstart request and response. Quickstart response status is 200.",
+  metadata: {
+    canonicalUrl: "https://acme.com/docs",
+    redirectChain: [],
+    httpStatus: 200,
+    contentType: "text/html",
+    retrievedAt: "2026-07-25T00:00:00Z",
+    contentPresent: true,
+    contentHash: "abc123",
+    contentTruncated: false,
+    retrievedContentChars: 94,
+    visibleTitle: "Acme Docs",
+    discoveredLinks: [],
+  },
+}];
 
 test("happy path yields a completed outcome without opening a GitHub contribution", async () => {
   const repo = new FakeRepoWriter({ url: "https://github.com/x/y/pull/9" });
@@ -68,12 +171,12 @@ test("transient search failure yields search_failed and no result", async () => 
   assert.equal(outcome.outcome, "search_failed");
 });
 
-test("no docs yields a no_docs terminal", async () => {
+test("no official docs yields a no_official_source terminal", async () => {
   const outcome = await run("Acme", {
     search: new FakeSearchProvider([]),
     llm: new FakeLLMProvider(draftRecord()),
   });
-  assert.equal(outcome.outcome, "no_docs");
+  assert.equal(outcome.outcome, "no_official_source");
 });
 
 test("transient model failure yields model_failed (retryable class, not terminal input error)", async () => {
@@ -117,6 +220,64 @@ test("drafts cannot cite URLs that were not returned by the docs search", async 
     llm: new FakeLLMProvider(draftRecord({ sources: [{ id: "S1", title: "Invented", url: "https://invented.example/docs" }] })),
     repo,
   });
-  assert.equal(outcome.outcome, "source_grounding_failed");
+  assert.equal(outcome.outcome, "claim_grounding_failed");
   assert.equal(repo.calls, 0);
+});
+
+test("graph evidence IDs must resolve to accepted record sources", async () => {
+  const record = draftRecord();
+  record.journey_graph.nodes[0].evidence[0].sourceId = "INVENTED";
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider(hits),
+    llm: new FakeLLMProvider(record),
+  });
+  assert.equal(outcome.outcome, "claim_grounding_failed");
+  assert.match(outcome.message, /graph evidence reference/);
+});
+
+test("a locator outside the bounded retrieved content cannot ground a graph claim", async () => {
+  const record = draftRecord();
+  record.journey_graph.nodes[0].evidence[0].locator = "Section beyond retrieval limit";
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider(hits),
+    llm: new FakeLLMProvider(record),
+  });
+  assert.equal(outcome.outcome, "claim_grounding_failed");
+  assert.match(outcome.message, /did not occur in the retrieved content/);
+});
+
+test("ambiguous Apollo identity stops before discovery", async () => {
+  const context = ctx();
+  context.identities = [
+    { ...context.identities[0], slug: "apollo-io", canonicalName: "Apollo.io", aliases: ["Apollo"] },
+    { ...context.identities[0], slug: "apollo-graphql", canonicalName: "Apollo GraphQL", aliases: ["Apollo"] },
+  ];
+  let searchCalls = 0;
+  const outcome = await run("Apollo", {
+    search: { findOfficialDocs: async () => { searchCalls += 1; return hits; } },
+    llm: new FakeLLMProvider(draftRecord()),
+  }, context);
+  assert.equal(outcome.outcome, "identity_ambiguous");
+  assert.equal(outcome.candidates.length, 2);
+  assert.equal(searchCalls, 0);
+});
+
+test("third-party DataCamp evidence is rejected before reconstruction", async () => {
+  let modelCalls = 0;
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider([{
+      ...hits[0],
+      title: "DataCamp tutorial",
+      url: "https://datacamp.com/tutorial/acme",
+      metadata: { ...hits[0].metadata, canonicalUrl: "https://datacamp.com/tutorial/acme" },
+    }]),
+    llm: {
+      reconstructRecord: async () => {
+        modelCalls += 1;
+        return draftRecord();
+      },
+    },
+  });
+  assert.equal(outcome.outcome, "official_source_unusable");
+  assert.equal(modelCalls, 0);
 });

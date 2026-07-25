@@ -7,6 +7,7 @@ import { OpenRouterProvider } from "../adapters/openRouter.js";
 import { GitHubPrWriter } from "../adapters/githubPr.js";
 import { createRecordValidator } from "../core/validate.js";
 import type { LLMProvider, MetricRow, PlatformRecord, RepoWriter, SearchProvider } from "../core/ports.js";
+import type { PlatformIdentity } from "../core/sourceAuthority.js";
 import { selectedPathRow } from "../../lib/measure.mjs";
 
 // Each Workflow task runs in its own instance and builds only the dependencies
@@ -26,6 +27,15 @@ export function buildRow(record: PlatformRecord): MetricRow {
 export function getSearchProvider(): SearchProvider {
   if (!config.youApiKey) throw new Error("YDC_API_KEY is not configured on the Workflow service.");
   return new YouSearchProvider(config.youApiKey);
+}
+
+let identitiesSingleton: PlatformIdentity[] | undefined;
+export function getPlatformIdentities(): PlatformIdentity[] {
+  if (!identitiesSingleton) {
+    const file = path.join(config.dataRoot, "trust", "platform-identities.json");
+    identitiesSingleton = (JSON.parse(readFileSync(file, "utf8")) as { identities: PlatformIdentity[] }).identities;
+  }
+  return identitiesSingleton;
 }
 
 export function getLLMProvider(): LLMProvider {

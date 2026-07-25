@@ -115,16 +115,16 @@ export class GitHubPrWriter implements RepoWriter {
       });
       const json = (await res.json().catch(() => ({}))) as T;
       return { status: res.status, json };
-    } catch (err) {
+    } catch {
       // Network error or abort: transient by definition.
-      throw new GitHubApiError(err instanceof Error ? err.message : "network error", 0, true);
+      throw new GitHubApiError("GitHub network request failed.", 0, true);
     } finally {
       clearTimeout(timer);
     }
   }
 
-  private fail(action: string, status: number, message?: string): never {
-    throw new GitHubApiError(`Could not ${action} (${status}): ${message ?? ""}`.trim(), status, transientStatus(status));
+  private fail(action: string, status: number, _message?: string): never {
+    throw new GitHubApiError(`Could not ${action} (${status}).`, status, transientStatus(status));
   }
 
   private async openPrForBranch(branch: string): Promise<string | undefined> {

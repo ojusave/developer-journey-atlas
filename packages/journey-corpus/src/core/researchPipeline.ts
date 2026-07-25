@@ -5,10 +5,18 @@ import { buildAssessment } from "./assessment.js";
 import { buildDocumentedOnboardingLoad } from "./onboardingLoad.js";
 import type { ContributionResult, ResearchOutcome, ResearchSteps, ResearchTaskInput } from "../workflows/contract.js";
 import { draftWithClassification, reconstructWithClassification } from "../workflows/classify.js";
+import {
+  resolvePlatformIdentity,
+  sourceCanSupportClaims,
+  validateSourceAuthority,
+  type PlatformIdentity,
+} from "./sourceAuthority.js";
+import { validateJourneyGraph } from "./journeyGraph.js";
 
 /** Read-only context the orchestration needs beyond the injectable steps. */
 export interface ResearchContext {
   store: DataStore;
+  identities: PlatformIdentity[];
   /** Bridge to the shared measurement contract (selectedPathRow). */
   buildRow: (record: PlatformRecord) => MetricRow;
 }
@@ -19,10 +27,6 @@ export function slugify(input: string): string {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-}
-
-function safeMessage(err: unknown): string {
-  return err instanceof Error ? err.message : "Unexpected error.";
 }
 
 function normalizedUrl(value: string): string {
@@ -36,12 +40,74 @@ function normalizedUrl(value: string): string {
   }
 }
 
+function normalizedEvidenceText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * A locator is covered only when its specific comma-separated parts occur in
+ * the exact bounded content supplied to reconstruction. This prevents a page
+ * shell, an empty page, or a section beyond the retrieval limit from grounding
+ * a claim merely because the URL was discovered.
+ */
+export function evidenceLocatorIsCovered(locator: string, doc: { title: string; content?: string }): boolean {
+  const haystack = normalizedEvidenceText(`${doc.title} ${doc.content ?? ""}`);
+  if (!haystack || !doc.content?.trim()) return false;
+  const whole = normalizedEvidenceText(locator);
+  if (whole.length >= 5 && haystack.includes(whole)) return true;
+  const parts = locator
+    .split(/[,;:]/)
+    .map(normalizedEvidenceText)
+    .filter((part) => part.length >= 3);
+  return parts.length > 0 && parts.every((part) => haystack.includes(part));
+}
+
 /** Every cited source URL must have been returned by the official-docs search. */
-export function validateSourceGrounding(record: PlatformRecord, docs: Array<{ url: string }>): string | null {
+export function validateSourceGrounding(
+  record: PlatformRecord,
+  docs: Array<{ title: string; url: string; content?: string }>,
+): string | null {
   const searchedUrls = new Set(docs.map((doc) => normalizedUrl(doc.url)));
   const unsupported = (record.sources ?? []).filter((source) => !searchedUrls.has(normalizedUrl(source.url)));
   if (unsupported.length > 0) {
     return `The draft cited ${unsupported.length} source URL${unsupported.length === 1 ? "" : "s"} that were not returned by the official-docs search.`;
+  }
+  const sourceIds = (record.sources ?? []).map((source) => source.id).filter(Boolean);
+  if (sourceIds.length === 0 || new Set(sourceIds).size !== sourceIds.length) {
+    return "The draft needs unique source IDs for its accepted evidence pages.";
+  }
+  const acceptedSourceIds = new Set(sourceIds);
+  const recordSourceById = new Map((record.sources ?? []).map((source) => [source.id, source]));
+  const docByUrl = new Map(docs.map((doc) => [normalizedUrl(doc.url), doc]));
+  const graph = record.journey_graph;
+  if (graph) {
+    const evidence = [
+      ...graph.prerequisites.flatMap((item) => item.evidence),
+      ...graph.nodes.flatMap((node) => node.evidence),
+      ...graph.nodes.flatMap((node) => node.requiredFields.flatMap((field) => field.evidence)),
+      ...graph.edges.flatMap((edge) => edge.evidence),
+      ...graph.externalGates.flatMap((item) => item.evidence),
+      ...graph.candidateRoutes.flatMap((item) => item.evidence),
+      ...graph.firstSuccessBoundary.evidence,
+    ];
+    const invalid = evidence.filter(
+      (item) => !acceptedSourceIds.has(item.sourceId) || !item.locator?.trim(),
+    );
+    if (invalid.length > 0) {
+      return `${invalid.length} graph evidence reference${invalid.length === 1 ? "" : "s"} did not resolve to an accepted source ID and locator.`;
+    }
+    const uncovered = evidence.filter((item) => {
+      const source = recordSourceById.get(item.sourceId);
+      const doc = source ? docByUrl.get(normalizedUrl(source.url)) : undefined;
+      return !doc || !evidenceLocatorIsCovered(item.locator, doc);
+    });
+    if (uncovered.length > 0) {
+      return `${uncovered.length} graph evidence locator${uncovered.length === 1 ? "" : "s"} did not occur in the retrieved content supplied to reconstruction.`;
+    }
   }
   return null;
 }
@@ -65,25 +131,51 @@ export async function runResearchPipeline(
 ): Promise<ResearchOutcome> {
   const { slug, platform } = input;
 
-  if (slug && ctx.store.getRow(slug)) {
+  if (slug && ctx.store.getRow(slug) && ctx.store.isPublicEligible(slug)) {
     return { outcome: "known", slug };
   }
 
+  const identityResult = resolvePlatformIdentity(platform, ctx.identities);
+  if (identityResult.outcome === "identity_ambiguous") {
+    return {
+      outcome: "identity_ambiguous",
+      candidates: identityResult.candidates.map((candidate) => ({
+        slug: candidate.slug,
+        name: candidate.canonicalName,
+        organization: candidate.organization,
+      })),
+    };
+  }
+  if (identityResult.outcome === "identity_unresolved") {
+    return { outcome: "identity_unresolved" };
+  }
+  const identity = identityResult.identity;
+
   let docs: DocHit[];
   try {
-    docs = await steps.searchDocs({ platform });
-  } catch (err) {
-    return { outcome: "search_failed", message: safeMessage(err) };
+    docs = await steps.searchDocs({ platform, identity });
+  } catch {
+    return { outcome: "search_failed", message: "Official-source discovery failed." };
   }
   if (docs.length === 0) {
-    return { outcome: "no_docs" };
+    return { outcome: "no_official_source" };
+  }
+  const unusable = docs.filter((doc) => {
+    const authority = validateSourceAuthority(doc.url, identity);
+    return !sourceCanSupportClaims(authority, doc.metadata);
+  });
+  if (unusable.length > 0) {
+    return {
+      outcome: "official_source_unusable",
+      message: `${unusable.length} official source page${unusable.length === 1 ? "" : "s"} lacked usable retrieved content.`,
+    };
   }
 
   let reconstruct;
   try {
     reconstruct = await steps.reconstructRecord({ platform, docs });
-  } catch (err) {
-    return { outcome: "model_failed", message: safeMessage(err) };
+  } catch {
+    return { outcome: "model_failed", message: "Route reconstruction failed." };
   }
   if (reconstruct.status === "invalid_output") {
     return { outcome: "invalid_output", message: reconstruct.message };
@@ -92,7 +184,20 @@ export async function runResearchPipeline(
 
   const groundingError = validateSourceGrounding(record, docs);
   if (groundingError) {
-    return { outcome: "source_grounding_failed", message: groundingError };
+    return { outcome: "claim_grounding_failed", message: groundingError };
+  }
+  if (!record.journey_graph) {
+    return {
+      outcome: "claim_grounding_failed",
+      message: "The reconstruction did not include an evidence-backed journey graph.",
+    };
+  }
+  const graphFindings = validateJourneyGraph(record.journey_graph, record.platform.slug);
+  if (graphFindings.length > 0) {
+    return {
+      outcome: "claim_grounding_failed",
+      message: `Journey integrity failed: ${graphFindings.map((finding) => finding.code).join(", ")}.`,
+    };
   }
 
   const row = ctx.buildRow(record);
@@ -119,7 +224,7 @@ export function stepsFromAdapters(deps: {
   repo?: RepoWriter;
 }): ResearchSteps {
   return {
-    searchDocs: ({ platform }) => deps.search.findOfficialDocs(platform),
+    searchDocs: ({ platform, identity }) => deps.search.findOfficialDocs(platform, identity),
     reconstructRecord: ({ platform, docs }) => reconstructWithClassification(deps.llm, platform, docs),
     draftContribution: ({ record }) => draftWithClassification(deps.repo, record),
   };

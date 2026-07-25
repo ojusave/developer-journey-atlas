@@ -129,7 +129,7 @@
     },
     "primary_path": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -162,7 +162,106 @@
           "success_signal": {"type": "string"},
           "failure_or_wait": {"type": "string"},
           "required": {"type": "boolean"},
+          "required_fields": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/journeyField"}
+          },
           "source_ids": {"$ref": "#/$defs/sourceIds"}
+        }
+      }
+    },
+    "journey_graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion", "platformSlug", "startingState", "prerequisites", "nodes",
+        "edges", "externalGates", "candidateRoutes", "uncertainties",
+        "firstSuccessBoundary", "selectedRoute"
+      ],
+      "properties": {
+        "schemaVersion": {"const": "1.0"},
+        "platformSlug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "startingState": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["boundary", "assumptions", "availableInputs"],
+          "properties": {
+            "boundary": {"const": "account_creation"},
+            "assumptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "availableInputs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+          }
+        },
+        "prerequisites": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/journeyPrerequisite"}
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/journeyNode"}
+        },
+        "edges": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/journeyEdge"}
+        },
+        "externalGates": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/journeyExternalGate"}
+        },
+        "candidateRoutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/journeyCandidateRoute"}
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/journeyUncertainty"}
+        },
+        "firstSuccessBoundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nodeId", "outcomeClass", "officialRouteContinues", "evidence"],
+          "properties": {
+            "nodeId": {"type": "string", "minLength": 1},
+            "outcomeClass": {"enum": ["meaningful_result", "resource_creation"]},
+            "officialRouteContinues": {"type": "boolean"},
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/evidenceLocator"}
+            }
+          }
+        },
+        "selectedRoute": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "nodeIds", "policy", "unresolvedReason"],
+          "properties": {
+            "id": {"type": ["string", "null"]},
+            "nodeIds": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "policy": {"type": "string", "minLength": 1},
+            "unresolvedReason": {"type": ["string", "null"]}
+          }
+        },
+        "comparisonBasis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "developerJobKey", "startingBoundaryKey", "firstSuccessOutcomeClass",
+            "firstSuccessBoundaryKey", "routeGranularityVersion", "categoryKey",
+            "evidenceFreshnessDate", "organizationKey", "documentationSetKey"
+          ],
+          "properties": {
+            "developerJobKey": {"type": "string", "minLength": 1},
+            "startingBoundaryKey": {"type": "string", "minLength": 1},
+            "firstSuccessOutcomeClass": {"enum": ["meaningful_result", "resource_creation"]},
+            "firstSuccessBoundaryKey": {"type": "string", "minLength": 1},
+            "routeGranularityVersion": {"type": "string", "minLength": 1},
+            "categoryKey": {"type": "string", "minLength": 1},
+            "evidenceFreshnessDate": {"type": "string", "format": "date"},
+            "organizationKey": {"type": "string", "minLength": 1},
+            "documentationSetKey": {"type": "string", "minLength": 1}
+          }
         }
       }
     },
@@ -238,6 +337,7 @@
           },
           "description": {"type": "string", "minLength": 1},
           "documented_requirement": {"type": "boolean"},
+          "required": {"type": "boolean"},
           "source_ids": {"$ref": "#/$defs/sourceIds"}
         }
       }
@@ -307,6 +407,131 @@
       "minItems": 1,
       "uniqueItems": true,
       "items": {"type": "string", "pattern": "^S[1-9][0-9]*$"}
+    },
+    "evidenceLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "locator"],
+      "properties": {
+        "sourceId": {"type": "string", "pattern": "^S[1-9][0-9]*$"},
+        "locator": {"type": "string", "minLength": 1}
+      }
+    },
+    "journeyField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "fieldType", "required", "evidence"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1},
+        "fieldType": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/evidenceLocator"}
+        }
+      }
+    },
+    "journeyNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "kind", "phase", "actor", "interface", "action", "required",
+        "requiredFields", "inputs", "outputs", "successSignal", "evidence",
+        "requiresFieldInventory"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["developer_action", "decision", "passive_wait", "platform_outcome", "terminal_outcome"]},
+        "phase": {"type": "string", "minLength": 1},
+        "actor": {"enum": ["developer", "platform", "system", "administrator", "external-system"]},
+        "interface": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "requiredFields": {"type": "array", "items": {"$ref": "#/$defs/journeyField"}},
+        "inputs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "outputs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "successSignal": {"type": "string"},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceLocator"}},
+        "branchId": {"type": ["string", "null"]},
+        "requiresFieldInventory": {"type": "boolean"}
+      }
+    },
+    "journeyEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "evidence"],
+      "properties": {
+        "from": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "condition": {"type": ["string", "null"]},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceLocator"}}
+      }
+    },
+    "journeyPrerequisite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "requirement", "required", "produces", "evidence"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {
+          "enum": [
+            "account", "access", "plan", "billing", "hardware", "software",
+            "identity", "permission", "region", "approval", "configuration",
+            "credential", "domain", "environment", "legal", "network",
+            "verification", "other"
+          ]
+        },
+        "requirement": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "produces": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceLocator"}}
+      }
+    },
+    "journeyExternalGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "description", "atNodeId", "required", "evidence"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "atNodeId": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceLocator"}}
+      }
+    },
+    "journeyCandidateRoute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "status", "nodeIds", "selectionBasis", "condition",
+        "routeSummary", "effectOnFirstSuccess", "reasonNotSelected",
+        "branchAtNodeId", "evidence"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "status": {"enum": ["selected", "considered"]},
+        "nodeIds": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "selectionBasis": {"type": "string", "minLength": 1},
+        "condition": {"type": "string", "minLength": 1},
+        "routeSummary": {"type": "string", "minLength": 1},
+        "effectOnFirstSuccess": {"type": "string", "minLength": 1},
+        "reasonNotSelected": {"type": ["string", "null"]},
+        "branchAtNodeId": {"type": ["string", "null"]},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidenceLocator"}}
+      }
+    },
+    "journeyUncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetType", "targetId", "description", "blocksPublication"],
+      "properties": {
+        "targetType": {"enum": ["prerequisite", "node", "field", "edge", "route", "terminal"]},
+        "targetId": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "blocksPublication": {"type": "boolean"}
+      }
     }
   }
 }

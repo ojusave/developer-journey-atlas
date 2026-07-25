@@ -7,7 +7,17 @@ import type { VerifyOutcome } from "../core/runVerifyAudit.js";
 type Client = ReturnType<typeof createWorkflowsClient>;
 
 const KNOWN_OUTCOMES = new Set<ResearchOutcome["outcome"]>([
-  "known", "no_docs", "invalid_output", "source_grounding_failed", "search_failed", "model_failed", "completed",
+  "known",
+  "identity_ambiguous",
+  "identity_unresolved",
+  "no_official_source",
+  "official_source_unusable",
+  "invalid_output",
+  "claim_grounding_failed",
+  "review_required",
+  "search_failed",
+  "model_failed",
+  "completed",
 ]);
 
 const VERIFY_OUTCOMES = new Set<VerifyOutcome["outcome"]>([

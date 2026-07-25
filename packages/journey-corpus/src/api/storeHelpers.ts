@@ -23,3 +23,10 @@ export async function ensureRow(store: DataStore, slug: string): Promise<MetricR
   }
   return undefined;
 }
+
+/** Resolve a row only when its generated trust record passes every publication gate. */
+export async function ensurePublicRow(store: DataStore, slug: string): Promise<MetricRow | undefined> {
+  const row = await ensureRow(store, slug);
+  if (!row || !store.isPublicEligible(slug)) return undefined;
+  return row;
+}

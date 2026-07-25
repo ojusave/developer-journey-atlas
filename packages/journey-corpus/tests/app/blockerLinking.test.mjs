@@ -38,6 +38,16 @@ test("filterConfirmedReasonIds drops unknown ids", () => {
   assert.equal(picks.rationale, "test");
 });
 
+test("filterConfirmedReasonIds preserves explicit abstention", () => {
+  const picks = filterConfirmedReasonIds(
+    { reason_ids: [], rationale: "No supported reason." },
+    new Set(["U04.01"]),
+    3,
+  );
+  assert.deepEqual(picks.reasonIds, []);
+  assert.equal(picks.rationale, "No supported reason.");
+});
+
 test("gateEmbedText includes type and description", () => {
   const text = gateEmbedText({ type: "account", description: "Sign up", stepAction: "Create account" });
   assert.match(text, /account/);
@@ -57,6 +67,7 @@ test("buildJourneyOverlay merges openrouter reason links with soft-map", () => {
       friction_gates: [{ at_step: 2, type: "account", description: "Human must create account" }],
     },
     {
+      includeUnvalidatedHypotheses: true,
       familyLookup: (id) =>
         id === "U04"
           ? { id: "U04", label: "Account fail", kind: "universal_family", diagnosticEligibility: "not_diagnosis_eligible" }
@@ -66,7 +77,7 @@ test("buildJourneyOverlay merges openrouter reason links with soft-map", () => {
         reasonId: "U04.01",
         label: "Signup friction",
         diagnosticEligibility: "not_diagnosis_eligible",
-        confidence: "confirmed",
+        confidence: "model_selected",
         similarity: 0.81,
         rationale: "Account creation gate",
       }],
@@ -78,4 +89,28 @@ test("buildJourneyOverlay merges openrouter reason links with soft-map", () => {
   assert.equal(hyps[1].linkSource, "openrouter");
   assert.equal(hyps[1].id, "U04.01");
   assert.match(hyps[1].note, /hypothesis/i);
+});
+
+test("public journey overlay does not serialize model-selected reasons", () => {
+  const journey = buildJourneyOverlay(
+    {
+      platform: { name: "Resend", slug: "resend", organization: "Resend" },
+      category: "Communications",
+      primary_path: [{ step_number: 1, action: "Create account", required: true }],
+      friction_gates: [{ at_step: 1, type: "account", description: "Account required" }],
+    },
+    {
+      familyLookup: () => null,
+      modelLinks: [{
+        gateKey: "1:account:0",
+        reasonId: "U04.01",
+        label: "Signup friction",
+        diagnosticEligibility: "not_diagnosis_eligible",
+        confidence: "model_selected",
+        similarity: 0.99,
+        rationale: "model choice",
+      }],
+    },
+  );
+  assert.doesNotMatch(JSON.stringify(journey), /Signup friction|U04\\.01|model_selected/);
 });

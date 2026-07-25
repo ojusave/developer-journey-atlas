@@ -3,10 +3,21 @@ const el = {
   input: document.querySelector("#search"),
   suggestions: document.querySelector("#suggestions"),
   result: document.querySelector("#result"),
+  status: document.querySelector("#global-status"),
 };
 
 let currentSuggestions = [];
 let activeSuggestion = -1;
+let searchController = null;
+let searchGeneration = 0;
+let comparisonGeneration = 0;
+let activePoll = 0;
+let researchPending = false;
+
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const scrollBehavior = () => prefersReducedMotion.matches ? "auto" : "smooth";
+const POLL_INTERVAL_MS = 2500;
+const MAX_POLLS = 160;
 
 function esc(value) {
   return String(value ?? "")
@@ -17,32 +28,31 @@ function esc(value) {
     .replaceAll("'", "&#039;");
 }
 
-function num(value) {
-  return new Intl.NumberFormat("en-US").format(Number(value) || 0);
+function announce(message) {
+  el.status.textContent = "";
+  window.setTimeout(() => {
+    el.status.textContent = message;
+  }, 20);
 }
 
-async function api(path) {
-  const res = await fetch(path);
-  const body = await res.json().catch(() => ({ error: { message: "Bad response" } }));
-  if (!res.ok || body.error) {
-    const message = body.error ? body.error.message : `Request failed (${res.status})`;
-    const err = new Error(message);
-    err.code = body.error && body.error.code;
-    err.status = res.status;
-    throw err;
+async function api(path, options = {}) {
+  const response = await fetch(path, options);
+  const body = await response.json().catch(() => ({ error: { message: "The server returned an unreadable response." } }));
+  if (!response.ok || body.error) {
+    const error = new Error(body.error?.message || `Request failed (${response.status}).`);
+    error.code = body.error?.code;
+    error.status = response.status;
+    throw error;
   }
   return body;
 }
 
-function debounce(fn, ms) {
-  let t;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), ms);
-  };
+function cancelSuggestions() {
+  searchGeneration += 1;
+  searchController?.abort();
+  searchController = null;
+  hideSuggestions();
 }
-
-/* ---------- Suggestions ---------- */
 
 function hideSuggestions() {
   el.suggestions.hidden = true;
@@ -65,410 +75,624 @@ function setActiveSuggestion(index) {
   });
 }
 
-function renderSuggestions(rows) {
-  currentSuggestions = rows;
-  if (rows.length === 0) {
+function renderSuggestions(rows, generation) {
+  if (generation !== searchGeneration) return;
+  currentSuggestions = rows.slice(0, 8);
+  if (currentSuggestions.length === 0) {
     hideSuggestions();
     return;
   }
-  el.suggestions.innerHTML = rows
-    .slice(0, 8)
-    .map(
-      (r, i) => `
-      <li class="suggestion" role="option" id="sugg-${i}" data-slug="${esc(r.slug)}" aria-selected="false">
-        <span class="s-name">${esc(r.name)}</span>
-        <span class="s-cat">${esc(r.category)}</span>
-      </li>`,
-    )
-    .join("");
+  el.suggestions.innerHTML = currentSuggestions.map((row, index) => `
+    <li class="suggestion" role="option" id="sugg-${index}" data-slug="${esc(row.slug)}" aria-selected="false">
+      <span class="s-name">${esc(row.name)}</span>
+      <span class="s-cat">${esc(row.category)}</span>
+    </li>
+  `).join("");
   el.suggestions.hidden = false;
   el.input.setAttribute("aria-expanded", "true");
 }
 
-const runSearch = debounce(async (q) => {
-  if (!q) {
-    hideSuggestions();
+let searchTimer;
+function queueSearch(query) {
+  window.clearTimeout(searchTimer);
+  const normalized = query.trim();
+  if (!normalized) {
+    cancelSuggestions();
     return;
   }
-  try {
-    const { data } = await api(`/api/search?q=${encodeURIComponent(q)}`);
-    renderSuggestions(data);
-  } catch {
-    hideSuggestions();
-  }
-}, 160);
-
-/* ---------- Rendering one platform's onboarding flow ---------- */
+  const generation = ++searchGeneration;
+  searchController?.abort();
+  searchController = new AbortController();
+  searchTimer = window.setTimeout(async () => {
+    try {
+      const { data } = await api(`/api/search?q=${encodeURIComponent(normalized)}`, {
+        signal: searchController.signal,
+      });
+      renderSuggestions(data, generation);
+    } catch (error) {
+      if (error.name !== "AbortError" && generation === searchGeneration) hideSuggestions();
+    }
+  }, 160);
+}
 
 function stepFields(fields) {
-  if (!fields || fields.length === 0) return "";
+  if (!Array.isArray(fields) || fields.length === 0) return "";
   return `
-    <ul class="step-fields" aria-label="Required fields">
-      ${fields.map((f) => `<li><strong>${esc(f.label)}</strong>${f.type ? ` <span class="step-tag">${esc(f.type)}</span>` : ""}</li>`).join("")}
-    </ul>`;
-}
-
-function stepFriction(gates) {
-  if (!gates || gates.length === 0) return "";
-  return `
-    <div class="step-friction">
-      ${gates.map((g) => `
-        <p class="friction-note">
-          <span class="chip chip-friction">${esc(g.type || "friction")}</span>
-          ${esc(g.description)}
-        </p>`).join("")}
-    </div>`;
-}
-
-function stepItem(s) {
-  const meta = [s.phase, s.interface]
-    .filter(Boolean)
-    .map((x) => `<span class="step-tag">${esc(x)}</span>`)
-    .join("");
-  const details = s.details && s.details.length
-    ? `<ul class="step-details">${s.details.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>`
-    : "";
-  const signal = s.successSignal
-    ? `<p class="step-signal">Done when: ${esc(s.successSignal)}</p>`
-    : "";
-  const optional = s.required === false ? '<span class="step-optional">optional</span>' : "";
-  const frictionClass = s.hasFriction ? " step-has-friction" : "";
-  return `
-    <li class="step${frictionClass}">
-      <div class="step-head"><span class="step-num">${num(s.stepNumber)}</span>${meta}${optional}</div>
-      <p class="step-action">${esc(s.action)}</p>
-      ${details}
-      ${stepFields(s.requiredFields)}
-      ${signal}
-      ${stepFriction(s.frictionGates)}
-    </li>`;
-}
-
-function bandLabel(band) {
-  if (band === "light") return "Light";
-  if (band === "moderate") return "Moderate";
-  if (band === "heavy") return "Heavy";
-  return "Unavailable";
-}
-
-function renderPlacement(placement, title) {
-  if (!placement) return "";
-  if (!placement.available) {
-    return `
-      <div class="score-placement">
-        <h4>${esc(title)}</h4>
-        <p class="score-unavailable">${esc(placement.summary)}</p>
-      </div>`;
-  }
-  const pos =
-    placement.position === "below"
-      ? "below peer median effort"
-      : placement.position === "above"
-        ? "above peer median effort"
-        : "at peer median effort";
-  return `
-    <div class="score-placement">
-      <h4>${esc(title)}</h4>
-      <p class="score-value">
-        <span class="score-number">${esc(placement.score)}</span>
-        <span class="score-band band-${esc(placement.band)}">${esc(bandLabel(placement.band))}</span>
-      </p>
-      <p class="score-meta">${esc(pos)} · ${num(placement.peerCount)} peers</p>
-      <p class="score-summary">${esc(placement.summary)}</p>
-    </div>`;
-}
-
-function renderOnboardingScore(score) {
-  if (!score) return "";
-  const b = score.breakdown || {};
-  return `
-    <section class="score-card" aria-label="Documented onboarding load">
-      <p class="section-kicker">${esc(score.name || "Documented Onboarding Load")}</p>
-      <p class="score-lede">Where this documented path sits overall and among category peers. Higher means a heavier path to first success.</p>
-      <div class="score-grid">
-        ${renderPlacement(score.overall, "Overall")}
-        ${renderPlacement(score.peers, "Among peers")}
-      </div>
-      <ul class="score-breakdown" aria-label="Score breakdown">
-        <li><span>Effort meter</span><strong>${esc(b.effort)}</strong></li>
-        <li><span>Required actions</span><strong>${num(b.requiredActions)}</strong></li>
-        <li><span>Friction gates</span><strong>${num(b.gates)}</strong></li>
-        <li><span>Waits</span><strong>${num(b.waits)}</strong></li>
+    <div class="field-inventory">
+      <p>Information to provide</p>
+      <ul class="step-fields">
+        ${fields.map((field) => `
+          <li>
+            <strong>${esc(field.label)}</strong>
+            <span class="step-tag">${esc(field.type || "field")}</span>
+            ${field.required === false ? '<span class="step-optional">optional</span>' : ""}
+          </li>
+        `).join("")}
       </ul>
-      <p class="score-note">${esc(score.note)}</p>
-      <p class="score-finish">Finish line: ${esc(score.finishLine)}</p>
-    </section>`;
+    </div>
+  `;
 }
 
-/** Title link to the documented docs surface (opens in a new tab). */
-function journeyTitle(journey) {
-  const name = esc(journey.name);
-  const url = typeof journey.startingUrl === "string" && /^https:\/\//.test(journey.startingUrl)
-    ? journey.startingUrl
-    : null;
-  if (!url) return `<h2>${name}</h2>`;
-  return `<h2><a class="journey-title-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${name}</a></h2>`;
-}
-
-/** Journey-first view: platform name + numbered onboarding steps only. */
-function renderJourney(journey) {
-  const stepList = journey.steps || [];
-  const steps = stepList.length
-    ? `<ol class="steps-list">${stepList.map(stepItem).join("")}</ol>`
-    : '<p class="lede">No documented onboarding steps are available for this platform yet.</p>';
-  const frictionHint = journey.highlightedStepCount
-    ? `<p class="journey-hint">${num(journey.highlightedStepCount)} step${journey.highlightedStepCount === 1 ? "" : "s"} mark documented friction.</p>`
-    : "";
-
+function stepGates(gates) {
+  if (!Array.isArray(gates) || gates.length === 0) return "";
   return `
-    <div class="card journey-card">
+    <div class="documented-gates">
+      <p>Requirement or choice</p>
+      <ul>
+        ${gates.map((gate) => `
+          <li>
+            <span class="step-tag">${esc(gate.type || "gate")}</span>
+            ${esc(gate.description)}
+            ${gate.required === false ? '<span class="step-optional">conditional</span>' : ""}
+          </li>
+        `).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+function kindLabel(kind) {
+  return {
+    developer_action: "Your action",
+    decision: "Your choice",
+    passive_wait: "Wait",
+    platform_outcome: "Platform status",
+    terminal_outcome: "First success",
+  }[kind] || "Route event";
+}
+
+function stepItem(step) {
+  const tags = `<span class="step-tag step-kind kind-${esc(step.kind)}">${esc(kindLabel(step.kind))}</span>`;
+  const signal = step.successSignal
+    ? `<p class="step-signal"><strong>Expected result:</strong> ${esc(step.successSignal)}</p>`
+    : "";
+  return `
+    <li class="step kind-border-${esc(step.kind)}">
+      <div class="step-head"><span class="step-num">${esc(step.stepNumber)}</span>${tags}</div>
+      <p class="step-action">${esc(step.action)}</p>
+      ${stepFields(step.requiredFields)}
+      ${stepGates(step.frictionGates)}
+      ${signal}
+    </li>
+  `;
+}
+
+function routeOverview(scope) {
+  if (!scope) return "";
+  const alternatives = Array.isArray(scope.alternatives) && scope.alternatives.length
+    ? `
+      <details class="route-alternatives">
+        <summary>Other documented routes considered</summary>
+        <ul>
+          ${scope.alternatives.map((alternative) => `
+            <li>
+              <strong>${esc(alternative.condition)}</strong>
+              <span>${esc(alternative.routeSummary)}</span>
+              <span class="alternative-reason">Not selected here: ${esc(alternative.reasonNotSelected)}</span>
+            </li>
+          `).join("")}
+        </ul>
+      </details>
+    `
+    : "";
+  return `
+    <section class="route-overview" aria-labelledby="route-overview-title">
+      <h3 id="route-overview-title">At a glance</h3>
+      <dl>
+        <div>
+          <dt>Selected path</dt>
+          <dd>${esc(scope.selectedPath)}</dd>
+        </div>
+        <div>
+          <dt>Best fit</dt>
+          <dd>${esc(scope.bestFit)}</dd>
+        </div>
+        <div>
+          <dt>First success</dt>
+          <dd>${esc(scope.firstSuccess)}</dd>
+        </div>
+      </dl>
+      ${alternatives}
+    </section>
+  `;
+}
+
+function correctionUrl(journey) {
+  const title = `Journey correction: ${journey.name}`;
+  const body = [
+    `Platform: ${journey.name}`,
+    `Route URL: ${location.origin}/platform/${journey.slug}`,
+    "",
+    "Disputed step:",
+    "",
+    "Current source:",
+    "",
+    "Proposed source:",
+    "",
+    "Expected first-success boundary:",
+    "",
+    "Contributor evidence:",
+  ].join("\n");
+  const params = new URLSearchParams({ title, body, labels: "journey-correction" });
+  return `https://github.com/ojusave/developer-journey-atlas/issues/new?${params}`;
+}
+
+function comparisonCriteria(criteria) {
+  return `
+    <details class="comparison-criteria">
+      <summary>What counts as comparable?</summary>
+      <ul>${criteria.map((criterion) => `<li>${esc(criterion)}</li>`).join("")}</ul>
+    </details>
+  `;
+}
+
+function renderUnavailableComparison(comparison, failed = false) {
+  return `
+    <div class="comparison-head">
+      <div>
+        <h3 id="peer-comparison-title">Comparable peers</h3>
+        <p class="comparison-state">Comparison unavailable</p>
+      </div>
+      <span class="comparison-count">${esc(comparison.qualifiedPeerCount)} of ${esc(comparison.requiredPeerCount)}</span>
+    </div>
+    <p>${esc(
+      failed
+        ? "The comparison could not be loaded. The documented route remains available."
+        : `${comparison.qualifiedPeerCount} of ${comparison.requiredPeerCount} qualified peers are currently available.`,
+    )}</p>
+    <p class="microcopy">${esc(comparison.note)}</p>
+    ${comparisonCriteria(comparison.criteria)}
+    ${failed ? '<button class="btn btn-secondary comparison-retry" type="button">Try comparison again</button>' : ""}
+  `;
+}
+
+function peerResultItem(peer) {
+  const values = peer.measurements;
+  return `
+    <li>
+      <strong>${esc(peer.name)}</strong>
+      <span>${esc(values.requiredActions)} actions, ${esc(values.requiredFields)} fields, ${esc(values.externalGates)} gates, ${esc(values.unavoidableWaits)} waits</span>
+    </li>
+  `;
+}
+
+function renderPeerResults(peers, query = "") {
+  const results = document.querySelector("#peer-results");
+  if (!results) return;
+  const normalized = query.trim().toLowerCase();
+  const matches = peers.filter((peer) =>
+    `${peer.name} ${peer.organization}`.toLowerCase().includes(normalized)
+  );
+  results.innerHTML = matches.length
+    ? matches.map(peerResultItem).join("")
+    : '<li class="peer-empty">No qualified peer matches that search.</li>';
+  const status = document.querySelector("#peer-search-status");
+  if (status) {
+    status.textContent = `${matches.length} qualified peer${matches.length === 1 ? "" : "s"} shown.`;
+  }
+}
+
+function renderAvailableComparison(comparison) {
+  const rows = comparison.dimensions.map((dimension) => `
+    <tr>
+      <th scope="row">${esc(dimension.label)}</th>
+      <td>${esc(dimension.subjectValue)}</td>
+      <td>${esc(dimension.peerMedian)}</td>
+      <td>${esc(dimension.peerMinimum)} to ${esc(dimension.peerMaximum)}</td>
+      <td>${esc(dimension.position)}</td>
+    </tr>
+  `).join("");
+  return `
+    <div class="comparison-head">
+      <div>
+        <h3 id="peer-comparison-title">Comparable peers</h3>
+        <p class="comparison-state">Direct route comparison</p>
+      </div>
+      <span class="comparison-count">${esc(comparison.qualifiedPeerCount)} qualified</span>
+    </div>
+    <div class="comparison-table-wrap" tabindex="0" role="region" aria-label="Route comparison dimensions">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">Route dimension</th>
+            <th scope="col">${esc(comparison.subject.name)}</th>
+            <th scope="col">Peer median</th>
+            <th scope="col">Peer range</th>
+            <th scope="col">Position</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="peer-search">
+      <label for="peer-search">Find a qualified peer</label>
+      <input id="peer-search" type="search" autocomplete="off" placeholder="Search by platform or organization">
+      <p id="peer-search-status" class="microcopy" role="status" aria-live="polite"></p>
+      <ul id="peer-results" class="peer-results"></ul>
+    </div>
+    <p class="microcopy">${esc(comparison.note)}</p>
+    ${comparisonCriteria(comparison.criteria)}
+  `;
+}
+
+function wirePeerComparison(comparison, slug) {
+  if (comparison.available) {
+    const input = document.querySelector("#peer-search");
+    renderPeerResults(comparison.peers);
+    input?.addEventListener("input", (event) => {
+      renderPeerResults(comparison.peers, event.target.value);
+    });
+  }
+  document.querySelector(".comparison-retry")?.addEventListener("click", () => {
+    loadPeerComparison(slug);
+  });
+}
+
+async function loadPeerComparison(slug) {
+  const mount = document.querySelector("#peer-comparison");
+  if (!mount) return;
+  const generation = ++comparisonGeneration;
+  mount.setAttribute("aria-busy", "true");
+  mount.innerHTML = '<p class="comparison-loading">Checking qualified peers…</p>';
+  try {
+    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/curve`);
+    const activeJourney = document.querySelector(".journey-card");
+    if (generation !== comparisonGeneration || activeJourney?.dataset.platformSlug !== slug) return;
+    mount.innerHTML = data.available
+      ? renderAvailableComparison(data)
+      : renderUnavailableComparison(data);
+    wirePeerComparison(data, slug);
+  } catch {
+    if (generation !== comparisonGeneration) return;
+    const fallback = {
+      qualifiedPeerCount: 0,
+      requiredPeerCount: 3,
+      criteria: [
+        "The same developer job and account-creation starting boundary",
+        "The same first-success outcome and boundary",
+        "The same route granularity and platform category",
+        "A distinct organization and documentation set",
+        "Current reviewed evidence",
+      ],
+      note: "Comparison data is temporarily unavailable.",
+    };
+    mount.innerHTML = renderUnavailableComparison(fallback, true);
+    wirePeerComparison(fallback, slug);
+  } finally {
+    if (generation === comparisonGeneration) mount.setAttribute("aria-busy", "false");
+  }
+}
+
+function renderJourney(journey) {
+  const prerequisites = Array.isArray(journey.prerequisites) && journey.prerequisites.length
+    ? `
+      <section class="route-facts" aria-labelledby="prerequisites-title">
+        <h3 id="prerequisites-title">What you need before starting</h3>
+        <ul>
+          ${journey.prerequisites.map((item) => `
+            <li>${esc(item.requirement)}${item.required === false ? " (optional)" : ""}</li>
+          `).join("")}
+        </ul>
+      </section>
+    `
+    : "";
+  const steps = Array.isArray(journey.steps) && journey.steps.length
+    ? `
+      <details class="route-details">
+        <summary>Show all ${esc(journey.steps.length)} documented events</summary>
+        <p class="route-details-note">Actions, choices, waits, and platform status changes stay separate so the route is not compressed.</p>
+        <ol class="steps-list">${journey.steps.map(stepItem).join("")}</ol>
+      </details>
+    `
+    : '<p>No published route is available.</p>';
+  return `
+    <article class="card journey-card" data-platform-slug="${esc(journey.slug)}">
       <div class="assess-head">
-        ${journeyTitle(journey)}
+        <div>
+          <p class="section-kicker">Route map</p>
+          <h2 tabindex="-1" id="journey-title">${esc(journey.name)}</h2>
+        </div>
         <span class="pill pill-cat">${esc(journey.category)}</span>
       </div>
-      <p class="lede">Onboarding from account creation to first success, step by step.</p>
-      ${renderOnboardingScore(journey.onboardingScore)}
-      ${frictionHint}
-      <h3 class="steps-heading visually-hidden">Onboarding steps</h3>
+      <p class="lede">${esc(journey.note)}</p>
+      ${routeOverview(journey.routeScope)}
+      ${prerequisites}
+      <div class="result-actions">
+        <button class="btn btn-secondary" type="button" id="share-route">Copy share link</button>
+        <a class="btn btn-secondary" id="correct-route" href="${esc(correctionUrl(journey))}" target="_blank" rel="noopener noreferrer">Suggest a correction</a>
+      </div>
+      <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+      <section class="peer-comparison" id="peer-comparison" aria-labelledby="peer-comparison-title" aria-busy="true">
+        <p class="comparison-loading">Checking qualified peers…</p>
+      </section>
+      <h3 class="steps-heading">Detailed route</h3>
       ${steps}
-    </div>`;
+    </article>
+  `;
 }
 
-/** Fallback when only an assessment payload exists (e.g. fresh research draft). */
-function renderAssessmentAsJourney(a) {
-  const gatesByStep = new Map();
-  for (const gate of a.frictionGates || []) {
-    if (gate.atStep == null) continue;
-    const list = gatesByStep.get(gate.atStep) || [];
-    list.push(gate);
-    gatesByStep.set(gate.atStep, list);
-  }
-  const steps = (a.steps || []).map((s) => {
-    const frictionGates = gatesByStep.get(s.stepNumber) || [];
-    return { ...s, hasFriction: frictionGates.length > 0, frictionGates };
-  });
-  return renderJourney({
-    name: a.name,
-    category: a.category,
-    steps,
-    highlightedStepCount: steps.filter((s) => s.hasFriction).length,
-  });
-}
-
-async function showPlatform(slug) {
-  hideSuggestions();
-  el.result.hidden = false;
-  el.result.innerHTML = '<div class="state-message">Loading the onboarding flow…</div>';
-  el.result.scrollIntoView({ behavior: "smooth", block: "start" });
+async function copyShareLink(slug) {
+  const url = `${location.origin}/platform/${slug}`;
+  const status = document.querySelector("#copy-status");
   try {
-    const journey = await api(`/api/platforms/${encodeURIComponent(slug)}/journey`);
-    el.result.innerHTML = renderJourney(journey.data);
-  } catch (journeyErr) {
-    try {
-      const assessment = await api(`/api/platforms/${encodeURIComponent(slug)}`);
-      el.result.innerHTML = renderAssessmentAsJourney(assessment.data);
-    } catch (err) {
-      el.result.innerHTML = `<div class="state-message"><strong>Could not load that platform.</strong><br>${esc(err.message || journeyErr.message)}</div>`;
-    }
+    await navigator.clipboard.writeText(url);
+    status.textContent = "Share link copied.";
+    announce("Share link copied.");
+  } catch {
+    status.textContent = "Could not copy automatically. Copy the URL from the address bar.";
+    announce("Could not copy the share link.");
   }
 }
 
-// A monotonically increasing token so a new submission (or reload) cancels any
-// in-flight polling loop from a previous one.
-let activePoll = 0;
-const POLL_INTERVAL_MS = 2500;
-const MAX_POLLS = 160; // ~6.5 minutes, then we stop polling but research continues.
+function wireJourneyActions(journey) {
+  document.querySelector("#share-route")?.addEventListener("click", () => copyShareLink(journey.slug));
+  document.querySelector("#correct-route")?.addEventListener("click", () => {
+    announce("Opening a prefilled GitHub correction form. Nothing has been submitted.");
+  });
+}
 
-const PHASE_TEXT = {
-  queued: "Queued. Research will start shortly…",
-  running: "Researching official documentation…",
-  retrying: "A step hit a transient error and is being retried…",
-};
+function setClientMetadata(journey) {
+  const title = `${journey.name} documented route | Developer Journey Atlas`;
+  const description = `Inspect ${journey.name}'s source-grounded route from account creation to first developer success.`;
+  document.title = title;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+  document.querySelector('link[rel="canonical"]')?.setAttribute("href", location.href);
+  document.querySelector('meta[property="og:url"]')?.setAttribute("content", location.href);
+}
+
+function setRootMetadata() {
+  const title = "Developer Journey Atlas";
+  const description = "Search a reviewed developer platform and inspect its source-grounded route from account creation to first success.";
+  document.title = title;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+  document.querySelector('link[rel="canonical"]')?.setAttribute("href", location.origin + "/");
+  document.querySelector('meta[property="og:url"]')?.setAttribute("content", location.origin + "/");
+}
+
+function pushPlatformRoute(slug) {
+  const target = `/platform/${encodeURIComponent(slug)}`;
+  if (location.pathname !== target) history.pushState({ slug }, "", target);
+}
+
+async function showPlatform(slug, { push = true, focus = true } = {}) {
+  activePoll += 1;
+  comparisonGeneration += 1;
+  researchPending = false;
+  cancelSuggestions();
+  el.result.hidden = false;
+  el.result.innerHTML = '<div class="state-message" role="status">Loading documented route…</div>';
+  try {
+    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/journey`);
+    if (push) pushPlatformRoute(data.slug);
+    el.input.value = data.name;
+    el.result.innerHTML = renderJourney(data);
+    wireJourneyActions(data);
+    setClientMetadata(data);
+    announce(`${data.name} documented route loaded.`);
+    if (focus) document.querySelector("#journey-title")?.focus();
+    loadPeerComparison(data.slug);
+  } catch (error) {
+    renderNotFound(slug, error.message);
+  }
+}
+
+function renderNotFound(slug, detail = "") {
+  el.result.hidden = false;
+  el.result.innerHTML = `
+    <section class="card unknown-panel" aria-labelledby="not-found-title">
+      <p class="section-kicker">Not found</p>
+      <h2 id="not-found-title" tabindex="-1">No published route for “${esc(slug)}”</h2>
+      <p class="lede">Only routes that pass the source, identity, field, and route-integrity gates are published.</p>
+      ${detail ? `<p class="microcopy">${esc(detail)}</p>` : ""}
+      <a class="btn btn-secondary" href="/" id="back-to-search">Back to search</a>
+    </section>
+  `;
+  setRootMetadata();
+  document.querySelector("#not-found-title")?.focus();
+  announce("No published route was found. Research did not start.");
+}
+
+function renderResearchConsent(query) {
+  el.result.hidden = false;
+  el.result.innerHTML = `
+    <section class="card unknown-panel" aria-labelledby="research-title">
+      <p class="section-kicker">Not in the published Atlas</p>
+      <h2 id="research-title" tabindex="-1">Research “${esc(query)}”?</h2>
+      <p class="lede">This action sends the platform name through the project’s research workflow. Render Workflows, You.com, and OpenRouter may process it.</p>
+      <p>The result remains a private draft until a maintainer reviews its identity, sources, fields, and selected route. Search suggestions do not start this process.</p>
+      <button class="btn btn-primary" id="research-btn" type="button">Start research</button>
+      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
+    </section>
+  `;
+  document.querySelector("#research-btn")?.addEventListener("click", () => researchPlatform(query));
+  document.querySelector("#research-title")?.focus();
+  announce("Research consent is required. No research has started.");
+}
+
+function setResearchStatus(message) {
+  const status = document.querySelector("#research-status");
+  if (status) status.textContent = message;
+  announce(message);
+}
+
+function renderResearchTerminal(query, heading, message, retry = true) {
+  researchPending = false;
+  el.result.innerHTML = `
+    <section class="card unknown-panel" aria-labelledby="research-terminal-title">
+      <p class="section-kicker">Research status</p>
+      <h2 id="research-terminal-title" tabindex="-1">${esc(heading)}</h2>
+      <p class="lede">${esc(message)}</p>
+      ${retry ? '<button class="btn btn-secondary" id="research-btn" type="button">Try again</button>' : ""}
+    </section>
+  `;
+  document.querySelector("#research-btn")?.addEventListener("click", () => researchPlatform(query));
+  document.querySelector("#research-terminal-title")?.focus();
+  announce(`${heading}. ${message}`);
+}
 
 const OUTCOME_MESSAGE = {
-  no_docs: "No official documentation was found for that platform, so nothing could be drafted.",
-  search_failed: "The documentation search provider was unavailable. Nothing was submitted. Try again shortly.",
-  model_failed: "The model provider was unavailable while reconstructing the record. Nothing was submitted. Try again shortly.",
-  invalid_output: "The model could not produce a schema-valid record from the official docs, so nothing was submitted.",
-  source_grounding_failed: "The draft cited sources that were not returned by the official-docs search, so it was rejected. Nothing was submitted.",
+  identity_ambiguous: "The name matches multiple platforms. Choose a more specific name before retrying.",
+  identity_unresolved: "The platform’s first-party identity could not be established.",
+  no_official_source: "No accepted first-party documentation was found.",
+  official_source_unusable: "The first-party documentation could not support a publishable route.",
+  invalid_output: "The draft did not pass the required record schema.",
+  claim_grounding_failed: "One or more route claims lacked accepted first-party evidence.",
+  search_failed: "The documentation search provider was unavailable.",
+  model_failed: "The reconstruction provider was unavailable.",
 };
 
-function setUrlState(query, runId) {
-  const params = new URLSearchParams();
-  if (query) params.set("q", query);
-  if (runId) params.set("research", runId);
-  const suffix = params.toString();
-  history.replaceState(null, "", suffix ? `?${suffix}` : location.pathname);
-}
-
-function setStatus(text) {
-  const statusEl = document.querySelector("#research-status");
-  if (statusEl) statusEl.textContent = text;
-}
-
-function renderUnknown(query) {
-  el.result.hidden = false;
-  el.result.innerHTML = `
-    <div class="card unknown-panel">
-      <p class="section-kicker">New platform</p>
-      <h2>Researching ${esc(query)}</h2>
-      <p class="lede">Looking up official docs and drafting the onboarding flow.</p>
-      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
-      <button class="btn btn-secondary" id="research-btn" type="button" hidden>Retry research</button>
-    </div>`;
-  wireRetry(query);
-  el.result.scrollIntoView({ behavior: "smooth", block: "start" });
-  researchPlatform(query);
-}
-
-function wireRetry(query) {
-  const btn = document.querySelector("#research-btn");
-  if (!btn) return;
-  btn.hidden = false;
-  btn.addEventListener("click", () => researchPlatform(query));
-}
-
-function renderResearchError(message, query) {
-  el.result.hidden = false;
-  el.result.innerHTML = `
-    <div class="card unknown-panel">
-      <p class="section-kicker">RESEARCH</p>
-      <h2>"${esc(query)}"</h2>
-      <p class="lede">${esc(message)}</p>
-      <button class="btn btn-secondary" id="research-btn" type="button">Try research again</button>
-    </div>`;
-  wireRetry(query);
-}
-
-function renderResult(result, query) {
-  if (result.outcome === "known") return showPlatform(result.slug);
-  if (result.outcome === "completed") {
-    // Prefer the persisted journey (Postgres) once the status poll has saved it.
-    if (result.slug) return showPlatform(result.slug);
-    el.result.innerHTML = renderAssessmentAsJourney(result.assessment);
+async function researchPlatform(query) {
+  if (researchPending) {
+    setResearchStatus("Research is already pending for this request.");
     return;
   }
-  renderResearchError(OUTCOME_MESSAGE[result.outcome] || "Research could not be completed.", query);
-}
-
-// Start research and poll for its result. Safe to call on retry or on reload.
-async function researchPlatform(query) {
-  const btn = document.querySelector("#research-btn");
-  if (btn) btn.disabled = true;
-  setStatus("Starting…");
+  researchPending = true;
+  const button = document.querySelector("#research-btn");
+  if (button) button.disabled = true;
+  setResearchStatus("Starting research…");
   try {
-    const res = await fetch("/api/research", {
+    const body = await api("/api/research", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ platform: query }),
     });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      renderResearchError(body.error ? body.error.message : `Research is unavailable right now (${res.status}).`, query);
+    if (body.data?.known) {
+      researchPending = false;
+      await showPlatform(body.data.slug);
       return;
     }
-    if (body.data && body.data.known) return showPlatform(body.data.slug);
-    const runId = body.data && body.data.runId;
-    if (!runId) {
-      renderResearchError("Research could not be started right now. Try again shortly.", query);
-      return;
-    }
-    setUrlState(query, runId);
-    setStatus(PHASE_TEXT[body.data.phase] || PHASE_TEXT.queued);
-    pollRunStatus(runId, query);
-  } catch {
-    renderResearchError("Could not reach the research service. Check your connection and try again.", query);
+    if (!body.data?.runId) throw new Error("Research could not be started.");
+    setResearchStatus(body.data.deduplicated ? "An existing research run is in progress…" : "Research is queued…");
+    pollRunStatus(body.data.runId, query);
+  } catch (error) {
+    const rateLimited = error.status === 429;
+    renderResearchTerminal(
+      query,
+      rateLimited ? "Research capacity reached" : "Research unavailable",
+      error.message,
+      true,
+    );
   }
 }
 
-// Poll server-side run status. A dropped connection never cancels the research;
-// the run continues on Render and the browser resumes on the next poll.
 async function pollRunStatus(runId, query) {
   const token = ++activePoll;
-  let networkErrors = 0;
-  for (let i = 0; i < MAX_POLLS; i += 1) {
-    if (token !== activePoll) return; // superseded by a newer run
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+  for (let attempt = 0; attempt < MAX_POLLS; attempt += 1) {
+    await new Promise((resolve) => window.setTimeout(resolve, POLL_INTERVAL_MS));
     if (token !== activePoll) return;
-    let body;
     try {
-      const res = await fetch(`/api/research/${encodeURIComponent(runId)}`);
-      body = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        if (res.status === 404 && i < 3) continue; // run may not be visible yet
-        renderResearchError(body.error ? body.error.message : "Lost track of this research run.", query);
+      const { data } = await api(`/api/research/${encodeURIComponent(runId)}`);
+      if (data.phase === "completed" && data.result) {
+        researchPending = false;
+        if (data.result.outcome === "known") {
+          await showPlatform(data.result.slug);
+          return;
+        }
+        if (data.result.outcome === "review_required") {
+          renderResearchTerminal(query, "Private draft ready for review", data.result.message, false);
+          return;
+        }
+        renderResearchTerminal(
+          query,
+          "Research stopped safely",
+          OUTCOME_MESSAGE[data.result.outcome] || data.result.message || "The draft did not pass a publication gate.",
+          true,
+        );
         return;
       }
-      networkErrors = 0;
-    } catch {
-      networkErrors += 1;
-      setStatus("Reconnecting to the research service… (your research is still running)");
-      if (networkErrors > 8) {
-        renderResearchError("Could not reach the research service. Your research may still be running: reload to resume.", query);
+      if (data.phase === "failed") {
+        renderResearchTerminal(query, "Research failed", data.message || "The workflow failed safely.", true);
         return;
       }
-      continue;
-    }
-
-    const projection = body.data;
-    if (!projection) continue;
-    if (projection.phase === "completed" && projection.result) {
-      setUrlState(query, null);
-      renderResult(projection.result, query);
+      setResearchStatus(data.phase === "retrying" ? "A provider step is retrying…" : "Research is running…");
+    } catch (error) {
+      renderResearchTerminal(query, "Research status unavailable", error.message, true);
       return;
     }
-    if (projection.phase === "failed") {
-      renderResearchError(projection.message || "Research could not be completed. Try again shortly.", query);
-      return;
-    }
-    setStatus(PHASE_TEXT[projection.phase] || PHASE_TEXT.running);
   }
-  setStatus("Research is taking longer than expected. It is still running: reload this page to resume.");
+  researchPending = false;
+  renderResearchTerminal(query, "Research is still running", "The browser stopped polling. You can safely retry later.", true);
 }
 
-async function submitQuery(q) {
-  const query = q.trim();
-  if (!query) return;
-  activePoll += 1; // cancel any previous polling loop
+async function submitQuery(rawQuery) {
+  const query = rawQuery.trim();
+  if (!query) {
+    announce("Enter a platform name.");
+    return;
+  }
+  activePoll += 1;
+  researchPending = false;
+  cancelSuggestions();
   try {
     const { data } = await api(`/api/search?q=${encodeURIComponent(query)}`);
-    const exact = data.find((r) => r.name.toLowerCase() === query.toLowerCase());
-    if (exact) return showPlatform(exact.slug);
-    if (data.length > 0) return showPlatform(data[0].slug);
-    renderUnknown(query);
-  } catch (err) {
+    const exact = data.find((row) => row.name.toLowerCase() === query.toLowerCase());
+    if (exact) {
+      await showPlatform(exact.slug);
+      return;
+    }
+    if (data.length > 0) {
+      await showPlatform(data[0].slug);
+      return;
+    }
+    if (location.pathname !== "/") history.pushState(null, "", "/");
+    renderResearchConsent(query);
+  } catch (error) {
     el.result.hidden = false;
-    el.result.innerHTML = `<div class="state-message">${esc(err.message)}</div>`;
+    el.result.innerHTML = `<div class="state-message" role="alert">${esc(error.message)}</div>`;
   }
 }
 
-// Resume an in-flight research run after a page reload using the URL state.
-function resumeFromUrl() {
-  const params = new URLSearchParams(location.search);
-  const runId = params.get("research");
-  const query = params.get("q");
-  if (!runId || !query) return false;
-  el.input.value = query;
-  el.result.hidden = false;
-  el.result.innerHTML = `
-    <div class="card unknown-panel">
-      <p class="section-kicker">New platform</p>
-      <h2>Researching ${esc(query)}</h2>
-      <p class="lede">Resuming research…</p>
-      <p class="research-status" id="research-status" role="status" aria-live="polite"></p>
-      <button class="btn btn-secondary" id="research-btn" type="button" hidden>Retry research</button>
-    </div>`;
-  wireRetry(query);
-  setStatus("Resuming…");
-  pollRunStatus(runId, query);
-  return true;
+function showLanding() {
+  activePoll += 1;
+  researchPending = false;
+  cancelSuggestions();
+  el.result.hidden = true;
+  el.result.innerHTML = "";
+  el.input.value = "";
+  setRootMetadata();
+  el.input.focus({ preventScroll: true });
 }
 
-/* ---------- Events ---------- */
+function routeFromLocation() {
+  const match = location.pathname.match(/^\/platform\/([^/]+)\/?$/);
+  if (match) {
+    showPlatform(decodeURIComponent(match[1]), { push: false, focus: false });
+    return;
+  }
+  showLanding();
+}
 
-el.input.addEventListener("input", (e) => runSearch(e.target.value));
-el.input.addEventListener("blur", () => setTimeout(hideSuggestions, 150));
+el.input.addEventListener("input", (event) => queueSearch(event.target.value));
+el.input.addEventListener("blur", () => window.setTimeout(hideSuggestions, 150));
 el.input.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    cancelSuggestions();
+    return;
+  }
   if (el.suggestions.hidden) return;
   if (event.key === "ArrowDown") {
     event.preventDefault();
@@ -476,8 +700,6 @@ el.input.addEventListener("keydown", (event) => {
   } else if (event.key === "ArrowUp") {
     event.preventDefault();
     setActiveSuggestion(activeSuggestion - 1);
-  } else if (event.key === "Escape") {
-    hideSuggestions();
   } else if (event.key === "Enter" && activeSuggestion >= 0) {
     event.preventDefault();
     const choice = currentSuggestions[activeSuggestion];
@@ -485,18 +707,16 @@ el.input.addEventListener("keydown", (event) => {
   }
 });
 
-el.suggestions.addEventListener("click", (e) => {
-  const li = e.target.closest(".suggestion");
-  if (li) showPlatform(li.dataset.slug);
+el.suggestions.addEventListener("click", (event) => {
+  const choice = event.target.closest(".suggestion");
+  if (choice) showPlatform(choice.dataset.slug);
 });
 
-el.form.addEventListener("submit", (e) => {
-  e.preventDefault();
+el.form.addEventListener("submit", (event) => {
+  event.preventDefault();
   submitQuery(el.input.value);
 });
 
-async function init() {
-  resumeFromUrl();
-}
+window.addEventListener("popstate", routeFromLocation);
 
-init();
+routeFromLocation();

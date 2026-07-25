@@ -5,25 +5,29 @@ import { fileURLToPath } from "node:url";
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = path.join(projectRoot, "public");
 const dataRoot = path.join(outputRoot, "data");
+const recordsRoot = path.join(dataRoot, "records");
 const sourceRoot = path.join(outputRoot, "source");
 const canonicalUrl = process.env.PUBLIC_BASE_URL ?? "https://developer-journey-atlas.onrender.com";
 
 const sourceFiles = [
-  { path: "site/index.html", language: "html", description: "Accessible static-site document." },
-  { path: "site/app.js", language: "javascript", description: "Browser-side dataset loading, search, filters, and rendering." },
-  { path: "site/styles.css", language: "css", description: "Visual design and responsive layout." },
-  { path: "site/robots.txt", language: "text", description: "Crawler access and sitemap discovery." },
-  { path: "scripts/build-site.mjs", language: "javascript", description: "Deterministic static-site and LLM artifact generator." },
-  { path: "scripts/check-llm-site.mjs", language: "javascript", description: "Machine-readable artifact contract checks." },
-  { path: "scripts/validate-shortest-path-audits.mjs", language: "javascript", description: "Validates shortest-path audits, source hashes, evidence references, and corpus audit status." },
-  { path: "build-all.mjs", language: "javascript", description: "Reproducible validation and derived-artifact pipeline." },
-  { path: "build-selected-path.mjs", language: "javascript", description: "Experimental, internal selected-route heuristic-score generator. Its output is not published to the public site and is not shown to visitors." },
-  { path: "build-ds-quality.mjs", language: "javascript", description: "Analytical quality and comparability metadata generator." },
-  { path: "validate-records.mjs", language: "javascript", description: "Canonical record schema and evidence validation." },
-  { path: "build-catalog.mjs", language: "javascript", description: "Human-readable catalog generation." },
-  { path: "lib/measure.mjs", language: "javascript", description: "Shared normalized measurement and classification functions." },
-  { path: "tests/regression.mjs", language: "javascript", description: "Regression fixtures for the measurement layer." },
-  { path: "package.json", language: "json", description: "Supported build, validation, audit, and test commands." },
+  { path: "web/index.html", language: "html", description: "The active product document served before generated artifacts." },
+  { path: "web/app.js", language: "javascript", description: "Search, durable routing, explicit research consent, sharing, and route rendering." },
+  { path: "web/styles.css", language: "css", description: "The active responsive and accessible visual system." },
+  { path: "src/server.ts", language: "typescript", description: "The deployed Express composition root and platform-page metadata route." },
+  { path: "src/api/router.ts", language: "typescript", description: "The complete public API route index." },
+  { path: "src/api/platforms.ts", language: "typescript", description: "Fail-closed platform list and route presenter." },
+  { path: "src/api/journey.ts", language: "typescript", description: "Selected journey graph presenter with public blocker links suppressed." },
+  { path: "src/api/research.ts", language: "typescript", description: "Explicit research start and private review projection." },
+  { path: "src/core/publicationGate.ts", language: "typescript", description: "Identity, source, claim, and route publication gate." },
+  { path: "src/core/sourceAuthority.ts", language: "typescript", description: "Deterministic first-party source authority checks." },
+  { path: "src/core/journeyGraph.ts", language: "typescript", description: "Typed journey graph and selected-route integrity checks." },
+  { path: "scripts/build-corpus-health.mjs", language: "javascript", description: "Machine-readable corpus health and migration analysis generator." },
+  { path: "scripts/build-site.mjs", language: "javascript", description: "Fail-closed machine artifact and source snapshot generator." },
+  { path: "scripts/check-llm-site.mjs", language: "javascript", description: "Generated public-surface contract check." },
+  { path: "PRIVACY.md", language: "markdown", description: "Provider, storage, retention, and deletion disclosure." },
+  { path: "EVENT-CONTRACT.txt", language: "text", description: "Uninstrumented privacy-preserving event contract." },
+  { path: "LAUNCH-CHECKLIST.txt", language: "text", description: "Human review and representative-user pilot gate." },
+  { path: "package.json", language: "json", description: "Supported build, audit, evaluation, and test commands." },
 ];
 
 function sourceUrl(filePath) {
@@ -37,87 +41,143 @@ function fencedCode(language, content) {
 }
 
 await rm(outputRoot, { recursive: true, force: true });
-await mkdir(dataRoot, { recursive: true });
+await mkdir(recordsRoot, { recursive: true });
 await mkdir(sourceRoot, { recursive: true });
-await cp(path.join(projectRoot, "site"), outputRoot, { recursive: true, force: true });
-// selected-path-heuristic.json is intentionally NOT published. It is the
-// experimental, internal effort-score output and is kept out of the public
-// site. The generator (build-selected-path.mjs) and its output stay in the
-// repo, clearly relabeled, in case a properly verified benchmark returns.
-await cp(path.join(projectRoot, "ds-quality.json"), path.join(dataRoot, "ds-quality.json"));
-await cp(path.join(projectRoot, "coverage.json"), path.join(dataRoot, "coverage.json"));
-await cp(path.join(projectRoot, "record.schema.json"), path.join(dataRoot, "record.schema.json"));
-await cp(path.join(projectRoot, "shortest-path-audit.schema.json"), path.join(dataRoot, "shortest-path-audit.schema.json"));
-await cp(path.join(projectRoot, "audit-status.json"), path.join(dataRoot, "audit-status.json"));
-await cp(path.join(projectRoot, "records"), path.join(dataRoot, "records"), { recursive: true, force: true });
-await cp(path.join(projectRoot, "audits"), path.join(dataRoot, "audits"), { recursive: true, force: true });
+await cp(path.join(projectRoot, "site", "robots.txt"), path.join(outputRoot, "robots.txt"));
 
 const coverage = JSON.parse(await readFile(path.join(projectRoot, "coverage.json"), "utf8"));
-// selected-path-heuristic.json is read only to enumerate platforms (name, slug,
-// category, outcome) for the manifest. Its scores are never emitted publicly.
+const health = JSON.parse(await readFile(path.join(projectRoot, "corpus-health.json"), "utf8"));
 const atlas = JSON.parse(await readFile(path.join(projectRoot, "selected-path-heuristic.json"), "utf8"));
 const auditStatus = JSON.parse(await readFile(path.join(projectRoot, "audit-status.json"), "utf8"));
+const eligibleSlugs = new Set(
+  health.records
+    .filter((record) => record.eligibility.public_display)
+    .map((record) => record.slug),
+);
+const eligibleRows = atlas.rows.filter((row) => eligibleSlugs.has(row.slug));
+
+function publicRecordFromGraph(record, graph) {
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const nodes = graph.selectedRoute.nodeIds.map((id) => nodeById.get(id)).filter(Boolean);
+  const stepNumberByNodeId = new Map(nodes.map((node, index) => [node.id, index + 1]));
+  const prerequisites = graph.prerequisites.map((item, index) => ({
+    order: index + 1,
+    type: item.type,
+    requirement: item.requirement,
+    required: item.required,
+    source_ids: [...new Set(item.evidence.map((evidence) => evidence.sourceId))],
+  }));
+  const frictionGates = graph.externalGates.map((gate) => ({
+    at_step: stepNumberByNodeId.get(gate.atNodeId),
+    type: gate.type,
+    description: gate.description,
+    documented_requirement: true,
+    required: gate.required,
+    source_ids: [...new Set(gate.evidence.map((evidence) => evidence.sourceId))],
+  }));
+  const branches = graph.candidateRoutes
+    .filter((candidate) => candidate.status === "considered")
+    .map((candidate) => ({
+      at_step: stepNumberByNodeId.get(candidate.branchAtNodeId),
+      condition: candidate.condition,
+      path: candidate.routeSummary,
+      effect_on_first_success: candidate.effectOnFirstSuccess,
+      source_ids: [...new Set(candidate.evidence.map((evidence) => evidence.sourceId))],
+    }));
+  return {
+    ...record,
+    prerequisites,
+    primary_path: nodes.map((node, index) => ({
+      step_number: index + 1,
+      phase: node.phase,
+      actor: node.actor,
+      interface: node.interface,
+      action: node.action,
+      details: [],
+      input: node.inputs.join(", "),
+      output: node.outputs.join(", "),
+      success_signal: node.successSignal,
+      failure_or_wait: node.kind === "passive_wait" ? node.action : "",
+      required: node.required,
+      source_ids: [...new Set(node.evidence.map((evidence) => evidence.sourceId))],
+      required_fields: node.requiredFields,
+    })),
+    branches,
+    friction_gates: frictionGates,
+    journey_graph: graph,
+  };
+}
+
+const publicRecords = new Map();
+for (const row of eligibleRows) {
+  const record = JSON.parse(await readFile(path.join(projectRoot, "records", `${row.slug}.json`), "utf8"));
+  const graph = JSON.parse(
+    await readFile(path.join(projectRoot, "trust", "journey-graphs", `${row.slug}.json`), "utf8"),
+  );
+  const publicRecord = publicRecordFromGraph(record, graph);
+  publicRecords.set(row.slug, publicRecord);
+  await writeFile(
+    path.join(recordsRoot, `${row.slug}.json`),
+    `${JSON.stringify(publicRecord, null, 2)}\n`,
+    "utf8",
+  );
+}
+await cp(path.join(projectRoot, "record.schema.json"), path.join(dataRoot, "record.schema.json"));
+
 const summary = {
   generatedAt: coverage.generated_at,
-  platforms: coverage.roster_count,
-  steps: coverage.records.reduce((total, record) => total + record.steps, 0),
-  sources: coverage.records.reduce((total, record) => total + record.sources, 0),
-  recordsWithErrors: coverage.records.filter((record) => record.errors.length > 0).length,
-  audits: {
-    verified: auditStatus.verified,
-    needsHumanJudgment: auditStatus.needs_human_judgment,
-    blocked: auditStatus.blocked,
-    pending: auditStatus.pending,
-  },
+  reviewedCorpusRecords: coverage.roster_count,
+  publicRoutes: eligibleRows.length,
+  researchDrafts: 0,
+  verifiedAudits: auditStatus.verified,
+  blockerLinkEvaluation: "awaiting independent labels",
+  publicAssociationsAvailable: false,
 };
-
 await writeFile(
   path.join(dataRoot, "coverage-summary.json"),
   `${JSON.stringify(summary, null, 2)}\n`,
   "utf8",
 );
 
-const auditBySlug = new Map(auditStatus.records.map((record) => [record.slug, record]));
-const records = atlas.rows.map((row) => ({
+const records = eligibleRows.map((row) => ({
   name: row.name,
   slug: row.slug,
   category: row.category,
   outcome: row.outcome,
-  url: `${canonicalUrl}/data/records/${row.slug}.json`,
-  auditStatus: auditBySlug.get(row.slug)?.status ?? "pending",
-  auditUrl: auditBySlug.get(row.slug)?.audit_url ? `${canonicalUrl}${auditBySlug.get(row.slug).audit_url}` : null,
+  platformUrl: `${canonicalUrl}/platform/${row.slug}`,
+  recordUrl: `${canonicalUrl}/data/records/${row.slug}.json`,
+  evidenceClass: "documented_fact",
 }));
-
 const dataIndex = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   name: "Developer Journey Atlas",
-  description: "Preserved official-documentation evidence records plus verified shortest required paths from account creation to first success.",
+  description:
+    "Publication-eligible documented routes from account creation to first success. Documentation structure is not user behavior or product quality.",
   canonicalUrl,
   generatedAt: coverage.generated_at,
-  interpretation: [
-    "A canonical source record is evidence, not automatically a verified shortest required path.",
-    "Only audits marked verified may expose action counts or anonymous peer context.",
-    "Verified paths begin at account creation, list every evidenced required field, and stop at first success.",
-    "This dataset is not product usability, conversion, drop-off, or observed developer completion time.",
-  ],
+  servingModel: {
+    productUi: "packages/journey-corpus/web",
+    machineArtifacts: "packages/journey-corpus/public",
+    note: "Generated artifacts never shadow or describe a second frontend.",
+  },
   counts: summary,
+  publicationContract: [
+    "Every public route passes deterministic platform identity, source authority, content availability, claim coverage, and selected-route integrity gates.",
+    "Unevaluated blocker-reason links and cross-platform associations are not public.",
+    "No public score, score band, percentile, peer median, or difficulty verdict is available.",
+  ],
   files: {
     llmIndex: `${canonicalUrl}/llms.txt`,
     fullContext: `${canonicalUrl}/llms-full.txt`,
-    catalog: `${canonicalUrl}/catalog.md`,
-    analyticalQuality: `${canonicalUrl}/data/ds-quality.json`,
-    coverage: `${canonicalUrl}/data/coverage.json`,
     coverageSummary: `${canonicalUrl}/data/coverage-summary.json`,
     recordSchema: `${canonicalUrl}/data/record.schema.json`,
-    shortestPathAuditSchema: `${canonicalUrl}/data/shortest-path-audit.schema.json`,
-    auditStatus: `${canonicalUrl}/data/audit-status.json`,
     measurementContract: `${canonicalUrl}/measurement-contract.md`,
+    privacy: `${canonicalUrl}/privacy.md`,
   },
   records,
   sourceCode: {
     index: `${canonicalUrl}/source/index.md`,
     license: "Apache-2.0",
-    notice: "Software is Apache-2.0. Original research is CC-BY-4.0 under the repository license scope.",
     files: sourceFiles.map((file) => ({
       path: file.path,
       url: sourceUrl(file.path),
@@ -125,31 +185,26 @@ const dataIndex = {
     })),
   },
 };
+await writeFile(path.join(dataRoot, "index.json"), `${JSON.stringify(dataIndex, null, 2)}\n`, "utf8");
 
-await writeFile(
-  path.join(dataRoot, "index.json"),
-  `${JSON.stringify(dataIndex, null, 2)}\n`,
-  "utf8",
-);
-
-const repoRoot = path.resolve(projectRoot, "../..");
-const readme = await readFile(path.join(repoRoot, "README.md"), "utf8");
 const selectionPolicy = await readFile(path.join(projectRoot, "SELECTION-POLICY.txt"), "utf8");
 const measurementContract = await readFile(path.join(projectRoot, "MEASUREMENT-CONTRACT.txt"), "utf8");
-const schema = await readFile(path.join(projectRoot, "record.schema.json"), "utf8");
-const auditSchema = await readFile(path.join(projectRoot, "shortest-path-audit.schema.json"), "utf8");
-const auditStatusText = await readFile(path.join(projectRoot, "audit-status.json"), "utf8");
-const platformCount = JSON.parse(auditStatusText).total;
-const renderAudit = await readFile(path.join(projectRoot, "audits/render.json"), "utf8");
-const zoomAudit = await readFile(path.join(projectRoot, "audits/zoom.json"), "utf8");
-const catalog = (await readFile(path.join(projectRoot, "catalog.txt"), "utf8"))
-  .replaceAll("](records/", "](data/records/")
-  .replaceAll("](audits/", "](data/audits/");
+const privacy = await readFile(path.join(projectRoot, "PRIVACY.md"), "utf8");
+const eventContract = await readFile(path.join(projectRoot, "EVENT-CONTRACT.txt"), "utf8");
+const launchChecklist = await readFile(path.join(projectRoot, "LAUNCH-CHECKLIST.txt"), "utf8");
+const methodology = `# Developer Journey Atlas methodology
 
-const methodology = `# Developer Journey Atlas methodology\n\n${readme.trim()}\n\n${selectionPolicy.trim()}\n\n${measurementContract.trim()}\n`;
+The Atlas publishes only a selected account-creation-to-first-success route that passes deterministic platform identity, first-party source-content, claim-grounding, required-field, branch, and route-integrity gates. Documentation structure is not evidence of usability, conversion, abandonment, difficulty, or causality.
+
+${selectionPolicy.trim()}
+
+${measurementContract.trim()}
+`;
 await writeFile(path.join(outputRoot, "methodology.md"), methodology, "utf8");
 await writeFile(path.join(outputRoot, "measurement-contract.md"), `${measurementContract.trim()}\n`, "utf8");
-await writeFile(path.join(outputRoot, "catalog.md"), `${catalog.trim()}\n`, "utf8");
+await writeFile(path.join(outputRoot, "privacy.md"), `${privacy.trim()}\n`, "utf8");
+await writeFile(path.join(outputRoot, "event-contract.txt"), `${eventContract.trim()}\n`, "utf8");
+await writeFile(path.join(outputRoot, "launch-checklist.txt"), `${launchChecklist.trim()}\n`, "utf8");
 
 const sourceSections = [];
 for (const file of sourceFiles) {
@@ -159,31 +214,73 @@ for (const file of sourceFiles) {
   await writeFile(destination, content, "utf8");
   sourceSections.push(`## ${file.path}\n\n${file.description}\n\n${fencedCode(file.language, content)}`);
 }
-
-const sourceIndex = `# Developer Journey Atlas source code\n\n> Deployed source snapshot for the Developer Journey Atlas static site and its research-data generators.\n\nSoftware is Apache-2.0 and original research is CC BY 4.0 under the repository license scope. Generated research artifacts and the ${platformCount} evidence records are indexed separately in [the data manifest](${canonicalUrl}/data/index.json).\n\n## Site and build\n\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n`;
+const sourceIndex = `# Developer Journey Atlas deployed source\n\nThe active product UI is \`packages/journey-corpus/web\`. Generated public files are machine artifacts only.\n\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n`;
 await writeFile(path.join(sourceRoot, "index.md"), sourceIndex, "utf8");
 
-const llmsIndex = `# Developer Journey Atlas\n\n> Account creation to first developer success, with preserved official evidence for ${platformCount} platforms.\n\nA source record is not automatically a verified shortest path. Use only audits marked verified for action counts or peer context. Verified audits list required fields, exclude optional work, and keep platform automation outside the developer action count. This is not conversion, drop-off, usability, or observed completion-time data. Software is Apache-2.0 and original research is CC BY 4.0 under the repository license scope.\n\n## Start here\n\n- [Audit status](${canonicalUrl}/data/audit-status.json): Corpus-wide verified, unresolved, blocked, and pending status.\n- [Shortest-path audit schema](${canonicalUrl}/data/shortest-path-audit.schema.json): Machine-readable audit contract.\n- [Render shortest-path audit](${canonicalUrl}/data/audits/render.json): Verified calibration case.\n- [Zoom shortest-path audit](${canonicalUrl}/data/audits/zoom.json): Unresolved calibration case with exact evidence gaps.\n- [Machine-readable manifest](${canonicalUrl}/data/index.json): Data boundaries and record links.\n- [Methodology](${canonicalUrl}/methodology.md): Research and measurement contracts.\n- [Full LLM context](${canonicalUrl}/llms-full.txt): Consolidated methodology, catalog, schemas, and deployed source.\n\n## Preserved evidence\n\n- [Coverage report](${canonicalUrl}/data/coverage.json): Structural status for canonical source records.\n- [Source record schema](${canonicalUrl}/data/record.schema.json): Evidence-archive contract.\n- [Render source record](${canonicalUrl}/data/records/render.json): Preserved pre-audit evidence record.\n\n## Source code\n\n- [Source index](${canonicalUrl}/source/index.md): Deployed source files and purpose notes.\n${sourceFiles.map((file) => `- [${file.path}](${sourceUrl(file.path)}): ${file.description}`).join("\n")}\n`;
+const recordLinks = records
+  .map((record) => `- [${record.name}](${record.platformUrl}): ${record.outcome}`)
+  .join("\n");
+const llmsIndex = `# Developer Journey Atlas
+
+> Publication-eligible, first-party documented routes from account creation to first success.
+
+The reviewed repository contains ${summary.reviewedCorpusRecords} records. ${summary.publicRoutes} currently passes every publication gate. Other records and database research drafts are not public routes. Documentation structure is not observed difficulty, conversion, abandonment, or causality. Scores, percentiles, peer placement, model-selected blocker reasons, and cross-platform associations are unavailable.
+
+## Public routes
+
+${recordLinks || "- No route currently passes every publication gate."}
+
+## Contracts
+
+- [Machine-readable manifest](${canonicalUrl}/data/index.json)
+- [Methodology](${canonicalUrl}/methodology.md)
+- [Measurement contract](${canonicalUrl}/measurement-contract.md)
+- [Privacy and research data flow](${canonicalUrl}/privacy.md)
+- [Measurement availability](${canonicalUrl}/event-contract.txt): \`measurement_unavailable\`, with no collector installed.
+- [20-platform human review gate](${canonicalUrl}/launch-checklist.txt)
+- [Deployed source](${canonicalUrl}/source/index.md)
+`;
 await writeFile(path.join(outputRoot, "llms.txt"), llmsIndex, "utf8");
 
-const llmsFull = `# Developer Journey Atlas: full LLM context\n\n> Consolidated methodology, audit status, verified calibration data, schemas, catalog, and deployed source code. For current canonical JSON, use ${canonicalUrl}/data/index.json.\n\nOnly audits marked verified may supply action counts, required-field counts, or peer context. Software is Apache-2.0 and original research is CC BY 4.0 under the repository license scope.\n\n${methodology.trim()}\n\n# Corpus audit status\n\n${fencedCode("json", auditStatusText)}\n\n# Verified Render shortest-path audit\n\n${fencedCode("json", renderAudit)}\n\n# Unresolved Zoom shortest-path audit\n\n${fencedCode("json", zoomAudit)}\n\n# Audit catalog\n\n${catalog.replace(/^# .*\n+/, "").trim()}\n\n# Shortest-path audit schema\n\n${fencedCode("json", auditSchema)}\n\n# Preserved source-record schema\n\n${fencedCode("json", schema)}\n\n# Deployed source code\n\n${sourceSections.join("\n\n")}\n`;
+const publicRecordSections = [];
+for (const record of records) {
+  const content = `${JSON.stringify(publicRecords.get(record.slug), null, 2)}\n`;
+  publicRecordSections.push(`# ${record.name} public documented record\n\n${fencedCode("json", content)}`);
+}
+const llmsFull = `# Developer Journey Atlas full public context
+
+Only publication-eligible routes are included. No score, comparison, blocker diagnosis, association, or causal claim is available.
+
+${methodology.trim()}
+
+${publicRecordSections.join("\n\n")}
+
+# Deployed source
+
+${sourceSections.join("\n\n")}
+`;
 await writeFile(path.join(outputRoot, "llms-full.txt"), llmsFull, "utf8");
 
 const sitemapUrls = [
   `${canonicalUrl}/`,
+  ...records.map((record) => record.platformUrl),
   `${canonicalUrl}/llms.txt`,
   `${canonicalUrl}/llms-full.txt`,
   `${canonicalUrl}/methodology.md`,
   `${canonicalUrl}/measurement-contract.md`,
-  `${canonicalUrl}/catalog.md`,
+  `${canonicalUrl}/privacy.md`,
+  `${canonicalUrl}/event-contract.txt`,
+  `${canonicalUrl}/launch-checklist.txt`,
   `${canonicalUrl}/data/index.json`,
-  `${canonicalUrl}/data/audit-status.json`,
-  `${canonicalUrl}/data/shortest-path-audit.schema.json`,
   `${canonicalUrl}/source/index.md`,
-  ...records.filter((record) => record.auditUrl).map((record) => record.auditUrl),
-  ...records.map((record) => record.url),
+  ...records.map((record) => record.recordUrl),
 ];
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapUrls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}
+</urlset>
+`;
 await writeFile(path.join(outputRoot, "sitemap.xml"), sitemap, "utf8");
-
-console.log(`Built Developer Journey Atlas with ${summary.platforms} platforms.`);
+console.log(
+  `Built public artifacts for ${summary.publicRoutes} eligible route from ${summary.reviewedCorpusRecords} reviewed records.`,
+);

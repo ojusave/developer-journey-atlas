@@ -20,15 +20,24 @@ function test(name, fn) {
   }
 }
 
-// 1. Render: Dashboard Web Service first-deploy path (compacted to official tutorial sections).
-test("render: 6 raw / 6 dev / 6 required / 0 optional / 0 platform", () => {
-  const t = analyzeRecord(load("render")).transitions;
-  assert.equal(t.raw_transition_count, 6);
-  assert.equal(t.developer_action_count, 6);
-  assert.equal(t.required_developer_action_count, 6);
-  assert.equal(t.optional_developer_action_count, 0);
-  assert.equal(t.platform_event_count, 0);
-  assert.equal(t.developer_action_count + t.platform_event_count, t.raw_transition_count);
+// 1. Render: the compact historical record is regression evidence only.
+test("render: public reconstruction is not derived from the compact legacy primary path", () => {
+  const legacy = load("render");
+  const graph = JSON.parse(
+    fs.readFileSync(path.join(ROOT, "trust", "journey-graphs", "render.json"), "utf8"),
+  );
+  assert.ok(
+    legacy.primary_path.length < graph.selectedRoute.nodeIds.length,
+    "legacy compact path must not be mistaken for the complete selected route",
+  );
+  assert.equal(graph.selectedRoute.nodeIds.length, 16);
+  assert.equal(
+    graph.nodes.flatMap((node) => node.requiredFields).length,
+    11,
+    "public graph must preserve account and service-form fields",
+  );
+  assert.ok(graph.nodes.some((node) => node.kind === "passive_wait"));
+  assert.ok(graph.nodes.some((node) => node.kind === "platform_outcome"));
 });
 
 // 2. Chronosphere: existing tenant + existing metric data assumptions are exposed.

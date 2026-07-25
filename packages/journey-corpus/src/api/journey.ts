@@ -1,15 +1,13 @@
 import type { Request, Response } from "express";
 import type { DataStore } from "../core/ports.js";
-import { buildCurvePlacement } from "../core/curvePlacement.js";
-import { buildOnboardingScore } from "../core/onboardingScore.js";
 import { sendData, sendError } from "./http.js";
-import { ensureRow } from "./storeHelpers.js";
+import { ensurePublicRow } from "./storeHelpers.js";
 
-/** GET /api/platforms/:slug/journey — full docs path with friction highlights. */
+/** GET /api/platforms/:slug/journey: selected source-grounded route. */
 export function getPlatformJourney(store: DataStore) {
   return async (req: Request, res: Response): Promise<void> => {
     const slug = String(req.params.slug);
-    const row = await ensureRow(store, slug);
+    const row = await ensurePublicRow(store, slug);
     if (!row) {
       sendError(res, 404, "not_found", `No platform found for "${slug}".`);
       return;
@@ -23,22 +21,19 @@ export function getPlatformJourney(store: DataStore) {
       sendError(res, 404, "not_found", `No journey record found for "${slug}".`);
       return;
     }
-    const curve = buildCurvePlacement(row, store);
-    const onboardingScore = buildOnboardingScore(row, store.listRows());
-    sendData(res, { ...journey, curve, onboardingScore }, {
-      blockerReasonCount: store.blockerReasonCount?.() ?? null,
-      honesty:
-        "Friction gates are documented requirements. Linked blockers are hypotheses, not confirmed drop-off causes. Onboarding load and curves use documentation counts only.",
+    sendData(res, journey, {
+      evidence:
+        "Published routes pass deterministic identity, source-content, claim-grounding, and selected-route integrity gates.",
     });
   };
 }
 
-/** GET /api/blockers/meta — taxonomy size and honesty note. */
+/** GET /api/blockers/meta: public evaluation status only. */
 export function getBlockerMeta(store: DataStore) {
   return (_req: Request, res: Response): void => {
     sendData(res, {
-      reasonCount: store.blockerReasonCount?.() ?? 0,
-      note: "790 blocker reasons are hypotheses across universal families and platform archetypes. They are not observed drop-off counts.",
+      publicLinksAvailable: false,
+      note: "Blocker-reason links remain internal until the labeled evaluation and owner-approved thresholds pass.",
     });
   };
 }

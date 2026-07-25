@@ -100,9 +100,9 @@ test("projectRun maps run statuses to safe phases", () => {
   assert.equal(failed.result, null);
   assert.ok(failed.message && !/stack|api|token/i.test(failed.message));
 
-  const completed = projectRun("r", { status: "succeeded", results: [{ outcome: "no_docs" }] });
+  const completed = projectRun("r", { status: "succeeded", results: [{ outcome: "no_official_source" }] });
   assert.equal(completed.phase, "completed");
-  assert.equal(completed.result.outcome, "no_docs");
+  assert.equal(completed.result.outcome, "no_official_source");
 
   const garbage = projectRun("r", { status: "succeeded", results: [{ nope: true }] });
   assert.equal(garbage.phase, "failed");
@@ -231,12 +231,27 @@ test("start begins a run and returns 202 with a run id", async () => {
 
 test("status returns only a safe projection and never the raw input", async () => {
   const runner = new FakeWorkflowRunner("r", [
-    { runId: "r", phase: "completed", result: { outcome: "no_docs" }, message: null },
+    { runId: "r", phase: "completed", result: { outcome: "no_official_source" }, message: null },
   ]);
   const res = fakeRes();
   await getResearchStatus(storeWithPeer(), runner)(fakeReq({ params: { runId: "r" } }), res);
   assert.deepEqual(Object.keys(res.body.data).sort(), ["message", "phase", "result", "runId"]);
-  assert.equal(res.body.data.result.outcome, "no_docs");
+  assert.equal(res.body.data.result.outcome, "no_official_source");
+});
+
+test("status redacts provider payloads from typed terminal outcomes", async () => {
+  const runner = new FakeWorkflowRunner("r", [
+    {
+      runId: "r",
+      phase: "completed",
+      result: { outcome: "model_failed", message: "Bearer secret-token provider payload" },
+      message: null,
+    },
+  ]);
+  const res = fakeRes();
+  await getResearchStatus(storeWithPeer(), runner)(fakeReq({ params: { runId: "r" } }), res);
+  assert.equal(res.body.data.result.outcome, "model_failed");
+  assert.doesNotMatch(JSON.stringify(res.body), /secret-token|provider payload/);
 });
 
 test("status maps a runner error to a safe 404", async () => {

@@ -1,90 +1,97 @@
 # Developer Journey Atlas
 
-Search a developer platform and inspect its documented route from account creation to first success.
+Search a reviewed developer platform and inspect its source-grounded route from account creation to first success.
 
-[Live Atlas](https://developer-journey-atlas.onrender.com) · [Deploy to Render](https://render.com/deploy?repo=https://github.com/ojusave/developer-journey-atlas) · [Data manifest](https://developer-journey-atlas.onrender.com/data/index.json) · [LLM guide](https://developer-journey-atlas.onrender.com/llms.txt)
+[Live Atlas](https://developer-journey-atlas.onrender.com) · [Data manifest](https://developer-journey-atlas.onrender.com/data/index.json) · [LLM guide](https://developer-journey-atlas.onrender.com/llms.txt)
 
-![Architecture diagram](static/images/architecture-diagram.png)
+Developer Journey Atlas is an independent community project, not an official Render product.
 
-![Pipeline flow](static/images/pipeline-flow.png)
+## Current publication state
 
-## Highlights
+- The repository preserves 224 historical research records.
+- One route, Render, currently passes the deterministic identity, first-party source-content, claim-grounding, required-field, branch, and route-integrity gates.
+- The other 223 records remain non-public while their routes and evidence need human review.
+- Blocker-reason links and cross-platform associations remain internal until independent evaluation passes.
+- Documentation structure is not evidence of conversion, abandonment, usability, difficulty, causality, or observed completion time.
 
-- **224 platforms** with preserved official-documentation evidence records and shortest-path audits.
-- **Audit-status honesty**: only verified audits expose action counts or peer context; unresolved routes show the evidence gap.
-- **Postgres-backed serving** on Render for journeys, curves, and blocker hypotheses (790 hypotheses, not observed drop-off causes).
-- **Optional research workflows** for missing platforms: search official docs, assemble a schema-valid draft, and show it in-session.
-- **Anonymous peer context** when a subject and enough same-category verified peers share a comparable first-success type.
+## Public experience
 
-## Overview
+Known platforms use durable routes such as `/platform/render`. The server renders platform-specific title, description, canonical URL, and Open Graph metadata before the browser loads JavaScript.
 
-Developer Journey Atlas is a public research wrapper over a corpus of platform onboarding paths. Each path starts at account creation, lists required developer actions and fields, and stops at a defined first-success outcome. Source records stay readable JSON. Audits sit beside them. Friction gates and blocker taxonomy entries are hypotheses until observed journey evidence says otherwise.
+Searching for an unknown platform does not start research. The user must read the provider disclosure and explicitly activate the research action. Render Workflows, You.com, and OpenRouter may process the platform name. A completed result remains private until maintainer review passes every publication gate.
 
-This is route structure, not conversion, activation, usability, or completion-time data.
-
-## Table of contents
-
-- [Usage](#usage)
-- [Deploy](#deploy)
-- [Configuration](#configuration)
-- [Project structure](#project-structure)
-- [License](#license)
-
-## Usage
-
-Open the [live Atlas](https://developer-journey-atlas.onrender.com), search for a platform (for example `Render` or `Plaid`), and read the journey panel: audit status, required actions and fields, waits, external gates, exclusions, and sources.
-
-API sketch (same host):
+The public API is fail-closed:
 
 ```http
 GET /api/meta
-GET /api/platforms?q=render
+GET /api/platforms
+GET /api/platforms/render/journey
+GET /api/search?q=render
 GET /healthz
 ```
 
-`/healthz` reports `dataStore=postgres` when the Render Postgres read model is active.
+Internal legacy calculations remain in the repository for migration analysis. Public routes and responses do not expose composite onboarding metrics, peer placement, model-selected blocker reasons, or cross-platform associations.
 
-## Deploy
+## Build and verification
 
-Deploy with the Blueprint at `render.yaml` (web service + Postgres). Prefer the Deploy button above, or create from the Render Dashboard with this repository.
+From `packages/journey-corpus`:
 
-The Blueprint uses a starter web plan and `preDeployCommand` for `db:setup` (migrate + seed). Workflow services for live research are created separately with the Render CLI or Dashboard; they are not Blueprint-managed yet.
+```sh
+npm run build:data
+npm run build:app
+npm run test:app
+npm test
+```
 
-## Configuration
+`build:data` regenerates the publication health and evaluation foundations, builds the machine-readable public surface, publishes the active web source snapshot, and checks that only eligible routes are included.
 
-| Variable | Required | Notes |
-| --- | --- | --- |
-| `DATABASE_URL` | Yes (Postgres mode) | Wired from Render Postgres via Blueprint `fromDatabase` |
-| `DATA_STORE` | Yes | `postgres` in production |
-| `NODE_VERSION` | Yes | `22.22.0` |
-| `PORT` | Set by Render | Bind `0.0.0.0:$PORT` |
-| `OPENROUTER_API_KEY` | Optional | Research / blocker linking |
-| `OPENROUTER_MODEL` | Optional | Research model id |
-| `RENDER_API_KEY` | Optional | Start/read Workflow runs from the web service |
-| `RENDER_WORKFLOW_TASK_SLUG` | Optional | Default research task slug |
-| `RENDER_VERIFY_TASK_SLUG` | Optional | Default verify task slug |
-| `BLOCKER_LINKING_ENABLED` | Optional | `"true"` to enable linking |
-| `RESEARCH_HOURLY_LIMIT` | Optional | Per-IP research starts per hour (default `60`) |
-| `RESEARCH_GLOBAL_HOURLY_LIMIT` | Optional | Shared research starts per hour across all clients (default `300`) |
-| `PRISMA_CONNECTION_LIMIT` | Optional | Prisma pool size per web instance (default `5`) |
+## Deploying a personal copy
 
-Concurrent developers share one Workflow per platform via the `ResearchClaim` table. Search and journey endpoints load platforms from Postgres when another instance persisted them first.
+The repository Blueprint selects a paid Starter web service and a paid Basic-256mb Render Postgres instance. Review [current Render pricing](https://render.com/pricing) before deploying.
 
-Health: `GET /healthz`. Logs: Render service logs for the web service and any Workflow service.
+The Blueprint manages the public web service and Postgres read model. Workflow services for research and verification are configured separately. No workflow starts unless the required server-side credentials and task slug are present.
+
+Relevant environment variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection in production |
+| `DATA_STORE` | `postgres` in production or `local` for the committed corpus |
+| `PUBLIC_BASE_URL` | Canonical public origin used for metadata |
+| `RENDER_API_KEY` | Starts and reads approved Workflow runs |
+| `RENDER_WORKFLOW_TASK_SLUG` | Research Workflow task |
+| `VERIFY_ADMIN_SECRET` | Protects the verification start endpoint |
+| `OPENROUTER_API_KEY` | Workflow-side reconstruction and internal evaluation |
+| `OPENROUTER_MODEL` | Workflow-side reconstruction model |
+| `YDC_API_KEY` | Workflow-side first-party documentation discovery |
+| `RESEARCH_GLOBAL_HOURLY_LIMIT` | Shared research-start capacity |
+
+## Trust and privacy contracts
+
+- `packages/journey-corpus/SELECTION-POLICY.txt`
+- `packages/journey-corpus/MEASUREMENT-CONTRACT.txt`
+- `packages/journey-corpus/PRIVACY.md`
+- `packages/journey-corpus/EVENT-CONTRACT.txt`
+- `packages/journey-corpus/LAUNCH-CHECKLIST.txt`
+- `packages/journey-corpus/corpus-health.json`
+- `packages/journey-corpus/migration-analysis.json`
+- `packages/journey-corpus/evaluation/`
+
+The event contract is `measurement_unavailable`: no approved analytics collector, persistence, query path, or verified test event is installed.
 
 ## Project structure
 
 | Path | Purpose |
 | --- | --- |
-| `packages/journey-corpus/` | Evidence records, audits, Express app, Prisma seed, public web UI |
-| `packages/blocker-taxonomy/` | Blocker hypothesis inventory (`first-mile-blocker-universe.txt`) |
-| `packages/generated-views/` | Deterministic JSONL projections for humans/LLMs |
-| `workflows/` | Render Workflows package for research/verify tasks |
-| `render.yaml` | Web service + Postgres Blueprint |
-| `static/images/` | README architecture and pipeline diagrams |
-
-Corpus contracts used at build time live as plain text: `SELECTION-POLICY.txt` and `MEASUREMENT-CONTRACT.txt` under `packages/journey-corpus/`. The only Markdown file in the repository is this README.
+| `packages/journey-corpus/web/` | Active public product UI |
+| `packages/journey-corpus/public/` | Generated public machine artifacts and active source snapshot |
+| `packages/journey-corpus/trust/` | Platform identities, fetched source evidence, and journey graphs |
+| `packages/journey-corpus/evaluation/` | Labeling packet and predeclared validation protocols |
+| `packages/journey-corpus/records/` | Preserved source records |
+| `packages/journey-corpus/audits/` | Historical shortest-path audit state |
+| `workflows/` | Render Workflow tasks |
+| `render.yaml` | Paid web service and Postgres Blueprint |
 
 ## License
 
-Software is Apache-2.0 (`LICENSE`). Original research expression is Creative Commons Attribution 4.0 (`DATA_LICENSE.txt`). Path boundaries: `LICENSE_SCOPE.txt`.
+Software is Apache-2.0 under `LICENSE`. Original research expression is Creative Commons Attribution 4.0 under `DATA_LICENSE.txt`.

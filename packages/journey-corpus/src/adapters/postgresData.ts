@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { readFileSync, readdirSync } from "node:fs";
+import path from "node:path";
 import type {
   DataStore,
   DatasetMeta,
@@ -7,7 +9,10 @@ import type {
   QualityRow,
   ShortestPathAudit,
 } from "../core/ports.js";
-import { buildJourneyOverlay, type JourneyOverlay, type ModelLinkInput } from "../core/journeyOverlay.js";
+import { buildJourneyOverlay, buildJourneyOverlayFromGraph, type JourneyOverlay, type ModelLinkInput } from "../core/journeyOverlay.js";
+import type { JourneyGraph } from "../core/journeyGraph.js";
+import { PublicationGate, type CorpusHealthReport } from "../core/publicationGate.js";
+import { config } from "../config.js";
 
 interface FamilyInfo {
   id: string;
@@ -41,6 +46,8 @@ export class PostgresDataStore implements DataStore {
   private readonly modelLinksBySlug = new Map<string, ModelLinkInput[]>();
   private readonly families = new Map<string, FamilyInfo>();
   private readonly reasonCount: number;
+  private readonly publicationGate: PublicationGate;
+  private readonly journeyGraphs: Map<string, JourneyGraph>;
 
   private constructor(args: {
     prisma: PrismaClient;
@@ -53,6 +60,8 @@ export class PostgresDataStore implements DataStore {
     modelLinksBySlug: Map<string, ModelLinkInput[]>;
     families: Map<string, FamilyInfo>;
     reasonCount: number;
+    publicationGate: PublicationGate;
+    journeyGraphs: Map<string, JourneyGraph>;
   }) {
     this.prisma = args.prisma;
     this.rows = args.rows;
@@ -65,6 +74,8 @@ export class PostgresDataStore implements DataStore {
     this.modelLinksBySlug = args.modelLinksBySlug;
     this.families = args.families;
     this.reasonCount = args.reasonCount;
+    this.publicationGate = args.publicationGate;
+    this.journeyGraphs = args.journeyGraphs;
   }
 
   /** Load the full serving snapshot from Postgres. */
@@ -184,6 +195,19 @@ export class PostgresDataStore implements DataStore {
       caveats: [],
       totals: { platforms: rows.length, steps: 0, sources: 0 },
     };
+    const health = JSON.parse(
+      readFileSync(path.join(config.dataRoot, "corpus-health.json"), "utf8"),
+    ) as CorpusHealthReport;
+    const publicationGate = new PublicationGate(health);
+    const graphDir = path.join(config.dataRoot, "trust", "journey-graphs");
+    const journeyGraphs = new Map<string, JourneyGraph>();
+    for (const file of readdirSync(graphDir).filter((name) => name.endsWith(".json"))) {
+      const graph = JSON.parse(readFileSync(path.join(graphDir, file), "utf8")) as JourneyGraph;
+      journeyGraphs.set(graph.platformSlug, graph);
+    }
+    meta.reviewedCorpusRecords = health.summary.records;
+    meta.researchDrafts = Math.max(0, rows.length - health.summary.records);
+    meta.publicRecords = publicationGate.filterRows(rows).length;
 
     return new PostgresDataStore({
       prisma: client,
@@ -196,6 +220,8 @@ export class PostgresDataStore implements DataStore {
       modelLinksBySlug,
       families: familyMap,
       reasonCount,
+      publicationGate,
+      journeyGraphs,
     });
   }
 
@@ -223,10 +249,24 @@ export class PostgresDataStore implements DataStore {
     return this.qualityBySlug.get(slug);
   }
 
+  isPublicEligible(slug: string): boolean {
+    return this.publicationGate.isEligible(slug);
+  }
+
+  publicEligibilityReasons(slug: string): string[] {
+    return this.publicationGate.reasons(slug);
+  }
+
+  getJourneyGraph(slug: string): JourneyGraph | undefined {
+    return this.journeyGraphs.get(slug);
+  }
+
   /** Joined journey with friction highlights, soft-map families, and OpenRouter links. */
   getJourney(slug: string): JourneyOverlay | undefined {
     const record = this.records.get(slug);
     if (!record) return undefined;
+    const graph = this.journeyGraphs.get(slug);
+    if (graph) return buildJourneyOverlayFromGraph(record, graph);
     return buildJourneyOverlay(record, {
       gateIds: this.gateIdsBySlug.get(slug),
       modelLinks: this.modelLinksBySlug.get(slug) ?? [],
