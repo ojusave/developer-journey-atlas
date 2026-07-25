@@ -3,26 +3,19 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const render = JSON.parse(await readFile(new URL("../audits/render.json", import.meta.url), "utf8"));
+const renderGraph = JSON.parse(
+  await readFile(new URL("../trust/journey-graphs/render.json", import.meta.url), "utf8"),
+);
 const zoom = JSON.parse(await readFile(new URL("../audits/zoom.json", import.meta.url), "utf8"));
 const status = JSON.parse(await readFile(new URL("../audit-status.json", import.meta.url), "utf8"));
 
-test("Render uses the compacted official Dashboard Web Service first-deploy path", () => {
+test("Render legacy audit stays unresolved and cannot substitute for the repaired graph", () => {
   assert.equal(render.audit_status, "needs-human-judgment");
   assert.equal(render.starting_state.boundary, "account creation");
-  assert.equal(render.required_path.length, 6);
   assert.equal(render.counts, null);
-  assert.deepEqual(
-    render.required_path.map((step) => step.action),
-    [
-      "Open Your First Render Deploy and follow the Dashboard deployment path for a Web Service.",
-      "Sign up for a free Render account.",
-      "Connect a Git provider under Account Settings → Git Deployment Credentials.",
-      "Create a Web Service from the connected Git repository.",
-      "Click Deploy to create the Web Service and start the first build.",
-      "Wait until the deploy is Live, then open the service's onrender.com URL and confirm the app's root content.",
-    ],
-  );
-  assert.ok(render.required_path.every((step) => step.evidence_state !== "unverified"));
+  assert.ok(render.required_path.length < renderGraph.selectedRoute.nodeIds.length);
+  assert.equal(renderGraph.selectedRoute.nodeIds.length, 16);
+  assert.equal(renderGraph.nodes.flatMap((node) => node.requiredFields).length, 11);
   assert.match(render.first_success.outcome, /Live|onrender\.com/i);
 });
 

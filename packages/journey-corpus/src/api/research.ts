@@ -9,6 +9,7 @@ import { persistResearchDraft } from "../db/persistResearchDraft.js";
 import {
   attachResearchRunId,
   beginResearchClaim,
+  cleanupResearchClaims,
   completeResearchClaim,
   countRecentResearchStarts,
   failResearchClaim,
@@ -17,15 +18,61 @@ import { selectedPathRow } from "../../lib/measure.mjs";
 import { ensureRow, isPostgresStore } from "./storeHelpers.js";
 
 const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
-const RESEARCH_LIMIT = Math.max(1, Number(process.env.RESEARCH_HOURLY_LIMIT ?? 60));
 const RESEARCH_GLOBAL_LIMIT = Math.max(
-  RESEARCH_LIMIT,
+  1,
   Number(process.env.RESEARCH_GLOBAL_HOURLY_LIMIT ?? 300),
 );
 
 // Local-only fallback when DATA_STORE=local (no ResearchClaim table usage).
 const DEDUPE_TTL_MS = 10 * 60 * 1_000;
 const recentRunsLocal = new Map<string, { runId: string; at: number }>();
+
+function browserSafeResearchResult(result: unknown): unknown {
+  if (!result || typeof result !== "object" || !("outcome" in result)) return null;
+  const value = result as { outcome: string; slug?: string; candidates?: unknown[]; message?: string };
+  switch (value.outcome) {
+    case "known":
+      return { outcome: "known", slug: value.slug };
+    case "identity_ambiguous":
+      return { outcome: "identity_ambiguous", candidates: value.candidates ?? [] };
+    case "identity_unresolved":
+    case "no_official_source":
+      return { outcome: value.outcome };
+    case "official_source_unusable":
+      return {
+        outcome: value.outcome,
+        message: "The official source pages did not contain usable retrieved content.",
+      };
+    case "invalid_output":
+      return {
+        outcome: value.outcome,
+        message: "The reconstruction did not satisfy the required record contract.",
+      };
+    case "claim_grounding_failed":
+      return {
+        outcome: value.outcome,
+        message: "The draft did not pass source and route integrity checks.",
+      };
+    case "search_failed":
+      return {
+        outcome: value.outcome,
+        message: "Official-source discovery was unavailable. Try again later.",
+      };
+    case "model_failed":
+      return {
+        outcome: value.outcome,
+        message: "Route reconstruction was unavailable. Try again later.",
+      };
+    case "review_required":
+      return {
+        outcome: value.outcome,
+        slug: value.slug,
+        message: "Research finished and remains private until maintainer review passes every publication gate.",
+      };
+    default:
+      return null;
+  }
+}
 
 function recentRunLocal(slug: string, now = Date.now()): string | null {
   const hit = recentRunsLocal.get(slug);
@@ -79,29 +126,16 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
 
     // Known platforms never hit the Workflow (including ones persisted by another instance).
     const known = await ensureRow(store, input.slug);
-    if (known) {
+    if (known && store.isPublicEligible(input.slug)) {
       sendData(res, { known: true, slug: input.slug }, { status: 200 });
       return;
     }
 
-    const clientIp = req.ip ?? null;
-
     if (isPostgresStore(store)) {
       const prisma = store.getPrisma();
       try {
-        const [ipStarts, globalStarts] = await Promise.all([
-          countRecentResearchStarts(prisma, RESEARCH_WINDOW_MS, { clientIp }),
-          countRecentResearchStarts(prisma, RESEARCH_WINDOW_MS),
-        ]);
-        if (ipStarts >= RESEARCH_LIMIT) {
-          sendError(
-            res,
-            429,
-            "rate_limited",
-            `This connection has started ${RESEARCH_LIMIT} research jobs in the last hour. Try again later.`,
-          );
-          return;
-        }
+        await cleanupResearchClaims(prisma);
+        const globalStarts = await countRecentResearchStarts(prisma, RESEARCH_WINDOW_MS);
         if (globalStarts >= RESEARCH_GLOBAL_LIMIT) {
           sendError(
             res,
@@ -113,14 +147,14 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
         }
 
         const claim = await beginResearchClaim(
-          { slug: input.slug, platform: input.platform, clientIp },
+          { slug: input.slug, platform: input.platform },
           prisma,
         );
 
         if (claim.kind === "existing") {
           if (claim.claim.status === "completed") {
             const loaded = await ensureRow(store, input.slug);
-            if (loaded) {
+            if (loaded && store.isPublicEligible(input.slug)) {
               sendData(res, { known: true, slug: input.slug }, { status: 200 });
               return;
             }
@@ -139,7 +173,7 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
           // Another request is mid-start (claiming without runId yet): wait briefly then re-read.
           await new Promise((resolve) => setTimeout(resolve, 400));
           const again = await beginResearchClaim(
-            { slug: input.slug, platform: input.platform, clientIp },
+            { slug: input.slug, platform: input.platform },
             prisma,
           );
           if (again.kind === "existing" && again.claim.runId) {
@@ -162,14 +196,14 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
           await attachResearchRunId(input.slug, runId, prisma);
           res.status(202);
           sendData(res, { runId, phase: "queued", slug: input.slug });
-        } catch (err) {
+        } catch {
           await failResearchClaim(input.slug, prisma);
-          console.error("Failed to start research run:", err);
+          console.error("Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows");
           sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
         }
         return;
-      } catch (err) {
-        console.error("Research claim failed:", err);
+      } catch {
+        console.error("Research diagnostic: stage=claim outcome=store_error provider=postgres");
         sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
         return;
       }
@@ -188,8 +222,8 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
       recentRunsLocal.set(input.slug, { runId, at: Date.now() });
       res.status(202);
       sendData(res, { runId, phase: "queued", slug: input.slug });
-    } catch (err) {
-      console.error("Failed to start research run:", err);
+    } catch {
+      console.error("Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows");
       sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
     }
   };
@@ -222,13 +256,32 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
       ) {
         try {
           await persistCompletedResearch(store, projection.result);
-        } catch (err) {
-          console.error("Failed to persist completed research:", err);
+        } catch {
+          console.error("Research diagnostic: stage=persist outcome=store_error provider=postgres");
+          sendError(res, 502, "persistence_failed", "Research finished, but the private review record could not be stored.");
+          return;
         }
+        sendData(res, {
+          ...projection,
+          result: {
+            outcome: "review_required",
+            slug: projection.result.slug,
+            message: "Research finished and remains private until maintainer review passes every publication gate.",
+          },
+        });
+        return;
       }
-      sendData(res, projection);
-    } catch (err) {
-      console.error("Failed to read research run:", err);
+      const safeResult = browserSafeResearchResult(projection.result);
+      sendData(res, {
+        ...projection,
+        result: safeResult,
+        message:
+          projection.phase === "completed" && projection.result && !safeResult
+            ? "This run is not a public research result."
+            : projection.message,
+      });
+    } catch {
+      console.error("Research diagnostic: stage=workflow-status outcome=not_found provider=render_workflows");
       sendError(res, 404, "run_not_found", "That research run could not be found.");
     }
   };

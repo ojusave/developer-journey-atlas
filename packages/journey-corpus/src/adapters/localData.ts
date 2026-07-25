@@ -1,8 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { DataStore, DatasetMeta, MetricRow, PlatformRecord, QualityRow, ShortestPathAudit } from "../core/ports.js";
-import { buildJourneyOverlay, type JourneyOverlay } from "../core/journeyOverlay.js";
+import { buildJourneyOverlay, buildJourneyOverlayFromGraph, type JourneyOverlay } from "../core/journeyOverlay.js";
+import type { JourneyGraph } from "../core/journeyGraph.js";
 import { resolveCatalogPath } from "../db/catalogPath.js";
+import { PublicationGate, type CorpusHealthReport } from "../core/publicationGate.js";
 
 interface HeuristicFile {
   score_model_version?: string;
@@ -51,11 +53,14 @@ export class LocalDataStore implements DataStore {
   private readonly metaValue: DatasetMeta;
   private readonly recordsDir: string;
   private readonly auditsDir: string;
+  private readonly journeyGraphsDir: string;
   private readonly qualityBySlug: Map<string, QualityRow>;
   private readonly recordCache = new Map<string, PlatformRecord | undefined>();
   private readonly auditCache = new Map<string, ShortestPathAudit | undefined>();
+  private readonly journeyGraphCache = new Map<string, JourneyGraph | undefined>();
   private readonly families = new Map<string, { id: string; label: string; kind: string; diagnosticEligibility: string | null }>();
   private readonly reasonCount: number;
+  private readonly publicationGate: PublicationGate;
 
   constructor(dataRoot: string) {
     const heuristic = readJson<HeuristicFile>(path.join(dataRoot, "selected-path-heuristic.json"));
@@ -63,6 +68,7 @@ export class LocalDataStore implements DataStore {
     this.bySlug = new Map(this.rows.map((r) => [r.slug, r]));
     this.recordsDir = path.join(dataRoot, "records");
     this.auditsDir = path.join(dataRoot, "audits");
+    this.journeyGraphsDir = path.join(dataRoot, "trust", "journey-graphs");
     const quality = readJson<QualityFile>(path.join(dataRoot, "ds-quality.json"));
     this.qualityBySlug = new Map((quality.records ?? []).map((record) => [record.slug, record]));
 
@@ -98,9 +104,15 @@ export class LocalDataStore implements DataStore {
       reasonCount = 0;
     }
     this.reasonCount = reasonCount;
+    this.publicationGate = new PublicationGate(
+      readJson<CorpusHealthReport>(path.join(dataRoot, "corpus-health.json")),
+    );
 
     this.metaValue = {
       count: this.rows.length,
+      reviewedCorpusRecords: coverage.roster_count ?? this.rows.length,
+      researchDrafts: Math.max(0, this.rows.length - (coverage.roster_count ?? this.rows.length)),
+      publicRecords: this.publicationGate.report.summary.eligible_for_public_display,
       generatedAt: coverage.generated_at ?? heuristic.source_snapshot_date ?? null,
       scoreModelVersion: heuristic.score_model_version ?? null,
       caveats: heuristic.caveats ?? [],
@@ -158,12 +170,34 @@ export class LocalDataStore implements DataStore {
     return this.qualityBySlug.get(slug);
   }
 
+  isPublicEligible(slug: string): boolean {
+    return this.publicationGate.isEligible(slug);
+  }
+
+  publicEligibilityReasons(slug: string): string[] {
+    return this.publicationGate.reasons(slug);
+  }
+
   getJourney(slug: string): JourneyOverlay | undefined {
     const record = this.getRecord(slug);
     if (!record) return undefined;
+    const graph = this.getJourneyGraph(slug);
+    if (graph) return buildJourneyOverlayFromGraph(record, graph);
     return buildJourneyOverlay(record, {
       familyLookup: (familyId) => this.families.get(familyId) ?? null,
     });
+  }
+
+  getJourneyGraph(slug: string): JourneyGraph | undefined {
+    if (this.journeyGraphCache.has(slug)) return this.journeyGraphCache.get(slug);
+    let graph: JourneyGraph | undefined;
+    try {
+      graph = readJson<JourneyGraph>(path.join(this.journeyGraphsDir, `${slug}.json`));
+    } catch {
+      graph = undefined;
+    }
+    this.journeyGraphCache.set(slug, graph);
+    return graph;
   }
 
   blockerReasonCount(): number {

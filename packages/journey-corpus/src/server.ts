@@ -1,5 +1,6 @@
 import express from "express";
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 import { config, researchAvailability } from "./config.js";
 import { createDataStore } from "./adapters/createStore.js";
 import { createApiRouter } from "./api/router.js";
@@ -25,14 +26,38 @@ function isPostgresStore(store: DataStore): store is PostgresDataStore {
   return typeof (store as PostgresDataStore).ping === "function";
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function pageOrigin(req: express.Request): string {
+  return config.publicBaseUrl || `${req.protocol}://${req.get("host")}`;
+}
+
+function renderPage(
+  template: string,
+  values: { title: string; description: string; canonicalUrl: string; socialImageUrl: string },
+): string {
+  return template
+    .replaceAll("__PAGE_TITLE__", escapeHtml(values.title))
+    .replaceAll("__PAGE_DESCRIPTION__", escapeHtml(values.description))
+    .replaceAll("__CANONICAL_URL__", escapeHtml(values.canonicalUrl))
+    .replaceAll("__SOCIAL_IMAGE_URL__", escapeHtml(values.socialImageUrl));
+}
+
 // Composition root: choose Local vs Postgres DataStore, wire API, mount static assets.
 async function main(): Promise<void> {
   let store: DataStore;
   let mode: string;
   try {
     ({ store, mode } = await createDataStore());
-  } catch (err) {
-    console.error("Failed to load dataset. For postgres: migrate + seed. For local: run build:data.", err);
+  } catch {
+    console.error("Server diagnostic: stage=dataset-load outcome=store_error");
     process.exit(1);
     return;
   }
@@ -67,11 +92,45 @@ async function main(): Promise<void> {
   app.use("/api", (_req, res) => sendError(res, 404, "not_found", "Unknown API route."));
 
   const webDir = path.join(config.dataRoot, "web");
+  const pageTemplate = await readFile(path.join(webDir, "index.html"), "utf8");
+
+  app.get("/", (req, res) => {
+    const origin = pageOrigin(req);
+    res.type("html").send(renderPage(pageTemplate, {
+      title: "Developer Journey Atlas",
+      description:
+        "Search a reviewed developer platform and inspect its source-grounded route from account creation to first success.",
+      canonicalUrl: `${origin}/`,
+      socialImageUrl: `${origin}/social-preview.svg`,
+    }));
+  });
+
+  app.get("/platform/:slug", async (req, res) => {
+    const slug = String(req.params.slug);
+    const row = store.isPublicEligible(slug) ? store.getRow(slug) : undefined;
+    const origin = pageOrigin(req);
+    if (!row) {
+      res.status(404).type("html").send(renderPage(pageTemplate, {
+        title: "Route not found | Developer Journey Atlas",
+        description: "This platform does not have a published source-grounded route.",
+        canonicalUrl: `${origin}/platform/${encodeURIComponent(slug)}`,
+        socialImageUrl: `${origin}/social-preview.svg`,
+      }));
+      return;
+    }
+    res.type("html").send(renderPage(pageTemplate, {
+      title: `${row.name} documented route | Developer Journey Atlas`,
+      description: `Inspect ${row.name}'s source-grounded route from account creation to first developer success.`,
+      canonicalUrl: `${origin}/platform/${encodeURIComponent(row.slug)}`,
+      socialImageUrl: `${origin}/social-preview.svg`,
+    }));
+  });
+
   app.use(express.static(webDir));
   app.use(express.static(config.publicDir, { index: false }));
 
-  app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error("Unhandled error:", err);
+  app.use((_err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error("Server diagnostic: stage=request outcome=internal_error");
     sendError(res, 500, "internal_error", "Something went wrong.");
   });
 
@@ -82,7 +141,7 @@ async function main(): Promise<void> {
   });
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch(() => {
+  console.error("Server diagnostic: stage=startup outcome=internal_error");
   process.exit(1);
 });

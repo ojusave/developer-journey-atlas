@@ -1,10 +1,11 @@
 import { task } from "@renderinc/sdk/workflows";
 
 import type { DocHit, PlatformRecord } from "../core/ports.js";
+import type { PlatformIdentity } from "../core/sourceAuthority.js";
 import { runResearchPipeline } from "../core/researchPipeline.js";
 import { reconstructWithClassification, draftWithClassification } from "./classify.js";
 import { parseResearchTaskInput } from "./input.js";
-import { buildRow, getLLMProvider, getRepoWriter, getSearchProvider, getStore } from "./deps.js";
+import { buildRow, getLLMProvider, getPlatformIdentities, getRepoWriter, getSearchProvider, getStore } from "./deps.js";
 import type { ContributionResult, ReconstructResult, ResearchOutcome, ResearchSteps } from "./contract.js";
 import { linkPlatformBlockersTask } from "./linkBlockers.js";
 import {
@@ -37,8 +38,8 @@ export const searchOfficialDocs = task(
     timeoutSeconds: 90,
     retry: { maxRetries: 2, waitDurationMs: 2_000, backoffScaling: 2 },
   },
-  async function searchOfficialDocs(input: { platform: string }): Promise<DocHit[]> {
-    return getSearchProvider().findOfficialDocs(input.platform);
+  async function searchOfficialDocs(input: { platform: string; identity: PlatformIdentity }): Promise<DocHit[]> {
+    return getSearchProvider().findOfficialDocs(input.platform, input.identity);
   },
 );
 
@@ -104,6 +105,10 @@ export const researchPlatform = task(
   },
   async function researchPlatform(rawInput: unknown): Promise<ResearchOutcome> {
     const input = parseResearchTaskInput(rawInput);
-    return runResearchPipeline(input, steps, { store: getStore(), buildRow });
+    return runResearchPipeline(input, steps, {
+      store: getStore(),
+      buildRow,
+      identities: getPlatformIdentities(),
+    });
   },
 );

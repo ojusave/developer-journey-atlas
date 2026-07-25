@@ -4,6 +4,7 @@
 
 import type { Assessment } from "../core/assessment.js";
 import type { DocHit, PlatformRecord } from "../core/ports.js";
+import type { PlatformIdentity } from "../core/sourceAuthority.js";
 
 /**
  * The only thing a run needs: the user's request and its normalized identity.
@@ -37,9 +38,13 @@ export type ReconstructResult =
  */
 export type ResearchOutcome =
   | { outcome: "known"; slug: string }
-  | { outcome: "no_docs" }
+  | { outcome: "identity_ambiguous"; candidates: Array<{ slug: string; name: string; organization: string }> }
+  | { outcome: "identity_unresolved" }
+  | { outcome: "no_official_source" }
+  | { outcome: "official_source_unusable"; message: string }
   | { outcome: "invalid_output"; message: string }
-  | { outcome: "source_grounding_failed"; message: string }
+  | { outcome: "claim_grounding_failed"; message: string }
+  | { outcome: "review_required"; slug: string; message: string }
   | { outcome: "search_failed"; message: string }
   | { outcome: "model_failed"; message: string }
   | {
@@ -57,7 +62,7 @@ export type ResearchOutcome =
  * tests without touching the network.
  */
 export interface ResearchSteps {
-  searchDocs(input: { platform: string }): Promise<DocHit[]>;
+  searchDocs(input: { platform: string; identity: PlatformIdentity }): Promise<DocHit[]>;
   reconstructRecord(input: { platform: string; docs: DocHit[] }): Promise<ReconstructResult>;
   draftContribution(input: { record: PlatformRecord }): Promise<ContributionResult>;
 }

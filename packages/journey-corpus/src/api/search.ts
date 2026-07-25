@@ -46,6 +46,7 @@ export function searchPlatforms(store: DataStore) {
       matched = filterInMemory(store.listRows(), q);
     }
 
-    sendData(res, matched.map((row) => toSummary(row, store)), { query: q, count: matched.length });
+    const eligible = matched.filter((row) => store.isPublicEligible(row.slug));
+    sendData(res, eligible.map((row) => toSummary(row, store)), { query: q, count: eligible.length });
   };
 }

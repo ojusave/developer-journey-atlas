@@ -5,6 +5,7 @@ import type {
 import type {
   ResearchOutcome, ResearchTaskInput, RunStatusProjection, WorkflowRunner,
 } from "../workflows/contract.js";
+import type { JourneyGraph } from "../core/journeyGraph.js";
 
 /** In-memory DataStore for tests: no filesystem, fully deterministic. */
 export class InMemoryDataStore implements DataStore {
@@ -23,6 +24,8 @@ export class InMemoryDataStore implements DataStore {
       caveats: [],
       totals: { platforms: rows.length, steps: 0, sources: 0 },
     },
+    private readonly eligibleSlugs: Set<string> = new Set(rows.map((row) => row.slug)),
+    private readonly journeyGraphs: Record<string, JourneyGraph> = {},
   ) {
     this.bySlug = new Map(rows.map((r) => [r.slug, r]));
     this.records = new Map(Object.entries(records));
@@ -45,6 +48,15 @@ export class InMemoryDataStore implements DataStore {
   }
   getQuality(slug: string): QualityRow | undefined {
     return this.quality[slug];
+  }
+  isPublicEligible(slug: string): boolean {
+    return this.eligibleSlugs.has(slug);
+  }
+  publicEligibilityReasons(slug: string): string[] {
+    return this.isPublicEligible(slug) ? [] : ["test_fixture_ineligible"];
+  }
+  getJourneyGraph(slug: string): JourneyGraph | undefined {
+    return this.journeyGraphs[slug];
   }
 }
 

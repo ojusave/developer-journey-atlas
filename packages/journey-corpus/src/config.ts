@@ -9,6 +9,7 @@ export const config = {
     return path.join(this.dataRoot, "public");
   },
   githubRepoUrl: "https://github.com/ojusave/developer-journey-atlas",
+  publicBaseUrl: (process.env.PUBLIC_BASE_URL ?? "").replace(/\/+$/, ""),
   // owner/repo slug; used by the PR writer. Overridable so the contribution
   // target is not a hard-coded constant.
   githubRepoSlug: process.env.GITHUB_REPO_SLUG ?? "ojusave/developer-journey-atlas",
@@ -18,6 +19,7 @@ export const config = {
   renderApiKey: process.env.RENDER_API_KEY ?? "",
   // Registered task slug, e.g. developer-journey-atlas-workflows/researchPlatform.
   workflowTaskSlug: process.env.RENDER_WORKFLOW_TASK_SLUG ?? "",
+  verifyAdminSecret: process.env.VERIFY_ADMIN_SECRET ?? "",
 
   // --- Workflow service: provider credentials for the research tasks ---
   // You.com Web Search API. YDC_API_KEY is You.com's canonical env var name.

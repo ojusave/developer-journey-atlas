@@ -151,7 +151,7 @@ export async function linkPlatformBlockers(
     const ranked = rankReasonsByEmbedding(queryVec, corpus, TOP_K);
     const allowed = new Set(ranked.map((row) => row.id));
 
-    let picks = ranked.slice(0, MAX_LINKS).map((row) => row.id);
+    let picks: string[] = [];
     let rationale: string | undefined;
     let confidence = "similarity";
 
@@ -160,7 +160,7 @@ export async function linkPlatformBlockers(
       const filtered = filterConfirmedReasonIds(raw, allowed, MAX_LINKS);
       picks = filtered.reasonIds;
       rationale = filtered.rationale;
-      confidence = picks.length ? "confirmed" : "confirmed-empty";
+      confidence = picks.length ? "model_selected" : "model_abstained";
     }
 
     await prisma.gateBlockerLink.deleteMany({

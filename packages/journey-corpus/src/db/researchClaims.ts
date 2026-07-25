@@ -7,7 +7,6 @@ export interface ResearchClaimRow {
   runId: string;
   platform: string;
   status: ResearchClaimStatus;
-  clientIp: string | null;
   startedAt: Date;
   updatedAt: Date;
 }
@@ -20,7 +19,6 @@ function asClaim(row: {
   runId: string;
   platform: string;
   status: string;
-  clientIp: string | null;
   startedAt: Date;
   updatedAt: Date;
 }): ResearchClaimRow {
@@ -59,7 +57,7 @@ export async function findActiveResearchClaim(
  * claim when another developer already started the same platform.
  */
 export async function beginResearchClaim(
-  input: { slug: string; platform: string; clientIp: string | null },
+  input: { slug: string; platform: string },
   prisma: PrismaClient,
   now = Date.now(),
 ): Promise<{ kind: "existing"; claim: ResearchClaimRow } | { kind: "acquired"; claim: ResearchClaimRow }> {
@@ -78,7 +76,6 @@ export async function beginResearchClaim(
         platform: input.platform,
         status: "claiming",
         runId: "",
-        clientIp: input.clientIp,
       },
     });
     return { kind: "acquired", claim: asClaim(created) };
@@ -96,7 +93,6 @@ export async function beginResearchClaim(
           platform: input.platform,
           status: "claiming",
           runId: "",
-          clientIp: input.clientIp,
           startedAt: new Date(now),
         },
       });
@@ -137,17 +133,41 @@ export async function failResearchClaim(
   });
 }
 
-/** Count research starts in a window (optionally scoped to one client IP). */
+/** Count research starts in a window across all service instances. */
 export async function countRecentResearchStarts(
   prisma: PrismaClient,
   windowMs: number,
-  options: { clientIp?: string | null; now?: number } = {},
+  options: { now?: number } = {},
 ): Promise<number> {
   const now = options.now ?? Date.now();
   return prisma.researchClaim.count({
     where: {
       startedAt: { gte: new Date(now - windowMs) },
-      ...(options.clientIp ? { clientIp: options.clientIp } : {}),
     },
   });
+}
+
+export const COMPLETED_CLAIM_RETENTION_MS = 7 * 24 * 60 * 60 * 1_000;
+export const STALE_ACTIVE_CLAIM_RETENTION_MS = 24 * 60 * 60 * 1_000;
+
+/** Delete expired claims without retaining IP addresses or provider payloads. */
+export async function cleanupResearchClaims(
+  prisma: PrismaClient,
+  now = Date.now(),
+): Promise<{ deleted: number }> {
+  const result = await prisma.researchClaim.deleteMany({
+    where: {
+      OR: [
+        {
+          status: { in: ["completed", "failed"] },
+          updatedAt: { lt: new Date(now - COMPLETED_CLAIM_RETENTION_MS) },
+        },
+        {
+          status: { in: ["claiming", "pending"] },
+          updatedAt: { lt: new Date(now - STALE_ACTIVE_CLAIM_RETENTION_MS) },
+        },
+      ],
+    },
+  });
+  return { deleted: result.count };
 }

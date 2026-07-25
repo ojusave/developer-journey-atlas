@@ -1,5 +1,6 @@
 import type { DocHit, LLMProvider, PlatformRecord } from "../core/ports.js";
 import type { RecordValidator } from "../core/validate.js";
+import { selectedRouteNodes, validateJourneyGraph, type JourneyGraph } from "../core/journeyGraph.js";
 
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const TIMEOUT_MS = 90_000;
@@ -119,6 +120,48 @@ export function normalizeFrictionGateTypes(parsed: unknown): unknown {
   return record;
 }
 
+/** Ignore any model-authored linear path and derive it from the validated selected graph. */
+export function materializeSelectedRoute(parsed: unknown): { value: unknown; errors: string[] } {
+  if (!parsed || typeof parsed !== "object") return { value: parsed, errors: ["response is not an object"] };
+  const record = parsed as Record<string, unknown>;
+  const graph = record.journey_graph as JourneyGraph | undefined;
+  if (!graph) return { value: parsed, errors: ["journey_graph is required"] };
+  const platform = record.platform as { slug?: unknown } | undefined;
+  const expectedPlatformSlug = typeof platform?.slug === "string" ? platform.slug : undefined;
+  const findings = validateJourneyGraph(graph, expectedPlatformSlug);
+  if (findings.length > 0) {
+    return {
+      value: parsed,
+      errors: findings.map((finding) => `${finding.code}: ${finding.message}`),
+    };
+  }
+  const nodes = selectedRouteNodes(graph);
+  record.primary_path = nodes.map((node, index) => ({
+    step_number: index + 1,
+    phase: node.phase,
+    actor: node.actor,
+    interface: node.interface,
+    action: node.action,
+    details: [],
+    input: node.inputs.join("; "),
+    output: node.outputs.join("; "),
+    success_signal: node.successSignal,
+    failure_or_wait: node.kind === "passive_wait" ? node.action : "",
+    required: node.required,
+    required_fields: node.requiredFields,
+    source_ids: [...new Set(node.evidence.map((item) => item.sourceId))],
+  }));
+  record.official_docs_only = true;
+  if (Array.isArray(record.sources)) {
+    record.sources = record.sources.map((source) =>
+      source && typeof source === "object"
+        ? { ...(source as Record<string, unknown>), official_domain: true }
+        : source,
+    );
+  }
+  return { value: record, errors: [] };
+}
+
 /**
  * Reconstructs a schema-valid first-mile record from official-docs search hits
  * using an OpenRouter-hosted model. Grounds strictly on the supplied documents,
@@ -157,17 +200,19 @@ export class OpenRouterProvider implements LLMProvider {
       }
 
       const normalized = normalizeFrictionGateTypes(parsed);
-      const { valid, errors } = this.validate(normalized);
-      if (valid) return normalized as PlatformRecord;
+      const materialized = materializeSelectedRoute(normalized);
+      const { valid, errors } = this.validate(materialized.value);
+      const combinedErrors = [...materialized.errors, ...errors];
+      if (valid && materialized.errors.length === 0) return materialized.value as PlatformRecord;
 
-      lastErrors = errors;
+      lastErrors = combinedErrors;
       if (attempt < MAX_ATTEMPTS) {
         messages.push({ role: "assistant", content: raw });
         messages.push({
           role: "user",
           content:
             "The JSON failed schema validation with these errors:\n" +
-            errors.slice(0, 30).join("\n") +
+            combinedErrors.slice(0, 30).join("\n") +
             "\nReturn a corrected JSON object that satisfies the schema. Output only JSON.",
         });
       }
@@ -220,14 +265,26 @@ export class OpenRouterProvider implements LLMProvider {
       "",
       "Hard rules:",
       "- Use ONLY the supplied official-docs sources. Never invent steps, URLs, or claims.",
-      "- official_docs_only must be true. Every `sources[].url` must be an official domain and official_domain must be true.",
+      "- Source authority is validated by the application. Do not decide whether a source is official.",
       "- Give each source an id S1, S2, ... and reference those ids in the *_source_ids arrays.",
       "- Measure documented developer onboarding: account creation through first success.",
       "- Prefer the vendor quickstart or hosted API/console path when one exists.",
       "- Include documented gates (email verify, payment, credits, domain, approval).",
       "- Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
       "- Do not invent knowledge/skill prerequisites (e.g. 'know JavaScript'). Omit soft knowledge requirements.",
-      "- Compact primary_path (roughly account → gates → credentials → execute → verify).",
+      "- Build `journey_graph` first. Represent alternate routes as branches and select exactly one route.",
+      "- Declare every candidate route in `journey_graph.candidateRoutes` with a condition, route summary, and first-success effect. Exactly one has selected status and must exactly match selectedRoute; considered alternatives need a reasonNotSelected and exact branchAtNodeId.",
+      "- Put evidence-backed preexisting requirements in `journey_graph.prerequisites` and declare the inputs each produces.",
+      "- Put account, permission, approval, terms, payment, and other route gates in `journey_graph.externalGates` at the exact node they affect.",
+      "- Set `primary_path` to an empty array. The application derives it from `journey_graph.selectedRoute` after validation.",
+      "- One developer action is one intentional interaction. Keep form fields nested under their action.",
+      "- Every node must set requiresFieldInventory. Set it true for any form or interaction with fields, and list every documented field.",
+      "- Represent passive waits and automatic platform work as passive_wait or platform_outcome nodes.",
+      "- Every prerequisite, node, field, edge, gate, candidate route, and first-success boundary requires a supplied source id and a specific section locator.",
+      "- Locator text must name wording or a section that occurs in the supplied bounded source content.",
+      "- Preserve causal continuity: every input must come from startingState.availableInputs or an earlier node output.",
+      "- Record uncertainty at its exact target in journey_graph.uncertainties; a publication-blocking uncertainty must set blocksPublication true.",
+      "- firstSuccessBoundary must point to the terminal node. Resource creation is not first success when the official route continues to a meaningful result.",
       "- If the docs do not establish a single first-success milestone, set research_status to",
       "  'needs-human-judgment' and record the ambiguity in `uncertainties` rather than guessing.",
       "- Prefer structured, atomic steps. Do not overstate; unknown fields become uncertainties.",

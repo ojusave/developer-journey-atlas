@@ -35,6 +35,9 @@ export interface QualityRow {
 /** Dataset-level metadata surfaced to the UI. */
 export interface DatasetMeta {
   count: number;
+  reviewedCorpusRecords?: number;
+  researchDrafts?: number;
+  publicRecords?: number;
   generatedAt: string | null;
   scoreModelVersion: string | null;
   caveats: string[];
@@ -113,6 +116,12 @@ export interface PlatformRecord {
     success_signal?: string;
     required?: boolean;
     source_ids?: string[];
+    required_fields?: Array<{
+      label: string;
+      fieldType: string;
+      required: boolean;
+      evidence: Array<{ sourceId: string; locator: string }>;
+    }>;
   }>;
   friction_gates?: Array<{ at_step?: number; type?: string; description?: string; requirement?: string }>;
   time_to_first_success?: {
@@ -121,6 +130,7 @@ export interface PlatformRecord {
   };
   sources?: Array<{ id: string; title: string; url: string }>;
   uncertainties?: Array<{ question: string }>;
+  journey_graph?: import("./journeyGraph.js").JourneyGraph;
   [key: string]: unknown;
 }
 
@@ -143,8 +153,13 @@ export interface DataStore {
   /** Verified or in-progress shortest-path audit. May be absent while re-audit is pending. */
   getAudit(slug: string): ShortestPathAudit | undefined;
   getQuality(slug: string): QualityRow | undefined;
+  /** Fail-closed publication gate generated from identity, source, claim, and route evidence. */
+  isPublicEligible(slug: string): boolean;
+  publicEligibilityReasons(slug: string): string[];
   /** Joined journey + friction overlays when the store supports it. */
   getJourney?(slug: string): import("./journeyOverlay.js").JourneyOverlay | undefined;
+  /** Reviewed graph used for direct route measurements and explicit cohort matching. */
+  getJourneyGraph?(slug: string): import("./journeyGraph.js").JourneyGraph | undefined;
   /** Count of catalog reason nodes (790 when fully seeded). */
   blockerReasonCount?(): number;
 }
@@ -163,11 +178,12 @@ export interface DocHit {
   title: string;
   url: string;
   content?: string;
+  metadata?: import("./sourceAuthority.js").FetchMetadata;
 }
 
 /** Phase 2 ports. Non-critical: failures degrade, never crash the site. */
 export interface SearchProvider {
-  findOfficialDocs(platform: string): Promise<DocHit[]>;
+  findOfficialDocs(platform: string, identity: import("./sourceAuthority.js").PlatformIdentity): Promise<DocHit[]>;
 }
 
 export interface LLMProvider {

@@ -19,7 +19,17 @@ import { getVerifyStatus, startVerify } from "./verify.js";
 export function createApiRouter(store: DataStore, runner: WorkflowRunner | null): Router {
   const router = Router();
 
-  router.get("/meta", (_req, res) => sendData(res, store.meta()));
+  router.get("/meta", (_req, res) => {
+    const meta = store.meta();
+    sendData(res, {
+      reviewedCorpusRecords: meta.reviewedCorpusRecords ?? meta.totals.platforms,
+      researchDrafts: meta.researchDrafts ?? 0,
+      publicRecords: meta.publicRecords ?? store.listRows().filter((row) => store.isPublicEligible(row.slug)).length,
+      generatedAt: meta.generatedAt,
+      audits: meta.audits,
+      comparisonAvailable: false,
+    });
+  });
   router.get("/blockers/meta", getBlockerMeta(store));
   router.get("/platforms", listPlatforms(store));
   router.get("/platforms/:slug/journey", getPlatformJourney(store));
