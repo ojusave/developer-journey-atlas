@@ -81,6 +81,7 @@ test("trusted record normalization restores official sources and strips prerequi
     journey_graph: {
       selectedRoute: { id: "api-route", nodeIds: ["create-key", "first-response"] },
       firstSuccessBoundary: { nodeId: "first-response" },
+      edges: [],
       candidateRoutes: [
         { id: "api-route", status: "selected" },
         { id: "vibe-work", status: "considered", nodeIds: ["unknown-node"] },
@@ -131,6 +132,12 @@ test("trusted record normalization restores official sources and strips prerequi
   assert.deepEqual(normalized.journey_graph.candidateRoutes, [{ id: "api-route", status: "selected" }]);
   assert.equal(normalized.journey_graph.nodes[1].kind, "terminal_outcome");
   assert.equal(normalized.journey_graph.nodes[1].successSignal, "The API returns text");
+  assert.deepEqual(normalized.journey_graph.edges, [{
+    from: "create-key",
+    to: "first-response",
+    condition: null,
+    evidence: [{ sourceId: "S2", locator: "API key and confirm" }],
+  }]);
   assert.equal(normalized.journey_graph.nodes[0].evidence[0].sourceId, "S2");
   assert.match(normalized.journey_graph.nodes[0].evidence[0].locator, /API key/);
 });
