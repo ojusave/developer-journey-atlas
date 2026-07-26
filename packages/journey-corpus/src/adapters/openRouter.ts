@@ -5,6 +5,8 @@ import { selectedRouteNodes, validateJourneyGraph, type JourneyGraph } from "../
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const TIMEOUT_MS = 90_000;
 const MAX_ATTEMPTS = 2;
+const MAX_PROMPT_DOCS = 8;
+const MAX_PROMPT_CONTENT_CHARS = 8_000;
 
 /**
  * Deterministic terminal failure: the model could not produce a schema-valid
@@ -35,11 +37,37 @@ function stripFences(text: string): string {
   return (fenced ? fenced[1] : text).trim();
 }
 
+const ONBOARDING_SIGNAL =
+  /\b(sign.?up|account|verify|verification|billing|payment|credit|api.?key|token|credential|quick.?start|curl|request|response|endpoint|model|console|dashboard)\b/i;
+
+export function boundedPromptContent(content: string): string {
+  if (content.length <= MAX_PROMPT_CONTENT_CHARS) return content;
+  const opening = content.slice(0, 1_800);
+  const segments = content
+    .split(/\n{2,}|(?<=[.!?])\s+(?=[A-Z0-9])/)
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0 && ONBOARDING_SIGNAL.test(segment));
+  const selected = [opening];
+  let length = opening.length;
+  for (const segment of segments) {
+    if (opening.includes(segment)) continue;
+    if (length + segment.length + 2 > MAX_PROMPT_CONTENT_CHARS) {
+      const remaining = MAX_PROMPT_CONTENT_CHARS - length - 2;
+      if (remaining > 0) selected.push(segment.slice(0, remaining));
+      break;
+    }
+    selected.push(segment);
+    length += segment.length + 2;
+  }
+  return selected.join("\n\n").slice(0, MAX_PROMPT_CONTENT_CHARS);
+}
+
 function docsBlock(docs: DocHit[]): string {
   return docs
+    .slice(0, MAX_PROMPT_DOCS)
     .map((d, i) => {
       const head = `[S${i + 1}] ${d.title}\nURL: ${d.url}`;
-      return d.content ? `${head}\nCONTENT:\n${d.content}` : head;
+      return d.content ? `${head}\nCONTENT:\n${boundedPromptContent(d.content)}` : head;
     })
     .join("\n\n---\n\n");
 }

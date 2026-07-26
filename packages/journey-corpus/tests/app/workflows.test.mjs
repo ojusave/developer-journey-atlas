@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { buildResearchInput, parseResearchTaskInput, InvalidResearchInput } from "../../dist/workflows/input.js";
 import { reconstructWithClassification, draftWithClassification } from "../../dist/workflows/classify.js";
 import {
+  boundedPromptContent,
   OpenRouterProvider,
   SchemaRepairError,
   normalizeFrictionGateTypes,
@@ -118,6 +119,18 @@ test("trusted record normalization restores official sources and strips prerequi
   assert.deepEqual(normalized.journey_graph.candidateRoutes, [{ id: "api-route", status: "selected" }]);
   assert.equal(normalized.journey_graph.nodes[1].kind, "terminal_outcome");
   assert.equal(normalized.journey_graph.nodes[1].successSignal, "The API returns text");
+});
+
+test("research prompt content stays bounded and keeps late onboarding evidence", () => {
+  const content = `${"General product narrative. ".repeat(500)}
+
+Create an API key in the dashboard, then send a cURL request to the model endpoint.
+
+${"Unrelated appendix. ".repeat(500)}`;
+  const bounded = boundedPromptContent(content);
+  assert.ok(bounded.length <= 8_000);
+  assert.match(bounded, /Create an API key in the dashboard/);
+  assert.ok(bounded.length < content.length);
 });
 
 /* ---------- Task input validation ---------- */
