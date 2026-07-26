@@ -91,7 +91,7 @@ test("trusted record normalization restores official sources and strips prerequi
           kind: "developer_action",
           action: "Create an API key",
           successSignal: "Key created",
-          evidence: [{ sourceId: "S1", locator: "API key creation section" }],
+          evidence: [{ sourceId: "S1", locator: "API key and confirm" }],
         },
         { id: "first-response", kind: "platform_outcome", action: "The API returns text", successSignal: "" },
       ],
