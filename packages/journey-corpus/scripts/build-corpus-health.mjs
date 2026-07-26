@@ -522,6 +522,12 @@ if (launchPlan.cohorts.length < 5) {
 if (new Set(cohortParticipants).size < 20 || new Set(cohortParticipants).size !== cohortParticipants.length) {
   throw new Error("Launch cohort plan must contain at least 20 distinct platforms with no repeated platform.");
 }
+if (
+  launchPlan.priority_cohort_id &&
+  !launchPlan.cohorts.some((cohort) => cohort.id === launchPlan.priority_cohort_id)
+) {
+  throw new Error(`Unknown priority cohort: ${launchPlan.priority_cohort_id}`);
+}
 
 const healthBySlug = new Map(healthRecords.map((record) => [record.slug, record]));
 const candidateCohorts = launchPlan.cohorts.map((cohort) => {
@@ -597,7 +603,7 @@ const candidateCohorts = launchPlan.cohorts.map((cohort) => {
       "Retrieve current first-party pages and record request, redirects, content, hashes, titles, links, authority, and locators.",
       "Reconstruct and validate one atomic selected route per participant.",
       "Independently review every route and its first-success boundary.",
-      "Certify cohort equivalence and comparison basis only after all four routes pass.",
+      `Certify cohort equivalence and comparison basis only after all ${participants.length} routes pass.`,
     ],
   };
 });
@@ -615,7 +621,10 @@ const rankedCohorts = [...candidateCohorts].sort((left, right) =>
   right.publication_eligible_count - left.publication_eligible_count ||
   left.id.localeCompare(right.id),
 );
-const recommendedCohort = rankedCohorts[0] ?? null;
+const recommendedCohort =
+  candidateCohorts.find((cohort) => cohort.id === launchPlan.priority_cohort_id) ??
+  rankedCohorts[0] ??
+  null;
 const candidateSlugSet = new Set(cohortParticipants);
 const dispositionRank = {
   route_needs_review: 0,
@@ -666,6 +675,8 @@ const health = {
   review_operations: {
     source: "trust/launch-cohort-candidates.json",
     status: launchPlan.status,
+    priority_cohort_id: launchPlan.priority_cohort_id ?? null,
+    priority_reason: launchPlan.priority_reason ?? null,
     closest_cohort: recommendedCohort?.id ?? null,
     closest_records: closestRecords,
     cohort_completion_candidates: candidateCohorts.map((cohort) => ({
@@ -722,7 +733,10 @@ const migration = {
     candidate_platforms: new Set(cohortParticipants).size,
     candidate_cohorts: candidateCohorts.length,
     qualified_cohorts: candidateCohorts.filter((cohort) => cohort.status === "qualified").length,
-    public_route_shortfall: Math.max(0, 20 - dispositionCounts.published),
+    public_route_shortfall: Math.max(
+      0,
+      new Set(cohortParticipants).size - dispositionCounts.published,
+    ),
     qualified_cohort_shortfall: Math.max(
       0,
       5 - candidateCohorts.filter((cohort) => cohort.status === "qualified").length,
