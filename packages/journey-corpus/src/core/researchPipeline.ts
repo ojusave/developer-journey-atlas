@@ -11,7 +11,7 @@ import {
   validateSourceAuthority,
   type PlatformIdentity,
 } from "./sourceAuthority.js";
-import { validateJourneyGraph } from "./journeyGraph.js";
+import { draftBlockingJourneyFindings, validateJourneyGraph } from "./journeyGraph.js";
 
 /** Read-only context the orchestration needs beyond the injectable steps. */
 export interface ResearchContext {
@@ -202,7 +202,9 @@ export async function runResearchPipeline(
       message: "The reconstruction did not include an evidence-backed journey graph.",
     };
   }
-  const graphFindings = validateJourneyGraph(record.journey_graph, record.platform.slug);
+  const graphFindings = draftBlockingJourneyFindings(
+    validateJourneyGraph(record.journey_graph, record.platform.slug),
+  );
   if (graphFindings.length > 0) {
     return {
       outcome: "claim_grounding_failed",

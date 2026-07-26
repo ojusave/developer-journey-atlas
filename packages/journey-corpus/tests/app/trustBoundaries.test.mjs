@@ -9,7 +9,10 @@ import {
   sourceCanSupportClaims,
   validateSourceAuthority,
 } from "../../dist/core/sourceAuthority.js";
-import { validateJourneyGraph } from "../../dist/core/journeyGraph.js";
+import {
+  draftBlockingJourneyFindings,
+  validateJourneyGraph,
+} from "../../dist/core/journeyGraph.js";
 import { LocalDataStore } from "../../dist/adapters/localData.js";
 import { getPlatformEvidence, getPlatformJourney } from "../../dist/api/journey.js";
 import { getPlatformCurve } from "../../dist/api/curve.js";
@@ -18,6 +21,10 @@ import { config } from "../../dist/config.js";
 import { getVerifyStatus, startVerify } from "../../dist/api/verify.js";
 import { FakeWorkflowRunner } from "../../dist/adapters/fakes.js";
 import { filterOfficialDiscoveryResults } from "../../dist/adapters/youSearch.js";
+import {
+  materializeResearchDraftRoute,
+  materializeSelectedRoute,
+} from "../../dist/adapters/openRouter.js";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const identityRegistry = JSON.parse(await readFile(path.join(projectRoot, "trust/platform-identities.json"), "utf8"));
@@ -185,6 +192,19 @@ test("missing field inventory and compound action fail publication reconstructio
   const findings = validateJourneyGraph(graph);
   assert.ok(findings.some((finding) => finding.code === "missing_field_inventory" && finding.nodeId === form.id));
   assert.ok(findings.some((finding) => finding.code === "compound_action" && finding.nodeId === form.id));
+  assert.ok(!draftBlockingJourneyFindings(findings).some((finding) => finding.code === "compound_action"));
+  assert.ok(draftBlockingJourneyFindings(findings).some((finding) => finding.code === "missing_field_inventory"));
+});
+
+test("private draft materialization cannot weaken publication materialization", () => {
+  const graph = structuredClone(renderGraph);
+  const action = graph.nodes.find((node) => node.id === graph.selectedRoute.nodeIds.at(-2));
+  action.action = "Write and run code to send the request";
+  const record = { platform: { slug: "render" }, journey_graph: graph };
+  assert.match(materializeSelectedRoute(structuredClone(record)).errors.join(" "), /compound_action/);
+  const draft = materializeResearchDraftRoute(structuredClone(record));
+  assert.deepEqual(draft.errors, []);
+  assert.equal(draft.value.primary_path.length, graph.selectedRoute.nodeIds.length);
 });
 
 test("an action plus its observable success check stays one interaction", () => {
