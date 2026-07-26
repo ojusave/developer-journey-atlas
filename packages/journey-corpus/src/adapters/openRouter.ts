@@ -316,6 +316,7 @@ export function normalizeTrustedRecordFields(parsed: unknown, docs: DocHit[]): u
   // The typed graph is the only route authority. Remove legacy model-authored
   // route copies so harmless extra fields in those copies cannot reject an
   // otherwise valid selected graph.
+  record.primary_path = [];
   record.candidate_paths = [];
   record.candidate_path_gap = null;
   record.branches = [];
