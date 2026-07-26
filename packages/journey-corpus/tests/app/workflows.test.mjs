@@ -125,6 +125,7 @@ test("trusted record normalization restores official sources and strips prerequi
     source_ids: ["S1"],
   }]);
   assert.deepEqual(normalized.candidate_paths, []);
+  assert.deepEqual(normalized.primary_path, []);
   assert.equal(normalized.candidate_path_gap, null);
   assert.deepEqual(normalized.branches, []);
   assert.deepEqual(normalized.journey_graph.candidateRoutes, [{ id: "api-route", status: "selected" }]);
