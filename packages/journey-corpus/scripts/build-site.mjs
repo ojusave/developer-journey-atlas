@@ -49,12 +49,109 @@ const coverage = JSON.parse(await readFile(path.join(projectRoot, "coverage.json
 const health = JSON.parse(await readFile(path.join(projectRoot, "corpus-health.json"), "utf8"));
 const atlas = JSON.parse(await readFile(path.join(projectRoot, "selected-path-heuristic.json"), "utf8"));
 const auditStatus = JSON.parse(await readFile(path.join(projectRoot, "audit-status.json"), "utf8"));
+const launchCohortPlan = JSON.parse(
+  await readFile(path.join(projectRoot, "trust", "launch-cohort-candidates.json"), "utf8"),
+);
 const eligibleSlugs = new Set(
   health.records
     .filter((record) => record.eligibility.public_display)
     .map((record) => record.slug),
 );
 const eligibleRows = atlas.rows.filter((row) => eligibleSlugs.has(row.slug));
+const rowBySlug = new Map(atlas.rows.map((row) => [row.slug, row]));
+
+const llmCohortCopy = {
+  "llm-api-first-response": {
+    label: "Direct model APIs",
+    shortLabel: "Model provider",
+    description:
+      "APIs operated by model providers. These routes start with a new provider account and end when an authenticated request returns model output.",
+  },
+  "managed-llm-inference-first-response": {
+    label: "Inference and routing",
+    shortLabel: "Inference or router",
+    description:
+      "Hosted services that run or route models. Model selection, routing, and the service provider remain visible in the review.",
+  },
+  "cloud-llm-platform-first-response": {
+    label: "Cloud platforms",
+    shortLabel: "Cloud platform",
+    description:
+      "Model APIs inside cloud or data platforms. Their reviews include the surrounding account, billing, project, region, and access setup.",
+  },
+};
+
+const llmProviderSearchAliases = {
+  "google-gemini-api": ["Google", "Gemini"],
+  "xai-api": ["xAI", "Grok"],
+  "groqcloud": ["Groq", "GroqCloud"],
+  "hugging-face": ["Hugging Face", "HF"],
+  "nvidia-developer": ["NVIDIA", "NIM"],
+  "cloudflare-workers-ai": ["Cloudflare", "Workers AI"],
+  "amazon-bedrock": ["Amazon", "AWS", "Bedrock"],
+  "microsoft-foundry": ["Microsoft", "Azure", "Azure AI Foundry"],
+  "google-vertex-ai": ["Google", "GCP", "Vertex AI"],
+  "ibm-watsonx-ai": ["IBM", "watsonx"],
+  "oracle-generative-ai": ["Oracle", "OCI"],
+  "databricks-foundation-model-api": ["Databricks"],
+  "snowflake-cortex-ai": ["Snowflake", "Cortex"],
+};
+
+const llmCohorts = launchCohortPlan.cohorts
+  .filter((cohort) => llmCohortCopy[cohort.id])
+  .map((cohort) => {
+    const copy = llmCohortCopy[cohort.id];
+    return {
+      id: cohort.id,
+      label: copy.label,
+      shortLabel: copy.shortLabel,
+      description: copy.description,
+      providers: cohort.participant_slugs.map((slug) => {
+        const row = rowBySlug.get(slug);
+        if (!row) throw new Error(`LLM API catalog references missing platform "${slug}".`);
+        const routePublished = eligibleSlugs.has(slug);
+        return {
+          name: row.name,
+          slug: row.slug,
+          cohortId: cohort.id,
+          cohortLabel: copy.label,
+          providerType: copy.shortLabel,
+          searchAliases: llmProviderSearchAliases[row.slug] ?? [],
+          routeStatus: routePublished ? "published" : "review_in_progress",
+          routeUrl: routePublished ? `${canonicalUrl}/platform/${row.slug}` : null,
+        };
+      }),
+    };
+  });
+
+const llmProviderSlugs = llmCohorts.flatMap((cohort) => cohort.providers.map((provider) => provider.slug));
+const expectedLlmProviderCount = launchCohortPlan.cohorts
+  .filter((cohort) => llmCohortCopy[cohort.id])
+  .reduce((count, cohort) => count + cohort.participant_slugs.length, 0);
+if (
+  llmProviderSlugs.length !== expectedLlmProviderCount
+  || new Set(llmProviderSlugs).size !== expectedLlmProviderCount
+) {
+  throw new Error(
+    `Expected ${expectedLlmProviderCount} unique LLM API providers, found ${llmProviderSlugs.length}.`,
+  );
+}
+
+const llmApiCatalog = {
+  schemaVersion: 1,
+  name: "LLM API research catalog",
+  description:
+    "A maintained inventory of currently documented LLM API providers, grouped by setup model. Catalog membership is not route verification or comparison certification.",
+  generatedAt: coverage.generated_at,
+  providerCount: llmProviderSlugs.length,
+  routeReviewStatus: "in_progress",
+  cohorts: llmCohorts,
+};
+await writeFile(
+  path.join(dataRoot, "llm-api-catalog.json"),
+  `${JSON.stringify(llmApiCatalog, null, 2)}\n`,
+  "utf8",
+);
 
 function publicRecordFromGraph(record, graph) {
   const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
@@ -169,6 +266,7 @@ const dataIndex = {
   files: {
     llmIndex: `${canonicalUrl}/llms.txt`,
     fullContext: `${canonicalUrl}/llms-full.txt`,
+    llmApiCatalog: `${canonicalUrl}/data/llm-api-catalog.json`,
     coverageSummary: `${canonicalUrl}/data/coverage-summary.json`,
     recordSchema: `${canonicalUrl}/data/record.schema.json`,
     measurementContract: `${canonicalUrl}/measurement-contract.md`,
@@ -220,11 +318,24 @@ await writeFile(path.join(sourceRoot, "index.md"), sourceIndex, "utf8");
 const recordLinks = records
   .map((record) => `- [${record.name}](${record.platformUrl}): ${record.outcome}`)
   .join("\n");
+const llmCatalogSections = llmCohorts
+  .map((cohort) => `### ${cohort.label}\n\n${cohort.providers.map((provider) => (
+    provider.routeStatus === "published" && provider.routeUrl
+      ? `- [${provider.name}](${provider.routeUrl}): reviewed route published`
+      : `- ${provider.name}: route review in progress`
+  )).join("\n")}`)
+  .join("\n\n");
 const llmsIndex = `# Developer Journey Atlas
 
 > Publication-eligible, first-party documented routes from account creation to first success.
 
 The reviewed repository contains ${summary.reviewedCorpusRecords} records. ${summary.publicRoutes} currently passes every publication gate. Other records and database research drafts are not public routes. Documentation structure is not observed difficulty, conversion, abandonment, or causality. Scores, percentiles, peer placement, model-selected blocker reasons, and cross-platform associations are unavailable.
+
+## LLM API research catalog
+
+The catalog tracks ${llmApiCatalog.providerCount} providers. Catalog membership means a research record exists. It does not mean a step-by-step route or comparison has passed independent review.
+
+${llmCatalogSections}
 
 ## Public routes
 
@@ -233,6 +344,7 @@ ${recordLinks || "- No route currently passes every publication gate."}
 ## Contracts
 
 - [Machine-readable manifest](${canonicalUrl}/data/index.json)
+- [LLM API research catalog](${canonicalUrl}/data/llm-api-catalog.json)
 - [Methodology](${canonicalUrl}/methodology.md)
 - [Measurement contract](${canonicalUrl}/measurement-contract.md)
 - [Privacy and research data flow](${canonicalUrl}/privacy.md)

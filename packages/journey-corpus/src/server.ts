@@ -100,6 +100,40 @@ async function main(): Promise<void> {
 
   const webDir = path.join(config.dataRoot, "web");
   const pageTemplate = await readFile(path.join(webDir, "index.html"), "utf8");
+  const llmCatalogProviders = new Map<string, { name: string; slug: string; providerType: string }>();
+  try {
+    const llmCatalog = JSON.parse(
+      await readFile(path.join(config.publicDir, "data", "llm-api-catalog.json"), "utf8"),
+    ) as unknown;
+    if (
+      !llmCatalog
+      || typeof llmCatalog !== "object"
+      || !("cohorts" in llmCatalog)
+      || !Array.isArray(llmCatalog.cohorts)
+    ) {
+      throw new Error("missing cohorts");
+    }
+    for (const cohort of llmCatalog.cohorts) {
+      if (!cohort || typeof cohort !== "object" || !Array.isArray(cohort.providers)) {
+        throw new Error("invalid cohort");
+      }
+      for (const provider of cohort.providers) {
+        if (
+          !provider
+          || typeof provider !== "object"
+          || typeof provider.name !== "string"
+          || typeof provider.slug !== "string"
+          || typeof provider.providerType !== "string"
+        ) {
+          throw new Error("invalid provider");
+        }
+        llmCatalogProviders.set(provider.slug, provider);
+      }
+    }
+  } catch {
+    console.error("Server diagnostic: stage=catalog-load outcome=invalid_catalog");
+    llmCatalogProviders.clear();
+  }
   const publicRecords = store.meta().publicRecords ??
     store.listRows().filter((row) => store.isPublicEligible(row.slug)).length;
   const reviewedRecords = store.meta().reviewedCorpusRecords ?? store.meta().totals.platforms;
@@ -108,9 +142,9 @@ async function main(): Promise<void> {
   app.get("/", (req, res) => {
     const origin = pageOrigin(req);
     res.type("html").send(renderPage(pageTemplate, {
-      title: "Developer Journey Atlas",
+      title: "Explore 25 LLM APIs | Developer Journey Atlas",
       description:
-        "Search a reviewed developer platform and inspect its source-grounded route from account creation to first success.",
+        "Browse 25 LLM API providers by setup model and see which step-by-step guides have passed independent review.",
       canonicalUrl: `${origin}/`,
       socialImageUrl: `${origin}/social-preview.svg`,
       coverage,
@@ -120,7 +154,19 @@ async function main(): Promise<void> {
   app.get("/platform/:slug", async (req, res) => {
     const slug = String(req.params.slug);
     const row = store.isPublicEligible(slug) ? store.getRow(slug) : undefined;
+    const catalogProvider = llmCatalogProviders.get(slug);
     const origin = pageOrigin(req);
+    if (!row && catalogProvider) {
+      res.type("html").send(renderPage(pageTemplate, {
+        title: `${catalogProvider.name} guide review | Developer Journey Atlas`,
+        description:
+          `${catalogProvider.name} is in the 25-provider LLM API research catalog. Its step-by-step setup guide is still under review.`,
+        canonicalUrl: `${origin}/platform/${encodeURIComponent(slug)}`,
+        socialImageUrl: `${origin}/social-preview.svg`,
+        coverage,
+      }));
+      return;
+    }
     if (!row) {
       res.status(404).type("html").send(renderPage(pageTemplate, {
         title: "Route not found | Developer Journey Atlas",

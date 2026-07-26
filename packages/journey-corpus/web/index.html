@@ -23,30 +23,84 @@
         <span class="brand-mark" aria-hidden="true">DJ</span>
         <span class="brand-text">Developer Journey Atlas</span>
       </a>
+      <a class="header-link" href="/">Browse LLM APIs</a>
     </header>
 
     <main id="main">
-      <section class="hero" aria-labelledby="page-title">
+      <section class="hero" id="home-hero" aria-labelledby="page-title">
         <div class="hero-atmosphere" aria-hidden="true"></div>
-        <h1 class="brand-display" id="page-title">Developer Journey Atlas</h1>
-        <p class="hero-line">Understand one documented path from account creation to a working result.</p>
-        <p class="hero-support">See what you need, which route was selected, and what first success looks like before opening the full detail.</p>
-        <p class="coverage-note">Reviewed coverage: __PUBLIC_COVERAGE__.</p>
+        <p class="eyebrow">LLM API onboarding research</p>
+        <h1 class="brand-display" id="page-title">Explore 25 LLM APIs by how they work</h1>
+        <p class="hero-line">Start with the kind of platform you want, then find the providers in that group.</p>
+        <p class="hero-support">A provider can be in the research catalog before its step-by-step setup guide passes independent review. The interface keeps those two states separate.</p>
+        <div class="catalog-summary" role="group" aria-label="Catalog scope">
+          <span><strong id="catalog-provider-count">…</strong> providers</span>
+          <span><strong id="catalog-type-count">…</strong> platform types</span>
+          <span>First authenticated model response</span>
+        </div>
+      </section>
 
-        <form id="search-form" class="search" role="search" autocomplete="off">
-          <label class="visually-hidden" for="search">Platform or company name</label>
+      <section class="catalog-shell" id="catalog-shell" aria-labelledby="catalog-title">
+        <div class="catalog-heading">
+          <div>
+            <p class="eyebrow">Provider directory</p>
+            <h2 id="catalog-title">Find the API you are considering</h2>
+          </div>
+          <p>Search by provider or narrow the list by setup model.</p>
+        </div>
+
+        <form id="search-form" class="catalog-search" role="search" autocomplete="off">
+          <label for="search">Find an LLM API provider</label>
+          <div class="search-row">
           <input
             id="search"
             type="search"
-            placeholder="Search reviewed platforms"
-            aria-expanded="false"
-            aria-controls="suggestions"
-            aria-autocomplete="list"
-            role="combobox"
+              placeholder="Try OpenAI, Gemini, Grok, or Bedrock"
+              aria-describedby="catalog-status"
           />
-          <button type="submit" class="btn btn-primary">View route</button>
-          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+            <button type="button" class="btn btn-secondary" id="clear-search" hidden>Clear</button>
+          </div>
         </form>
+
+        <div class="catalog-filters" role="group" aria-label="Filter providers by platform type">
+          <button type="button" class="filter-button" data-cohort="all" aria-pressed="true">All <span data-cohort-count="all">…</span></button>
+          <button type="button" class="filter-button" data-cohort="llm-api-first-response" aria-pressed="false">Direct model APIs <span data-cohort-count="llm-api-first-response">…</span></button>
+          <button type="button" class="filter-button" data-cohort="managed-llm-inference-first-response" aria-pressed="false">Inference and routing <span data-cohort-count="managed-llm-inference-first-response">…</span></button>
+          <button type="button" class="filter-button" data-cohort="cloud-llm-platform-first-response" aria-pressed="false">Cloud platforms <span data-cohort-count="cloud-llm-platform-first-response">…</span></button>
+        </div>
+
+        <div class="catalog-layout">
+          <aside class="cohort-guide" aria-labelledby="cohort-guide-title">
+            <h3 id="cohort-guide-title">Why these groups?</h3>
+            <p>They require different setup work, so comparing them as one category would be misleading.</p>
+            <dl id="cohort-guide-list"></dl>
+            <details>
+              <summary>What “route review” means</summary>
+              <p>Before Atlas publishes a setup guide, a person must confirm the provider, current official sources, every required action, and the first successful response.</p>
+            </details>
+          </aside>
+
+          <div class="provider-directory">
+            <div class="directory-heading">
+              <h3 id="provider-list-title">All providers</h3>
+              <p id="catalog-status" role="status" aria-live="polite">Loading the provider catalog…</p>
+            </div>
+            <ul id="provider-list" class="provider-list" aria-labelledby="provider-list-title"></ul>
+            <section id="catalog-empty" class="catalog-empty" aria-labelledby="catalog-empty-title" hidden>
+              <h3 id="catalog-empty-title">No provider matches that search</h3>
+              <p>Clear the search to browse all 25 providers, or start a separate research request for a provider that is not listed.</p>
+              <div class="empty-actions">
+                <button type="button" class="btn btn-primary" id="empty-clear">Show all providers</button>
+                <button type="button" class="btn btn-secondary" id="research-unknown">Research a provider not listed</button>
+              </div>
+            </section>
+            <div id="catalog-error" class="catalog-error" role="alert" hidden>
+              <h3>The provider catalog could not be loaded</h3>
+              <p>The published route pages still work. Try loading the catalog again.</p>
+              <button type="button" class="btn btn-secondary" id="catalog-retry">Try again</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="result" class="result-panel" aria-live="polite" hidden></section>
@@ -55,24 +109,28 @@
 
     <footer class="site-footer">
       <p>Independent community project, not an official Render product.</p>
-      <nav class="footer-links" aria-label="Site">
-        <a href="https://github.com/ojusave/developer-journey-atlas">GitHub</a>
-        <a href="/privacy.md">Privacy and research data flow</a>
-      </nav>
-      <div class="footer-deploy">
-        <p id="deploy-cost">
-          Running your own copy uses paid Render resources: a Starter web service and Basic-256mb Postgres. Review
-          <a href="https://render.com/pricing" target="_blank" rel="noopener noreferrer">current Render pricing</a>
-          before continuing.
-        </p>
-        <a
-          class="btn btn-secondary"
-          href="https://render.com/deploy?repo=https://github.com/ojusave/developer-journey-atlas"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-describedby="deploy-cost"
-        >Review and deploy a personal copy</a>
-      </div>
+      <details class="footer-details">
+        <summary>Project details</summary>
+        <nav class="footer-links" aria-label="Project">
+          <a href="https://github.com/ojusave/developer-journey-atlas">GitHub repository</a>
+          <a href="/methodology.md">Research method</a>
+          <a href="/privacy.md">Privacy and data flow</a>
+        </nav>
+        <div class="footer-deploy">
+          <p id="deploy-cost">
+            Running your own copy uses paid Render resources: a Starter web service and Basic-256mb Postgres. Review
+            <a href="https://render.com/pricing" target="_blank" rel="noopener noreferrer">current Render pricing</a>
+            before continuing.
+          </p>
+          <a
+            class="btn btn-secondary"
+            href="https://render.com/deploy?repo=https://github.com/ojusave/developer-journey-atlas"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-describedby="deploy-cost"
+          >Review and deploy a personal copy</a>
+        </div>
+      </details>
     </footer>
 
     <script src="/app.js" defer></script>

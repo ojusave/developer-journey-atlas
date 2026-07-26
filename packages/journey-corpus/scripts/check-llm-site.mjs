@@ -19,6 +19,7 @@ const requiredFiles = [
   "launch-checklist.txt",
   "sitemap.xml",
   "data/index.json",
+  "data/llm-api-catalog.json",
   "data/coverage-summary.json",
   "data/record.schema.json",
   "data/records/render.json",
@@ -44,6 +45,45 @@ assert.equal(manifest.records.length, 1);
 assert.equal(manifest.records[0].slug, "render");
 assert.equal(manifest.servingModel.productUi, "packages/journey-corpus/web");
 assert.equal(manifest.sourceCode.license, "Apache-2.0");
+assert.match(manifest.files.llmApiCatalog, /\/data\/llm-api-catalog\.json$/);
+
+const llmCatalog = JSON.parse(await readFile(path.join(publicRoot, "data/llm-api-catalog.json"), "utf8"));
+const launchCohortPlan = JSON.parse(
+  await readFile(path.join(projectRoot, "trust", "launch-cohort-candidates.json"), "utf8"),
+);
+const llmCohortIds = new Set([
+  "llm-api-first-response",
+  "managed-llm-inference-first-response",
+  "cloud-llm-platform-first-response",
+]);
+const plannedLlmCohorts = launchCohortPlan.cohorts.filter((cohort) => llmCohortIds.has(cohort.id));
+const plannedCountByCohort = new Map(
+  plannedLlmCohorts.map((cohort) => [cohort.id, cohort.participant_slugs.length]),
+);
+const catalogProviders = llmCatalog.cohorts.flatMap((cohort) => cohort.providers);
+assert.equal(llmCatalog.schemaVersion, 1);
+assert.equal(llmCatalog.providerCount, catalogProviders.length);
+assert.equal(llmCatalog.cohorts.length, plannedLlmCohorts.length);
+for (const cohort of llmCatalog.cohorts) {
+  assert.equal(cohort.providers.length, plannedCountByCohort.get(cohort.id));
+}
+assert.equal(
+  new Set(catalogProviders.map((provider) => provider.slug)).size,
+  llmCatalog.providerCount,
+);
+assert.ok(catalogProviders.every(
+  (provider) => provider.routeStatus === "published"
+    ? provider.routeUrl === `${canonicalUrl}/platform/${provider.slug}`
+    : provider.routeStatus === "review_in_progress" && provider.routeUrl === null,
+));
+assert.ok(catalogProviders.every(
+  (provider) => Array.isArray(provider.searchAliases),
+));
+const providerBySlug = new Map(
+  catalogProviders.map((provider) => [provider.slug, provider]),
+);
+assert.ok(providerBySlug.get("xai-api").searchAliases.includes("Grok"));
+assert.ok(providerBySlug.get("amazon-bedrock").searchAliases.includes("AWS"));
 
 for (const source of manifest.sourceCode.files) {
   const canonical = await readFile(path.join(projectRoot, source.path), "utf8");
@@ -98,13 +138,17 @@ for (const forbidden of [
 
 const app = await readFile(path.join(projectRoot, "web/app.js"), "utf8");
 assert.doesNotMatch(app, /renderOnboardingScore|onboardingScore|curvePlacement|score-card|percentile|leaderboard/i);
-assert.match(app, /Comparable peers/);
+assert.match(app, /Compare with reviewed providers/);
 assert.match(app, /Open official starting point/);
 assert.match(app, /View official evidence/);
 assert.match(app, /Open route/);
 assert.match(app, /setNotFoundMetadata/);
-assert.match(app, /What counts as comparable\?/);
-assert.match(app, /qualified peers are currently available/);
+assert.match(app, /How Atlas decides which routes can be compared/);
+assert.match(app, /Why no provider comparison is shown yet/);
+assert.match(app, /step-by-step setup guide is still under review/i);
+assert.match(app, /View provider status/);
+assert.match(app, /We could not build a reliable guide/);
+assert.doesNotMatch(app, /Research stopped safely|draft did not pass the required record schema/i);
 assert.match(app, /Start research/);
 assert.match(app, /addEventListener\("click", \(\) => researchPlatform\(query\)\)/);
 const consentBody = app.match(/function renderResearchConsent\(query\) \{([\s\S]*?)\n\}/)?.[1] ?? "";
@@ -115,7 +159,12 @@ assert.equal((html.match(/<h1\b/g) || []).length, 1);
 assert.match(html, /href="\/project-mark\.svg"/);
 assert.doesNotMatch(html, /render\.com\/favicon/);
 assert.match(html, /Independent community project, not an official Render product/);
-assert.match(html, /Reviewed coverage: __PUBLIC_COVERAGE__/);
+assert.match(html, /Explore 25 LLM APIs by how they work/);
+assert.match(html, /Find an LLM API provider/);
+assert.match(html, /Direct model APIs/);
+assert.match(html, /Inference and routing/);
+assert.match(html, /Cloud platforms/);
+assert.doesNotMatch(html, /corpus records currently publish/i);
 assert.match(html, /paid Render resources/i);
 assert.match(html, /Starter web service and Basic-256mb Postgres/);
 assert.match(html, /current Render pricing/);
@@ -126,6 +175,7 @@ assert.doesNotMatch(headerBody, /render\.com\/deploy|deploy a personal copy/i);
 const llms = await readFile(path.join(publicRoot, "llms.txt"), "utf8");
 assert.match(llms, /^# Developer Journey Atlas\n\n> /);
 assert.match(llms, /1 currently passes every publication gate/);
+assert.match(llms, /The catalog tracks 25 providers/);
 assert.match(llms, /measurement_unavailable/i);
 
 const links = [...llms.matchAll(/\[[^\]]+\]\((https:\/\/[^)]+)\)/g)].map((match) => match[1]);

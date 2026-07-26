@@ -46,12 +46,12 @@ function browserSafeResearchResult(result: unknown): unknown {
     case "invalid_output":
       return {
         outcome: value.outcome,
-        message: "The reconstruction did not satisfy the required record contract.",
+        message: "The documentation could not be turned into a complete, internally consistent setup guide.",
       };
     case "claim_grounding_failed":
       return {
         outcome: value.outcome,
-        message: "The draft did not pass source and route integrity checks.",
+        message: "At least one required action was not supported by the accepted official documentation.",
       };
     case "search_failed":
       return {
