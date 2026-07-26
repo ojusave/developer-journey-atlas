@@ -1,0 +1,56 @@
+{
+  "platform": {"name": "Google Vertex AI", "slug": "google-vertex-ai", "organization": "Google"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Google Cloud Gemini model API quickstart",
+    "selection_basis": "Google's cloud model quickstart includes project, billing, API enablement, IAM, authentication, and a first model request, which is materially different from the Gemini Developer API.",
+    "alternatives_considered": [
+      {"name": "Gemini Developer API", "url": "https://ai.google.dev/gemini-api/docs/get-started", "reason_not_primary": "It is tracked in the direct API cohort because AI Studio can create the project and key automatically."},
+      {"name": "Partner models in Model Garden", "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start", "reason_not_primary": "Partner-model deployment adds model-specific access and deployment choices."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Configure a Google Cloud project and receive a Gemini model response through the cloud model API.", "starting_url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start", "assumed_prior_state": ["No Google Cloud project, billing link, enabled API, IAM grant, or credential exists.", "A browser and terminal are available."]},
+  "documented_first_success": {
+    "official_milestone": "Send a request to a model",
+    "normalized_outcome": "An authenticated Google Cloud model API request returns Gemini-generated text.",
+    "observable_completion_signal": "The SDK or REST response contains generated model output.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The current cloud getting-started guide proceeds from project prerequisites and authentication to a model request and response.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The first returned model text is meaningful, while cloud project, billing, API enablement, IAM, region, and credentials remain part of this platform's starting boundary.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Google Cloud account and project.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "billing", "requirement": "Billing enabled for the project.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "configuration", "requirement": "The documented generative AI API enabled in the project.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "permission", "requirement": "Required IAM permissions for model access.", "required": true, "source_ids": ["S1"]},
+    {"order": 5, "type": "credential", "requirement": "An API key or Application Default Credentials for the selected route.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "web-console", "action": "Create or select a Google Cloud project and link billing.", "details": [], "input": "Google Cloud account and billing account", "output": "Billable Cloud project", "success_signal": "The project is active with billing.", "failure_or_wait": "Account, organization policy, or billing setup can block the project.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Enable the required model API and select the project location.", "details": [], "input": "Cloud project", "output": "Enabled regional model surface", "success_signal": "The API is enabled.", "failure_or_wait": "API enablement permissions or region availability can block setup.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Grant the required IAM role and create the selected credential.", "details": ["The guide supports API key or Application Default Credentials paths."], "input": "Project administrator access", "output": "Authorized credential", "success_signal": "The client can authenticate to the project.", "failure_or_wait": "IAM propagation or policy restrictions can delay access.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "api", "action": "Send the documented text request to a Gemini model.", "details": [], "input": "Project, region, credential, model, and prompt", "output": "Model response", "success_signal": "The API returns generated output.", "failure_or_wait": "Credential, permission, quota, region, model, or request errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm generated text is present in the response.", "details": [], "input": "Model response", "output": "Verified first Vertex AI response", "success_signal": "Generated text is readable.", "failure_or_wait": "An error body is not first success.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 3, "condition": "The developer chooses Application Default Credentials instead of an API key.", "path": "Authenticate the local environment with Google Cloud credentials and IAM.", "effect_on_first_success": "Changes credential setup and may add local CLI steps.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "billing", "description": "A billable Google Cloud project is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "configuration", "description": "API enablement and location selection are required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "permission", "description": "IAM and credential setup are required.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Get started with Gemini Enterprise Agent Platform models", "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Before you begin", "Authentication", "Send a request"], "evidence_supported": ["Project and billing", "API enablement", "IAM", "Credential options", "First model request"]}
+  ],
+  "uncertainties": [
+    {"question": "Should the maintained product label remain Vertex AI after Google's current documentation route and navigation changes?", "impact": "Affects product identity and durable URL approval.", "reason_unresolved": "The historical Vertex AI quickstart redirects into Google's current Gemini Enterprise Agent Platform model documentation.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Studio exploration", "Partner model deployment", "Fine-tuning", "Batch inference", "Agents", "Evaluation"]
+}

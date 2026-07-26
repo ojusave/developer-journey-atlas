@@ -28,7 +28,7 @@ test("every corpus record has exactly one allowed operational disposition", () =
     "evidence_needs_review",
     "route_needs_review",
   ]);
-  assert.equal(health.records.length, 224);
+  assert.equal(health.records.length, 237);
   assert.equal(
     Object.values(health.summary.dispositions).reduce((sum, count) => sum + count, 0),
     health.records.length,
@@ -52,12 +52,22 @@ test("maintainer-selected LLM API cohort remains the review priority", () => {
     (candidate) => candidate.id === "llm-api-first-response",
   );
   assert.ok(cohort);
-  assert.equal(cohort.required_platform_count, 10);
-  assert.equal(cohort.participants.length, 10);
-  assert.match(cohort.required_review_sequence.at(-1), /all 10 routes pass/);
+  assert.equal(cohort.required_platform_count, 9);
+  assert.equal(cohort.participants.length, 9);
+  assert.match(cohort.required_review_sequence.at(-1), /all 9 routes pass/);
+  const inferenceCohort = health.review_operations.candidate_cohorts.find(
+    (candidate) => candidate.id === "managed-llm-inference-first-response",
+  );
+  assert.equal(inferenceCohort.required_platform_count, 9);
+  assert.equal(inferenceCohort.participants.length, 9);
+  const cloudCohort = health.review_operations.candidate_cohorts.find(
+    (candidate) => candidate.id === "cloud-llm-platform-first-response",
+  );
+  assert.equal(cloudCohort.required_platform_count, 7);
+  assert.equal(cloudCohort.participants.length, 7);
   const migration = JSON.parse(readFileSync(path.join(root, "migration-analysis.json"), "utf8"));
-  assert.equal(migration.launch_review.candidate_platforms, 26);
-  assert.equal(migration.launch_review.public_route_shortfall, 25);
+  assert.equal(migration.launch_review.candidate_platforms, 41);
+  assert.equal(migration.launch_review.public_route_shortfall, 40);
 });
 
 test("Reason Lab enforces independent labels and adjudication before eligibility", () => {

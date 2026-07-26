@@ -1,0 +1,57 @@
+{
+  "platform": {"name": "Snowflake Cortex AI", "slug": "snowflake-cortex-ai", "organization": "Snowflake"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Cortex REST API Chat Completions",
+    "selection_basis": "Snowflake's current Cortex REST quickstart supports the OpenAI Chat Completions format with a Snowflake account URL, programmatic access token, and model name.",
+    "alternatives_considered": [
+      {"name": "Cortex Messages API", "url": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-rest-api", "reason_not_primary": "It is limited to Claude models, while Chat Completions supports the broader catalog."},
+      {"name": "AI_COMPLETE SQL function", "url": "https://docs.snowflake.com/en/sql-reference/functions/ai_complete", "reason_not_primary": "It is a SQL surface rather than the selected developer-facing REST API."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Configure Snowflake Cortex REST access and receive model-generated content from Chat Completions.", "starting_url": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-rest-api", "assumed_prior_state": ["No Snowflake account access, Cortex role grant, PAT, or model selection exists.", "A browser and cURL are available."]},
+  "documented_first_success": {
+    "official_milestone": "Chat Completions quickstart",
+    "normalized_outcome": "An authenticated Cortex REST Chat Completions request returns generated assistant content.",
+    "observable_completion_signal": "The response follows the OpenAI Chat Completions format and contains assistant content in choices.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "The Cortex REST page provides a Chat Completions quickstart and POST /api/v2/cortex/v1/chat/completions reference.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The first returned assistant message completes the model API job, while Snowflake account, role, token, budget, and model state remain platform prerequisites.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "Access to a Snowflake account enabled for Cortex REST API.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "permission", "requirement": "A role with the SNOWFLAKE.CORTEX_USER database role and model access.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "credential", "requirement": "A Snowflake programmatic access token or another supported REST token.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "configuration", "requirement": "The Snowflake account identifier and an available model name.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "web-console", "action": "Sign in to a Snowflake account enabled for Cortex REST API.", "details": [], "input": "Snowflake account and user", "output": "Authenticated Snowflake session", "success_signal": "Cortex and user security settings are reachable.", "failure_or_wait": "Account edition, region, administrator, or REST enablement can block access.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "access", "actor": "administrator", "interface": "web-console", "action": "Grant the user a role with SNOWFLAKE.CORTEX_USER and access to the intended model.", "details": [], "input": "Snowflake administrator rights", "output": "Authorized role", "success_signal": "The user can invoke Cortex.", "failure_or_wait": "Missing role returns Not Authorized.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Generate a programmatic access token.", "details": [], "input": "Authorized Snowflake user", "output": "Snowflake PAT", "success_signal": "The token is stored for the REST request.", "failure_or_wait": "Security policy can restrict token generation.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "documentation", "action": "Choose an available model and form the account-specific Cortex base URL.", "details": [], "input": "Account identifier and model catalog", "output": "Endpoint and model", "success_signal": "Both values are valid for the account.", "failure_or_wait": "Model availability varies.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST model and messages to /api/v2/cortex/v1/chat/completions with the Bearer token.", "details": [], "input": "Account URL, PAT, model, and messages", "output": "Chat completion response", "success_signal": "The API returns a successful completion.", "failure_or_wait": "Authorization, model, budget, quota, or request errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm generated assistant content is present in choices.", "details": [], "input": "Completion response", "output": "Verified first Cortex response", "success_signal": "Generated content is readable.", "failure_or_wait": "An error body does not meet the boundary.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 5, "condition": "The selected model is Claude and the developer prefers Anthropic semantics.", "path": "Use the Cortex Messages API and Anthropic SDK-compatible base URL.", "effect_on_first_success": "Changes request format but not Snowflake prerequisites.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "access", "description": "The account must be enabled for Cortex REST API.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "permission", "description": "The calling user needs Cortex role access.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "credential", "description": "A supported REST token is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 5, "type": "limit", "description": "Consumption budget and quota can block a request.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Cortex REST API", "url": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-rest-api", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Choose your API", "Quickstart", "Chat Completions API reference", "Status codes"], "evidence_supported": ["Account URL", "PAT", "Model selection", "OpenAI-compatible endpoint", "Role, budget, and quota errors"]}
+  ],
+  "uncertainties": [
+    {"question": "Which account editions, regions, and trial accounts are enabled for Cortex REST by default?", "impact": "Could add procurement or administrator gates before role and token setup.", "reason_unresolved": "The REST page describes the enabled-account prerequisite but not universal account eligibility.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Tool calling", "Images", "Prompt caching", "Messages API", "SQL functions", "Agents", "Governance configuration"]
+}

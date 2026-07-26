@@ -1,0 +1,52 @@
+{
+  "platform": {"name": "xAI API", "slug": "xai-api", "organization": "xAI"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Grok Responses API via cURL",
+    "selection_basis": "xAI's quickstart runs from account creation through credits, API key creation, and a cURL Responses request.",
+    "alternatives_considered": [
+      {"name": "xAI SDK", "url": "https://docs.x.ai/developers/quickstart", "reason_not_primary": "The cURL tab reaches the same first-response boundary without an SDK installation."},
+      {"name": "OpenAI SDK compatibility", "url": "https://docs.x.ai/developers/quickstart", "reason_not_primary": "It is a documented compatibility route, but adds a package dependency."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Fund an xAI API account, create a key, and receive Grok output from the Responses API.", "starting_url": "https://docs.x.ai/developers/quickstart", "assumed_prior_state": ["No xAI account, credits, or API key exist.", "A browser and cURL are available."]},
+  "documented_first_success": {
+    "official_milestone": "Make your first request",
+    "normalized_outcome": "An authenticated POST to the xAI Responses API returns Grok model output.",
+    "observable_completion_signal": "The successful response contains generated output for the supplied coding prompt.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "Step 4 documents a cURL request to /v1/responses after account, credit, and key setup.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The first returned Grok response completes the basic API job before optional multi-turn, tools, image, or voice work.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "An xAI account.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "billing", "requirement": "Credits loaded into the account before using the API.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "credential", "requirement": "An xAI API key exported as XAI_API_KEY.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "software", "requirement": "An HTTPS client such as cURL.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create an xAI account and sign in.", "details": [], "input": "Account details", "output": "Authenticated xAI session", "success_signal": "The console is reachable.", "failure_or_wait": "Account access follows the xAI signup flow.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "billing", "actor": "developer", "interface": "console", "action": "Load the account with credits.", "details": [], "input": "Authenticated account and payment method", "output": "Usable credit balance", "success_signal": "Credits are available for API usage.", "failure_or_wait": "The quickstart says credits are required to start using the API.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "credential", "actor": "developer", "interface": "console", "action": "Generate an API key and export it as XAI_API_KEY.", "details": [], "input": "Funded xAI account", "output": "XAI_API_KEY", "success_signal": "The key is available to the shell.", "failure_or_wait": "A missing key prevents authentication.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST the quickstart prompt to https://api.x.ai/v1/responses with the Bearer key.", "details": ["Send model and input in JSON."], "input": "XAI_API_KEY, credits, model, and prompt", "output": "Responses API result", "success_signal": "The API returns Grok output.", "failure_or_wait": "Authentication, balance, model, or request errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "api", "action": "Inspect the response for model-generated content.", "details": [], "input": "API result", "output": "Verified first Grok response", "success_signal": "Generated content is present.", "failure_or_wait": "An error body is not first success.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [],
+  "friction_gates": [
+    {"at_step": 2, "type": "payment", "description": "The quickstart requires loading credits before API use.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "credential", "description": "An API key is required.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "xAI API Quickstart", "url": "https://docs.x.ai/developers/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": "July 3, 2026", "sections_used": ["Create an xAI account", "Generate an API key", "Make your first request"], "evidence_supported": ["Account and credit prerequisites", "API key export", "cURL Responses request and model output boundary"]}
+  ],
+  "uncertainties": [
+    {"question": "Which signup and payment fields are required for a new individual account?", "impact": "Could change field-level friction and timing.", "reason_unresolved": "The quickstart treats account and credit setup as console actions without enumerating every field.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Multi-turn chat", "Tools", "Images", "Video", "Voice", "Files and collections"]
+}

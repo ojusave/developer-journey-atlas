@@ -1,0 +1,57 @@
+{
+  "platform": {"name": "OCI Generative AI", "slug": "oracle-generative-ai", "organization": "Oracle"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "OCI Generative AI OpenAI-compatible chat completions",
+    "selection_basis": "Oracle documents an OpenAI-compatible chat endpoint but requires OCI tenancy, compartment, IAM, project, region, and credential state, so it belongs in the cloud-platform cohort.",
+    "alternatives_considered": [
+      {"name": "OCI Responses API", "url": "https://docs.oracle.com/en-us/iaas/Content/generative-ai/chat-completions-api.htm", "reason_not_primary": "Oracle recommends Responses for new applications, but the selected page currently provides the clearest chat-completions request contract for the first response."},
+      {"name": "OCI SDK native inference", "url": "https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm", "reason_not_primary": "It adds an OCI-specific client and request model."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Configure an OCI Generative AI project and receive model output from an OpenAI-compatible endpoint.", "starting_url": "https://docs.oracle.com/en-us/iaas/Content/generative-ai/get-started-agents.htm", "assumed_prior_state": ["No OCI tenancy, compartment permission, Generative AI project, credential, or endpoint configuration exists.", "A browser and terminal are available."]},
+  "documented_first_success": {
+    "official_milestone": "Send a chat completion",
+    "normalized_outcome": "An authenticated request to the regional OCI Generative AI chat-completions endpoint returns model output.",
+    "observable_completion_signal": "The OpenAI-compatible response contains a generated assistant choice.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "Oracle documents the regional OpenAI-compatible base URL and chat-completions request format.", "source_ids": ["S1", "S2"]},
+    "why_this_is_the_boundary": "A returned assistant message is meaningful, while OCI account, compartment, project, region, IAM, and authentication remain necessary platform gates.",
+    "source_ids": ["S1", "S2"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "An OCI tenancy and user.", "required": true, "source_ids": ["S2"]},
+    {"order": 2, "type": "permission", "requirement": "IAM permissions for the intended compartment and Generative AI resources.", "required": true, "source_ids": ["S2"]},
+    {"order": 3, "type": "configuration", "requirement": "An OCI Generative AI project, region, endpoint, and model.", "required": true, "source_ids": ["S1", "S2"]},
+    {"order": 4, "type": "credential", "requirement": "An API key or supported OCI IAM authentication method.", "required": true, "source_ids": ["S2"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "web-console", "action": "Create or sign in to an OCI tenancy and select a compartment and region.", "details": [], "input": "Oracle account and tenancy state", "output": "Authenticated OCI session", "success_signal": "Generative AI resources are reachable.", "failure_or_wait": "Tenancy, region, or policy can block access.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 2, "phase": "configure", "actor": "administrator", "interface": "web-console", "action": "Grant the required IAM permissions and create a Generative AI project.", "details": [], "input": "Compartment and administrator access", "output": "Authorized Generative AI project", "success_signal": "The project is active for the user.", "failure_or_wait": "Missing policy statements block resource use.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 3, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Create or configure a supported credential for the selected endpoint.", "details": [], "input": "OCI identity and project", "output": "Usable credential", "success_signal": "The client can authenticate.", "failure_or_wait": "Incorrect signing, token, profile, or permissions block the request.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "code", "action": "Set the regional OCI Generative AI OpenAI-compatible base URL and model.", "details": [], "input": "Region, endpoint, model, and credential", "output": "Configured client", "success_signal": "The client targets the intended regional service.", "failure_or_wait": "Region or model availability can differ.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "api", "action": "Send a chat-completions request with messages.", "details": [], "input": "Configured client and prompt", "output": "Chat completion response", "success_signal": "The API returns a generated choice.", "failure_or_wait": "Authentication, permission, model, quota, or request errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm generated assistant content is present.", "details": [], "input": "Chat completion response", "output": "Verified first OCI response", "success_signal": "Generated content is readable.", "failure_or_wait": "An error body does not meet the boundary.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 5, "condition": "The developer follows Oracle's recommendation for a new application.", "path": "Use the OCI Responses API instead of Chat Completions.", "effect_on_first_success": "Changes the API surface while retaining the same cloud prerequisites.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "account", "description": "An OCI tenancy and region are required.", "documented_requirement": true, "source_ids": ["S2"]},
+    {"at_step": 2, "type": "permission", "description": "Compartment IAM permissions and a Generative AI project are required.", "documented_requirement": true, "source_ids": ["S2"]},
+    {"at_step": 3, "type": "credential", "description": "A supported OCI authentication method is required.", "documented_requirement": true, "source_ids": ["S2"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Chat Completions API in Generative AI", "url": "https://docs.oracle.com/en-us/iaas/Content/generative-ai/chat-completions-api.htm", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-25", "last_updated_if_shown": "2026-05-01", "sections_used": ["OpenAI compatibility", "Base URL", "Chat Completions"], "evidence_supported": ["Regional endpoint", "OpenAI-compatible request and response", "Responses recommendation"]},
+    {"id": "S2", "title": "Get started with Generative AI agents", "url": "https://docs.oracle.com/en-us/iaas/Content/generative-ai/get-started-agents.htm", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Prerequisites", "Project", "Authentication"], "evidence_supported": ["OCI IAM and compartment", "Generative AI project", "Credential choices"]}
+  ],
+  "uncertainties": [
+    {"question": "Which current OCI model and authentication path is shortest for a new tenancy?", "impact": "Changes exact credential and model-access steps.", "reason_unresolved": "Oracle documents multiple authentication and model routes.", "checked_source_ids": ["S1", "S2"]}
+  ],
+  "excluded_after_success": ["Agents", "Knowledge bases", "Dedicated AI clusters", "Fine-tuning", "Production IAM hardening"]
+}

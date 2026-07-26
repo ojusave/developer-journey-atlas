@@ -8,9 +8,9 @@ Developer Journey Atlas is an independent community project, not an official Ren
 
 ## Current publication state
 
-- The repository preserves 224 historical research records.
+- The repository preserves 237 research records, including 25 currently documented LLM API surfaces across direct-provider, managed-inference or routing, and cloud-platform cohorts.
 - One route, Render, currently passes the deterministic identity, first-party source-content, claim-grounding, required-field, branch, and route-integrity gates.
-- The other 223 records remain non-public while their routes and evidence need human review.
+- The other 236 records remain non-public while their routes and evidence need human review.
 - Blocker-reason links and cross-platform associations remain internal until independent evaluation passes.
 - Documentation structure is not evidence of conversion, abandonment, usability, difficulty, causality, or observed completion time.
 
@@ -48,7 +48,7 @@ npm run reason:lab -- inspect G001
 
 `build:data` regenerates the publication health and evaluation foundations, builds the machine-readable public surface, publishes the active web source snapshot, and checks that only eligible routes are included.
 
-`review:corpus` reports one deterministic disposition for all 224 records and the next coherent cohort-review action. `reason:lab` operates the private two-reviewer labeling workflow. Candidate cohort inclusion never makes a route public or comparison-qualified.
+`review:corpus` reports one deterministic disposition for all 237 records and the next coherent cohort-review action. `reason:lab` operates the private two-reviewer labeling workflow. Candidate cohort inclusion never makes a route public or comparison-qualified.
 
 ## Deploying a personal copy
 

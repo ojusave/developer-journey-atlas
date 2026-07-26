@@ -35,7 +35,7 @@ for (const file of requiredFiles) {
 
 const manifest = JSON.parse(await readFile(path.join(publicRoot, "data/index.json"), "utf8"));
 assert.equal(manifest.schemaVersion, 2);
-assert.equal(manifest.counts.reviewedCorpusRecords, 224);
+assert.equal(manifest.counts.reviewedCorpusRecords, 237);
 assert.equal(manifest.counts.publicRoutes, 1);
 assert.equal(manifest.counts.researchDrafts, 0);
 assert.equal(manifest.counts.verifiedAudits, 0);

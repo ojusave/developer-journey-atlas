@@ -1,0 +1,56 @@
+{
+  "platform": {"name": "Databricks Foundation Model APIs", "slug": "databricks-foundation-model-api", "organization": "Databricks"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Pay-per-token chat endpoint via OpenAI-compatible REST",
+    "selection_basis": "Databricks provides preconfigured pay-per-token endpoints and an OpenAI-like Chat Completions format, avoiding a provisioned-throughput deployment for the first response.",
+    "alternatives_considered": [
+      {"name": "Provisioned throughput endpoint", "url": "https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/api-reference", "reason_not_primary": "It requires endpoint creation and capacity configuration beyond the pay-per-token route."},
+      {"name": "OpenAI Responses client", "url": "https://docs.databricks.com/aws/en/machine-learning/model-serving/query-chat-models", "reason_not_primary": "It is a supported peer route, while Chat Completions is fully documented in the selected API reference."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Use a Databricks workspace and token to receive model output from a pay-per-token Foundation Model API endpoint.", "starting_url": "https://docs.databricks.com/aws/en/machine-learning/model-serving/query-chat-models", "assumed_prior_state": ["No Databricks workspace access, token, or endpoint choice exists.", "A terminal and HTTPS client are available."]},
+  "documented_first_success": {
+    "official_milestone": "Query a chat model",
+    "normalized_outcome": "An authenticated request to a Databricks Foundation Model API endpoint returns generated assistant content.",
+    "observable_completion_signal": "The response has a choices array with the next assistant message.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The query guide and REST reference document pay-per-token chat requests and their response object.", "source_ids": ["S1", "S2"]},
+    "why_this_is_the_boundary": "The returned assistant message completes the basic model API job, with Databricks workspace, authentication, and endpoint state included in the cloud-data-platform boundary.",
+    "source_ids": ["S1", "S2"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "Access to a Databricks workspace that supports Foundation Model APIs.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "permission", "requirement": "Permission to query the selected Model Serving endpoint.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "credential", "requirement": "A Databricks authentication token or supported workspace credential.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "configuration", "requirement": "A supported pay-per-token endpoint name and workspace host.", "required": true, "source_ids": ["S1", "S2"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "web-console", "action": "Sign in to a Databricks workspace with Foundation Model API access.", "details": [], "input": "Workspace account", "output": "Authenticated workspace session", "success_signal": "Model Serving is reachable.", "failure_or_wait": "Workspace edition, cloud, region, or administrator policy can block access.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Select a supported preconfigured pay-per-token chat endpoint.", "details": [], "input": "Workspace and model choice", "output": "Endpoint name and workspace host", "success_signal": "The endpoint is available to query.", "failure_or_wait": "Model availability varies by workspace and cloud.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 3, "phase": "authenticate", "actor": "developer", "interface": "console", "action": "Create or configure a workspace credential with endpoint query permission.", "details": [], "input": "Workspace identity and permissions", "output": "Usable token", "success_signal": "The token can authenticate to Model Serving.", "failure_or_wait": "Missing endpoint permission blocks the request.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST chat messages to the selected serving endpoint invocation URL.", "details": ["Use the OpenAI-like chat request fields."], "input": "Host, token, endpoint, and messages", "output": "Chat completion response", "success_signal": "The endpoint returns a completion object.", "failure_or_wait": "Authentication, permission, endpoint, model, quota, or request errors block output.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm that choices contains generated assistant content.", "details": [], "input": "Completion object", "output": "Verified first Databricks response", "success_signal": "Generated content is readable.", "failure_or_wait": "An error body does not meet the boundary.", "required": true, "source_ids": ["S2"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "The developer requires reserved capacity or a custom model.", "path": "Create a provisioned-throughput Model Serving endpoint.", "effect_on_first_success": "Adds endpoint creation and capacity steps.", "source_ids": ["S2"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "access", "description": "A compatible Databricks workspace is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "choice", "description": "A supported endpoint must be available in the workspace.", "documented_requirement": true, "source_ids": ["S1", "S2"]},
+    {"at_step": 3, "type": "permission", "description": "The credential needs endpoint query permission.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Query a chat model", "url": "https://docs.databricks.com/aws/en/machine-learning/model-serving/query-chat-models", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": "May 19, 2026", "sections_used": ["Requirements", "Query examples"], "evidence_supported": ["Workspace route", "Pay-per-token endpoint", "Client options"]},
+    {"id": "S2", "title": "Foundation model REST API reference", "url": "https://docs.databricks.com/aws/en/machine-learning/foundation-model-apis/api-reference", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-25", "last_updated_if_shown": "July 22, 2026", "sections_used": ["Endpoints", "Chat Completions API"], "evidence_supported": ["Pay-per-token and provisioned endpoints", "Request and response shape", "OpenAI similarity"]}
+  ],
+  "uncertainties": [
+    {"question": "Which workspace editions, clouds, regions, and new-account offers expose pay-per-token endpoints by default?", "impact": "Could add procurement, billing, or administrator gates.", "reason_unresolved": "The API documents query requirements but availability depends on workspace state.", "checked_source_ids": ["S1", "S2"]}
+  ],
+  "excluded_after_success": ["Provisioned throughput", "Custom endpoint deployment", "A/B testing", "Batch inference", "Governance configuration"]
+}
