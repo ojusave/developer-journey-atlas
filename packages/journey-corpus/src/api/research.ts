@@ -156,11 +156,27 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
       return;
     }
 
-    // Known platforms never hit the Workflow (including ones persisted by another instance).
+    // Reuse an existing result before touching the Workflow. Public records use
+    // the reviewed journey endpoint; private research records return the same
+    // browser-safe draft that the completed run originally displayed.
     const known = await ensureRow(store, input.slug);
-    if (known && store.isPublicEligible(input.slug)) {
-      sendData(res, { known: true, slug: input.slug }, { status: 200 });
-      return;
+    if (known) {
+      if (store.isPublicEligible(input.slug)) {
+        sendData(res, { known: true, slug: input.slug }, { status: 200 });
+        return;
+      }
+      const existingDraft = store.getRecord(input.slug);
+      if (existingDraft) {
+        sendData(res, {
+          result: {
+            outcome: "draft_ready",
+            slug: input.slug,
+            draft: browserSafeDraft(existingDraft),
+            message: "Using the saved private research draft.",
+          },
+        }, { status: 200 });
+        return;
+      }
     }
 
     if (isPostgresStore(store)) {

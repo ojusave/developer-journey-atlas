@@ -384,8 +384,8 @@ const OUTCOME_MESSAGE = {
   identity_unresolved: ["Provider not confirmed", "We could not confirm the official provider.", false],
   no_official_source: ["No official guide found", "We could not find usable first-party setup documentation.", false],
   official_source_unusable: ["Official docs were not enough", "The pages did not contain enough detail to build the path.", false],
-  invalid_output: ["Could not build a reliable path", "The draft was incomplete or inconsistent.", false],
-  claim_grounding_failed: ["Path could not be verified", "A required step was not supported by the official docs.", false],
+  invalid_output: ["Try that again", "The first attempt did not finish.", true],
+  claim_grounding_failed: ["Try that again", "The first attempt could not verify every step.", true],
   search_failed: ["Docs search is unavailable", "Try the research again.", true],
   model_failed: ["Route builder is unavailable", "Try the research again.", true],
 };
@@ -404,6 +404,11 @@ async function researchPlatform(query) {
     });
     if (body.data?.known) {
       await showPlatform(body.data.slug);
+      return;
+    }
+    if (body.data?.result?.outcome === "draft_ready" && body.data.result.draft) {
+      researchPending = false;
+      renderResearchDraft(body.data.result);
       return;
     }
     if (!body.data?.runId) throw new Error("Research could not be started.");

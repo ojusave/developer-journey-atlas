@@ -328,6 +328,37 @@ function storeWithPeer() {
   ]);
 }
 
+function storeWithPrivateDraft() {
+  const record = {
+    platform: { name: "Mistral AI", slug: "mistral-ai", organization: "Mistral AI" },
+    category: "LLM API",
+    research_status: "needs-human-judgment",
+    documented_first_success: {
+      normalized_outcome: "Receive the first model response",
+      observable_completion_signal: "The response contains generated text",
+    },
+    primary_path: [{
+      step_number: 1,
+      action: "Send the first API request",
+      success_signal: "The response returns text",
+      required: true,
+    }],
+    sources: [{
+      id: "S1",
+      title: "Mistral quickstart",
+      url: "https://docs.mistral.ai/getting-started/",
+    }],
+  };
+  return new InMemoryDataStore(
+    [selectedPathRow(record)],
+    { "mistral-ai": record },
+    {},
+    {},
+    undefined,
+    new Set(),
+  );
+}
+
 test("start returns 503 when no runner is configured", async () => {
   const res = fakeRes();
   await startResearch(storeWithPeer(), null)(fakeReq({ body: { platform: "New" } }), res);
@@ -339,6 +370,19 @@ test("start short-circuits known platforms without touching the workflow", async
   const res = fakeRes();
   await startResearch(storeWithPeer(), runner)(fakeReq({ body: { platform: "Known" } }), res);
   assert.equal(res.body.data.known, true);
+  assert.equal(runner.started.length, 0);
+});
+
+test("start returns a saved private draft without restarting research", async () => {
+  const runner = new FakeWorkflowRunner();
+  const res = fakeRes();
+  await startResearch(storeWithPrivateDraft(), runner)(
+    fakeReq({ body: { platform: "Mistral AI" } }),
+    res,
+  );
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.data.result.outcome, "draft_ready");
+  assert.equal(res.body.data.result.draft.steps[0].action, "Send the first API request");
   assert.equal(runner.started.length, 0);
 });
 
