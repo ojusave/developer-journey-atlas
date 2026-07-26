@@ -97,6 +97,122 @@ const FRICTION_GATE_ALIASES: Record<string, string> = {
   "manual review": "approval",
 };
 
+const PREREQUISITE_TYPES = new Set([
+  "account",
+  "access",
+  "plan",
+  "billing",
+  "hardware",
+  "software",
+  "identity",
+  "permission",
+  "region",
+  "approval",
+  "configuration",
+  "credential",
+  "domain",
+  "environment",
+  "legal",
+  "network",
+  "verification",
+  "other",
+]);
+
+const SOURCE_TYPES = new Set([
+  "documentation",
+  "tutorial",
+  "quickstart",
+  "installation",
+  "troubleshooting",
+  "api-reference",
+  "official-repository",
+  "official-example-repository",
+  "help-center",
+  "policy",
+  "pricing",
+  "account-setup",
+  "release-note",
+]);
+
+function inferredSourceType(url: string): string {
+  const value = url.toLowerCase();
+  if (/quick.?start|get(?:ting)?.?started/.test(value)) return "quickstart";
+  if (/pricing|billing/.test(value)) return "pricing";
+  if (/api.?reference|\/reference/.test(value)) return "api-reference";
+  if (/help|support/.test(value)) return "help-center";
+  return "documentation";
+}
+
+/**
+ * Keep the model responsible for claims and route structure, while rebuilding
+ * the source inventory from the accepted retrieval set. This prevents a repair
+ * response from dropping sources or adding schema noise to prerequisites.
+ */
+export function normalizeTrustedRecordFields(parsed: unknown, docs: DocHit[]): unknown {
+  if (!parsed || typeof parsed !== "object") return parsed;
+  const record = parsed as Record<string, unknown>;
+  const authoredSources = Array.isArray(record.sources)
+    ? record.sources.filter((source): source is Record<string, unknown> =>
+        Boolean(source && typeof source === "object"))
+    : [];
+  record.sources = docs.map((doc, index) => {
+    const authored = authoredSources.find((source) => source.url === doc.url);
+    const sourceType = typeof authored?.source_type === "string"
+      && SOURCE_TYPES.has(authored.source_type)
+      ? authored.source_type
+      : inferredSourceType(doc.url);
+    const sections = Array.isArray(authored?.sections_used)
+      ? authored.sections_used.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+      : [];
+    const supported = Array.isArray(authored?.evidence_supported)
+      ? authored.evidence_supported.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+      : [];
+    return {
+      id: `S${index + 1}`,
+      title: doc.title,
+      url: doc.url,
+      official_domain: true,
+      source_type: sourceType,
+      accessed_at: today(),
+      last_updated_if_shown:
+        typeof authored?.last_updated_if_shown === "string"
+          ? authored.last_updated_if_shown
+          : null,
+      sections_used: sections.length ? sections : [doc.title],
+      evidence_supported: supported.length
+        ? supported
+        : ["Documented onboarding route"],
+    };
+  });
+
+  if (Array.isArray(record.prerequisites)) {
+    record.prerequisites = record.prerequisites.flatMap((item, index) => {
+      if (!item || typeof item !== "object") return [];
+      const value = item as Record<string, unknown>;
+      if (typeof value.requirement !== "string" || !value.requirement.trim()) return [];
+      const sourceIds = Array.isArray(value.source_ids)
+        ? value.source_ids.filter((sourceId): sourceId is string => {
+            if (typeof sourceId !== "string") return false;
+            const match = sourceId.match(/^S([1-9][0-9]*)$/);
+            return Boolean(match && Number(match[1]) <= docs.length);
+          })
+        : [];
+      if (!sourceIds.length) return [];
+      const type = typeof value.type === "string" && PREREQUISITE_TYPES.has(value.type)
+        ? value.type
+        : "other";
+      return [{
+        order: index + 1,
+        type,
+        requirement: value.requirement.trim(),
+        required: value.required !== false,
+        source_ids: [...new Set(sourceIds)],
+      }];
+    });
+  }
+  return record;
+}
+
 /**
  * Coerce friction_gates[].type onto the schema enum before validation.
  * Models often invent near-synonyms; map those or fall back to "other".
@@ -200,7 +316,8 @@ export class OpenRouterProvider implements LLMProvider {
         continue;
       }
 
-      const normalized = normalizeFrictionGateTypes(parsed);
+      const trusted = normalizeTrustedRecordFields(parsed, docs);
+      const normalized = normalizeFrictionGateTypes(trusted);
       const materialized = materializeSelectedRoute(normalized);
       const { valid, errors } = this.validate(materialized.value);
       const combinedErrors = [...materialized.errors, ...errors];
@@ -214,7 +331,8 @@ export class OpenRouterProvider implements LLMProvider {
           content:
             "The JSON failed schema validation with these errors:\n" +
             combinedErrors.slice(0, 30).join("\n") +
-            "\nReturn a corrected JSON object that satisfies the schema. Output only JSON.",
+            "\nKeep every required root property, including sources and all required arrays. " +
+            "Remove properties that the schema does not allow. Return only the corrected JSON object.",
         });
       }
     }
@@ -274,6 +392,7 @@ export class OpenRouterProvider implements LLMProvider {
       "- Use ONLY the supplied official-docs sources. Never invent steps, URLs, or claims.",
       "- Source authority is validated by the application. Do not decide whether a source is official.",
       "- Give each source an id S1, S2, ... and reference those ids in the *_source_ids arrays.",
+      "- Always include the complete sources array, including during a repair response.",
       "- Measure documented developer onboarding: account creation through first success.",
       "- Prefer the vendor quickstart or hosted API/console path when one exists.",
       "- Include documented gates (email verify, payment, credits, domain, approval).",
