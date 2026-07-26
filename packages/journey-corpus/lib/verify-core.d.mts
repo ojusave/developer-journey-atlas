@@ -6,6 +6,7 @@ export interface PreparedDoc {
 
 export interface SupportingExcerpt {
   supported: boolean;
+  coverage: number;
   excerpt: string | null;
   matchedTokens: string[];
   missingTokens: string[];

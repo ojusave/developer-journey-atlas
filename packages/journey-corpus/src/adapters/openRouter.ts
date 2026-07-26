@@ -72,16 +72,18 @@ export function normalizeLiteralEvidenceLocators(record: Record<string, unknown>
     for (const item of evidence) {
       if (!item || typeof item !== "object") continue;
       const value = item as Record<string, unknown>;
-      const match = typeof value.sourceId === "string"
-        ? value.sourceId.match(/^S([1-9][0-9]*)$/)
-        : null;
-      if (!match) continue;
-      const doc = prepared[Number(match[1]) - 1];
-      if (!doc?.original) continue;
-      const support = findSupportingExcerpt(doc.original, doc.lower, doc.tokens, claim);
-      if (support.supported && support.excerpt) {
-        value.locator = support.excerpt.replace(/…$/, "").trim();
-      }
+      const best = prepared
+        .map((doc, index) => ({
+          index,
+          support: doc.original
+            ? findSupportingExcerpt(doc.original, doc.lower, doc.tokens, claim)
+            : null,
+        }))
+        .filter((candidate) => candidate.support?.supported && candidate.support.excerpt)
+        .sort((a, b) => (b.support?.coverage ?? 0) - (a.support?.coverage ?? 0))[0];
+      if (!best?.support?.excerpt) continue;
+      value.sourceId = `S${best.index + 1}`;
+      value.locator = best.support.excerpt.replace(/…$/, "").trim();
     }
   };
   const asRecords = (value: unknown): Array<Record<string, unknown>> =>

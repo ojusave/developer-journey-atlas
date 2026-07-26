@@ -9,6 +9,7 @@ import {
   completeResearchClaim,
   completeResearchClaimByRunId,
   countRecentResearchStarts,
+  failResearchClaimByRunId,
 } from "../../dist/db/researchClaims.js";
 
 test("claim completion stores only terminal status for the selected slug", async () => {
@@ -42,6 +43,23 @@ test("claim completion can use the run id when an alias resolves to a canonical 
   assert.deepEqual(received, {
     where: { runId: "run-gemini" },
     data: { status: "completed" },
+  });
+});
+
+test("terminal research failure releases a pending claim by run id", async () => {
+  let received;
+  const prisma = {
+    researchClaim: {
+      updateMany: async (args) => {
+        received = args;
+        return { count: 1 };
+      },
+    },
+  };
+  await failResearchClaimByRunId("run-failed", prisma);
+  assert.deepEqual(received, {
+    where: { runId: "run-failed", status: { in: ["claiming", "pending"] } },
+    data: { status: "failed" },
   });
 });
 

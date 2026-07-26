@@ -99,19 +99,24 @@ test("trusted record normalization restores official sources and strips prerequi
   }, [{
     title: "Anthropic quickstart",
     url: "https://platform.claude.com/docs/en/get-started",
-    content: "Create an account and API key.",
+    content: "Create an account first.",
+  }, {
+    title: "Anthropic API keys",
+    url: "https://platform.claude.com/settings/keys",
+    content: "Create an API key and confirm the key was created.",
   }]);
-  assert.deepEqual(normalized.sources, [{
-    id: "S1",
-    title: "Anthropic quickstart",
-    url: "https://platform.claude.com/docs/en/get-started",
-    official_domain: true,
-    source_type: "quickstart",
-    accessed_at: new Date().toISOString().slice(0, 10),
-    last_updated_if_shown: null,
-    sections_used: ["Anthropic quickstart"],
-    evidence_supported: ["Documented onboarding route"],
-  }]);
+  assert.equal(normalized.sources.length, 2);
+  assert.deepEqual(normalized.sources[0], {
+      id: "S1",
+      title: "Anthropic quickstart",
+      url: "https://platform.claude.com/docs/en/get-started",
+      official_domain: true,
+      source_type: "quickstart",
+      accessed_at: new Date().toISOString().slice(0, 10),
+      last_updated_if_shown: null,
+      sections_used: ["Anthropic quickstart"],
+      evidence_supported: ["Documented onboarding route"],
+    });
   assert.deepEqual(normalized.prerequisites, [{
     order: 1,
     type: "account",
@@ -125,6 +130,7 @@ test("trusted record normalization restores official sources and strips prerequi
   assert.deepEqual(normalized.journey_graph.candidateRoutes, [{ id: "api-route", status: "selected" }]);
   assert.equal(normalized.journey_graph.nodes[1].kind, "terminal_outcome");
   assert.equal(normalized.journey_graph.nodes[1].successSignal, "The API returns text");
+  assert.equal(normalized.journey_graph.nodes[0].evidence[0].sourceId, "S2");
   assert.match(normalized.journey_graph.nodes[0].evidence[0].locator, /API key/);
 });
 
