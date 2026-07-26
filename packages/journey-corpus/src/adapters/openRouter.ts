@@ -2,7 +2,6 @@ import type { DocHit, LLMProvider, PlatformRecord } from "../core/ports.js";
 import type { RecordValidator } from "../core/validate.js";
 import {
   draftBlockingJourneyFindings,
-  selectedRouteNodes,
   validateJourneyGraph,
   type JourneyGraph,
 } from "../core/journeyGraph.js";
@@ -396,24 +395,28 @@ export function normalizeFrictionGateTypes(parsed: unknown): unknown {
   return record;
 }
 
-/** Ignore any model-authored linear path and derive it from the validated selected graph. */
-export function materializeSelectedRoute(parsed: unknown): { value: unknown; errors: string[] } {
+function materializeRoute(
+  parsed: unknown,
+  draftMode: boolean,
+): { value: unknown; errors: string[] } {
   if (!parsed || typeof parsed !== "object") return { value: parsed, errors: ["response is not an object"] };
   const record = parsed as Record<string, unknown>;
   const graph = record.journey_graph as JourneyGraph | undefined;
   if (!graph) return { value: parsed, errors: ["journey_graph is required"] };
   const platform = record.platform as { slug?: unknown } | undefined;
   const expectedPlatformSlug = typeof platform?.slug === "string" ? platform.slug : undefined;
-  const findings = draftBlockingJourneyFindings(
-    validateJourneyGraph(graph, expectedPlatformSlug),
-  );
+  const validated = validateJourneyGraph(graph, expectedPlatformSlug);
+  const findings = draftMode ? draftBlockingJourneyFindings(validated) : validated;
   if (findings.length > 0) {
     return {
       value: parsed,
       errors: findings.map((finding) => `${finding.code}: ${finding.message}`),
     };
   }
-  const nodes = selectedRouteNodes(graph);
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const nodes = graph.selectedRoute.nodeIds
+    .map((id) => nodeById.get(id))
+    .filter((node): node is JourneyGraph["nodes"][number] => Boolean(node));
   record.primary_path = nodes.map((node, index) => ({
     step_number: index + 1,
     phase: node.phase,
@@ -438,6 +441,16 @@ export function materializeSelectedRoute(parsed: unknown): { value: unknown; err
     );
   }
   return { value: record, errors: [] };
+}
+
+/** Ignore any model-authored linear path and derive it from the publication-valid graph. */
+export function materializeSelectedRoute(parsed: unknown): { value: unknown; errors: string[] } {
+  return materializeRoute(parsed, false);
+}
+
+/** Derive a private draft route while leaving editorial granularity for review. */
+export function materializeResearchDraftRoute(parsed: unknown): { value: unknown; errors: string[] } {
+  return materializeRoute(parsed, true);
 }
 
 /**
@@ -480,7 +493,7 @@ export class OpenRouterProvider implements LLMProvider {
 
       const trusted = normalizeTrustedRecordFields(parsed, docs);
       const normalized = normalizeFrictionGateTypes(trusted);
-      const materialized = materializeSelectedRoute(normalized);
+      const materialized = materializeResearchDraftRoute(normalized);
       const { valid, errors } = this.validate(materialized.value);
       const combinedErrors = [...materialized.errors, ...errors];
       if (valid && materialized.errors.length === 0) return materialized.value as PlatformRecord;
