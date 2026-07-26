@@ -195,6 +195,14 @@ test("an action plus its observable success check stays one interaction", () => 
   assert.ok(!findings.some((finding) => finding.code === "compound_action" && finding.nodeId === action.id));
 });
 
+test("a success check cannot hide a later intentional interaction", () => {
+  const graph = structuredClone(renderGraph);
+  const action = graph.nodes.find((node) => node.id === graph.selectedRoute.nodeIds.at(-2));
+  action.action = "Run the script and verify the response is printed, then click Save";
+  const findings = validateJourneyGraph(graph);
+  assert.ok(findings.some((finding) => finding.code === "compound_action" && finding.nodeId === action.id));
+});
+
 test("field inventory status cannot be omitted or contradict recorded fields", () => {
   const missing = structuredClone(renderGraph);
   delete missing.nodes.find((node) => node.id === "open-git-credentials").requiresFieldInventory;

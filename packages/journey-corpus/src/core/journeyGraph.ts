@@ -186,7 +186,7 @@ function hasEvidence(evidence: EvidenceLocator[]): boolean {
 
 function looksCompound(action: string): boolean {
   const normalized = action.toLowerCase().replace(
-    /\b(?:and(?: then)?|then)\s+(?:verify|confirm|check|observe|ensure)\s+(?:that\s+)?(?:the\s+)?(?:response|output|result|status|text|message|success|completion)\b.*$/,
+    /\b(?:and(?: then)?|then)\s+(?:verify|confirm|check|observe|ensure)\s+(?:that\s+)?(?:the\s+)?(?:response|output|result|status|text|message|success|completion)\b(?:(?!\b(?:and(?: then)?|then|after that)\b).)*$/,
     "",
   );
   const connectors = normalized.match(/\b(and then|then|and|after that)\b/g) ?? [];
