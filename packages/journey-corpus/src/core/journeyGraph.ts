@@ -156,6 +156,13 @@ export interface JourneyGraphFinding {
   message: string;
 }
 
+/** Editorial granularity findings remain publication blockers, not draft blockers. */
+export function draftBlockingJourneyFindings(
+  findings: JourneyGraphFinding[],
+): JourneyGraphFinding[] {
+  return findings.filter((finding) => finding.code !== "compound_action");
+}
+
 function normalizedAction(value: string): string {
   return value
     .toLowerCase()

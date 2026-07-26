@@ -9,7 +9,10 @@ import {
   sourceCanSupportClaims,
   validateSourceAuthority,
 } from "../../dist/core/sourceAuthority.js";
-import { validateJourneyGraph } from "../../dist/core/journeyGraph.js";
+import {
+  draftBlockingJourneyFindings,
+  validateJourneyGraph,
+} from "../../dist/core/journeyGraph.js";
 import { LocalDataStore } from "../../dist/adapters/localData.js";
 import { getPlatformEvidence, getPlatformJourney } from "../../dist/api/journey.js";
 import { getPlatformCurve } from "../../dist/api/curve.js";
@@ -185,6 +188,8 @@ test("missing field inventory and compound action fail publication reconstructio
   const findings = validateJourneyGraph(graph);
   assert.ok(findings.some((finding) => finding.code === "missing_field_inventory" && finding.nodeId === form.id));
   assert.ok(findings.some((finding) => finding.code === "compound_action" && finding.nodeId === form.id));
+  assert.ok(!draftBlockingJourneyFindings(findings).some((finding) => finding.code === "compound_action"));
+  assert.ok(draftBlockingJourneyFindings(findings).some((finding) => finding.code === "missing_field_inventory"));
 });
 
 test("an action plus its observable success check stays one interaction", () => {

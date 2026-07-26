@@ -1,6 +1,11 @@
 import type { DocHit, LLMProvider, PlatformRecord } from "../core/ports.js";
 import type { RecordValidator } from "../core/validate.js";
-import { selectedRouteNodes, validateJourneyGraph, type JourneyGraph } from "../core/journeyGraph.js";
+import {
+  draftBlockingJourneyFindings,
+  selectedRouteNodes,
+  validateJourneyGraph,
+  type JourneyGraph,
+} from "../core/journeyGraph.js";
 import { findSupportingExcerpt, prepareDoc } from "../../lib/verify-core.mjs";
 
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
@@ -399,7 +404,9 @@ export function materializeSelectedRoute(parsed: unknown): { value: unknown; err
   if (!graph) return { value: parsed, errors: ["journey_graph is required"] };
   const platform = record.platform as { slug?: unknown } | undefined;
   const expectedPlatformSlug = typeof platform?.slug === "string" ? platform.slug : undefined;
-  const findings = validateJourneyGraph(graph, expectedPlatformSlug);
+  const findings = draftBlockingJourneyFindings(
+    validateJourneyGraph(graph, expectedPlatformSlug),
+  );
   if (findings.length > 0) {
     return {
       value: parsed,
