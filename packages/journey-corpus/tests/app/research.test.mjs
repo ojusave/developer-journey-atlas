@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { runResearchPipeline, stepsFromAdapters, slugify } from "../../dist/core/researchPipeline.js";
+import {
+  runResearchPipeline,
+  stepsFromAdapters,
+  slugify,
+  validateSourceGrounding,
+} from "../../dist/core/researchPipeline.js";
 import {
   InMemoryDataStore, FakeSearchProvider, FakeLLMProvider, FakeRepoWriter,
 } from "../../dist/adapters/fakes.js";
@@ -235,15 +240,18 @@ test("graph evidence IDs must resolve to accepted record sources", async () => {
   assert.match(outcome.message, /graph evidence reference/);
 });
 
-test("a locator outside the bounded retrieved content cannot ground a graph claim", async () => {
+test("a private draft can display before literal locators pass publication review", async () => {
   const record = draftRecord();
   record.journey_graph.nodes[0].evidence[0].locator = "Section beyond retrieval limit";
+  assert.match(
+    validateSourceGrounding(record, hits),
+    /did not occur in the retrieved content/,
+  );
   const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
     llm: new FakeLLMProvider(record),
   });
-  assert.equal(outcome.outcome, "claim_grounding_failed");
-  assert.match(outcome.message, /did not occur in the retrieved content/);
+  assert.equal(outcome.outcome, "completed");
 });
 
 test("ambiguous Apollo identity stops before discovery", async () => {
