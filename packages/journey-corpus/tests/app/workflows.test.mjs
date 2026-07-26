@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 
 import { buildResearchInput, parseResearchTaskInput, InvalidResearchInput } from "../../dist/workflows/input.js";
 import { reconstructWithClassification, draftWithClassification } from "../../dist/workflows/classify.js";
-import { OpenRouterProvider, SchemaRepairError, normalizeFrictionGateTypes } from "../../dist/adapters/openRouter.js";
+import {
+  OpenRouterProvider,
+  SchemaRepairError,
+  normalizeFrictionGateTypes,
+  normalizeTrustedRecordFields,
+} from "../../dist/adapters/openRouter.js";
 import { GitHubApiError, GitHubPrWriter } from "../../dist/adapters/githubPr.js";
 import { projectRun, coerceOutcome } from "../../dist/adapters/renderWorkflows.js";
 import { startResearch, getResearchStatus } from "../../dist/api/research.js";
@@ -56,6 +61,42 @@ test("OpenRouter research classifies an unreadable upstream response", async () 
   } finally {
     globalThis.fetch = original;
   }
+});
+
+test("trusted record normalization restores official sources and strips prerequisite noise", () => {
+  const normalized = normalizeTrustedRecordFields({
+    prerequisites: [{
+      order: 9,
+      type: "account",
+      requirement: "An Anthropic account",
+      required: true,
+      source_ids: ["S1", "S99"],
+      description: "not in schema",
+      evidence: "not in schema",
+    }],
+  }, [{
+    title: "Anthropic quickstart",
+    url: "https://platform.claude.com/docs/en/get-started",
+    content: "Create an account and API key.",
+  }]);
+  assert.deepEqual(normalized.sources, [{
+    id: "S1",
+    title: "Anthropic quickstart",
+    url: "https://platform.claude.com/docs/en/get-started",
+    official_domain: true,
+    source_type: "quickstart",
+    accessed_at: new Date().toISOString().slice(0, 10),
+    last_updated_if_shown: null,
+    sections_used: ["Anthropic quickstart"],
+    evidence_supported: ["Documented onboarding route"],
+  }]);
+  assert.deepEqual(normalized.prerequisites, [{
+    order: 1,
+    type: "account",
+    requirement: "An Anthropic account",
+    required: true,
+    source_ids: ["S1"],
+  }]);
 });
 
 /* ---------- Task input validation ---------- */
