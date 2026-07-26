@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { buildResearchInput, parseResearchTaskInput, InvalidResearchInput } from "../../dist/workflows/input.js";
 import { reconstructWithClassification, draftWithClassification } from "../../dist/workflows/classify.js";
-import { SchemaRepairError, normalizeFrictionGateTypes } from "../../dist/adapters/openRouter.js";
+import { OpenRouterProvider, SchemaRepairError, normalizeFrictionGateTypes } from "../../dist/adapters/openRouter.js";
 import { GitHubApiError, GitHubPrWriter } from "../../dist/adapters/githubPr.js";
 import { projectRun, coerceOutcome } from "../../dist/adapters/renderWorkflows.js";
 import { startResearch, getResearchStatus } from "../../dist/api/research.js";
@@ -24,6 +24,38 @@ test("normalizeFrictionGateTypes maps aliases and unknown values onto the schema
     normalized.friction_gates.map((g) => g.type),
     ["account", "other", "other"],
   );
+});
+
+test("OpenRouter research fails fast without a configured model", () => {
+  assert.throws(
+    () => new OpenRouterProvider("key", "", () => ({ valid: true, errors: [] }), "{}", []),
+    /OPENROUTER_MODEL/,
+  );
+});
+
+test("OpenRouter research classifies an unreadable upstream response", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => ({
+    ok: false,
+    status: 502,
+    statusText: "Bad Gateway",
+    text: async () => "",
+  });
+  try {
+    const provider = new OpenRouterProvider(
+      "key",
+      "provider/model",
+      () => ({ valid: true, errors: [] }),
+      "{}",
+      [],
+    );
+    await assert.rejects(
+      provider.reconstructRecord("Acme", []),
+      /OpenRouter error: unreadable 502 response/,
+    );
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 
 /* ---------- Task input validation ---------- */
@@ -252,6 +284,45 @@ test("status redacts provider payloads from typed terminal outcomes", async () =
   await getResearchStatus(storeWithPeer(), runner)(fakeReq({ params: { runId: "r" } }), res);
   assert.equal(res.body.data.result.outcome, "model_failed");
   assert.doesNotMatch(JSON.stringify(res.body), /secret-token|provider payload/);
+});
+
+test("status returns a useful browser-safe draft after completed research", async () => {
+  const record = {
+    platform: { name: "Acme AI", slug: "acme-ai", organization: "Acme" },
+    category: "LLM API",
+    entry_point: { starting_url: "https://docs.acme.test/start" },
+    documented_first_success: {
+      normalized_outcome: "Receive the first model response",
+      observable_completion_signal: "The response contains generated text",
+    },
+    prerequisites: [{ type: "account", requirement: "An Acme account", required: true }],
+    primary_path: [{
+      step_number: 1,
+      action: "Create an API key",
+      success_signal: "The key is shown once",
+      details: ["provider-only detail must not cross the browser boundary"],
+    }],
+    sources: [{
+      id: "S1",
+      title: "Acme quickstart",
+      url: "https://docs.acme.test/quickstart",
+      accessed_at: "2026-07-25",
+      sections_used: ["secret provider locator"],
+    }],
+  };
+  const runner = new FakeWorkflowRunner("r", [{
+    runId: "r",
+    phase: "completed",
+    result: { outcome: "completed", slug: "acme-ai", record, assessment: { private: "audit" } },
+    message: null,
+  }]);
+  const res = fakeRes();
+  await getResearchStatus(storeWithPeer(), runner)(fakeReq({ params: { runId: "r" } }), res);
+  assert.equal(res.body.data.result.outcome, "draft_ready");
+  assert.equal(res.body.data.result.draft.name, "Acme AI");
+  assert.equal(res.body.data.result.draft.steps[0].action, "Create an API key");
+  assert.equal(res.body.data.result.draft.sources[0].url, "https://docs.acme.test/quickstart");
+  assert.doesNotMatch(JSON.stringify(res.body), /provider-only|secret provider locator|private.*audit/);
 });
 
 test("status maps a runner error to a safe 404", async () => {
