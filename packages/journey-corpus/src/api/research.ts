@@ -14,6 +14,7 @@ import {
   completeResearchClaimByRunId,
   countRecentResearchStarts,
   failResearchClaim,
+  failResearchClaimByRunId,
 } from "../db/researchClaims.js";
 import { selectedPathRow } from "../../lib/measure.mjs";
 import { ensureRow, isPostgresStore } from "./storeHelpers.js";
@@ -304,6 +305,22 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
         return;
       }
       const safeResult = browserSafeResearchResult(projection.result);
+      if (projection.phase === "completed" && isPostgresStore(store)) {
+        try {
+          if (
+            safeResult
+            && typeof safeResult === "object"
+            && "outcome" in safeResult
+            && (safeResult.outcome === "known" || safeResult.outcome === "review_required")
+          ) {
+            await completeResearchClaimByRunId(runId, store.getPrisma());
+          } else {
+            await failResearchClaimByRunId(runId, store.getPrisma());
+          }
+        } catch {
+          console.error("Research diagnostic: stage=claim-terminal outcome=store_error provider=postgres");
+        }
+      }
       sendData(res, {
         ...projection,
         result: safeResult,

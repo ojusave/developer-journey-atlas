@@ -143,6 +143,16 @@ export async function failResearchClaim(
   });
 }
 
+export async function failResearchClaimByRunId(
+  runId: string,
+  prisma: PrismaClient,
+): Promise<void> {
+  await prisma.researchClaim.updateMany({
+    where: { runId, status: { in: ["claiming", "pending"] } },
+    data: { status: "failed" },
+  });
+}
+
 /** Count research starts in a window across all service instances. */
 export async function countRecentResearchStarts(
   prisma: PrismaClient,
