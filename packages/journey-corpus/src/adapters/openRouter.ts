@@ -367,6 +367,33 @@ export function normalizeTrustedRecordFields(parsed: unknown, docs: DocHit[]): u
         }
       }
     }
+    if (Array.isArray(graph.nodes)) {
+      const nodes = graph.nodes.filter((node): node is Record<string, unknown> =>
+        Boolean(node && typeof node === "object"));
+      const nodeById = new Map(
+        nodes
+          .filter((node) => typeof node.id === "string")
+          .map((node) => [node.id as string, node]),
+      );
+      const edges = Array.isArray(graph.edges)
+        ? graph.edges.filter((edge): edge is Record<string, unknown> =>
+            Boolean(edge && typeof edge === "object"))
+        : [];
+      for (let index = 0; index < routeIds.length - 1; index += 1) {
+        const from = routeIds[index];
+        const to = routeIds[index + 1];
+        if (edges.some((edge) => edge.from === from && edge.to === to)) continue;
+        const toEvidence = nodeById.get(to)?.evidence;
+        const fromEvidence = nodeById.get(from)?.evidence;
+        const evidence = Array.isArray(toEvidence) && toEvidence.length > 0
+          ? structuredClone(toEvidence)
+          : Array.isArray(fromEvidence)
+            ? structuredClone(fromEvidence)
+            : [];
+        edges.push({ from, to, condition: null, evidence });
+      }
+      graph.edges = edges;
+    }
   }
   normalizeLiteralEvidenceLocators(record, docs);
   return record;
