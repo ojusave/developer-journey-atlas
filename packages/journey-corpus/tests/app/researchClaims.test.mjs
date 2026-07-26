@@ -7,6 +7,7 @@ import {
   STALE_ACTIVE_CLAIM_RETENTION_MS,
   cleanupResearchClaims,
   completeResearchClaim,
+  completeResearchClaimByRunId,
   countRecentResearchStarts,
 } from "../../dist/db/researchClaims.js";
 
@@ -25,6 +26,23 @@ test("claim completion stores only terminal status for the selected slug", async
     where: { slug: "acme" },
     data: { status: "completed" },
   }]);
+});
+
+test("claim completion can use the run id when an alias resolves to a canonical slug", async () => {
+  let received;
+  const prisma = {
+    researchClaim: {
+      updateMany: async (args) => {
+        received = args;
+        return { count: 1 };
+      },
+    },
+  };
+  await completeResearchClaimByRunId("run-gemini", prisma);
+  assert.deepEqual(received, {
+    where: { runId: "run-gemini" },
+    data: { status: "completed" },
+  });
 });
 
 test("claim cleanup enforces seven-day terminal and one-day active retention", async () => {

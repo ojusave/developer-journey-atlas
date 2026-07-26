@@ -123,6 +123,16 @@ export async function completeResearchClaim(
   });
 }
 
+export async function completeResearchClaimByRunId(
+  runId: string,
+  prisma: PrismaClient,
+): Promise<void> {
+  await prisma.researchClaim.updateMany({
+    where: { runId },
+    data: { status: "completed" },
+  });
+}
+
 export async function failResearchClaim(
   slug: string,
   prisma: PrismaClient,
