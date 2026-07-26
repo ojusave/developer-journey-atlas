@@ -86,7 +86,13 @@ test("trusted record normalization restores official sources and strips prerequi
         { id: "vibe-work", status: "considered", nodeIds: ["unknown-node"] },
       ],
       nodes: [
-        { id: "create-key", kind: "developer_action", action: "Create an API key", successSignal: "Key created" },
+        {
+          id: "create-key",
+          kind: "developer_action",
+          action: "Create an API key",
+          successSignal: "Key created",
+          evidence: [{ sourceId: "S1", locator: "API key creation section" }],
+        },
         { id: "first-response", kind: "platform_outcome", action: "The API returns text", successSignal: "" },
       ],
     },
@@ -119,6 +125,7 @@ test("trusted record normalization restores official sources and strips prerequi
   assert.deepEqual(normalized.journey_graph.candidateRoutes, [{ id: "api-route", status: "selected" }]);
   assert.equal(normalized.journey_graph.nodes[1].kind, "terminal_outcome");
   assert.equal(normalized.journey_graph.nodes[1].successSignal, "The API returns text");
+  assert.match(normalized.journey_graph.nodes[0].evidence[0].locator, /API key/);
 });
 
 test("research prompt content stays bounded and keeps late onboarding evidence", () => {

@@ -11,6 +11,7 @@ import {
   beginResearchClaim,
   cleanupResearchClaims,
   completeResearchClaim,
+  completeResearchClaimByRunId,
   countRecentResearchStarts,
   failResearchClaim,
 } from "../db/researchClaims.js";
@@ -114,11 +115,12 @@ async function persistCompletedResearch(store: DataStore, result: {
   slug: string;
   record: import("../core/ports.js").PlatformRecord;
   assessment: unknown;
-}): Promise<void> {
+}, runId: string): Promise<void> {
   if (!isPostgresStore(store)) return;
   const prisma = store.getPrisma();
   if (store.getRow(result.slug) && store.getRecord(result.slug)) {
     await completeResearchClaim(result.slug, prisma);
+    await completeResearchClaimByRunId(runId, prisma);
     return;
   }
   const row = selectedPathRow(result.record);
@@ -126,6 +128,7 @@ async function persistCompletedResearch(store: DataStore, result: {
   await persistResearchDraft(result.record, row, { prisma, audit });
   store.ingestLive(result.record, row, audit);
   await completeResearchClaim(result.slug, prisma);
+  await completeResearchClaimByRunId(runId, prisma);
   console.log(`Persisted research draft for ${result.slug} into Postgres.`);
 }
 
@@ -283,7 +286,7 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
         projection.result.record
       ) {
         try {
-          await persistCompletedResearch(store, projection.result);
+          await persistCompletedResearch(store, projection.result, runId);
         } catch {
           console.error("Research diagnostic: stage=persist outcome=store_error provider=postgres");
           sendError(res, 502, "persistence_failed", "Research finished, but the private review record could not be stored.");

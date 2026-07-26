@@ -1,6 +1,7 @@
 import type { DocHit, LLMProvider, PlatformRecord } from "../core/ports.js";
 import type { RecordValidator } from "../core/validate.js";
 import { selectedRouteNodes, validateJourneyGraph, type JourneyGraph } from "../core/journeyGraph.js";
+import { findSupportingExcerpt, prepareDoc } from "../../lib/verify-core.mjs";
 
 const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const TIMEOUT_MS = 90_000;
@@ -60,6 +61,72 @@ export function boundedPromptContent(content: string): string {
     length += segment.length + 2;
   }
   return selected.join("\n\n").slice(0, MAX_PROMPT_CONTENT_CHARS);
+}
+
+export function normalizeLiteralEvidenceLocators(record: Record<string, unknown>, docs: DocHit[]): void {
+  if (!record.journey_graph || typeof record.journey_graph !== "object") return;
+  const graph = record.journey_graph as Record<string, unknown>;
+  const prepared = docs.map((doc) => prepareDoc(doc.content ?? ""));
+  const normalizeEvidence = (evidence: unknown, claim: string): void => {
+    if (!Array.isArray(evidence) || !claim.trim()) return;
+    for (const item of evidence) {
+      if (!item || typeof item !== "object") continue;
+      const value = item as Record<string, unknown>;
+      const match = typeof value.sourceId === "string"
+        ? value.sourceId.match(/^S([1-9][0-9]*)$/)
+        : null;
+      if (!match) continue;
+      const doc = prepared[Number(match[1]) - 1];
+      if (!doc?.original) continue;
+      const support = findSupportingExcerpt(doc.original, doc.lower, doc.tokens, claim);
+      if (support.supported && support.excerpt) {
+        value.locator = support.excerpt.replace(/…$/, "").trim();
+      }
+    }
+  };
+  const asRecords = (value: unknown): Array<Record<string, unknown>> =>
+    Array.isArray(value)
+      ? value.filter((item): item is Record<string, unknown> =>
+          Boolean(item && typeof item === "object"))
+      : [];
+  const text = (...values: unknown[]): string =>
+    values.filter((value): value is string => typeof value === "string").join(" ");
+  const nodes = asRecords(graph.nodes);
+  const nodeById = new Map(
+    nodes
+      .filter((node) => typeof node.id === "string")
+      .map((node) => [node.id as string, node]),
+  );
+
+  for (const prerequisite of asRecords(graph.prerequisites)) {
+    normalizeEvidence(prerequisite.evidence, text(prerequisite.requirement));
+  }
+  for (const node of nodes) {
+    const nodeClaim = text(node.action, node.successSignal);
+    normalizeEvidence(node.evidence, nodeClaim);
+    for (const field of asRecords(node.requiredFields)) {
+      normalizeEvidence(field.evidence, text(field.label, node.action));
+    }
+  }
+  for (const edge of asRecords(graph.edges)) {
+    const from = typeof edge.from === "string" ? nodeById.get(edge.from) : undefined;
+    const to = typeof edge.to === "string" ? nodeById.get(edge.to) : undefined;
+    normalizeEvidence(edge.evidence, text(from?.action, to?.action, edge.condition));
+  }
+  for (const gate of asRecords(graph.externalGates)) {
+    normalizeEvidence(gate.evidence, text(gate.description));
+  }
+  for (const candidate of asRecords(graph.candidateRoutes)) {
+    normalizeEvidence(
+      candidate.evidence,
+      text(candidate.routeSummary, candidate.selectionBasis, candidate.effectOnFirstSuccess),
+    );
+  }
+  if (graph.firstSuccessBoundary && typeof graph.firstSuccessBoundary === "object") {
+    const boundary = graph.firstSuccessBoundary as Record<string, unknown>;
+    const terminal = typeof boundary.nodeId === "string" ? nodeById.get(boundary.nodeId) : undefined;
+    normalizeEvidence(boundary.evidence, text(terminal?.action, terminal?.successSignal));
+  }
 }
 
 function docsBlock(docs: DocHit[]): string {
@@ -289,6 +356,7 @@ export function normalizeTrustedRecordFields(parsed: unknown, docs: DocHit[]): u
       }
     }
   }
+  normalizeLiteralEvidenceLocators(record, docs);
   return record;
 }
 
