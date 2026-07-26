@@ -131,3 +131,105 @@ test("search, consent, research, and draft display form one complete human flow"
 
   dom.window.close();
 });
+
+test("a failed attempt can retry into a saved private draft", async () => {
+  const html = await readFile(new URL("index.html", webRoot), "utf8");
+  const app = await readFile(new URL("app.js", webRoot), "utf8");
+  let researchStarts = 0;
+  const dom = new JSDOM(html, {
+    url: "https://atlas.test/",
+    runScripts: "outside-only",
+  });
+  const { window } = dom;
+  const nativeSetTimeout = globalThis.setTimeout;
+  window.setTimeout = (callback) => nativeSetTimeout(callback, 0);
+  const draft = {
+    name: "Mistral AI",
+    slug: "mistral-ai",
+    startingUrl: "https://docs.mistral.ai/getting-started/",
+    firstSuccess: "Receive the first model response",
+    successSignal: "The response contains generated text",
+    prerequisites: [],
+    steps: [{ stepNumber: 1, action: "Send the first API request", successSignal: "Text returns" }],
+    sources: [{ title: "Mistral quickstart", url: "https://docs.mistral.ai/getting-started/" }],
+  };
+  window.fetch = async (path, options = {}) => {
+    if (path === "/data/llm-api-catalog.json") {
+      return {
+        ok: true,
+        json: async () => ({
+          cohorts: [{
+            providers: [{
+              name: "Mistral AI",
+              slug: "mistral-ai",
+              searchAliases: ["Mistral"],
+              routeStatus: "review",
+            }],
+          }],
+        }),
+      };
+    }
+    if (path === "/api/platforms") {
+      return { ok: true, json: async () => ({ data: [] }) };
+    }
+    if (path === "/api/platforms/mistral-ai/journey") {
+      return {
+        ok: false,
+        status: 404,
+        json: async () => ({ error: { message: "No public route." } }),
+      };
+    }
+    if (path === "/api/research" && options.method === "POST") {
+      researchStarts += 1;
+      return researchStarts === 1
+        ? { ok: true, json: async () => ({ data: { runId: "old-run", resumed: true } }) }
+        : {
+            ok: true,
+            json: async () => ({
+              data: { result: { outcome: "draft_ready", slug: "mistral-ai", draft } },
+            }),
+          };
+    }
+    if (path === "/api/research/old-run") {
+      return {
+        ok: true,
+        json: async () => ({
+          data: {
+            runId: "old-run",
+            phase: "completed",
+            result: { outcome: "invalid_output" },
+          },
+        }),
+      };
+    }
+    throw new Error(`Unexpected request: ${options.method ?? "GET"} ${path}`);
+  };
+
+  window.eval(app);
+  await waitFor(
+    () => window.document.querySelector("#search-status")?.textContent.includes("Try OpenAI"),
+    "provider search did not become ready",
+  );
+  const input = window.document.querySelector("#search");
+  input.value = "Mistral AI";
+  window.document.querySelector("#search-form").dispatchEvent(
+    new window.Event("submit", { bubbles: true, cancelable: true }),
+  );
+  await waitFor(
+    () => window.document.querySelector("#research-btn")?.textContent === "Start research",
+    "search did not show the research action",
+  );
+  window.document.querySelector("#research-btn").click();
+  await waitFor(
+    () => window.document.querySelector("#research-btn")?.textContent === "Try again",
+    "failed research did not offer an immediate retry",
+  );
+  window.document.querySelector("#research-btn").click();
+  await waitFor(
+    () => window.document.querySelector(".state-label")?.textContent === "Research draft",
+    "retry did not display the saved private draft",
+  );
+  assert.match(window.document.querySelector("#result").textContent, /Send the first API request/);
+  assert.equal(researchStarts, 2);
+  dom.window.close();
+});
