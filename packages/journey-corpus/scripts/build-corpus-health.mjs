@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = path.join(root, "corpus-health.json");
 const migrationPath = path.join(root, "migration-analysis.json");
+const launchCohortsPath = path.join(root, "trust", "launch-cohort-candidates.json");
+const COMPARISON_FRESHNESS_DAYS = 90;
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, "utf8"));
@@ -88,6 +90,103 @@ function normalizedAction(value) {
     .replace(/\b(the|a|an|your|this|that)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function daysOld(date, now) {
+  const timestamp = Date.parse(`${date}T00:00:00Z`);
+  if (!Number.isFinite(timestamp)) return null;
+  return Math.floor((now.getTime() - timestamp) / (24 * 60 * 60 * 1000));
+}
+
+function dispositionFor(record, now) {
+  const age = record.last_retrieval_date?.slice(0, 10)
+    ? daysOld(record.last_retrieval_date.slice(0, 10), now)
+    : null;
+  const passesEveryRuleExceptFreshness =
+    record.resolved_platform_identity.status === "resolved" &&
+    record.source_authority.rejected_sources.length === 0 &&
+    record.source_authority.accepted_sources.length > 0 &&
+    record.source_content_availability.missing_or_unusable_source_ids.length === 0 &&
+    record.claims.without_evidence.length === 0 &&
+    record.journey_integrity.findings.length === 0;
+  if (
+    passesEveryRuleExceptFreshness &&
+    age !== null &&
+    age > COMPARISON_FRESHNESS_DAYS
+  ) {
+    return {
+      status: "stale",
+      machine_readable_reasons: ["evidence_freshness_exceeded_90_days"],
+      failed_freshness_rule: {
+        maximum_age_days: COMPARISON_FRESHNESS_DAYS,
+        observed_age_days: age,
+        last_retrieval_date: record.last_retrieval_date,
+      },
+    };
+  }
+  if (record.eligibility.public_display) {
+    return {
+      status: "published",
+      machine_readable_reasons: [],
+      failed_freshness_rule: null,
+    };
+  }
+  if (record.resolved_platform_identity.status !== "resolved") {
+    return {
+      status: "identity_needs_approval",
+      machine_readable_reasons: [record.resolved_platform_identity.status],
+      failed_freshness_rule: null,
+    };
+  }
+  if (record.source_authority.rejected_sources.length > 0) {
+    return {
+      status: "excluded",
+      machine_readable_reasons: [
+        "rejected_authoritative_source",
+        ...record.source_authority.rejected_sources.map((source) => source.reason),
+      ],
+      failed_freshness_rule: null,
+    };
+  }
+  if (
+    record.source_authority.accepted_sources.length === 0 ||
+    record.source_content_availability.missing_or_unusable_source_ids.length > 0 ||
+    record.claims.without_evidence.length > 0
+  ) {
+    return {
+      status: "evidence_needs_review",
+      machine_readable_reasons: [
+        ...(record.source_authority.accepted_sources.length === 0 ? ["no_accepted_source"] : []),
+        ...(record.source_content_availability.missing_or_unusable_source_ids.length > 0
+          ? ["source_content_unavailable"]
+          : []),
+        ...(record.claims.without_evidence.length > 0 ? ["claim_grounding_failed"] : []),
+      ],
+      failed_freshness_rule: null,
+    };
+  }
+  return {
+    status: "route_needs_review",
+    machine_readable_reasons: record.journey_integrity.findings.map((finding) => finding.code),
+    failed_freshness_rule: null,
+  };
+}
+
+function generatedFilesFor(slug) {
+  return [
+    `trust/platform-identities.json`,
+    `trust/source-evidence/${slug}.json`,
+    `trust/journey-graphs/${slug}.json`,
+    "corpus-health.json",
+    "migration-analysis.json",
+    "selected-path-heuristic.json",
+    "public/data/index.json",
+    `public/data/records/${slug}.json`,
+    "public/llms.txt",
+    "public/llms-full.txt",
+    "public/sitemap.xml",
+    "public/source/index.md",
+  ];
 }
 
 function looksCompound(action) {
@@ -286,7 +385,9 @@ function graphHealth(graph, evidenceById, recordSourceIds, expectedPlatformSlug)
 const roster = readJson(path.join(root, "roster.json"));
 const identities = readJson(path.join(root, "trust", "platform-identities.json")).identities;
 const records = roster.map((entry) => readJson(path.join(root, "records", `${entry.slug}.json`)));
+const recordsBySlug = new Map(records.map((record) => [record.platform.slug, record]));
 const healthRecords = [];
+const generatedAt = new Date();
 
 for (const record of records) {
   const slug = record.platform.slug;
@@ -313,6 +414,12 @@ for (const record of records) {
     new Set((record.sources ?? []).map((source) => source.id)),
     slug,
   );
+  const lastRetrievalDate = evidenceFile?.retrieved_at ?? null;
+  const evidenceAgeDays = lastRetrievalDate?.slice(0, 10)
+    ? daysOld(lastRetrievalDate.slice(0, 10), generatedAt)
+    : null;
+  const evidenceIsFresh =
+    evidenceAgeDays !== null && evidenceAgeDays <= COMPARISON_FRESHNESS_DAYS;
   const identityStatus = candidates.length === 1
     ? "resolved"
     : candidates.length > 1
@@ -323,12 +430,17 @@ for (const record of records) {
     rejectedSources.length === 0 &&
     acceptedSources.length > 0 &&
     missingContent.length === 0 &&
-    graphResult.findings.length === 0;
+    graphResult.findings.length === 0 &&
+    evidenceIsFresh;
   const reasons = [
     ...(identityStatus === "resolved" ? [] : [identityStatus]),
     ...(rejectedSources.length ? ["rejected_authoritative_source"] : []),
     ...(missingContent.length ? ["source_content_unavailable"] : []),
     ...graphResult.findings.map((item) => item.code),
+    ...(evidenceAgeDays === null ? ["evidence_retrieval_date_missing"] : []),
+    ...(evidenceAgeDays !== null && !evidenceIsFresh
+      ? ["evidence_freshness_exceeded_90_days"]
+      : []),
   ];
   healthRecords.push({
     slug,
@@ -356,7 +468,7 @@ for (const record of records) {
       findings: graphResult.findings,
       required_field_inventory_count: graphResult.field_inventory_count,
     },
-    last_retrieval_date: evidenceFile?.retrieved_at ?? null,
+    last_retrieval_date: lastRetrievalDate,
     eligibility: {
       reconstruction: eligible,
       audit: eligible,
@@ -366,9 +478,183 @@ for (const record of records) {
   });
 }
 
+const allowedDispositions = new Set([
+  "published",
+  "excluded",
+  "stale",
+  "identity_needs_approval",
+  "evidence_needs_review",
+  "route_needs_review",
+]);
+for (const healthRecord of healthRecords) {
+  const record = recordsBySlug.get(healthRecord.slug);
+  const sourcesById = new Map((record?.sources ?? []).map((source) => [source.id, source]));
+  const disposition = dispositionFor(healthRecord, generatedAt);
+  if (!allowedDispositions.has(disposition.status)) {
+    throw new Error(`${healthRecord.slug}: unknown operational disposition ${disposition.status}`);
+  }
+  healthRecord.operational_disposition = {
+    ...disposition,
+    failed_evidence: {
+      rejected_sources: healthRecord.source_authority.rejected_sources.map((source) => ({
+        source_id: source.source_id,
+        url: source.url,
+        reason: source.reason,
+      })),
+      missing_or_unusable_sources:
+        healthRecord.source_content_availability.missing_or_unusable_source_ids.map((sourceId) => ({
+          source_id: sourceId,
+          title: sourcesById.get(sourceId)?.title ?? null,
+          url: sourcesById.get(sourceId)?.url ?? null,
+        })),
+      claims_without_evidence: healthRecord.claims.without_evidence,
+      route_findings: healthRecord.journey_integrity.findings,
+    },
+    generated_files_on_approval: generatedFilesFor(healthRecord.slug),
+  };
+}
+
+const launchPlan = readJson(launchCohortsPath);
+const cohortParticipants = launchPlan.cohorts.flatMap((cohort) => cohort.participant_slugs);
+if (launchPlan.cohorts.length < 5) {
+  throw new Error("Launch cohort plan must contain at least five candidate cohorts.");
+}
+if (new Set(cohortParticipants).size < 20 || new Set(cohortParticipants).size !== cohortParticipants.length) {
+  throw new Error("Launch cohort plan must contain at least 20 distinct platforms with no repeated platform.");
+}
+if (
+  launchPlan.priority_cohort_id &&
+  !launchPlan.cohorts.some((cohort) => cohort.id === launchPlan.priority_cohort_id)
+) {
+  throw new Error(`Unknown priority cohort: ${launchPlan.priority_cohort_id}`);
+}
+
+const healthBySlug = new Map(healthRecords.map((record) => [record.slug, record]));
+const candidateCohorts = launchPlan.cohorts.map((cohort) => {
+  if (cohort.participant_slugs.length < 4) {
+    throw new Error(`${cohort.id}: candidate cohort requires at least four platforms.`);
+  }
+  const participants = cohort.participant_slugs.map((slug) => {
+    const healthRecord = healthBySlug.get(slug);
+    const record = recordsBySlug.get(slug);
+    if (!healthRecord || !record) throw new Error(`${cohort.id}: unknown platform ${slug}`);
+    return { slug, healthRecord, record };
+  });
+  const organizations = new Set(
+    participants.map(({ record }) => normalizeIdentityKey(record.platform.organization)),
+  );
+  if (organizations.size !== participants.length) {
+    throw new Error(`${cohort.id}: organizations must be distinct within the candidate cohort.`);
+  }
+  const qualifiedParticipants = participants.filter(({ healthRecord, record }) => {
+    if (healthRecord.operational_disposition.status !== "published") return false;
+    const graph = loadOptionalJson(path.join(root, "trust", "journey-graphs", `${healthRecord.slug}.json`));
+    const basis = graph?.comparisonBasis;
+    return Boolean(
+      basis &&
+      basis.developerJobKey === cohort.developer_job_key &&
+      basis.startingBoundaryKey === cohort.starting_boundary_key &&
+      basis.firstSuccessOutcomeClass === cohort.first_success_outcome_class &&
+      basis.firstSuccessBoundaryKey === cohort.first_success_boundary_key &&
+      basis.routeGranularityVersion === cohort.route_granularity_version &&
+      basis.categoryKey === cohort.category_key &&
+      basis.organizationKey === normalizeIdentityKey(record.platform.organization),
+    );
+  });
+  return {
+    id: cohort.id,
+    status:
+      qualifiedParticipants.length === participants.length
+        ? "qualified"
+        : "candidate_needs_review",
+    developer_job_key: cohort.developer_job_key,
+    starting_boundary_key: cohort.starting_boundary_key,
+    first_success_outcome_class: cohort.first_success_outcome_class,
+    first_success_boundary_key: cohort.first_success_boundary_key,
+    route_granularity_version: cohort.route_granularity_version,
+    category_key: cohort.category_key,
+    review_hypothesis: cohort.review_hypothesis,
+    publication_eligible_count: participants.filter(
+      ({ healthRecord }) => healthRecord.operational_disposition.status === "published",
+    ).length,
+    comparison_qualified_count: qualifiedParticipants.length,
+    required_platform_count: participants.length,
+    participants: participants.map(({ slug, healthRecord, record }) => ({
+      slug,
+      name: record.platform.name,
+      organization: record.platform.organization,
+      disposition: healthRecord.operational_disposition.status,
+      blocking_reasons: healthRecord.operational_disposition.machine_readable_reasons,
+      starting_url: record.entry_point?.starting_url ?? null,
+      proposed_first_success: record.documented_first_success?.normalized_outcome ?? null,
+      unresolved_questions: (record.uncertainties ?? []).map((item) => item.question),
+      source_candidates: (record.sources ?? []).map((source) => ({
+        id: source.id,
+        title: source.title,
+        url: source.url,
+        accessed_at: source.accessed_at ?? null,
+        sections_used: source.sections_used ?? [],
+      })),
+      generated_files_on_approval:
+        healthRecord.operational_disposition.generated_files_on_approval,
+    })),
+    required_review_sequence: [
+      "Approve one unambiguous platform identity per participant.",
+      "Retrieve current first-party pages and record request, redirects, content, hashes, titles, links, authority, and locators.",
+      "Reconstruct and validate one atomic selected route per participant.",
+      "Independently review every route and its first-success boundary.",
+      `Certify cohort equivalence and comparison basis only after all ${participants.length} routes pass.`,
+    ],
+  };
+});
+
+const dispositionCounts = Object.fromEntries(
+  [...allowedDispositions].map((status) => [
+    status,
+    healthRecords.filter((record) => record.operational_disposition.status === status).length,
+  ]),
+);
+if (Object.values(dispositionCounts).reduce((sum, count) => sum + count, 0) !== healthRecords.length) {
+  throw new Error("Every corpus record must receive exactly one operational disposition.");
+}
+const rankedCohorts = [...candidateCohorts].sort((left, right) =>
+  right.publication_eligible_count - left.publication_eligible_count ||
+  left.id.localeCompare(right.id),
+);
+const recommendedCohort =
+  candidateCohorts.find((cohort) => cohort.id === launchPlan.priority_cohort_id) ??
+  rankedCohorts[0] ??
+  null;
+const candidateSlugSet = new Set(cohortParticipants);
+const dispositionRank = {
+  route_needs_review: 0,
+  evidence_needs_review: 1,
+  identity_needs_approval: 2,
+  stale: 3,
+  excluded: 4,
+  published: 5,
+};
+const closestRecords = healthRecords
+  .filter((record) => record.operational_disposition.status !== "published")
+  .sort((left, right) =>
+    Number(candidateSlugSet.has(right.slug)) - Number(candidateSlugSet.has(left.slug)) ||
+    dispositionRank[left.operational_disposition.status] -
+      dispositionRank[right.operational_disposition.status] ||
+    left.slug.localeCompare(right.slug),
+  )
+  .slice(0, 20)
+  .map((record) => ({
+    slug: record.slug,
+    disposition: record.operational_disposition.status,
+    blocking_reasons: record.operational_disposition.machine_readable_reasons,
+    launch_cohorts: candidateCohorts
+      .filter((cohort) => cohort.participants.some((participant) => participant.slug === record.slug))
+      .map((cohort) => cohort.id),
+  }));
+
 const health = {
   schema_version: "1.0",
-  generated_at: new Date().toISOString(),
+  generated_at: generatedAt.toISOString(),
   contract:
     "A record is public only when identity, source authority, source content, claim coverage, and selected-route integrity all pass.",
   summary: {
@@ -378,6 +664,34 @@ const health = {
     records_with_content_metadata: healthRecords.filter((item) => item.source_content_availability.metadata_records > 0).length,
     records_with_selected_graph: healthRecords.filter((item) => item.journey_integrity.selected_route_resolved).length,
     eligible_for_public_display: healthRecords.filter((item) => item.eligibility.public_display).length,
+    dispositions: dispositionCounts,
+    candidate_launch_platforms: new Set(cohortParticipants).size,
+    candidate_comparison_cohorts: candidateCohorts.length,
+    qualified_comparison_cohorts: candidateCohorts.filter((cohort) => cohort.status === "qualified").length,
+    routes_with_three_qualified_peers: candidateCohorts
+      .filter((cohort) => cohort.status === "qualified")
+      .reduce((sum, cohort) => sum + cohort.required_platform_count, 0),
+  },
+  review_operations: {
+    source: "trust/launch-cohort-candidates.json",
+    status: launchPlan.status,
+    priority_cohort_id: launchPlan.priority_cohort_id ?? null,
+    priority_reason: launchPlan.priority_reason ?? null,
+    closest_cohort: recommendedCohort?.id ?? null,
+    closest_records: closestRecords,
+    cohort_completion_candidates: candidateCohorts.map((cohort) => ({
+      cohort_id: cohort.id,
+      remaining_platforms: cohort.participants
+        .filter((participant) => participant.disposition !== "published")
+        .map((participant) => participant.slug),
+      remaining_count: cohort.participants.filter(
+        (participant) => participant.disposition !== "published",
+      ).length,
+    })),
+    recommended_next_review_action: recommendedCohort
+      ? `Review identity candidates for the unpublished ${recommendedCohort.id} participants as one cohort, then retrieve and reconstruct those routes together.`
+      : null,
+    candidate_cohorts: candidateCohorts,
   },
   records: healthRecords,
 };
@@ -414,6 +728,21 @@ const migration = {
     broken_causal_continuity: healthRecords.filter((item) =>
       item.journey_integrity.findings.some((finding) => finding.code === "broken_causal_input"),
     ).length,
+  },
+  launch_review: {
+    candidate_platforms: new Set(cohortParticipants).size,
+    candidate_cohorts: candidateCohorts.length,
+    qualified_cohorts: candidateCohorts.filter((cohort) => cohort.status === "qualified").length,
+    public_route_shortfall: Math.max(
+      0,
+      new Set(cohortParticipants).size - dispositionCounts.published,
+    ),
+    qualified_cohort_shortfall: Math.max(
+      0,
+      5 - candidateCohorts.filter((cohort) => cohort.status === "qualified").length,
+    ),
+    routes_with_three_qualified_peers: health.summary.routes_with_three_qualified_peers,
+    recommended_next_review_action: health.review_operations.recommended_next_review_action,
   },
   affected_records: (quality.records ?? [])
     .filter((item) => item.non_atomic_step_count > 0)

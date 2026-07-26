@@ -11,6 +11,7 @@ import type {
 } from "../core/ports.js";
 import { buildJourneyOverlay, buildJourneyOverlayFromGraph, type JourneyOverlay, type ModelLinkInput } from "../core/journeyOverlay.js";
 import type { JourneyGraph } from "../core/journeyGraph.js";
+import { buildJourneyEvidence, type JourneyEvidence } from "../core/journeyEvidence.js";
 import { PublicationGate, type CorpusHealthReport } from "../core/publicationGate.js";
 import { config } from "../config.js";
 
@@ -259,6 +260,13 @@ export class PostgresDataStore implements DataStore {
 
   getJourneyGraph(slug: string): JourneyGraph | undefined {
     return this.journeyGraphs.get(slug);
+  }
+
+  getJourneyEvidence(slug: string): JourneyEvidence | undefined {
+    const record = this.records.get(slug);
+    const graph = this.journeyGraphs.get(slug);
+    if (!record || !graph) return undefined;
+    return buildJourneyEvidence(record, graph);
   }
 
   /** Joined journey with friction highlights, soft-map families, and OpenRouter links. */

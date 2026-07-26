@@ -1,0 +1,54 @@
+{
+  "platform": {"name": "Microsoft Foundry", "slug": "microsoft-foundry", "organization": "Microsoft"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Microsoft Foundry project and Responses API route",
+    "selection_basis": "Microsoft's current quickstart index separates resource setup from a Responses API call, making subscription, project, access, and model deployment part of the cloud-platform journey.",
+    "alternatives_considered": [
+      {"name": "Foundry SDK chat application", "url": "https://learn.microsoft.com/en-us/azure/foundry/quickstarts/quickstarts", "reason_not_primary": "It targets an application rather than the shortest first model API response."},
+      {"name": "Prompt agent", "url": "https://learn.microsoft.com/en-us/azure/foundry/quickstarts/quickstarts", "reason_not_primary": "It introduces agent creation beyond a basic model response."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Create Foundry resources, deploy or select a model, and receive output through the Responses API.", "starting_url": "https://learn.microsoft.com/en-us/azure/foundry/quickstarts/quickstarts", "assumed_prior_state": ["No Azure subscription, Foundry project, deployment, or credential exists.", "A browser and local development environment are available."]},
+  "documented_first_success": {
+    "official_milestone": "Build agents using the Responses API",
+    "normalized_outcome": "An authenticated Microsoft Foundry Responses request returns model output.",
+    "observable_completion_signal": "The client receives generated output from the selected Foundry model deployment.",
+    "boundary_evidence": {"type": "not-established-by-docs", "official_label_or_terminal_state": "The quickstart index names Create resources and Build agents using the Responses API as separate routes; their exact join remains under review.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "A returned response is meaningful, but the current index alone does not prove one atomic shortest path across subscription, resource, deployment, RBAC, and request steps.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Microsoft account and Azure subscription.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "configuration", "requirement": "A Foundry project and model deployment or instant-model selection.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "permission", "requirement": "Access granted to the project and model resources.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "credential", "requirement": "A supported Foundry authentication method for the API client.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign in with an Azure subscription.", "details": [], "input": "Microsoft account and subscription", "output": "Authenticated Azure session", "success_signal": "Microsoft Foundry can be opened.", "failure_or_wait": "Subscription or directory access can block setup.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Create the required Foundry resources and project.", "details": ["The setup quickstart also covers team access."], "input": "Azure subscription, resource group, region, and project choices", "output": "Foundry project", "success_signal": "The project is active.", "failure_or_wait": "Region, quota, policy, or RBAC can block creation.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Deploy or select a model available to the project.", "details": [], "input": "Foundry project and model choice", "output": "Callable model endpoint", "success_signal": "A model is available to the project.", "failure_or_wait": "Deployment, capacity, or access can block the model.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "authenticate", "actor": "developer", "interface": "code", "action": "Configure a supported credential and endpoint for the OpenAI-compatible client.", "details": [], "input": "Project endpoint and credential", "output": "Authenticated client configuration", "success_signal": "The client can address the model.", "failure_or_wait": "RBAC propagation or credential configuration can fail.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "api", "action": "Send a Responses API request to the selected model.", "details": [], "input": "Client, model, and prompt", "output": "Responses API result", "success_signal": "The API returns generated output.", "failure_or_wait": "Authentication, deployment, quota, region, or request errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "code", "action": "Confirm that generated output is present.", "details": [], "input": "API result", "output": "Verified first Foundry response", "success_signal": "Model output is readable.", "failure_or_wait": "An error result does not meet first success.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": {"reason": "The current quickstart index links setup and API paths but the exact route join and field inventory require human reconstruction.", "impact": "The record cannot be comparison-qualified until the selected resource and authentication path is independently verified.", "source_ids": ["S1"]},
+  "branches": [],
+  "friction_gates": [
+    {"at_step": 1, "type": "billing", "description": "An Azure subscription is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "permission", "description": "Project and team access require Azure resource permissions.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "choice", "description": "A model must be deployed or selected.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "each quickstart is described as taking a few minutes", "source_ids": ["S1"]},
+  "sources": [
+    {"id": "S1", "title": "Microsoft Foundry quickstarts", "url": "https://learn.microsoft.com/en-us/azure/foundry/quickstarts/quickstarts", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": "2026-06-26", "sections_used": ["Set up", "Build your first agent"], "evidence_supported": ["Project, model, access setup", "Responses API route", "Cloud-platform boundary"]}
+  ],
+  "uncertainties": [
+    {"question": "Which current model and authentication path is the shortest generally available route across new subscriptions?", "impact": "Determines exact steps, fields, and gates.", "reason_unresolved": "The quickstart index exposes multiple setup and model paths and requires authorization for some linked content.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Prompt agent creation", "Hosted agents", "Toolboxes", "Evaluation", "Tracing", "CI/CD"]
+}

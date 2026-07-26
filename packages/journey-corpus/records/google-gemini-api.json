@@ -1,0 +1,55 @@
+{
+  "platform": {"name": "Gemini Developer API", "slug": "google-gemini-api", "organization": "Google"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Gemini Interactions API via REST",
+    "selection_basis": "Google's current getting-started guide makes the Interactions API the default first-call surface and documents an SDK-free REST request.",
+    "alternatives_considered": [
+      {"name": "generateContent API", "url": "https://ai.google.dev/gemini-api/docs/get-started", "reason_not_primary": "The guide still exposes this route through a toggle, but currently presents Interactions as the default."},
+      {"name": "Vertex AI", "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start", "reason_not_primary": "Vertex AI requires Google Cloud project, billing, API, and IAM state and is tracked in the cloud-platform cohort."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {
+    "developer_intent": "Create a Gemini API key and receive text from the Interactions REST API.",
+    "starting_url": "https://ai.google.dev/gemini-api/docs/get-started",
+    "assumed_prior_state": ["No Gemini API key exists.", "A browser and terminal with cURL are available."]
+  },
+  "documented_first_success": {
+    "official_milestone": "Make your first call",
+    "normalized_outcome": "An authenticated Gemini Interactions request returns model-generated text.",
+    "observable_completion_signal": "The response has status completed and a model_output step containing text.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The REST quickstart shows a completed Interaction with model output text.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The returned model output is the first meaningful API result, before streaming, multimodal, tool, and multi-turn extensions.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Google account able to use Google AI Studio.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "credential", "requirement": "A Gemini API key. AI Studio automatically creates a project and key for new users or can create another key-project pair.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "software", "requirement": "An HTTPS client such as cURL.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Sign in to Google AI Studio and open API keys.", "details": [], "input": "Google account", "output": "Authenticated AI Studio session", "success_signal": "The API keys page is reachable.", "failure_or_wait": "Account access follows Google's sign-in flow.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Copy the automatically created key or create a new API key.", "details": ["Export it as GEMINI_API_KEY."], "input": "AI Studio session", "output": "GEMINI_API_KEY", "success_signal": "The key is available to the shell.", "failure_or_wait": "Paid-tier upgrade is optional for the first call but requires Cloud Billing and prepaid credits.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST the documented text prompt to https://generativelanguage.googleapis.com/v1beta/interactions with x-goog-api-key.", "details": ["Send JSON containing a model and input."], "input": "GEMINI_API_KEY and prompt", "output": "Interaction response", "success_signal": "The response status is completed.", "failure_or_wait": "Invalid credentials, model, or quota return an API error.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm that the response contains a model_output text step.", "details": [], "input": "Interaction response", "output": "Verified first model response", "success_signal": "Generated text is present.", "failure_or_wait": "A response without generated text does not meet the boundary.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "The developer upgrades to the paid tier.", "path": "Link Cloud Billing, add a payment method, and prepay at least the documented minimum.", "effect_on_first_success": "Raises limits but is not required when the free tier can serve the first request.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "credential", "description": "A Gemini API key is required.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "under a minute", "source_ids": ["S1"]},
+  "sources": [
+    {"id": "S1", "title": "Getting started with the Gemini API", "url": "https://ai.google.dev/gemini-api/docs/get-started", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Get an API key", "Install the SDK and make your first call", "REST"], "evidence_supported": ["AI Studio key creation", "Optional paid-tier setup", "REST endpoint, headers, request, and completed response"]}
+  ],
+  "uncertainties": [
+    {"question": "Does every new account receive usable free-tier quota in every supported region?", "impact": "Could add a billing gate before first success.", "reason_unresolved": "The quickstart describes paid-tier upgrade as optional but does not establish universal account eligibility.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Streaming", "Multimodal input and generation", "Structured output", "Tools and function calling", "Multi-turn conversations"]
+}

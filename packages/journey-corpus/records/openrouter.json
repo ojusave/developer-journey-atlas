@@ -1,0 +1,52 @@
+{
+  "platform": {"name": "OpenRouter", "slug": "openrouter", "organization": "OpenRouter"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "OpenRouter unified Chat Completions API via cURL",
+    "selection_basis": "OpenRouter's quickstart calls its standard HTTP endpoint the most direct integration and provides a cURL request with no SDK dependency.",
+    "alternatives_considered": [
+      {"name": "OpenRouter client SDK", "url": "https://openrouter.ai/docs/quickstart", "reason_not_primary": "It adds a package dependency over the same API."},
+      {"name": "OpenAI SDK compatibility", "url": "https://openrouter.ai/docs/quickstart", "reason_not_primary": "It is useful for migration but not required for the first HTTP result."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Create an OpenRouter API key, choose a routed model, and receive generated text from the unified endpoint.", "starting_url": "https://openrouter.ai/docs/quickstart", "assumed_prior_state": ["No OpenRouter API key exists.", "A browser and cURL are available."]},
+  "documented_first_success": {
+    "official_milestone": "Using the OpenRouter API",
+    "normalized_outcome": "An authenticated OpenRouter Chat Completions request returns model-generated content.",
+    "observable_completion_signal": "The response contains an assistant choice from the selected or routed model.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The quickstart provides a direct cURL POST to /api/v1/chat/completions.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The first generated completion completes the router API job, while provider selection, fallbacks, and attribution remain separate routing concerns.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "An OpenRouter account able to create an API key.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "credential", "requirement": "An OpenRouter API key.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "configuration", "requirement": "A model slug or router selection.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "software", "requirement": "An HTTPS client such as cURL.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create or sign in to an OpenRouter account.", "details": [], "input": "Account details", "output": "Authenticated OpenRouter session", "success_signal": "API key management is reachable.", "failure_or_wait": "Signup fields are not enumerated in the API quickstart.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "console", "action": "Create and store an OpenRouter API key.", "details": [], "input": "OpenRouter account", "output": "OPENROUTER_API_KEY", "success_signal": "The key is available to cURL.", "failure_or_wait": "A missing key prevents authentication.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "documentation", "action": "Choose the quickstart model alias or another catalog slug.", "details": ["Optional app-attribution headers do not affect basic authentication."], "input": "Desired model or routing policy", "output": "Model slug", "success_signal": "A valid model value is selected.", "failure_or_wait": "Availability, price, and provider policy can vary by model.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST messages to https://openrouter.ai/api/v1/chat/completions with the Bearer key.", "details": [], "input": "API key, model, and messages", "output": "Chat completion response", "success_signal": "The API returns an assistant choice.", "failure_or_wait": "Credential, credit, model, provider, or rate-limit errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm that the response contains generated assistant content.", "details": [], "input": "Chat completion response", "output": "Verified first routed response", "success_signal": "Generated content is present.", "failure_or_wait": "An error body does not meet the boundary.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [],
+  "friction_gates": [
+    {"at_step": 2, "type": "credential", "description": "An OpenRouter API key is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "choice", "description": "The developer must select a model or router, and the platform may select an underlying provider.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "OpenRouter Quickstart", "url": "https://openrouter.ai/docs/quickstart", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Using the OpenRouter API"], "evidence_supported": ["Unified endpoint", "API key header", "Model selection", "cURL request", "Optional attribution headers"]}
+  ],
+  "uncertainties": [
+    {"question": "Which funding path is shortest for a brand-new account at the time of review?", "impact": "Free-model availability versus purchased credits changes the payment gate.", "reason_unresolved": "The quickstart delegates free-model and rate-limit details to separate changing guidance.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Fallback configuration", "Provider policy", "App attribution", "Streaming", "Agent SDK", "Tools and routing optimization"]
+}

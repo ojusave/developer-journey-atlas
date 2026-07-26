@@ -1,0 +1,51 @@
+{
+  "platform": {"name": "AI21 Jamba API", "slug": "ai21-api", "organization": "AI21 Labs"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Jamba Chat Completions REST API",
+    "selection_basis": "AI21 documents public REST access and a Jamba chat-completions endpoint, so a direct HTTP request is the least dependency-heavy first-response route.",
+    "alternatives_considered": [
+      {"name": "AI21 Python SDK", "url": "https://docs.ai21.com/docs/sdk", "reason_not_primary": "The SDK is optional convenience over the public REST API."},
+      {"name": "Cloud platform deployment", "url": "https://docs.ai21.com/docs/model-availability-by-platform", "reason_not_primary": "Cloud marketplaces introduce different account, IAM, and deployment boundaries."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Create an AI21 Studio API key and receive a Jamba chat completion.", "starting_url": "https://docs.ai21.com/docs/create-an-api-key", "assumed_prior_state": ["No AI21 Studio API key exists.", "A browser and cURL are available."]},
+  "documented_first_success": {
+    "official_milestone": "Jamba chat completion",
+    "normalized_outcome": "An authenticated AI21 Studio chat-completions request returns a Jamba assistant message.",
+    "observable_completion_signal": "The response contains generated assistant content.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The API reference documents POST /studio/v1/chat/completions with request and response examples.", "source_ids": ["S1", "S2"]},
+    "why_this_is_the_boundary": "The first returned Jamba message completes the basic language-model API job before private deployment, RAG, or agent workflows.",
+    "source_ids": ["S1", "S2"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "An AI21 Studio account.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "credential", "requirement": "An AI21 Studio API key exported as AI21_API_KEY.", "required": true, "source_ids": ["S1", "S3"]},
+    {"order": 3, "type": "software", "requirement": "An HTTPS client such as cURL.", "required": true, "source_ids": ["S2"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create or sign in to an AI21 Studio account.", "details": [], "input": "Account details", "output": "Authenticated Studio session", "success_signal": "The API key area is reachable.", "failure_or_wait": "Signup fields are outside the API reference.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "console", "action": "Create an API key and export it as AI21_API_KEY.", "details": [], "input": "Studio account", "output": "AI21_API_KEY", "success_signal": "The key is available to the HTTP client.", "failure_or_wait": "A missing key prevents authentication.", "required": true, "source_ids": ["S1", "S3"]},
+    {"step_number": 3, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST messages and a current Jamba model to the Studio chat-completions endpoint.", "details": ["Use the Bearer API key and JSON content type."], "input": "API key, model, and messages", "output": "Chat completion response", "success_signal": "The API returns an assistant message.", "failure_or_wait": "Credential, access, model, or request errors prevent output.", "required": true, "source_ids": ["S2"]},
+    {"step_number": 4, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm that the response contains generated assistant content.", "details": [], "input": "Chat completion response", "output": "Verified first Jamba response", "success_signal": "Generated content is present.", "failure_or_wait": "An error response is not first success.", "required": true, "source_ids": ["S2"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [],
+  "friction_gates": [
+    {"at_step": 2, "type": "credential", "description": "An AI21 API key is required.", "documented_requirement": true, "source_ids": ["S1", "S3"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "AI21 Developer Platform overview", "url": "https://docs.ai21.com/docs/overview", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Accessing our Models and Solutions"], "evidence_supported": ["Public REST API and SDK access"]},
+    {"id": "S2", "title": "Jamba API reference", "url": "https://docs.ai21.com/reference/jamba-1-6-api-ref", "official_domain": true, "source_type": "api-reference", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Chat Completions"], "evidence_supported": ["Endpoint, request, authentication, and response boundary"]},
+    {"id": "S3", "title": "AI21 SDK", "url": "https://docs.ai21.com/docs/sdk", "official_domain": true, "source_type": "documentation", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["API key"], "evidence_supported": ["AI21_API_KEY configuration"]}
+  ],
+  "uncertainties": [
+    {"question": "What payment or trial-credit state is required for a newly created Studio account?", "impact": "Could add a mandatory billing gate.", "reason_unresolved": "The selected setup and API pages do not establish a universal new-account balance.", "checked_source_ids": ["S1", "S2", "S3"]}
+  ],
+  "excluded_after_success": ["Maestro agents", "Private deployment", "RAG", "Fine-tuning", "Batch API"]
+}

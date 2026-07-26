@@ -1,0 +1,53 @@
+{
+  "platform": {"name": "DeepSeek API", "slug": "deepseek-api", "organization": "DeepSeek"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "DeepSeek Chat Completions API via cURL",
+    "selection_basis": "DeepSeek's first-call page documents a direct cURL request and current model names using its OpenAI-compatible format.",
+    "alternatives_considered": [
+      {"name": "Anthropic-compatible API", "url": "https://api-docs.deepseek.com/guides/anthropic_api", "reason_not_primary": "It is a compatibility branch, while the main first-call page presents the OpenAI-format chat request."},
+      {"name": "OpenAI SDK", "url": "https://api-docs.deepseek.com/", "reason_not_primary": "It adds a package dependency that the cURL route avoids."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Create a DeepSeek API key and receive a chat completion over HTTPS.", "starting_url": "https://api-docs.deepseek.com/", "assumed_prior_state": ["No DeepSeek API key exists.", "A browser and cURL are available."]},
+  "documented_first_success": {
+    "official_milestone": "Your First API Call",
+    "normalized_outcome": "An authenticated DeepSeek Chat Completions request returns model-generated content.",
+    "observable_completion_signal": "The non-streaming response contains an assistant message.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The first-call page gives a cURL POST to /chat/completions after obtaining an API key.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "A returned assistant message is the first meaningful DeepSeek API result.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A DeepSeek Platform account able to apply for an API key.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "credential", "requirement": "A DeepSeek API key exported as DEEPSEEK_API_KEY.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "software", "requirement": "An HTTPS client such as cURL.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create or sign in to a DeepSeek Platform account.", "details": [], "input": "Account details", "output": "Authenticated platform session", "success_signal": "The API key page is reachable.", "failure_or_wait": "Signup fields are not enumerated in the first-call documentation.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "console", "action": "Apply for an API key and export it as DEEPSEEK_API_KEY.", "details": [], "input": "Platform account", "output": "DEEPSEEK_API_KEY", "success_signal": "The key is available to cURL.", "failure_or_wait": "No successful request can authenticate without a key.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST messages to https://api.deepseek.com/chat/completions with the Bearer key and a current model.", "details": ["The current page lists deepseek-v4-flash and deepseek-v4-pro."], "input": "API key, model, and messages", "output": "Chat completion response", "success_signal": "The API returns an assistant choice.", "failure_or_wait": "Invalid credentials, request shape, model, rate limit, or insufficient balance return errors.", "required": true, "source_ids": ["S1", "S2"]},
+    {"step_number": 4, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm that the first choice contains generated assistant content.", "details": [], "input": "Chat completion response", "output": "Verified first DeepSeek response", "success_signal": "Generated content is present.", "failure_or_wait": "An error body does not meet the boundary.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 3, "condition": "The developer uses an Anthropic-compatible client.", "path": "Use the documented /anthropic base URL and corresponding message format.", "effect_on_first_success": "Changes request compatibility without changing the model-output boundary.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 2, "type": "credential", "description": "An API key is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "payment", "description": "Insufficient balance can return HTTP 402.", "documented_requirement": true, "source_ids": ["S2"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Your First API Call", "url": "https://api-docs.deepseek.com/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Invoke The Chat API"], "evidence_supported": ["API key prerequisite", "Base URLs", "Current model names", "cURL chat request"]},
+    {"id": "S2", "title": "Error Codes", "url": "https://api-docs.deepseek.com/quick_start/error_codes/", "official_domain": true, "source_type": "troubleshooting", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["Error Codes"], "evidence_supported": ["Insufficient balance error"]}
+  ],
+  "uncertainties": [
+    {"question": "Must a new account purchase balance before its first call, or is introductory balance available?", "impact": "Determines whether payment is always a prerequisite.", "reason_unresolved": "The first-call page does not describe initial balance eligibility, while error documentation confirms insufficient balance can block calls.", "checked_source_ids": ["S1", "S2"]}
+  ],
+  "excluded_after_success": ["Agent integrations", "Tool calls", "Context caching", "Multi-round conversation", "Streaming"]
+}

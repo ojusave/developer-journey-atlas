@@ -1,0 +1,55 @@
+{
+  "platform": {"name": "Cloudflare Workers AI", "slug": "cloudflare-workers-ai", "organization": "Cloudflare"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Workers AI REST API",
+    "selection_basis": "Cloudflare's current REST quickstart starts with an account, creates a Workers AI API token, captures the account ID, and runs a hosted language model through cURL.",
+    "alternatives_considered": [
+      {"name": "Workers binding", "url": "https://developers.cloudflare.com/workers-ai/get-started/", "reason_not_primary": "It requires a Worker project and deployment, while the REST route can return model output directly."},
+      {"name": "Dashboard playground", "url": "https://developers.cloudflare.com/workers-ai/get-started/", "reason_not_primary": "The review goal is a programmable authenticated API response."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Create Workers AI REST credentials and receive output from a hosted language model.", "starting_url": "https://developers.cloudflare.com/workers-ai/get-started/rest-api/", "assumed_prior_state": ["No Cloudflare account, Workers AI token, or account ID has been configured.", "A browser and cURL are available."]},
+  "documented_first_success": {
+    "official_milestone": "Run a model via API",
+    "normalized_outcome": "An authenticated Workers AI REST request returns language-model output.",
+    "observable_completion_signal": "The JSON response has success true and result.response contains generated text.",
+    "boundary_evidence": {"type": "demonstrated-terminal-state", "official_label_or_terminal_state": "The REST guide ends with a successful Execute AI model response and generated text.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "The returned model text completes the first hosted-inference job before Worker deployment, bindings, gateway, or production controls.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "A Cloudflare account.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "credential", "requirement": "A Workers AI API token with the required permissions.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "configuration", "requirement": "The Cloudflare account ID and a Workers AI model name.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "software", "requirement": "An HTTPS client such as cURL.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create or sign in to a Cloudflare account and open Workers AI.", "details": [], "input": "Cloudflare account details", "output": "Authenticated dashboard session", "success_signal": "The Workers AI page is reachable.", "failure_or_wait": "Account access follows Cloudflare's signup and verification flow.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "web-console", "action": "Select Use REST API and create a Workers AI API token.", "details": ["The documented token template supplies the intended permissions."], "input": "Workers AI dashboard access", "output": "API token", "success_signal": "The token is copied and stored.", "failure_or_wait": "A custom token needs Workers AI Read and Edit permissions.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "configure", "actor": "developer", "interface": "web-console", "action": "Copy the Cloudflare account ID and select the documented model or another catalog model.", "details": [], "input": "Workers AI dashboard", "output": "Account ID and model name", "success_signal": "Both values are available for the request URL.", "failure_or_wait": "An invalid account or model prevents execution.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "execute", "actor": "developer", "interface": "api", "action": "POST the prompt to the account-specific Execute AI model endpoint with the Bearer token.", "details": [], "input": "Account ID, token, model, and prompt", "output": "Workers AI response", "success_signal": "The response has success true.", "failure_or_wait": "Credential, permission, account, model, quota, or request errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "verify", "actor": "developer", "interface": "api", "action": "Confirm result.response contains generated model text.", "details": [], "input": "Workers AI response", "output": "Verified first Workers AI response", "success_signal": "Generated text is readable.", "failure_or_wait": "An error body or missing result does not meet the boundary.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "The developer creates a custom API token instead of using the template.", "path": "Grant Workers AI Read and Edit permissions explicitly.", "effect_on_first_success": "Adds permission selection and a risk of an under-scoped token.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "account", "description": "A Cloudflare account is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "permission", "description": "The API token needs Workers AI permissions.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 3, "type": "configuration", "description": "The account ID and model name are required.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": false, "value": "not documented", "source_ids": []},
+  "sources": [
+    {"id": "S1", "title": "Get started with the Workers AI REST API", "url": "https://developers.cloudflare.com/workers-ai/get-started/rest-api/", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": "April 21, 2026", "sections_used": ["Prerequisites", "Get API token and Account ID", "Run a model via API"], "evidence_supported": ["Cloudflare account", "Token permissions", "Account ID", "Execute AI model endpoint", "Successful generated response"]}
+  ],
+  "uncertainties": [
+    {"question": "Which plan, free allocation, or payment state applies to a new account at first request?", "impact": "Could add a billing or quota gate.", "reason_unresolved": "The REST quickstart proves the API route but does not define universal new-account commercial eligibility.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Worker deployment", "Workers bindings", "AI Gateway", "Streaming", "Model optimization", "Production token hardening"]
+}

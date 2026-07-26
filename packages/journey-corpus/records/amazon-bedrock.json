@@ -1,0 +1,56 @@
+{
+  "platform": {"name": "Amazon Bedrock", "slug": "amazon-bedrock", "organization": "Amazon Web Services"},
+  "category": "AI, ML, and agents",
+  "surface": {
+    "name": "Amazon Bedrock Responses API quickstart",
+    "selection_basis": "The current Bedrock quickstart begins with an AWS account, creates a short-term Bedrock API key, and demonstrates an OpenAI-compatible Responses request.",
+    "alternatives_considered": [
+      {"name": "Bedrock Chat Completions API", "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html", "reason_not_primary": "It is a peer compatibility route; Responses is selected to match the OpenAI baseline."},
+      {"name": "Bedrock Converse API", "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html", "reason_not_primary": "It uses AWS-native SDK configuration rather than the selected compatibility surface."}
+    ]
+  },
+  "research_status": "needs-human-judgment",
+  "researched_at": "2026-07-25",
+  "official_docs_only": true,
+  "entry_point": {"developer_intent": "Use an AWS account and Bedrock credentials to receive a first foundation-model response.", "starting_url": "https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html", "assumed_prior_state": ["No AWS account or Bedrock credential exists.", "Python and a terminal are available."]},
+  "documented_first_success": {
+    "official_milestone": "Run your first inference request",
+    "normalized_outcome": "An authenticated Amazon Bedrock Responses request returns model output.",
+    "observable_completion_signal": "Running the quickstart script prints the inference response.",
+    "boundary_evidence": {"type": "explicitly-named", "official_label_or_terminal_state": "Step 5 is Run your first inference request, followed by You should see the output.", "source_ids": ["S1"]},
+    "why_this_is_the_boundary": "Printed inference output is the first meaningful model result. AWS account and regional credential state are included because the official quickstart begins there.",
+    "source_ids": ["S1"]
+  },
+  "prerequisites": [
+    {"order": 1, "type": "account", "requirement": "An AWS account.", "required": true, "source_ids": ["S1"]},
+    {"order": 2, "type": "credential", "requirement": "A short-term Bedrock API key for the quickstart, or production IAM credentials in a later route.", "required": true, "source_ids": ["S1"]},
+    {"order": 3, "type": "region", "requirement": "A Bedrock region represented in the API base URL.", "required": true, "source_ids": ["S1"]},
+    {"order": 4, "type": "software", "requirement": "Python plus the OpenAI and boto3 packages for the selected quickstart route.", "required": true, "source_ids": ["S1"]}
+  ],
+  "primary_path": [
+    {"step_number": 1, "phase": "account", "actor": "developer", "interface": "browser", "action": "Create or sign in to an AWS account.", "details": [], "input": "AWS account details", "output": "Authenticated AWS Console session", "success_signal": "Amazon Bedrock is reachable in the console.", "failure_or_wait": "AWS account setup and verification can block console access.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 2, "phase": "credential", "actor": "developer", "interface": "console", "action": "Generate a short-term Bedrock API key.", "details": ["Production applications should use IAM roles or temporary credentials instead."], "input": "AWS session and selected region", "output": "Bedrock API key", "success_signal": "The key is available for environment configuration.", "failure_or_wait": "Permissions can prevent key creation.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 3, "phase": "install", "actor": "developer", "interface": "cli", "action": "Install boto3 and the OpenAI package.", "details": [], "input": "Python environment", "output": "Installed client dependencies", "success_signal": "The packages import successfully.", "failure_or_wait": "Python or package-install errors block the script.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 4, "phase": "configure", "actor": "developer", "interface": "cli", "action": "Set OPENAI_API_KEY and the regional Bedrock OPENAI_BASE_URL.", "details": [], "input": "Bedrock key and region", "output": "Configured environment", "success_signal": "The client can read both variables.", "failure_or_wait": "A wrong region or expired short-term key prevents authentication.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 5, "phase": "execute", "actor": "developer", "interface": "sdk", "action": "Run the documented Responses request with a Bedrock model ID.", "details": [], "input": "Configured client, model, and prompt", "output": "Inference response", "success_signal": "The script prints the response.", "failure_or_wait": "Credential, permission, region, model, or quota errors block output.", "required": true, "source_ids": ["S1"]},
+    {"step_number": 6, "phase": "verify", "actor": "developer", "interface": "cli", "action": "Confirm that the printed response contains model output.", "details": [], "input": "Inference response", "output": "Verified first Bedrock response", "success_signal": "Generated content is visible.", "failure_or_wait": "An error or empty result is not first success.", "required": true, "source_ids": ["S1"]}
+  ],
+  "candidate_paths": [],
+  "candidate_path_gap": null,
+  "branches": [
+    {"at_step": 2, "condition": "The developer is building a production application.", "path": "Use IAM roles or temporary credentials instead of the short-term API key.", "effect_on_first_success": "Adds AWS IAM configuration and changes authentication.", "source_ids": ["S1"]}
+  ],
+  "friction_gates": [
+    {"at_step": 1, "type": "account", "description": "An AWS account is required.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 2, "type": "permission", "description": "Bedrock credential creation depends on AWS account permissions.", "documented_requirement": true, "source_ids": ["S1"]},
+    {"at_step": 4, "type": "configuration", "description": "Authentication and base URL are regional.", "documented_requirement": true, "source_ids": ["S1"]}
+  ],
+  "time_to_first_success": {"vendor_claim": true, "value": "within a few minutes", "source_ids": ["S1"]},
+  "sources": [
+    {"id": "S1", "title": "Quickstart, Amazon Bedrock", "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html", "official_domain": true, "source_type": "quickstart", "accessed_at": "2026-07-25", "last_updated_if_shown": null, "sections_used": ["AWS Account", "API key", "Get the SDK", "Set environment variables", "Run your first inference request"], "evidence_supported": ["AWS starting state", "Short-term key", "Regional base URL", "Dependencies", "Responses request and output boundary"]}
+  ],
+  "uncertainties": [
+    {"question": "Which regions and accounts can create the quickstart short-term key without additional model-access actions?", "impact": "Could add access or approval gates.", "reason_unresolved": "The quickstart abstracts account-specific eligibility and permissions.", "checked_source_ids": ["S1"]}
+  ],
+  "excluded_after_success": ["Production IAM hardening", "Model evaluation", "Provisioned throughput", "Guardrails", "Knowledge bases", "Agents"]
+}

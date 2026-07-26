@@ -1,4 +1,5 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,6 +8,14 @@ mkdirSync(path.join(root, "evaluation"), { recursive: true });
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, "utf8"));
+}
+
+function readOptionalJson(file) {
+  try {
+    return readJson(file);
+  } catch {
+    return null;
+  }
 }
 
 function normalize(value) {
@@ -33,6 +42,68 @@ const roster = readJson(path.join(root, "roster.json"));
 const records = roster.map((entry) => readJson(path.join(root, "records", `${entry.slug}.json`)));
 const catalog = readJson(path.join(root, "blocker-catalog.json"));
 const reasons = catalog.nodes.filter((node) => node.kind === "reason");
+const catalogById = new Map(catalog.nodes.map((node) => [node.id, node]));
+const previousLabelingPacket = readOptionalJson(
+  path.join(root, "evaluation", "blocker-labeling-packet.json"),
+);
+const previousEvaluationStatus = readOptionalJson(
+  path.join(root, "evaluation", "blocker-evaluation-status.json"),
+);
+const gateTypeFamilyMap = {
+  account: "U04",
+  verification: "U04",
+  credential: "U12",
+  permission: "U07",
+  access: "U07",
+  approval: "U07",
+  payment: "U06",
+  billing: "U06",
+  legal: "U06",
+  terms: "U06",
+  policy: "U06",
+  dns: "U13",
+  domain: "U13",
+  network: "U13",
+  wait: "U25",
+  "rate-limit": "U20",
+  limit: "U20",
+  installation: "U11",
+  download: "U11",
+  software: "U11",
+  configuration: "U12",
+  environment: "U12",
+  form: "U15",
+  choice: "U15",
+  hardware: "U10",
+  knowledge: "U09",
+  other: "U08",
+};
+const reasonLabVersions = {
+  taxonomy_version: catalog.catalogVersion,
+  taxonomy_source_hash: catalog.sourceHash,
+  embedding_model: previousEvaluationStatus?.embedding_model ?? null,
+  model: previousEvaluationStatus?.model_version ?? null,
+};
+const previousSamples = new Map(
+  (previousLabelingPacket?.samples ?? []).map((sample) => [sample.sample_id, sample]),
+);
+const previousVersions = previousLabelingPacket?.versions ?? null;
+const versionsMatch =
+  previousVersions?.taxonomy_version === reasonLabVersions.taxonomy_version &&
+  previousVersions?.taxonomy_source_hash === reasonLabVersions.taxonomy_source_hash &&
+  previousVersions?.embedding_model === reasonLabVersions.embedding_model &&
+  previousVersions?.model === reasonLabVersions.model;
+
+function normalizedReview(review) {
+  return {
+    reviewer_id: review?.reviewer_id ?? null,
+    label: review?.label ?? null,
+    abstain: review?.abstain ?? false,
+    taxonomy_gap: review?.taxonomy_gap ?? false,
+    notes: review?.notes ?? null,
+    labeled_at: review?.labeled_at ?? null,
+  };
+}
 
 const exactGroups = new Map();
 for (const reason of reasons) {
@@ -122,8 +193,22 @@ while (samples.length < 100 && selectedPlatforms.length > 0) {
     }));
   const sampleNumber = samples.length + 1;
   const heldOutPlatforms = new Set(selectedPlatforms.slice(-5).map((item) => item.platform.slug));
+  const familyId = gateTypeFamilyMap[String(gate.type ?? "").toLowerCase()] ?? null;
+  const contextHash = createHash("sha256").update(JSON.stringify({
+    platform_slug: record.platform.slug,
+    route_phase: step?.phase ?? "unknown",
+    gate_type: gate.type,
+    gate_description: gate.description,
+    step_action: step?.action ?? null,
+    source_context: sourceContext,
+  })).digest("hex");
+  const previous = previousSamples.get(`G${String(sampleNumber).padStart(3, "0")}`);
+  const preserveReview =
+    versionsMatch &&
+    previous?.context_hash === contextHash;
   samples.push({
     sample_id: `G${String(sampleNumber).padStart(3, "0")}`,
+    context_hash: contextHash,
     split: heldOutPlatforms.has(record.platform.slug) ? "platform_held_out_test" : "development",
     platform: {
       slug: record.platform.slug,
@@ -135,16 +220,87 @@ while (samples.length < 100 && selectedPlatforms.length > 0) {
     gate_description: gate.description,
     step_action: step?.action ?? null,
     source_context: sourceContext,
-    reviewer_a: { label: null, abstain: false, taxonomy_gap: false, notes: null },
-    reviewer_b: { label: null, abstain: false, taxonomy_gap: false, notes: null },
-    adjudication: { label: null, abstain: false, taxonomy_gap: false, notes: null },
+    candidate_hypothesis: {
+      family_id: familyId,
+      family_label: familyId ? catalogById.get(familyId)?.label ?? null : null,
+      reason_id: null,
+      reason_label: null,
+      evidence_class: "model_hypothesis",
+      method: familyId ? "curated_gate_type_soft_map" : "no_candidate",
+      confidence: null,
+      versions: reasonLabVersions,
+    },
+    reviewer_a: preserveReview
+      ? normalizedReview(previous.reviewer_a)
+      : normalizedReview(null),
+    reviewer_b: preserveReview
+      ? normalizedReview(previous.reviewer_b)
+      : normalizedReview(null),
+    adjudication: preserveReview
+      ? normalizedReview(previous.adjudication)
+      : normalizedReview(null),
+    evaluation_eligible: false,
+    public_eligible: false,
+    invalidated_at: preserveReview ? previous.invalidated_at ?? null : previous ? new Date().toISOString() : null,
   });
   cursor += 1;
 }
 
+function reviewerOutcome(review) {
+  if (review?.taxonomy_gap) return "taxonomy_gap";
+  if (review?.abstain) return "abstain";
+  if (review?.label) return `reason:${review.label}`;
+  return null;
+}
+
+for (const sample of samples) {
+  const left = reviewerOutcome(sample.reviewer_a);
+  const right = reviewerOutcome(sample.reviewer_b);
+  const adjudicated = reviewerOutcome(sample.adjudication);
+  const independentLabels = Boolean(
+    sample.reviewer_a.reviewer_id &&
+    sample.reviewer_b.reviewer_id &&
+    sample.reviewer_a.reviewer_id !== sample.reviewer_b.reviewer_id,
+  );
+  const independentAdjudicator = Boolean(
+    sample.adjudication.reviewer_id &&
+    ![sample.reviewer_a.reviewer_id, sample.reviewer_b.reviewer_id]
+      .includes(sample.adjudication.reviewer_id),
+  );
+  sample.adjudication_state =
+    !left || !right
+      ? "awaiting_labels"
+      : !independentLabels
+        ? "reviewer_identity_invalid"
+      : left === right
+        ? "agreement"
+        : adjudicated && independentAdjudicator
+          ? "adjudicated"
+          : adjudicated
+            ? "reviewer_identity_invalid"
+          : "disagreement";
+  sample.evaluation_eligible =
+    sample.adjudication_state === "agreement" ||
+    sample.adjudication_state === "adjudicated";
+}
+
+const labelsComplete = samples.every((sample) =>
+  Boolean(reviewerOutcome(sample.reviewer_a) && reviewerOutcome(sample.reviewer_b)),
+);
+const adjudicationComplete = samples.every((sample) =>
+  sample.adjudication_state === "agreement" || sample.adjudication_state === "adjudicated",
+);
+
 const labelingPacket = {
   schema_version: "1.0",
-  status: "awaiting_two_independent_reviewers",
+  status:
+    labelsComplete && adjudicationComplete
+      ? "labels_and_adjudication_complete"
+      : "awaiting_two_independent_reviewers",
+  workflow_name: "Reason Lab",
+  versions: reasonLabVersions,
+  invalidation_policy:
+    "Reviewer and adjudication results are invalidated when the sample context, taxonomy version, taxonomy source hash, embedding model, or reconstruction model changes.",
   instructions: [
     "Reviewers label independently from source and route context without model scores.",
     "Use abstain when no reason is supported.",
@@ -169,12 +325,20 @@ const labelingPacket = {
 
 const evaluationStatus = {
   schema_version: "1.0",
-  status: "awaiting_independent_labels",
+  status:
+    labelsComplete && adjudicationComplete
+      ? "awaiting_threshold_approval_and_frozen_test_run"
+      : "awaiting_independent_labels",
   public_blocker_links_allowed: false,
-  labels_complete: false,
-  thresholds_approved: false,
-  frozen_test_run_complete: false,
-  model_version: null,
+  labels_complete: labelsComplete,
+  adjudication_complete: adjudicationComplete,
+  thresholds_approved: versionsMatch && previousEvaluationStatus?.thresholds_approved === true,
+  frozen_test_run_complete:
+    versionsMatch && previousEvaluationStatus?.frozen_test_run_complete === true,
+  model_version: reasonLabVersions.model,
+  embedding_model: reasonLabVersions.embedding_model,
+  taxonomy_version: reasonLabVersions.taxonomy_version,
+  taxonomy_source_hash: reasonLabVersions.taxonomy_source_hash,
   metrics: null,
   evidence_class: "model_hypothesis",
 };
