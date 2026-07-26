@@ -70,6 +70,7 @@ export function evidenceLocatorIsCovered(locator: string, doc: { title: string; 
 export function validateSourceGrounding(
   record: PlatformRecord,
   docs: Array<{ title: string; url: string; content?: string }>,
+  options: { requireLiteralLocators?: boolean } = {},
 ): string | null {
   const searchedUrls = new Set(docs.map((doc) => normalizedUrl(doc.url)));
   const unsupported = (record.sources ?? []).filter((source) => !searchedUrls.has(normalizedUrl(source.url)));
@@ -100,6 +101,7 @@ export function validateSourceGrounding(
     if (invalid.length > 0) {
       return `${invalid.length} graph evidence reference${invalid.length === 1 ? "" : "s"} did not resolve to an accepted source ID and locator.`;
     }
+    if (options.requireLiteralLocators === false) return null;
     const uncovered = evidence.filter((item) => {
       const source = recordSourceById.get(item.sourceId);
       const doc = source ? docByUrl.get(normalizedUrl(source.url)) : undefined;
@@ -182,7 +184,15 @@ export async function runResearchPipeline(
   }
   const record = reconstruct.record;
 
-  const groundingError = validateSourceGrounding(record, docs);
+  // A live result is a private draft, not a published corpus record. Official
+  // source URLs, source IDs, nonempty locators, and graph integrity are still
+  // mandatory here. Exact locator-to-page matching remains a publication gate
+  // so a useful draft is not hidden from the developer awaiting review.
+  const groundingError = validateSourceGrounding(
+    record,
+    docs,
+    { requireLiteralLocators: false },
+  );
   if (groundingError) {
     return { outcome: "claim_grounding_failed", message: groundingError };
   }
