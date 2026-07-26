@@ -210,6 +210,57 @@ export function normalizeTrustedRecordFields(parsed: unknown, docs: DocHit[]): u
       }];
     });
   }
+
+  // The typed graph is the only route authority. Remove legacy model-authored
+  // route copies so harmless extra fields in those copies cannot reject an
+  // otherwise valid selected graph.
+  record.candidate_paths = [];
+  record.candidate_path_gap = null;
+  record.branches = [];
+
+  if (record.journey_graph && typeof record.journey_graph === "object") {
+    const graph = record.journey_graph as Record<string, unknown>;
+    const selected = graph.selectedRoute && typeof graph.selectedRoute === "object"
+      ? graph.selectedRoute as Record<string, unknown>
+      : null;
+    const boundary = graph.firstSuccessBoundary && typeof graph.firstSuccessBoundary === "object"
+      ? graph.firstSuccessBoundary as Record<string, unknown>
+      : null;
+    const routeIds = Array.isArray(selected?.nodeIds)
+      ? selected.nodeIds.filter((item): item is string => typeof item === "string")
+      : [];
+    const selectedId = typeof selected?.id === "string" ? selected.id : null;
+    if (Array.isArray(graph.candidateRoutes) && selectedId) {
+      graph.candidateRoutes = graph.candidateRoutes.filter((candidate) =>
+        Boolean(
+          candidate
+          && typeof candidate === "object"
+          && (candidate as Record<string, unknown>).id === selectedId
+          && (candidate as Record<string, unknown>).status === "selected",
+        ));
+    }
+    const terminalId = routeIds.at(-1);
+    if (
+      terminalId
+      && boundary?.nodeId === terminalId
+      && Array.isArray(graph.nodes)
+    ) {
+      const terminal = graph.nodes.find((node) =>
+        Boolean(node && typeof node === "object" && (node as Record<string, unknown>).id === terminalId),
+      ) as Record<string, unknown> | undefined;
+      if (terminal) {
+        terminal.kind = "terminal_outcome";
+        if (
+          (typeof terminal.successSignal !== "string" || !terminal.successSignal.trim())
+          && typeof terminal.action === "string"
+          && terminal.action.trim()
+        ) {
+          terminal.successSignal =
+            terminal.action;
+        }
+      }
+    }
+  }
   return record;
 }
 

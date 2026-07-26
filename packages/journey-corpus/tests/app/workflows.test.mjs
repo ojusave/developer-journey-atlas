@@ -65,6 +65,9 @@ test("OpenRouter research classifies an unreadable upstream response", async () 
 
 test("trusted record normalization restores official sources and strips prerequisite noise", () => {
   const normalized = normalizeTrustedRecordFields({
+    candidate_paths: [{ steps: [{ extra: "noise" }] }],
+    candidate_path_gap: { reason: "model copy" },
+    branches: [{ path: "model copy" }],
     prerequisites: [{
       order: 9,
       type: "account",
@@ -74,6 +77,18 @@ test("trusted record normalization restores official sources and strips prerequi
       description: "not in schema",
       evidence: "not in schema",
     }],
+    journey_graph: {
+      selectedRoute: { id: "api-route", nodeIds: ["create-key", "first-response"] },
+      firstSuccessBoundary: { nodeId: "first-response" },
+      candidateRoutes: [
+        { id: "api-route", status: "selected" },
+        { id: "vibe-work", status: "considered", nodeIds: ["unknown-node"] },
+      ],
+      nodes: [
+        { id: "create-key", kind: "developer_action", action: "Create an API key", successSignal: "Key created" },
+        { id: "first-response", kind: "platform_outcome", action: "The API returns text", successSignal: "" },
+      ],
+    },
   }, [{
     title: "Anthropic quickstart",
     url: "https://platform.claude.com/docs/en/get-started",
@@ -97,6 +112,12 @@ test("trusted record normalization restores official sources and strips prerequi
     required: true,
     source_ids: ["S1"],
   }]);
+  assert.deepEqual(normalized.candidate_paths, []);
+  assert.equal(normalized.candidate_path_gap, null);
+  assert.deepEqual(normalized.branches, []);
+  assert.deepEqual(normalized.journey_graph.candidateRoutes, [{ id: "api-route", status: "selected" }]);
+  assert.equal(normalized.journey_graph.nodes[1].kind, "terminal_outcome");
+  assert.equal(normalized.journey_graph.nodes[1].successSignal, "The API returns text");
 });
 
 /* ---------- Task input validation ---------- */
