@@ -16,6 +16,7 @@ import {
 } from "../db/researchClaims.js";
 import { selectedPathRow } from "../../lib/measure.mjs";
 import { ensureRow, isPostgresStore } from "./storeHelpers.js";
+import type { PlatformRecord } from "../core/ports.js";
 
 const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
 const RESEARCH_GLOBAL_LIMIT = Math.max(
@@ -26,6 +27,33 @@ const RESEARCH_GLOBAL_LIMIT = Math.max(
 // Local-only fallback when DATA_STORE=local (no ResearchClaim table usage).
 const DEDUPE_TTL_MS = 10 * 60 * 1_000;
 const recentRunsLocal = new Map<string, { runId: string; at: number }>();
+
+function browserSafeDraft(record: PlatformRecord) {
+  return {
+    name: record.platform.name,
+    slug: record.platform.slug,
+    startingUrl: record.entry_point?.starting_url ?? null,
+    firstSuccess:
+      record.documented_first_success?.normalized_outcome
+      ?? record.documented_first_success?.official_milestone
+      ?? "First documented API success",
+    successSignal: record.documented_first_success?.observable_completion_signal ?? null,
+    prerequisites: (record.prerequisites ?? []).slice(0, 12).map((item) => ({
+      requirement: item.requirement,
+      required: item.required,
+    })),
+    steps: (record.primary_path ?? []).slice(0, 30).map((step) => ({
+      stepNumber: step.step_number,
+      action: step.action,
+      successSignal: step.success_signal ?? null,
+    })),
+    sources: (record.sources ?? []).slice(0, 12).map((source) => ({
+      title: source.title,
+      url: source.url,
+      accessedAt: source.accessed_at ?? null,
+    })),
+  };
+}
 
 function browserSafeResearchResult(result: unknown): unknown {
   if (!result || typeof result !== "object" || !("outcome" in result)) return null;
@@ -264,9 +292,10 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
         sendData(res, {
           ...projection,
           result: {
-            outcome: "review_required",
+            outcome: "draft_ready",
             slug: projection.result.slug,
-            message: "Research finished and remains private until maintainer review passes every publication gate.",
+            draft: browserSafeDraft(projection.result.record),
+            message: "Research finished. This draft stays private until maintainer review.",
           },
         });
         return;

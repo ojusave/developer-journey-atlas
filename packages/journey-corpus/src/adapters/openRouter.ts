@@ -171,13 +171,14 @@ export function materializeSelectedRoute(parsed: unknown): { value: unknown; err
 export class OpenRouterProvider implements LLMProvider {
   constructor(
     private readonly apiKey: string,
-    /** Optional. When empty, no model is sent and OpenRouter uses the account default. */
+    /** Required because OpenRouter does not provide a server-side default model. */
     private readonly model: string,
     private readonly validate: RecordValidator,
     private readonly schemaText: string,
     private readonly categories: string[] = [],
   ) {
     if (!apiKey) throw new Error("OpenRouterProvider requires an OPENROUTER_API_KEY.");
+    if (!model) throw new Error("OpenRouterProvider requires OPENROUTER_MODEL.");
   }
 
   async reconstructRecord(platform: string, docs: DocHit[]): Promise<PlatformRecord> {
@@ -236,16 +237,22 @@ export class OpenRouterProvider implements LLMProvider {
           "X-Title": "Developer Journey Atlas",
         },
         body: JSON.stringify({
-          // Omit `model` entirely when unset so OpenRouter falls back to the
-          // account/payer default instead of a pinned, possibly stale model.
-          ...(this.model ? { model: this.model } : {}),
+          model: this.model,
           messages,
           temperature: 0.2,
           response_format: { type: "json_object" },
         }),
         signal: controller.signal,
       });
-      const body = (await res.json()) as ChatResponse;
+      const responseText = await res.text();
+      let body: ChatResponse;
+      try {
+        body = JSON.parse(responseText) as ChatResponse;
+      } catch {
+        throw new Error(
+          `OpenRouter error: unreadable ${res.status || "unknown"} response`,
+        );
+      }
       if (!res.ok || body.error) {
         throw new Error(`OpenRouter error: ${body.error?.message ?? res.statusText}`);
       }

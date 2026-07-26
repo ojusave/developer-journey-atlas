@@ -138,37 +138,29 @@ for (const forbidden of [
 
 const app = await readFile(path.join(projectRoot, "web/app.js"), "utf8");
 assert.doesNotMatch(app, /renderOnboardingScore|onboardingScore|curvePlacement|score-card|percentile|leaderboard/i);
-assert.match(app, /Compare with reviewed providers/);
-assert.match(app, /Open official starting point/);
-assert.match(app, /View official evidence/);
-assert.match(app, /Open route/);
+assert.match(app, /Open official guide/);
+assert.match(app, /Official sources/);
 assert.match(app, /setNotFoundMetadata/);
-assert.match(app, /How Atlas decides which routes can be compared/);
-assert.match(app, /Why no provider comparison is shown yet/);
-assert.match(app, /step-by-step setup guide is still under review/i);
-assert.match(app, /View provider status/);
-assert.match(app, /We could not build a reliable guide/);
+assert.match(app, /No guide yet/);
+assert.match(app, /Could not build a reliable path/);
+assert.match(app, /draft_ready/);
+assert.match(app, /renderResearchDraft/);
 assert.doesNotMatch(app, /Research stopped safely|draft did not pass the required record schema/i);
 assert.match(app, /Start research/);
-assert.match(app, /addEventListener\("click", \(\) => researchPlatform\(query\)\)/);
-const consentBody = app.match(/function renderResearchConsent\(query\) \{([\s\S]*?)\n\}/)?.[1] ?? "";
-assert.doesNotMatch(consentBody, /\n\s*researchPlatform\(query\);/);
+assert.match(app, /addEventListener\("click", \(\) => researchPlatform\(name\)\)/);
+const consentBody = app.match(/function renderResearchOffer\(name, slug = ""\) \{([\s\S]*?)\n\}/)?.[1] ?? "";
+assert.doesNotMatch(consentBody, /\n\s*researchPlatform\(name\);/);
 
 const html = await readFile(path.join(projectRoot, "web/index.html"), "utf8");
 assert.equal((html.match(/<h1\b/g) || []).length, 1);
 assert.match(html, /href="\/project-mark\.svg"/);
 assert.doesNotMatch(html, /render\.com\/favicon/);
-assert.match(html, /Independent community project, not an official Render product/);
-assert.match(html, /Explore 25 LLM APIs by how they work/);
-assert.match(html, /Find an LLM API provider/);
-assert.match(html, /Direct model APIs/);
-assert.match(html, /Inference and routing/);
-assert.match(html, /Cloud platforms/);
+assert.match(html, /Independent project/);
+assert.match(html, /Find the path to your first API response/);
+assert.match(html, /Search an LLM API/);
+assert.match(html, /placeholder="OpenAI, Gemini, Grok…"/);
 assert.doesNotMatch(html, /corpus records currently publish/i);
-assert.match(html, /paid Render resources/i);
-assert.match(html, /Starter web service and Basic-256mb Postgres/);
-assert.match(html, /current Render pricing/);
-assert.match(html, /Review and deploy a personal copy/);
+assert.doesNotMatch(html, /Provider directory|Why these groups|Catalog scope|paid Render resources/i);
 const headerBody = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
 assert.doesNotMatch(headerBody, /render\.com\/deploy|deploy a personal copy/i);
 
@@ -191,7 +183,7 @@ assert.equal((sitemap.match(/\/platform\//g) || []).length, 1);
 
 const fullContext = await readFile(path.join(publicRoot, "llms-full.txt"), "utf8");
 assert.match(fullContext, /# Deployed source/);
-assert.match(fullContext, /function renderResearchConsent/);
+assert.match(fullContext, /function renderResearchOffer/);
 assert.ok(fullContext.length > 50_000, "full context should contain public methodology, route, and deployed source");
 
 console.log(
