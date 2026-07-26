@@ -58,6 +58,37 @@ test("platform identity resolution stops ambiguous Apollo before source discover
   assert.equal(result.candidates.length, 3);
 });
 
+test("every LLM API catalog provider has a resolvable trusted identity", async () => {
+  const launchPlan = JSON.parse(
+    await readFile(path.join(projectRoot, "trust/launch-cohort-candidates.json"), "utf8"),
+  );
+  const llmCohortIds = new Set([
+    "llm-api-first-response",
+    "managed-llm-inference-first-response",
+    "cloud-llm-platform-first-response",
+  ]);
+  const catalogSlugs = launchPlan.cohorts
+    .filter((cohort) => llmCohortIds.has(cohort.id))
+    .flatMap((cohort) => cohort.participant_slugs);
+  const identitySlugs = new Set(identities.map((identity) => identity.slug));
+  assert.deepEqual(
+    catalogSlugs.filter((slug) => !identitySlugs.has(slug)),
+    [],
+    "A catalog provider without a trusted identity cannot be researched.",
+  );
+  assert.equal(new Set(catalogSlugs).size, 25);
+  const atlas = JSON.parse(
+    await readFile(path.join(projectRoot, "selected-path-heuristic.json"), "utf8"),
+  );
+  const rowBySlug = new Map(atlas.rows.map((row) => [row.slug, row]));
+  for (const slug of catalogSlugs) {
+    const name = rowBySlug.get(slug)?.name;
+    const resolution = resolvePlatformIdentity(name, identities);
+    assert.equal(resolution.outcome, "resolved", `${name} must resolve from the catalog label.`);
+    assert.equal(resolution.identity.slug, slug);
+  }
+});
+
 test("source authority rejects third-party tutorials and unrelated repositories", () => {
   const renderIdentity = identities.find((identity) => identity.slug === "render");
   assert.equal(validateSourceAuthority("https://render.com/docs", renderIdentity).accepted, true);
