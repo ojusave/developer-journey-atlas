@@ -100,16 +100,40 @@ async function main(): Promise<void> {
 
   const webDir = path.join(config.dataRoot, "web");
   const pageTemplate = await readFile(path.join(webDir, "index.html"), "utf8");
-  const llmCatalog = JSON.parse(
-    await readFile(path.join(config.publicDir, "data", "llm-api-catalog.json"), "utf8"),
-  ) as {
-    cohorts: Array<{
-      providers: Array<{ name: string; slug: string; providerType: string }>;
-    }>;
-  };
-  const llmCatalogProviders = new Map(
-    llmCatalog.cohorts.flatMap((cohort) => cohort.providers.map((provider) => [provider.slug, provider])),
-  );
+  const llmCatalogProviders = new Map<string, { name: string; slug: string; providerType: string }>();
+  try {
+    const llmCatalog = JSON.parse(
+      await readFile(path.join(config.publicDir, "data", "llm-api-catalog.json"), "utf8"),
+    ) as unknown;
+    if (
+      !llmCatalog
+      || typeof llmCatalog !== "object"
+      || !("cohorts" in llmCatalog)
+      || !Array.isArray(llmCatalog.cohorts)
+    ) {
+      throw new Error("missing cohorts");
+    }
+    for (const cohort of llmCatalog.cohorts) {
+      if (!cohort || typeof cohort !== "object" || !Array.isArray(cohort.providers)) {
+        throw new Error("invalid cohort");
+      }
+      for (const provider of cohort.providers) {
+        if (
+          !provider
+          || typeof provider !== "object"
+          || typeof provider.name !== "string"
+          || typeof provider.slug !== "string"
+          || typeof provider.providerType !== "string"
+        ) {
+          throw new Error("invalid provider");
+        }
+        llmCatalogProviders.set(provider.slug, provider);
+      }
+    }
+  } catch {
+    console.error("Server diagnostic: stage=catalog-load outcome=invalid_catalog");
+    llmCatalogProviders.clear();
+  }
   const publicRecords = store.meta().publicRecords ??
     store.listRows().filter((row) => store.isPublicEligible(row.slug)).length;
   const reviewedRecords = store.meta().reviewedCorpusRecords ?? store.meta().totals.platforms;

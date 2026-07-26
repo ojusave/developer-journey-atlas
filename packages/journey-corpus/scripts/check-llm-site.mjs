@@ -48,22 +48,39 @@ assert.equal(manifest.sourceCode.license, "Apache-2.0");
 assert.match(manifest.files.llmApiCatalog, /\/data\/llm-api-catalog\.json$/);
 
 const llmCatalog = JSON.parse(await readFile(path.join(publicRoot, "data/llm-api-catalog.json"), "utf8"));
-assert.equal(llmCatalog.schemaVersion, 1);
-assert.equal(llmCatalog.providerCount, 25);
-assert.equal(llmCatalog.cohorts.length, 3);
-assert.deepEqual(llmCatalog.cohorts.map((cohort) => cohort.providers.length), [9, 9, 7]);
-assert.equal(
-  new Set(llmCatalog.cohorts.flatMap((cohort) => cohort.providers.map((provider) => provider.slug))).size,
-  25,
+const launchCohortPlan = JSON.parse(
+  await readFile(path.join(projectRoot, "trust", "launch-cohort-candidates.json"), "utf8"),
 );
-assert.ok(llmCatalog.cohorts.flatMap((cohort) => cohort.providers).every(
-  (provider) => provider.routeStatus === "review_in_progress" && provider.routeUrl === null,
+const llmCohortIds = new Set([
+  "llm-api-first-response",
+  "managed-llm-inference-first-response",
+  "cloud-llm-platform-first-response",
+]);
+const plannedLlmCohorts = launchCohortPlan.cohorts.filter((cohort) => llmCohortIds.has(cohort.id));
+const plannedCountByCohort = new Map(
+  plannedLlmCohorts.map((cohort) => [cohort.id, cohort.participant_slugs.length]),
+);
+const catalogProviders = llmCatalog.cohorts.flatMap((cohort) => cohort.providers);
+assert.equal(llmCatalog.schemaVersion, 1);
+assert.equal(llmCatalog.providerCount, catalogProviders.length);
+assert.equal(llmCatalog.cohorts.length, plannedLlmCohorts.length);
+for (const cohort of llmCatalog.cohorts) {
+  assert.equal(cohort.providers.length, plannedCountByCohort.get(cohort.id));
+}
+assert.equal(
+  new Set(catalogProviders.map((provider) => provider.slug)).size,
+  llmCatalog.providerCount,
+);
+assert.ok(catalogProviders.every(
+  (provider) => provider.routeStatus === "published"
+    ? provider.routeUrl === `${canonicalUrl}/platform/${provider.slug}`
+    : provider.routeStatus === "review_in_progress" && provider.routeUrl === null,
 ));
-assert.ok(llmCatalog.cohorts.flatMap((cohort) => cohort.providers).every(
+assert.ok(catalogProviders.every(
   (provider) => Array.isArray(provider.searchAliases),
 ));
 const providerBySlug = new Map(
-  llmCatalog.cohorts.flatMap((cohort) => cohort.providers.map((provider) => [provider.slug, provider])),
+  catalogProviders.map((provider) => [provider.slug, provider]),
 );
 assert.ok(providerBySlug.get("xai-api").searchAliases.includes("Grok"));
 assert.ok(providerBySlug.get("amazon-bedrock").searchAliases.includes("AWS"));

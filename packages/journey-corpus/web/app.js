@@ -1,6 +1,8 @@
 const el = {
   hero: document.querySelector("#home-hero"),
   catalogShell: document.querySelector("#catalog-shell"),
+  catalogProviderCount: document.querySelector("#catalog-provider-count"),
+  catalogTypeCount: document.querySelector("#catalog-type-count"),
   form: document.querySelector("#search-form"),
   input: document.querySelector("#search"),
   clearSearch: document.querySelector("#clear-search"),
@@ -131,6 +133,12 @@ function renderCatalog() {
   el.providerList.hidden = providers.length === 0;
   el.catalogEmpty.hidden = providers.length !== 0;
   el.clearSearch.hidden = query.length === 0;
+  document.querySelectorAll("[data-cohort-count]").forEach((count) => {
+    const cohortId = count.dataset.cohortCount;
+    count.textContent = cohortId === "all"
+      ? String(allCatalogProviders().length)
+      : String(llmCatalog.cohorts.find((cohort) => cohort.id === cohortId)?.providers.length ?? 0);
+  });
   el.catalogStatus.textContent = providers.length === allCatalogProviders().length && !query
     ? `${providers.length} providers shown. Setup-guide reviews are in progress.`
     : `${providers.length} provider${providers.length === 1 ? "" : "s"} shown.`;
@@ -157,10 +165,23 @@ async function loadCatalog() {
     const response = await fetch("/data/llm-api-catalog.json");
     if (!response.ok) throw new Error(`Catalog request failed (${response.status}).`);
     const catalog = await response.json();
-    if (catalog.providerCount !== 25 || !Array.isArray(catalog.cohorts)) {
+    if (
+      !catalog
+      || !Array.isArray(catalog.cohorts)
+      || !catalog.cohorts.every((cohort) => Array.isArray(cohort.providers))
+    ) {
       throw new Error("Catalog data is incomplete.");
     }
+    const catalogProviders = catalog.cohorts.flatMap((cohort) => cohort.providers);
+    if (
+      catalog.providerCount !== catalogProviders.length
+      || new Set(catalogProviders.map((provider) => provider.slug)).size !== catalog.providerCount
+    ) {
+      throw new Error("Catalog provider counts are inconsistent.");
+    }
     llmCatalog = catalog;
+    el.catalogProviderCount.textContent = String(catalog.providerCount);
+    el.catalogTypeCount.textContent = String(catalog.cohorts.length);
     renderCohortGuide();
     renderCatalog();
   } catch {
@@ -646,11 +667,11 @@ async function showPlatform(slug, { push = true, focus = true } = {}) {
   evidenceGeneration += 1;
   researchPending = false;
   hideHomeSurface();
+  if (push) pushPlatformRoute(slug);
   el.result.hidden = false;
   el.result.innerHTML = '<div class="state-message" role="status">Loading the setup guide…</div>';
   try {
     const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/journey`);
-    if (push) pushPlatformRoute(data.slug);
     el.result.innerHTML = renderJourney(data);
     wireJourneyActions(data);
     setClientMetadata(data);
@@ -896,6 +917,8 @@ async function submitQuery(rawQuery) {
     return;
   }
   if (!llmCatalog) {
+    el.catalogError.hidden = false;
+    el.catalogStatus.textContent = "Provider catalog unavailable.";
     announce("The provider catalog is unavailable. Try loading it again.");
     return;
   }

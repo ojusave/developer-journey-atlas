@@ -125,8 +125,16 @@ const llmCohorts = launchCohortPlan.cohorts
   });
 
 const llmProviderSlugs = llmCohorts.flatMap((cohort) => cohort.providers.map((provider) => provider.slug));
-if (llmProviderSlugs.length !== 25 || new Set(llmProviderSlugs).size !== 25) {
-  throw new Error(`Expected 25 unique LLM API providers, found ${llmProviderSlugs.length}.`);
+const expectedLlmProviderCount = launchCohortPlan.cohorts
+  .filter((cohort) => llmCohortCopy[cohort.id])
+  .reduce((count, cohort) => count + cohort.participant_slugs.length, 0);
+if (
+  llmProviderSlugs.length !== expectedLlmProviderCount
+  || new Set(llmProviderSlugs).size !== expectedLlmProviderCount
+) {
+  throw new Error(
+    `Expected ${expectedLlmProviderCount} unique LLM API providers, found ${llmProviderSlugs.length}.`,
+  );
 }
 
 const llmApiCatalog = {
@@ -311,7 +319,11 @@ const recordLinks = records
   .map((record) => `- [${record.name}](${record.platformUrl}): ${record.outcome}`)
   .join("\n");
 const llmCatalogSections = llmCohorts
-  .map((cohort) => `### ${cohort.label}\n\n${cohort.providers.map((provider) => `- ${provider.name}: route review in progress`).join("\n")}`)
+  .map((cohort) => `### ${cohort.label}\n\n${cohort.providers.map((provider) => (
+    provider.routeStatus === "published" && provider.routeUrl
+      ? `- [${provider.name}](${provider.routeUrl}): reviewed route published`
+      : `- ${provider.name}: route review in progress`
+  )).join("\n")}`)
   .join("\n\n");
 const llmsIndex = `# Developer Journey Atlas
 
