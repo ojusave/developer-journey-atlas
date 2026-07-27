@@ -31,6 +31,15 @@ function postgresUrlWithPoolLimit(): string {
 }
 
 /**
+ * The record to serve for a platform. A live research reconstruction wins over
+ * the canonical corpus record because only the reconstruction carries a journey
+ * graph; seeding keeps rewriting recordJson, so the two are stored separately.
+ */
+function servedRecord(platform: { recordJson: unknown; draftRecordJson?: unknown }): PlatformRecord {
+  return (platform.draftRecordJson ?? platform.recordJson) as PlatformRecord;
+}
+
+/**
  * DataStore backed by Render Postgres. Corpus rows are loaded into memory at
  * construct so the existing sync DataStore port stays unchanged. Platforms
  * persisted by other instances are pulled in via ensurePlatformLoaded / searchRows.
@@ -49,6 +58,7 @@ export class PostgresDataStore implements DataStore {
   private readonly reasonCount: number;
   private readonly publicationGate: PublicationGate;
   private readonly journeyGraphs: Map<string, JourneyGraph>;
+  private readonly committedGraphSlugs: Set<string>;
 
   private constructor(args: {
     prisma: PrismaClient;
@@ -63,6 +73,7 @@ export class PostgresDataStore implements DataStore {
     reasonCount: number;
     publicationGate: PublicationGate;
     journeyGraphs: Map<string, JourneyGraph>;
+    committedGraphSlugs: Set<string>;
   }) {
     this.prisma = args.prisma;
     this.rows = args.rows;
@@ -77,6 +88,7 @@ export class PostgresDataStore implements DataStore {
     this.reasonCount = args.reasonCount;
     this.publicationGate = args.publicationGate;
     this.journeyGraphs = args.journeyGraphs;
+    this.committedGraphSlugs = args.committedGraphSlugs;
   }
 
   /** Load the full serving snapshot from Postgres. */
@@ -118,7 +130,7 @@ export class PostgresDataStore implements DataStore {
 
     const records = new Map<string, PlatformRecord>();
     for (const platform of platforms) {
-      records.set(platform.slug, platform.recordJson as unknown as PlatformRecord);
+      records.set(platform.slug, servedRecord(platform));
     }
 
     const auditMap = new Map<string, ShortestPathAudit>();
@@ -206,6 +218,14 @@ export class PostgresDataStore implements DataStore {
       const graph = JSON.parse(readFileSync(path.join(graphDir, file), "utf8")) as JourneyGraph;
       journeyGraphs.set(graph.platformSlug, graph);
     }
+    const committedGraphSlugs = new Set(journeyGraphs.keys());
+    // Graphs carried by persisted drafts survive restarts this way. A committed
+    // trust graph is reviewed, so it always wins over a reconstruction.
+    for (const [slug, record] of records) {
+      if (record.journey_graph && !committedGraphSlugs.has(slug)) {
+        journeyGraphs.set(slug, record.journey_graph);
+      }
+    }
     meta.reviewedCorpusRecords = health.summary.records;
     meta.researchDrafts = Math.max(0, rows.length - health.summary.records);
     meta.publicRecords = publicationGate.filterRows(rows).length;
@@ -223,6 +243,7 @@ export class PostgresDataStore implements DataStore {
       reasonCount,
       publicationGate,
       journeyGraphs,
+      committedGraphSlugs,
     });
   }
 
@@ -305,8 +326,11 @@ export class PostgresDataStore implements DataStore {
     this.audits.set(slug, audit);
     // A draft carries its own reconstructed graph. Registering it powers the
     // route and evidence views; publication still depends on the gate, which
-    // reads committed trust artifacts and is untouched here.
-    if (record.journey_graph) this.journeyGraphs.set(slug, record.journey_graph);
+    // reads committed trust artifacts and is untouched here. A reviewed graph
+    // is never replaced by a reconstruction.
+    if (record.journey_graph && !this.committedGraphSlugs.has(slug)) {
+      this.journeyGraphs.set(slug, record.journey_graph);
+    }
     this.metaValue = {
       ...this.metaValue,
       count: this.rows.length,
@@ -328,7 +352,7 @@ export class PostgresDataStore implements DataStore {
       include: { metric: true, audit: true, gates: true },
     });
     if (!platform?.metric) return false;
-    const record = platform.recordJson as unknown as PlatformRecord;
+    const record = servedRecord(platform);
     const row = platform.metric.metricJson as unknown as MetricRow;
     const audit = platform.audit
       ? (platform.audit.auditJson as unknown as ShortestPathAudit)
@@ -374,7 +398,7 @@ export class PostgresDataStore implements DataStore {
     for (const platform of platforms) {
       if (!platform.metric) continue;
       const row = platform.metric.metricJson as unknown as MetricRow;
-      const record = platform.recordJson as unknown as PlatformRecord;
+      const record = servedRecord(platform);
       if (platform.audit) {
         this.ingestLive(record, row, platform.audit.auditJson as unknown as ShortestPathAudit);
       } else if (!this.bySlug.has(platform.slug)) {
