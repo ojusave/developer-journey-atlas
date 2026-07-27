@@ -11,11 +11,26 @@ const el = {
 };
 
 let providers = [];
+let providerCount = 0;
 let activePoll = 0;
 let researchPending = false;
 
 const POLL_INTERVAL_MS = 2500;
 const MAX_POLLS = 160;
+const DISCOVERY_SLUGS = [
+  "stripe",
+  "openai",
+  "github",
+  "google-gemini-api",
+  "mistral-ai",
+  "xai-api",
+  "anthropic",
+  "auth0",
+  "twilio",
+  "slack",
+  "sentry",
+  "render",
+];
 
 function esc(value) {
   return String(value ?? "")
@@ -122,20 +137,32 @@ async function loadProviders() {
     const published = await publishedResponse.json();
     const catalogProviders = [];
     providers = mergeProviders(catalogProviders, Array.isArray(published?.data) ? published.data : []);
+    providerCount = Number(published?.meta?.count ?? providers.length);
     if (!providers.length) throw new Error("Platform search is empty.");
-    el.searchStatus.textContent = "Try OpenAI, Stripe, GitHub, Render, Auth0, or Gemini.";
     renderMatches();
   } catch {
     providers = [];
+    providerCount = 0;
     el.searchResults.hidden = true;
     el.searchError.hidden = false;
     el.searchStatus.textContent = "";
   }
 }
 
+function discoveryProviders() {
+  const bySlug = new Map(providers.map((provider) => [provider.slug, provider]));
+  const selected = DISCOVERY_SLUGS.map((slug) => bySlug.get(slug)).filter(Boolean);
+  if (selected.length >= 8) return selected;
+  const selectedSlugs = new Set(selected.map((provider) => provider.slug));
+  return [
+    ...selected,
+    ...providers.filter((provider) => !selectedSlugs.has(provider.slug)).slice(0, 12 - selected.length),
+  ];
+}
+
 function matchesFor(query) {
   const normalized = query.trim().toLowerCase();
-  if (!normalized) return [];
+  if (!normalized) return discoveryProviders();
   return providers.filter((provider) =>
     `${provider.name} ${provider.slug} ${provider.aliases.join(" ")}`.toLowerCase().includes(normalized)
   ).slice(0, 10);
@@ -164,9 +191,9 @@ function renderMatches() {
   const query = el.input.value.trim();
   const matches = matchesFor(query);
   el.searchResults.innerHTML = matches.map(providerResult).join("");
-  el.searchResults.hidden = !query || matches.length === 0;
+  el.searchResults.hidden = matches.length === 0;
   if (!query) {
-    el.searchStatus.textContent = "Try OpenAI, Stripe, GitHub, Render, Auth0, or Gemini.";
+    el.searchStatus.textContent = `${providerCount || providers.length} platforms loaded. Pick one or type to search.`;
   } else if (matches.length) {
     el.searchStatus.textContent = `${matches.length} match${matches.length === 1 ? "" : "es"}`;
   } else {
