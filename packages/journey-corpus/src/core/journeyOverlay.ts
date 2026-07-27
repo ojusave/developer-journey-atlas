@@ -1,6 +1,11 @@
 import type { PlatformRecord } from "./ports.js";
 import { familyIdForGateType } from "../db/gateTypeFamilyMap.js";
 import { selectedRouteNodes, type JourneyGraph } from "./journeyGraph.js";
+import {
+  buildComplexityProfileFromGraph,
+  buildComplexityProfileFromRecord,
+  type ComplexityProfile,
+} from "./complexityProfile.js";
 
 /** One blocker hypothesis attached to a gate or step (never a diagnosed cause). */
 export interface BlockerHypothesisRef {
@@ -64,6 +69,7 @@ export interface JourneyOverlay {
   routeScope: JourneyRouteScope | null;
   prerequisites: Array<{ id: string | null; requirement: string; required: boolean }>;
   steps: JourneyStepView[];
+  complexity: ComplexityProfile;
 }
 
 const HYPOTHESIS_NOTE =
@@ -194,6 +200,7 @@ export function buildJourneyOverlay(
       required: item.required,
     })),
     steps,
+    complexity: buildComplexityProfileFromRecord(record),
   };
 }
 
@@ -274,5 +281,6 @@ export function buildJourneyOverlayFromGraph(
       required: item.required,
     })),
     steps,
+    complexity: buildComplexityProfileFromGraph(nodes, graph.externalGates),
   };
 }

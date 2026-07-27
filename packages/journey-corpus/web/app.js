@@ -66,15 +66,15 @@ function setMeta(title, description, url = location.href) {
 function setRootMetadata() {
   setMeta(
     "Developer Journey Atlas",
-    "Search an LLM API and see its source-grounded path from account creation to the first API response.",
+    "Search a developer platform and see the documented first-mile path from account creation to first success.",
     `${location.origin}/`,
   );
 }
 
 function setNotFoundMetadata(slug) {
   setMeta(
-    "API route not found | Developer Journey Atlas",
-    "Research this LLM API to build a source-grounded setup draft.",
+    "Route not reviewed | Developer Journey Atlas",
+    "Research this platform to reconstruct the source-grounded first-mile path.",
     `${location.origin}/platform/${encodeURIComponent(slug)}`,
   );
 }
@@ -84,22 +84,30 @@ function normalizeProvider(provider, published = false) {
     name: String(provider.name ?? ""),
     slug: String(provider.slug ?? ""),
     aliases: Array.isArray(provider.searchAliases) ? provider.searchAliases.map(String) : [],
+    category: String(provider.category ?? ""),
+    outcome: String(provider.outcome ?? ""),
+    routeStatus: String(provider.routeStatus ?? (published ? "published" : "known_needs_review")),
+    reviewReasons: Array.isArray(provider.reviewReasons) ? provider.reviewReasons.map(String) : [],
     published: published || provider.routeStatus === "published",
   };
 }
 
-function mergeProviders(catalog, published) {
+function mergeProviders(catalog, corpus) {
   const merged = new Map();
   for (const provider of catalog) {
     if (provider.name && provider.slug) merged.set(provider.slug, normalizeProvider(provider));
   }
-  for (const provider of published) {
+  for (const provider of corpus) {
     if (!provider.name || !provider.slug) continue;
     const current = merged.get(provider.slug);
     merged.set(provider.slug, {
       ...(current ?? normalizeProvider(provider)),
       name: provider.name,
-      published: true,
+      category: provider.category ?? current?.category ?? "",
+      outcome: provider.outcome ?? current?.outcome ?? "",
+      routeStatus: provider.routeStatus ?? current?.routeStatus ?? "known_needs_review",
+      reviewReasons: provider.reviewReasons ?? current?.reviewReasons ?? [],
+      published: provider.routeStatus === "published",
     });
   }
   return [...merged.values()].sort((a, b) => a.name.localeCompare(b.name));
@@ -107,21 +115,15 @@ function mergeProviders(catalog, published) {
 
 async function loadProviders() {
   el.searchError.hidden = true;
-  el.searchStatus.textContent = "Loading providers…";
+  el.searchStatus.textContent = "Loading platforms...";
   try {
-    const [catalogResponse, publishedResponse] = await Promise.all([
-      fetch("/data/llm-api-catalog.json"),
-      fetch("/api/platforms"),
-    ]);
-    if (!catalogResponse.ok || !publishedResponse.ok) throw new Error("Provider search failed.");
-    const catalog = await catalogResponse.json();
+    const publishedResponse = await fetch("/api/platforms?include=all");
+    if (!publishedResponse.ok) throw new Error("Platform search failed.");
     const published = await publishedResponse.json();
-    const catalogProviders = Array.isArray(catalog?.cohorts)
-      ? catalog.cohorts.flatMap((cohort) => Array.isArray(cohort.providers) ? cohort.providers : [])
-      : [];
+    const catalogProviders = [];
     providers = mergeProviders(catalogProviders, Array.isArray(published?.data) ? published.data : []);
-    if (!providers.length) throw new Error("Provider search is empty.");
-    el.searchStatus.textContent = "Try OpenAI, Gemini, Grok, Anthropic, or Mistral.";
+    if (!providers.length) throw new Error("Platform search is empty.");
+    el.searchStatus.textContent = "Try OpenAI, Stripe, GitHub, Render, Auth0, or Gemini.";
     renderMatches();
   } catch {
     providers = [];
@@ -136,7 +138,14 @@ function matchesFor(query) {
   if (!normalized) return [];
   return providers.filter((provider) =>
     `${provider.name} ${provider.slug} ${provider.aliases.join(" ")}`.toLowerCase().includes(normalized)
-  ).slice(0, 8);
+  ).slice(0, 10);
+}
+
+function statusLabel(provider) {
+  if (provider.routeStatus === "published") return "Reviewed route";
+  if (provider.routeStatus === "private_draft") return "Private draft";
+  if (provider.routeStatus === "known_needs_review") return "Needs review";
+  return "Research available";
 }
 
 function providerResult(provider) {
@@ -144,7 +153,7 @@ function providerResult(provider) {
     <li>
       <button type="button" data-provider="${esc(provider.slug)}">
         <span>${esc(provider.name)}</span>
-        <small>${provider.published ? "Guide ready" : "Research available"}</small>
+        <small>${esc(statusLabel(provider))}</small>
       </button>
     </li>
   `;
@@ -157,11 +166,11 @@ function renderMatches() {
   el.searchResults.innerHTML = matches.map(providerResult).join("");
   el.searchResults.hidden = !query || matches.length === 0;
   if (!query) {
-    el.searchStatus.textContent = "Try OpenAI, Gemini, Grok, Anthropic, or Mistral.";
+    el.searchStatus.textContent = "Try OpenAI, Stripe, GitHub, Render, Auth0, or Gemini.";
   } else if (matches.length) {
     el.searchStatus.textContent = `${matches.length} match${matches.length === 1 ? "" : "es"}`;
   } else {
-    el.searchStatus.textContent = `No saved guide for “${query}”. You can research it.`;
+    el.searchStatus.textContent = `No saved platform for "${query}". You can research it.`;
   }
 }
 
@@ -198,9 +207,43 @@ function compactSteps(steps) {
         <li>
           <p>${esc(step.action)}</p>
           ${step.successSignal ? `<small>${esc(step.successSignal)}</small>` : ""}
+          ${Array.isArray(step.requiredFields) && step.requiredFields.length ? `
+            <ul class="field-list">
+              ${step.requiredFields.map((field) => `<li>${esc(field.label)}${field.required === false ? " (optional)" : ""}</li>`).join("")}
+            </ul>
+          ` : ""}
+          ${Array.isArray(step.frictionGates) && step.frictionGates.length ? `
+            <ul class="gate-list">
+              ${step.frictionGates.map((gate) => `<li>${esc(gate.description)}</li>`).join("")}
+            </ul>
+          ` : ""}
         </li>
       `).join("")}
     </ol>
+  `;
+}
+
+function renderComplexity(complexity) {
+  if (!complexity?.dimensions) return "";
+  const d = complexity.dimensions;
+  const items = [
+    ["Actions", d.requiredActions],
+    ["Fields", d.requiredFields],
+    ["Choices", d.decisionPoints],
+    ["Gates", d.documentedExternalGates],
+    ["Waits", d.unavoidableWaits],
+  ];
+  return `
+    <section class="complexity-panel" aria-label="Documented complexity">
+      <div>
+        <p class="state-label">Complexity</p>
+        <h2>${esc(complexity.rating)} (${esc(complexity.score)})</h2>
+        <p>${esc(complexity.note)}</p>
+      </div>
+      <dl>
+        ${items.map(([label, value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join("")}
+      </dl>
+    </section>
   `;
 }
 
@@ -230,6 +273,8 @@ function renderJourney(journey) {
       <p class="result-lede">${esc(firstSuccess)}</p>
       ${startUrl ? `<a class="btn btn-primary start-link" href="${esc(startUrl)}" target="_blank" rel="noopener noreferrer">Open official guide</a>` : ""}
 
+      ${renderComplexity(journey.complexity)}
+
       <section>
         <h2>Path</h2>
         <p>${esc(selectedPath)}</p>
@@ -244,6 +289,11 @@ function renderJourney(journey) {
       <details id="official-evidence">
         <summary>Official sources</summary>
         <div id="official-evidence-content"><p>Open to load sources.</p></div>
+      </details>
+
+      <details id="peer-comparison">
+        <summary>Domain comparison</summary>
+        <div id="peer-comparison-content"><p>Open to load compatible peers.</p></div>
       </details>
     </article>
   `;
@@ -269,6 +319,46 @@ function wireJourney(journey) {
       loadOfficialEvidence(journey.slug);
     }
   });
+  const comparison = document.querySelector("#peer-comparison");
+  comparison?.addEventListener("toggle", () => {
+    if (comparison.open && comparison.dataset.loaded !== "true") {
+      comparison.dataset.loaded = "true";
+      loadPeerComparison(journey.slug);
+    }
+  });
+}
+
+function renderPeerComparison(comparison) {
+  if (!comparison?.available) {
+    return `
+      <p>${esc(comparison?.note ?? "Comparison is not available yet.")}</p>
+      <p class="trust-note">${esc(comparison?.qualifiedPeerCount ?? 0)} of ${esc(comparison?.requiredPeerCount ?? 3)} compatible peers are ready.</p>
+    `;
+  }
+  return `
+    <p>${esc(comparison.note)}</p>
+    <ul class="comparison-list">
+      ${comparison.dimensions.map((item) => `
+        <li>
+          <span>${esc(item.label)}</span>
+          <strong>${esc(item.subjectValue)}</strong>
+          <small>peer median ${esc(item.peerMedian)}, range ${esc(item.peerMinimum)}-${esc(item.peerMaximum)}</small>
+        </li>
+      `).join("")}
+    </ul>
+  `;
+}
+
+async function loadPeerComparison(slug) {
+  const mount = document.querySelector("#peer-comparison-content");
+  if (!mount) return;
+  mount.innerHTML = "<p>Loading comparison...</p>";
+  try {
+    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/peer-comparison`);
+    mount.innerHTML = renderPeerComparison(data);
+  } catch {
+    mount.innerHTML = "<p>Comparison could not be loaded.</p>";
+  }
 }
 
 async function showPlatform(slug, { push = true, focus = true } = {}) {
@@ -283,36 +373,53 @@ async function showPlatform(slug, { push = true, focus = true } = {}) {
     wireJourney(data);
     setMeta(
       `${data.name} API setup | Developer Journey Atlas`,
-      `See ${data.name}'s documented path to the first API response.`,
+      `See ${data.name}'s documented first-mile path.`,
       location.href,
     );
     announce(`${data.name} guide loaded.`);
     if (focus) document.querySelector("#result-title")?.focus();
   } catch {
     const provider = providers.find((candidate) => candidate.slug === slug);
-    renderResearchOffer(provider?.name ?? slug, slug);
+    if (provider) {
+      renderResearchOffer(provider.name, slug, provider);
+      return;
+    }
+    try {
+      const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}?include=all`);
+      renderResearchOffer(data.name ?? slug, slug, data);
+    } catch {
+      renderResearchOffer(slug, slug);
+    }
   }
 }
 
-function renderResearchOffer(name, slug = "") {
+function renderResearchOffer(name, slug = "", provider = null) {
   activePoll += 1;
   researchPending = false;
   showResultSurface();
+  const known = provider?.routeStatus && provider.routeStatus !== "unknown";
+  const reasons = Array.isArray(provider?.reviewReasons) && provider.reviewReasons.length
+    ? `<ul class="review-list">${provider.reviewReasons.slice(0, 4).map((reason) => `<li>${esc(reason)}</li>`).join("")}</ul>`
+    : "";
   el.result.innerHTML = `
     <section class="research-card">
       ${backLink()}
-      <p class="state-label">No guide yet</p>
+      <p class="state-label">${known ? "Needs review" : "No saved platform"}</p>
       <h1 id="result-title" tabindex="-1">${esc(name)}</h1>
-      <p class="result-lede">Research the official docs and build the setup path.</p>
-      <p class="trust-note">Uses You.com and OpenRouter. The draft stays private until review.</p>
-      <button class="btn btn-primary" id="research-btn" type="button">Start research</button>
+      <p class="result-lede">${known
+        ? "This platform is in the corpus, but its atomic first-mile route is not publication-ready."
+        : "Research the official docs and build the first-mile path."}</p>
+      ${provider?.outcome ? `<p class="trust-note">Target outcome: ${esc(provider.outcome)}</p>` : ""}
+      ${reasons}
+      <p class="trust-note">Research starts from official docs and saves a private draft for review.</p>
+      <button class="btn btn-primary" id="research-btn" type="button">${known ? "Refresh research" : "Start research"}</button>
       <p class="status-line" id="research-status" role="status" aria-live="polite"></p>
     </section>
   `;
   document.querySelector("#research-btn")?.addEventListener("click", () => researchPlatform(name));
   setNotFoundMetadata(slug || name);
   document.querySelector("#result-title")?.focus();
-  announce(`No guide for ${name}. Research has not started.`);
+  announce(`${name} is ready for research.`);
 }
 
 function setResearchStatus(message) {
@@ -351,6 +458,8 @@ function renderResearchDraft(result) {
       ${draft.successSignal ? `<p class="success-signal">Done when: ${esc(draft.successSignal)}</p>` : ""}
       ${startUrl ? `<a class="btn btn-primary start-link" href="${esc(startUrl)}" target="_blank" rel="noopener noreferrer">Open official guide</a>` : ""}
 
+      ${renderComplexity(draft.complexity)}
+
       <section>
         <h2>Path</h2>
         ${compactSteps(draft.steps)}
@@ -381,11 +490,11 @@ function renderResearchDraft(result) {
 
 const OUTCOME_MESSAGE = {
   identity_ambiguous: ["Use a more specific name", "That name matches more than one platform.", false],
-  identity_unresolved: ["Provider not confirmed", "We could not confirm the official provider.", false],
+  identity_unresolved: ["Platform not confirmed", "We could not confirm the official platform.", false],
   no_official_source: ["No official guide found", "We could not find usable first-party setup documentation.", false],
   official_source_unusable: ["Official docs were not enough", "The pages did not contain enough detail to build the path.", false],
-  invalid_output: ["Try that again", "The first attempt did not finish.", true],
-  claim_grounding_failed: ["Try that again", "The first attempt could not verify every step.", true],
+  invalid_output: ["Draft failed validation", "The draft missed required journey fields or contradicted the record schema.", true],
+  claim_grounding_failed: ["Evidence check failed", "At least one action, field, option, gate, or edge was not supported by an accepted official source.", true],
   search_failed: ["Docs search is unavailable", "Try the research again.", true],
   model_failed: ["Route builder is unavailable", "Try the research again.", true],
 };
@@ -460,7 +569,7 @@ async function pollRunStatus(runId, query) {
 async function submitQuery(rawQuery) {
   const query = rawQuery.trim();
   if (!query) {
-    el.searchStatus.textContent = "Enter an LLM API name.";
+    el.searchStatus.textContent = "Enter a platform name.";
     el.input.focus();
     return;
   }
@@ -476,7 +585,7 @@ async function submitQuery(rawQuery) {
   }
   if (matches.length > 1) {
     el.searchResults.hidden = false;
-    el.searchStatus.textContent = "Choose a provider below.";
+    el.searchStatus.textContent = "Choose a platform below.";
     el.searchResults.querySelector("button")?.focus();
     return;
   }

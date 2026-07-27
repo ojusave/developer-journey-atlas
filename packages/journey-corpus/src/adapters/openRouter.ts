@@ -118,6 +118,12 @@ export function normalizeLiteralEvidenceLocators(record: Record<string, unknown>
     for (const field of asRecords(node.requiredFields)) {
       normalizeEvidence(field.evidence, text(field.label, node.action));
     }
+    for (const option of asRecords(node.decisionOptions)) {
+      normalizeEvidence(option.evidence, text(option.label, option.effect, node.action));
+    }
+    for (const failure of asRecords(node.failureModes)) {
+      normalizeEvidence(failure.evidence, text(failure.condition, failure.recovery, node.action));
+    }
   }
   for (const edge of asRecords(graph.edges)) {
     const from = typeof edge.from === "string" ? nodeById.get(edge.from) : undefined;
@@ -601,12 +607,16 @@ export class OpenRouterProvider implements LLMProvider {
       "- Prefer HTTP/cURL when documented; do not prefer local/no-account toolkit shortcuts over hosted onboarding.",
       "- Do not invent knowledge/skill prerequisites (e.g. 'know JavaScript'). Omit soft knowledge requirements.",
       "- Build `journey_graph` first. Represent alternate routes as branches and select exactly one route.",
+      "- Model account creation, app creation, OAuth or API-key generation, permissions, scopes, redirect URIs, consent, SDK setup, request construction, execution, waits, and verification as separate atomic nodes when the docs separate them.",
       "- Declare every candidate route in `journey_graph.candidateRoutes` with a condition, route summary, and first-success effect. Exactly one has selected status and must exactly match selectedRoute; considered alternatives need a reasonNotSelected and exact branchAtNodeId.",
       "- Put evidence-backed preexisting requirements in `journey_graph.prerequisites` and declare the inputs each produces.",
       "- Put account, permission, approval, terms, payment, and other route gates in `journey_graph.externalGates` at the exact node they affect.",
       "- Set `primary_path` to an empty array. The application derives it from `journey_graph.selectedRoute` after validation.",
       "- One developer action is one intentional interaction. Keep form fields nested under their action.",
       "- Every node must set requiresFieldInventory. Set it true for any form or interaction with fields, and list every documented field.",
+      "- For create-account, create-app, configure-OAuth, generate-credential, configure-scope, and make-request interactions, list every documented required field with its field type and evidence.",
+      "- For decisions, use kind decision and include decisionOptions with label, selected, effect, and evidence for each documented option.",
+      "- For documented validation errors, rejected states, or retry paths, add failureModes on the exact node with condition, recovery, and evidence.",
       "- Represent passive waits and automatic platform work as passive_wait or platform_outcome nodes.",
       "- Every prerequisite, node, field, edge, gate, candidate route, and first-success boundary requires a supplied source id and a specific section locator.",
       "- Locator text must name wording or a section that occurs in the supplied bounded source content.",

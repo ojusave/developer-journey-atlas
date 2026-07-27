@@ -27,6 +27,7 @@ function filterInMemory(rows: MetricRow[], q: string): MetricRow[] {
 export function searchPlatforms(store: DataStore) {
   return async (req: Request, res: Response): Promise<void> => {
     const q = String(req.query.q ?? "").trim().toLowerCase();
+    const includePublicOnly = String(req.query.visibility ?? "").toLowerCase() === "published";
     if (!q) {
       sendData(res, [], { query: q, count: 0 });
       return;
@@ -46,7 +47,9 @@ export function searchPlatforms(store: DataStore) {
       matched = filterInMemory(store.listRows(), q);
     }
 
-    const eligible = matched.filter((row) => store.isPublicEligible(row.slug));
-    sendData(res, eligible.map((row) => toSummary(row, store)), { query: q, count: eligible.length });
+    const visible = includePublicOnly
+      ? matched.filter((row) => store.isPublicEligible(row.slug))
+      : matched;
+    sendData(res, visible.map((row) => toSummary(row, store)), { query: q, count: visible.length });
   };
 }

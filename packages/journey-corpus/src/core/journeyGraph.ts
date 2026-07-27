@@ -17,6 +17,19 @@ export interface JourneyField {
   evidence: EvidenceLocator[];
 }
 
+export interface JourneyDecisionOption {
+  label: string;
+  selected: boolean;
+  effect: string;
+  evidence: EvidenceLocator[];
+}
+
+export interface JourneyFailureMode {
+  condition: string;
+  recovery: string;
+  evidence: EvidenceLocator[];
+}
+
 export interface JourneyNode {
   id: string;
   kind: JourneyNodeKind;
@@ -32,6 +45,8 @@ export interface JourneyNode {
   evidence: EvidenceLocator[];
   branchId?: string | null;
   requiresFieldInventory: boolean;
+  decisionOptions?: JourneyDecisionOption[];
+  failureModes?: JourneyFailureMode[];
 }
 
 export interface JourneyEdge {
@@ -133,6 +148,7 @@ export interface JourneyGraphFinding {
     | "near_duplicate_action"
     | "compound_action"
     | "missing_field_inventory"
+    | "missing_decision_options"
     | "field_inventory_status_missing"
     | "field_inventory_inconsistent"
     | "wrong_actor_for_event"
@@ -389,6 +405,34 @@ export function validateJourneyGraph(
           code: field.evidence?.length ? "missing_evidence_locator" : "missing_evidence",
           nodeId: node.id,
           message: `Required field "${field.label}" lacks accepted evidence and a locator.`,
+        });
+      }
+    }
+    if (
+      node.kind === "decision" &&
+      (!Array.isArray(node.decisionOptions) || node.decisionOptions.length < 2)
+    ) {
+      findings.push({
+        code: "missing_decision_options",
+        nodeId: node.id,
+        message: "Decision nodes must list the documented options and their effect on the selected route.",
+      });
+    }
+    for (const option of node.decisionOptions ?? []) {
+      if (!hasEvidence(option.evidence)) {
+        findings.push({
+          code: option.evidence?.length ? "missing_evidence_locator" : "missing_evidence",
+          nodeId: node.id,
+          message: `Decision option "${option.label}" lacks accepted evidence and a locator.`,
+        });
+      }
+    }
+    for (const failure of node.failureModes ?? []) {
+      if (!hasEvidence(failure.evidence)) {
+        findings.push({
+          code: failure.evidence?.length ? "missing_evidence_locator" : "missing_evidence",
+          nodeId: node.id,
+          message: `Failure mode "${failure.condition}" lacks accepted evidence and a locator.`,
         });
       }
     }

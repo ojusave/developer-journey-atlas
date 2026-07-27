@@ -26,23 +26,20 @@ test("search, consent, research, and draft display form one complete human flow"
   window.setTimeout = (callback) => nativeSetTimeout(callback, 0);
   window.fetch = async (path, options = {}) => {
     requests.push({ path: String(path), method: options.method ?? "GET" });
-    if (path === "/data/llm-api-catalog.json") {
+    if (path === "/api/platforms?include=all") {
       return {
         ok: true,
         json: async () => ({
-          cohorts: [{
-            providers: [{
+          data: [{
               name: "Mistral",
               slug: "mistral",
-              searchAliases: ["Mistral AI"],
-              routeStatus: "review",
-            }],
+              category: "AI, ML, and agents",
+              outcome: "Receive the first model response",
+              routeStatus: "known_needs_review",
+              reviewReasons: ["missing_journey_graph"],
           }],
         }),
       };
-    }
-    if (path === "/api/platforms") {
-      return { ok: true, json: async () => ({ data: [] }) };
     }
     if (path === "/api/platforms/mistral/journey") {
       return {
@@ -75,6 +72,18 @@ test("search, consent, research, and draft display form one complete human flow"
                   { stepNumber: 1, action: "Create an API key", successSignal: "The key is available" },
                   { stepNumber: 2, action: "Send a chat request", successSignal: "The response returns text" },
                 ],
+                complexity: {
+                  rating: "low",
+                  score: 2,
+                  note: "Documented structural complexity.",
+                  dimensions: {
+                    requiredActions: 2,
+                    requiredFields: 0,
+                    decisionPoints: 0,
+                    documentedExternalGates: 0,
+                    unavoidableWaits: 0,
+                  },
+                },
                 sources: [{
                   title: "Mistral quickstart",
                   url: "https://docs.mistral.ai/getting-started/",
@@ -101,10 +110,10 @@ test("search, consent, research, and draft display form one complete human flow"
     new window.Event("submit", { bubbles: true, cancelable: true }),
   );
   await waitFor(
-    () => window.document.querySelector("#research-btn")?.textContent === "Start research",
+    () => window.document.querySelector("#research-btn")?.textContent === "Refresh research",
     "search did not show the explicit research action",
   );
-  assert.match(window.document.querySelector(".trust-note").textContent, /You\.com and OpenRouter/);
+  assert.match(window.document.querySelector("#result").textContent, /missing_journey_graph/);
   assert.equal(
     requests.filter((request) => request.path === "/api/research").length,
     0,
@@ -151,26 +160,35 @@ test("a failed attempt can retry into a saved private draft", async () => {
     successSignal: "The response contains generated text",
     prerequisites: [],
     steps: [{ stepNumber: 1, action: "Send the first API request", successSignal: "Text returns" }],
+    complexity: {
+      rating: "low",
+      score: 1,
+      note: "Documented structural complexity.",
+      dimensions: {
+        requiredActions: 1,
+        requiredFields: 0,
+        decisionPoints: 0,
+        documentedExternalGates: 0,
+        unavoidableWaits: 0,
+      },
+    },
     sources: [{ title: "Mistral quickstart", url: "https://docs.mistral.ai/getting-started/" }],
   };
   window.fetch = async (path, options = {}) => {
-    if (path === "/data/llm-api-catalog.json") {
+    if (path === "/api/platforms?include=all") {
       return {
         ok: true,
         json: async () => ({
-          cohorts: [{
-            providers: [{
+          data: [{
               name: "Mistral AI",
               slug: "mistral-ai",
-              searchAliases: ["Mistral"],
-              routeStatus: "review",
-            }],
+              category: "AI, ML, and agents",
+              outcome: "Receive the first model response",
+              routeStatus: "known_needs_review",
+              reviewReasons: ["missing_journey_graph"],
           }],
         }),
       };
-    }
-    if (path === "/api/platforms") {
-      return { ok: true, json: async () => ({ data: [] }) };
     }
     if (path === "/api/platforms/mistral-ai/journey") {
       return {
@@ -216,7 +234,7 @@ test("a failed attempt can retry into a saved private draft", async () => {
     new window.Event("submit", { bubbles: true, cancelable: true }),
   );
   await waitFor(
-    () => window.document.querySelector("#research-btn")?.textContent === "Start research",
+    () => window.document.querySelector("#research-btn")?.textContent === "Refresh research",
     "search did not show the research action",
   );
   window.document.querySelector("#research-btn").click();

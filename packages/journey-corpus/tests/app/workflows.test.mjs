@@ -373,17 +373,17 @@ test("start short-circuits known platforms without touching the workflow", async
   assert.equal(runner.started.length, 0);
 });
 
-test("start returns a saved private draft without restarting research", async () => {
-  const runner = new FakeWorkflowRunner();
+test("start refreshes a known non-public corpus row instead of returning it as a draft", async () => {
+  const runner = new FakeWorkflowRunner("refresh-run");
   const res = fakeRes();
   await startResearch(storeWithPrivateDraft(), runner)(
     fakeReq({ body: { platform: "Mistral AI" } }),
     res,
   );
-  assert.equal(res.statusCode, 200);
-  assert.equal(res.body.data.result.outcome, "draft_ready");
-  assert.equal(res.body.data.result.draft.steps[0].action, "Send the first API request");
-  assert.equal(runner.started.length, 0);
+  assert.equal(res.statusCode, 202);
+  assert.equal(res.body.data.runId, "refresh-run");
+  assert.equal(runner.started.length, 1);
+  assert.equal(runner.started[0].slug, "mistral-ai");
 });
 
 test("start rejects invalid platform names", async () => {

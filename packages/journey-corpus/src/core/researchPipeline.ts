@@ -90,6 +90,8 @@ export function validateSourceGrounding(
       ...graph.prerequisites.flatMap((item) => item.evidence),
       ...graph.nodes.flatMap((node) => node.evidence),
       ...graph.nodes.flatMap((node) => node.requiredFields.flatMap((field) => field.evidence)),
+      ...graph.nodes.flatMap((node) => (node.decisionOptions ?? []).flatMap((option) => option.evidence)),
+      ...graph.nodes.flatMap((node) => (node.failureModes ?? []).flatMap((failure) => failure.evidence)),
       ...graph.edges.flatMap((edge) => edge.evidence),
       ...graph.externalGates.flatMap((item) => item.evidence),
       ...graph.candidateRoutes.flatMap((item) => item.evidence),
