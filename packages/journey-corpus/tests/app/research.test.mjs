@@ -184,6 +184,33 @@ test("no official docs yields a no_official_source terminal", async () => {
   assert.equal(outcome.outcome, "no_official_source");
 });
 
+test("unusable official pages do not poison usable official docs", async () => {
+  let docsSeenByModel = [];
+  const unusable = {
+    ...hits[0],
+    title: "Blocked help page",
+    url: "https://acme.com/help",
+    metadata: {
+      ...hits[0].metadata,
+      canonicalUrl: "https://acme.com/help",
+      httpStatus: 403,
+      contentPresent: false,
+      contentHash: null,
+    },
+  };
+  const outcome = await run("Acme", {
+    search: new FakeSearchProvider([unusable, ...hits]),
+    llm: {
+      reconstructRecord: async (_platform, docs) => {
+        docsSeenByModel = docs;
+        return draftRecord();
+      },
+    },
+  });
+  assert.equal(outcome.outcome, "completed");
+  assert.deepEqual(docsSeenByModel.map((doc) => doc.url), ["https://acme.com/docs"]);
+});
+
 test("transient model failure yields model_failed (retryable class, not terminal input error)", async () => {
   const outcome = await run("Acme", {
     search: new FakeSearchProvider(hits),
