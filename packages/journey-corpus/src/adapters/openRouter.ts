@@ -405,6 +405,77 @@ export function normalizeTrustedRecordFields(parsed: unknown, docs: DocHit[]): u
   return record;
 }
 
+const STEP_PHASES = new Set([
+  "arrive", "access", "account", "install", "prepare", "configure", "connect",
+  "authenticate", "credential", "billing", "build", "execute", "run", "wait", "verify",
+]);
+
+const STEP_PHASE_ALIASES: Record<string, string> = {
+  signup: "account",
+  "sign up": "account",
+  registration: "account",
+  register: "account",
+  login: "authenticate",
+  "sign in": "authenticate",
+  signin: "authenticate",
+  auth: "authenticate",
+  authorize: "authenticate",
+  authorization: "authenticate",
+  "api key": "credential",
+  key: "credential",
+  token: "credential",
+  setup: "configure",
+  configuration: "configure",
+  initialize: "prepare",
+  init: "prepare",
+  installation: "install",
+  download: "install",
+  payment: "billing",
+  subscribe: "billing",
+  test: "verify",
+  validate: "verify",
+  confirm: "verify",
+  deploy: "execute",
+  call: "execute",
+  request: "execute",
+  code: "build",
+  implement: "build",
+  navigate: "arrive",
+  discover: "arrive",
+};
+
+function coercePhase(item: unknown): unknown {
+  if (!item || typeof item !== "object") return item;
+  const next = { ...(item as Record<string, unknown>) };
+  if (typeof next.phase !== "string") return next;
+  const key = next.phase.trim().toLowerCase().replace(/_/g, " ");
+  if (STEP_PHASES.has(key)) next.phase = key;
+  else if (STEP_PHASE_ALIASES[key]) next.phase = STEP_PHASE_ALIASES[key];
+  return next;
+}
+
+/**
+ * Coerce authored phases onto the schema enum before validation. Both shapes
+ * are covered because primary_path is normally rebuilt from the graph nodes,
+ * and survives as authored only when the graph is unusable.
+ *
+ * Unlike friction gate types there is no "other" bucket, so an unrecognized
+ * phase is left untouched: validation should reject it rather than have a step
+ * silently mislabelled as something the documentation never said.
+ */
+export function normalizeStepPhases(parsed: unknown): unknown {
+  if (!parsed || typeof parsed !== "object") return parsed;
+  const record = parsed as Record<string, unknown>;
+  if (Array.isArray(record.primary_path)) {
+    record.primary_path = record.primary_path.map(coercePhase);
+  }
+  const graph = record.journey_graph as { nodes?: unknown } | undefined;
+  if (graph && Array.isArray(graph.nodes)) {
+    graph.nodes = graph.nodes.map(coercePhase);
+  }
+  return record;
+}
+
 /**
  * Coerce friction_gates[].type onto the schema enum before validation.
  * Models often invent near-synonyms; map those or fall back to "other".
@@ -525,7 +596,7 @@ export class OpenRouterProvider implements LLMProvider {
       }
 
       const trusted = normalizeTrustedRecordFields(parsed, docs);
-      const normalized = normalizeFrictionGateTypes(trusted);
+      const normalized = normalizeStepPhases(normalizeFrictionGateTypes(trusted));
       const materialized = materializeResearchDraftRoute(normalized);
       const { valid, errors } = this.validate(materialized.value);
       const combinedErrors = [...materialized.errors, ...errors];
@@ -540,6 +611,7 @@ export class OpenRouterProvider implements LLMProvider {
             "The JSON failed schema validation with these errors:\n" +
             combinedErrors.slice(0, 30).join("\n") +
             "\nKeep every required root property, including sources and all required arrays. " +
+            "Where an error lists allowed values, pick the closest one from that list. " +
             "Remove properties that the schema does not allow. Return only the corrected JSON object.",
         });
       }
