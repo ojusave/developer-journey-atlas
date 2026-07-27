@@ -168,19 +168,11 @@ function matchesFor(query) {
   ).slice(0, 10);
 }
 
-function statusLabel(provider) {
-  if (provider.routeStatus === "published") return "Reviewed route";
-  if (provider.routeStatus === "private_draft") return "Private draft";
-  if (provider.routeStatus === "known_needs_review") return "Needs review";
-  return "Research available";
-}
-
 function providerResult(provider) {
   return `
     <li>
       <button type="button" data-provider="${esc(provider.slug)}">
         <span>${esc(provider.name)}</span>
-        <small>${esc(statusLabel(provider))}</small>
       </button>
     </li>
   `;
