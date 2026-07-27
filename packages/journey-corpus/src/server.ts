@@ -126,9 +126,9 @@ async function main(): Promise<void> {
     res.set("Cache-Control", "no-cache, no-store, must-revalidate");
     if (!row && known) {
       res.type("html").send(renderPage(pageTemplate, {
-        title: `${known.name} route review | Developer Journey Atlas`,
+        title: `${known.name} path builder | Developer Journey Atlas`,
         description:
-          `${known.name} is in the Atlas corpus. Its atomic first-mile route is still under review.`,
+          `${known.name} is in the Atlas corpus. Build its step-by-step path from official docs.`,
         canonicalUrl: `${origin}/platform/${encodeURIComponent(slug)}`,
         socialImageUrl: `${origin}/social-preview.svg`,
         coverage,
