@@ -42,6 +42,9 @@ export async function persistResearchDraft(
   const existing = await prisma.platform.findUnique({ where: { slug }, select: { slug: true } });
 
   try {
+    // The draft lands in draftRecordJson. recordJson is the canonical corpus
+    // record and is owned by the seed, which rewrites it on every deploy; a
+    // draft written there would be silently discarded on the next release.
     await prisma.platform.upsert({
       where: { slug },
       create: {
@@ -52,6 +55,7 @@ export async function persistResearchDraft(
         researchedAt: record.researched_at ?? null,
         researchStatus: (record.research_status as string | undefined) ?? "complete",
         recordJson: asJson(record),
+        draftRecordJson: asJson(record),
         sourceSha256: sha256(recordText),
       },
       update: {
@@ -60,7 +64,7 @@ export async function persistResearchDraft(
         category: record.category,
         researchedAt: record.researched_at ?? null,
         researchStatus: (record.research_status as string | undefined) ?? "complete",
-        recordJson: asJson(record),
+        draftRecordJson: asJson(record),
         sourceSha256: sha256(recordText),
       },
     });
