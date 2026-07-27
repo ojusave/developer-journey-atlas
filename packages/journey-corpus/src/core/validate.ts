@@ -8,7 +8,11 @@ const Ajv = ((AjvModule as unknown as { default?: unknown }).default ?? AjvModul
   opts?: Record<string, unknown>,
 ) => {
   compile: (schema: unknown) => ((data: unknown) => boolean) & {
-    errors?: Array<{ instancePath?: string; message?: string }> | null;
+    errors?: Array<{
+      instancePath?: string;
+      message?: string;
+      params?: { allowedValues?: unknown[] };
+    }> | null;
   };
 };
 const addFormats = ((addFormatsModule as unknown as { default?: unknown }).default ??
@@ -34,9 +38,15 @@ export function createRecordValidator(schemaPath: string): RecordValidator {
 
   return (record: unknown): ValidationResult => {
     const valid = validate(record) === true;
-    const errors = (validate.errors ?? []).map((e) =>
-      `${e.instancePath || "(root)"} ${e.message ?? "invalid"}`.trim(),
-    );
+    const errors = (validate.errors ?? []).map((e) => {
+      const where = e.instancePath || "(root)";
+      const what = e.message ?? "invalid";
+      // Ajv reports "must be equal to one of the allowed values" without saying
+      // which. A repair pass cannot act on that, so name them.
+      const allowed = e.params?.allowedValues;
+      const suffix = Array.isArray(allowed) ? ` (allowed: ${allowed.join(", ")})` : "";
+      return `${where} ${what}${suffix}`.trim();
+    });
     return { valid, errors };
   };
 }
