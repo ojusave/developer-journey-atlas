@@ -296,6 +296,16 @@ test("public handlers expose only the eligible graph route and no metric or bloc
   listPlatforms(store)(fakeReq(), listRes);
   assert.deepEqual(listRes.body.data.map((row) => row.slug), ["render"]);
 
+  const allListRes = fakeRes();
+  listPlatforms(store)(fakeReq({ query: { include: "all" } }), allListRes);
+  const hiddenSummary = allListRes.body.data.find((row) => row.slug === "stripe");
+  assert.equal(hiddenSummary.routeStatus, "known_needs_review");
+  assert.deepEqual(hiddenSummary.reviewReasons, []);
+  assert.doesNotMatch(
+    JSON.stringify(hiddenSummary),
+    /source_content_unavailable|missing_journey_graph|evidence_retrieval_date_missing/,
+  );
+
   const journeyRes = fakeRes();
   await getPlatformJourney(store)(fakeReq({ params: { slug: "render" } }), journeyRes);
   assert.equal(journeyRes.body.data.steps.length, 16);
