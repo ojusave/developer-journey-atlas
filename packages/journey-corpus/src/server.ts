@@ -107,6 +107,7 @@ async function main(): Promise<void> {
 
   app.get("/", (req, res) => {
     const origin = pageOrigin(req);
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
     res.type("html").send(renderPage(pageTemplate, {
       title: "Developer Journey Atlas",
       description:
@@ -122,6 +123,7 @@ async function main(): Promise<void> {
     const row = store.isPublicEligible(slug) ? store.getRow(slug) : undefined;
     const known = store.getRow(slug);
     const origin = pageOrigin(req);
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
     if (!row && known) {
       res.type("html").send(renderPage(pageTemplate, {
         title: `${known.name} route review | Developer Journey Atlas`,
@@ -152,7 +154,13 @@ async function main(): Promise<void> {
     }));
   });
 
-  app.use(express.static(webDir));
+  app.use(express.static(webDir, {
+    setHeaders(res, filePath) {
+      if (/\.(?:js|css|html)$/.test(filePath)) {
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      }
+    },
+  }));
   app.use(express.static(config.publicDir, { index: false }));
 
   app.use((_err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

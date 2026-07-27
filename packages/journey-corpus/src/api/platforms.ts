@@ -21,9 +21,7 @@ export function toSummary(row: MetricRow, store?: DataStore) {
     category: row.category,
     outcome: row.outcome,
     routeStatus: routeStatus(row, store),
-    reviewReasons: store && !store.isPublicEligible(row.slug)
-      ? store.publicEligibilityReasons(row.slug).slice(0, 5)
-      : [],
+    reviewReasons: [],
   };
 }
 
@@ -51,7 +49,7 @@ export function getPlatform(store: DataStore) {
       sendData(res, {
         ...toSummary(row, store),
         routeStatus: routeStatus(row, store),
-        reviewReasons: store.publicEligibilityReasons(slug).slice(0, 8),
+        reviewReasons: [],
         documentedRouteUrl: null,
       });
       return;
