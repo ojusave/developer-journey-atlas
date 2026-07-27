@@ -119,6 +119,14 @@ export async function seedAtlasDatabase(dataRoot: string, prisma = new PrismaCli
       friction_gates?: Array<Record<string, unknown>>;
     };
 
+    const liveDraftClaim = await prisma.researchClaim.findUnique({
+      where: { slug: row.slug },
+      select: { status: true, runId: true },
+    });
+    if (liveDraftClaim?.status === "completed" && liveDraftClaim.runId) {
+      continue;
+    }
+
     await prisma.platform.upsert({
       where: { slug: row.slug },
       create: {

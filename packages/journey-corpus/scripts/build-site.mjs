@@ -17,14 +17,17 @@ const sourceFiles = [
   { path: "src/api/router.ts", language: "typescript", description: "The complete public API route index." },
   { path: "src/api/platforms.ts", language: "typescript", description: "Fail-closed platform list and route presenter." },
   { path: "src/api/journey.ts", language: "typescript", description: "Selected journey graph presenter with public blocker links suppressed." },
+  { path: "src/api/peerComparison.ts", language: "typescript", description: "Compatible-domain peer comparison presenter with strict qualification gates." },
   { path: "src/api/research.ts", language: "typescript", description: "Explicit research start and private review projection." },
+  { path: "src/core/complexityProfile.ts", language: "typescript", description: "Auditable documented structural complexity dimensions and rating formula." },
+  { path: "src/core/peerComparison.ts", language: "typescript", description: "Reviewed-route compatible peer qualification and comparison dimensions." },
   { path: "src/core/publicationGate.ts", language: "typescript", description: "Identity, source, claim, and route publication gate." },
   { path: "src/core/sourceAuthority.ts", language: "typescript", description: "Deterministic first-party source authority checks." },
   { path: "src/core/journeyGraph.ts", language: "typescript", description: "Typed journey graph and selected-route integrity checks." },
   { path: "scripts/build-corpus-health.mjs", language: "javascript", description: "Machine-readable corpus health and migration analysis generator." },
   { path: "scripts/build-site.mjs", language: "javascript", description: "Fail-closed machine artifact and source snapshot generator." },
   { path: "scripts/check-llm-site.mjs", language: "javascript", description: "Generated public-surface contract check." },
-  { path: "PRIVACY.md", language: "markdown", description: "Provider, storage, retention, and deletion disclosure." },
+  { path: "PRIVACY.md", language: "markdown", description: "Research provider, storage, retention, and deletion disclosure." },
   { path: "EVENT-CONTRACT.txt", language: "text", description: "Uninstrumented privacy-preserving event contract." },
   { path: "LAUNCH-CHECKLIST.txt", language: "text", description: "Human review and representative-user pilot gate." },
   { path: "package.json", language: "json", description: "Supported build, audit, evaluation, and test commands." },
@@ -261,7 +264,8 @@ const dataIndex = {
   publicationContract: [
     "Every public route passes deterministic platform identity, source authority, content availability, claim coverage, and selected-route integrity gates.",
     "Unevaluated blocker-reason links and cross-platform associations are not public.",
-    "No public score, score band, percentile, peer median, or difficulty verdict is available.",
+    "Documented structural complexity is shown as auditable counts and a formula, not observed difficulty or product quality.",
+    "Peer comparison is withheld unless the subject and at least three compatible domain peers pass every qualification rule.",
   ],
   files: {
     llmIndex: `${canonicalUrl}/llms.txt`,
@@ -329,11 +333,13 @@ const llmsIndex = `# Developer Journey Atlas
 
 > Publication-eligible, first-party documented routes from account creation to first success.
 
-The reviewed repository contains ${summary.reviewedCorpusRecords} records. ${summary.publicRoutes} currently passes every publication gate. Other records and database research drafts are not public routes. Documentation structure is not observed difficulty, conversion, abandonment, or causality. Scores, percentiles, peer placement, model-selected blocker reasons, and cross-platform associations are unavailable.
+The reviewed repository contains ${summary.reviewedCorpusRecords} records. ${summary.publicRoutes} currently passes every publication gate. Other records and database research drafts are not public routes. Documentation structure is not observed difficulty, conversion, abandonment, or causality. Model-selected blocker reasons and cross-platform associations are unavailable.
+
+Search covers the whole reviewed corpus. Published route pages show atomic steps, documented fields, friction gates, official evidence, and documented structural complexity. Compatible-domain comparison appears only when enough qualified peers exist.
 
 ## LLM API research catalog
 
-The catalog tracks ${llmApiCatalog.providerCount} providers. Catalog membership means a research record exists. It does not mean a step-by-step route or comparison has passed independent review.
+LLM APIs are one cohort inside the Atlas. The LLM cohort file tracks ${llmApiCatalog.providerCount} providers. Catalog membership means a research record exists. It does not mean a route or comparison has passed independent review.
 
 ${llmCatalogSections}
 
@@ -349,7 +355,7 @@ ${recordLinks || "- No route currently passes every publication gate."}
 - [Measurement contract](${canonicalUrl}/measurement-contract.md)
 - [Privacy and research data flow](${canonicalUrl}/privacy.md)
 - [Measurement availability](${canonicalUrl}/event-contract.txt): \`measurement_unavailable\`, with no collector installed.
-- [20-platform human review gate](${canonicalUrl}/launch-checklist.txt)
+- [Whole-corpus human review gate](${canonicalUrl}/launch-checklist.txt)
 - [Deployed source](${canonicalUrl}/source/index.md)
 `;
 await writeFile(path.join(outputRoot, "llms.txt"), llmsIndex, "utf8");
@@ -361,7 +367,7 @@ for (const record of records) {
 }
 const llmsFull = `# Developer Journey Atlas full public context
 
-Only publication-eligible routes are included. No score, comparison, blocker diagnosis, association, or causal claim is available.
+Only publication-eligible routes are included. Documented complexity is a count-based route profile. No observed blocker diagnosis, association, or causal claim is available.
 
 ${methodology.trim()}
 

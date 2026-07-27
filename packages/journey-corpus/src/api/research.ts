@@ -19,6 +19,7 @@ import {
 import { selectedPathRow } from "../../lib/measure.mjs";
 import { ensureRow, isPostgresStore } from "./storeHelpers.js";
 import type { PlatformRecord } from "../core/ports.js";
+import { buildComplexityProfileFromRecord } from "../core/complexityProfile.js";
 
 const RESEARCH_WINDOW_MS = 60 * 60 * 1_000;
 const RESEARCH_GLOBAL_LIMIT = Math.max(
@@ -48,7 +49,18 @@ function browserSafeDraft(record: PlatformRecord) {
       stepNumber: step.step_number,
       action: step.action,
       successSignal: step.success_signal ?? null,
+      requiredFields: (step.required_fields ?? []).map((field) => ({
+        label: field.label,
+        type: field.fieldType,
+        required: field.required,
+      })),
     })),
+    frictionGates: (record.friction_gates ?? []).slice(0, 20).map((gate) => ({
+      atStep: gate.at_step ?? null,
+      type: gate.type ?? "other",
+      description: gate.description ?? gate.requirement ?? "",
+    })),
+    complexity: buildComplexityProfileFromRecord(record),
     sources: (record.sources ?? []).slice(0, 12).map((source) => ({
       title: source.title,
       url: source.url,
@@ -119,11 +131,6 @@ async function persistCompletedResearch(store: DataStore, result: {
 }, runId: string): Promise<void> {
   if (!isPostgresStore(store)) return;
   const prisma = store.getPrisma();
-  if (store.getRow(result.slug) && store.getRecord(result.slug)) {
-    await completeResearchClaim(result.slug, prisma);
-    await completeResearchClaimByRunId(runId, prisma);
-    return;
-  }
   const row = selectedPathRow(result.record);
   const audit = buildNhjAuditFromRecord(result.record);
   await persistResearchDraft(result.record, row, { prisma, audit });
@@ -134,8 +141,8 @@ async function persistCompletedResearch(store: DataStore, result: {
 }
 
 /**
- * Start research for a platform that is not in the Atlas. Validates and
- * rate-limits, short-circuits known platforms, then starts a durable Workflow
+ * Start or refresh research for a platform. Validates and rate-limits,
+ * short-circuits only public reviewed platforms, then starts a durable Workflow
  * run and returns 202 with a run id immediately. Concurrent developers who
  * request the same slug share one Workflow via ResearchClaim in Postgres.
  */
@@ -156,27 +163,12 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
       return;
     }
 
-    // Reuse an existing result before touching the Workflow. Public records use
-    // the reviewed journey endpoint; private research records return the same
-    // browser-safe draft that the completed run originally displayed.
+    // Reuse only public reviewed records before touching Workflow. A committed
+    // corpus row is not proof that the atomic journey has been reconstructed.
     const known = await ensureRow(store, input.slug);
-    if (known) {
-      if (store.isPublicEligible(input.slug)) {
-        sendData(res, { known: true, slug: input.slug }, { status: 200 });
-        return;
-      }
-      const existingDraft = store.getRecord(input.slug);
-      if (existingDraft) {
-        sendData(res, {
-          result: {
-            outcome: "draft_ready",
-            slug: input.slug,
-            draft: browserSafeDraft(existingDraft),
-            message: "Using the saved private research draft.",
-          },
-        }, { status: 200 });
-        return;
-      }
+    if (known && store.isPublicEligible(input.slug)) {
+      sendData(res, { known: true, slug: input.slug }, { status: 200 });
+      return;
     }
 
     if (isPostgresStore(store)) {
@@ -204,6 +196,18 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
             const loaded = await ensureRow(store, input.slug);
             if (loaded && store.isPublicEligible(input.slug)) {
               sendData(res, { known: true, slug: input.slug }, { status: 200 });
+              return;
+            }
+            const existingDraft = store.getRecord(input.slug);
+            if (existingDraft) {
+              sendData(res, {
+                result: {
+                  outcome: "draft_ready",
+                  slug: input.slug,
+                  draft: browserSafeDraft(existingDraft),
+                  message: "Using the saved private research draft.",
+                },
+              }, { status: 200 });
               return;
             }
           }

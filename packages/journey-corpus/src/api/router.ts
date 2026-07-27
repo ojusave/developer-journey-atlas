@@ -5,6 +5,7 @@ import { sendData } from "./http.js";
 import { getPlatform, listPlatforms } from "./platforms.js";
 import { getBlockerMeta, getPlatformEvidence, getPlatformJourney } from "./journey.js";
 import { getPlatformCurve } from "./curve.js";
+import { getPeerComparison } from "./peerComparison.js";
 import { searchPlatforms } from "./search.js";
 import { getResearchStatus, startResearch } from "./research.js";
 import { getVerifyStatus, startVerify } from "./verify.js";
@@ -27,11 +28,14 @@ export function createApiRouter(store: DataStore, runner: WorkflowRunner | null)
       publicRecords: meta.publicRecords ?? store.listRows().filter((row) => store.isPublicEligible(row.slug)).length,
       generatedAt: meta.generatedAt,
       audits: meta.audits,
-      comparisonAvailable: false,
+      comparisonAvailable: true,
+      comparisonRules:
+        "Peer comparison is withheld unless the subject and at least three compatible domain peers pass graph integrity, public eligibility, freshness, and cohort-key checks.",
     });
   });
   router.get("/blockers/meta", getBlockerMeta(store));
   router.get("/platforms", listPlatforms(store));
+  router.get("/platforms/:slug/peer-comparison", getPeerComparison(store));
   router.get("/platforms/:slug/journey", getPlatformJourney(store));
   router.get("/platforms/:slug/evidence", getPlatformEvidence(store));
   router.get("/platforms/:slug/curve", getPlatformCurve(store));

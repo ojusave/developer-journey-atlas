@@ -24,6 +24,12 @@ export interface MetricRow {
   comparability_status: string;
 }
 
+export type RouteStatus =
+  | "published"
+  | "known_needs_review"
+  | "private_draft"
+  | "unknown";
+
 /** Quality and comparability fields loaded from ds-quality.json. */
 export interface QualityRow {
   slug: string;
