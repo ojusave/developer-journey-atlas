@@ -425,21 +425,17 @@ function renderResearchOffer(name, slug = "", provider = null) {
   researchPending = false;
   showResultSurface();
   const known = provider?.routeStatus && provider.routeStatus !== "unknown";
-  const reasons = Array.isArray(provider?.reviewReasons) && provider.reviewReasons.length
-    ? `<ul class="review-list">${provider.reviewReasons.slice(0, 4).map((reason) => `<li>${esc(reason)}</li>`).join("")}</ul>`
-    : "";
   el.result.innerHTML = `
     <section class="research-card">
       ${backLink()}
-      <p class="state-label">${known ? "Needs review" : "No saved platform"}</p>
+      <p class="state-label">${known ? "Not mapped yet" : "New platform"}</p>
       <h1 id="result-title" tabindex="-1">${esc(name)}</h1>
       <p class="result-lede">${known
-        ? "This platform is in the corpus, but its atomic first-mile route is not publication-ready."
-        : "Research the official docs and build the first-mile path."}</p>
-      ${provider?.outcome ? `<p class="trust-note">Target outcome: ${esc(provider.outcome)}</p>` : ""}
-      ${reasons}
-      <p class="trust-note">Research starts from official docs and saves a private draft for review.</p>
-      <button class="btn btn-primary" id="research-btn" type="button">${known ? "Refresh research" : "Start research"}</button>
+        ? "We know this platform belongs in the atlas. The step-by-step first-mile path still needs to be built from official docs."
+        : "Build a first-mile path from official docs."}</p>
+      ${provider?.outcome ? `<p class="trust-note">First goal: ${esc(provider.outcome)}</p>` : ""}
+      <p class="trust-note">The draft will show the steps, fields, gates, and sources here.</p>
+      <button class="btn btn-primary" id="research-btn" type="button">${known ? "Build path from docs" : "Start research"}</button>
       <p class="status-line" id="research-status" role="status" aria-live="polite"></p>
     </section>
   `;

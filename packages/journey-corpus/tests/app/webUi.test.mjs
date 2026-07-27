@@ -153,10 +153,13 @@ test("search, consent, research, and draft display form one complete human flow"
     new window.Event("submit", { bubbles: true, cancelable: true }),
   );
   await waitFor(
-    () => window.document.querySelector("#research-btn")?.textContent === "Refresh research",
+    () => window.document.querySelector("#research-btn")?.textContent === "Build path from docs",
     "search did not show the explicit research action",
   );
-  assert.match(window.document.querySelector("#result").textContent, /missing_journey_graph/);
+  const offerText = window.document.querySelector("#result").textContent;
+  assert.match(offerText, /Not mapped yet/);
+  assert.match(offerText, /First goal: Receive the first model response/);
+  assert.doesNotMatch(offerText, /missing_journey_graph|source_content_unavailable|evidence_retrieval_date_missing/);
   assert.equal(
     requests.filter((request) => request.path === "/api/research").length,
     0,
@@ -277,7 +280,7 @@ test("a failed attempt can retry into a saved private draft", async () => {
     new window.Event("submit", { bubbles: true, cancelable: true }),
   );
   await waitFor(
-    () => window.document.querySelector("#research-btn")?.textContent === "Refresh research",
+    () => window.document.querySelector("#research-btn")?.textContent === "Build path from docs",
     "search did not show the research action",
   );
   window.document.querySelector("#research-btn").click();
