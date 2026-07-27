@@ -160,7 +160,7 @@ const html = await readFile(path.join(projectRoot, "web/index.html"), "utf8");
 assert.equal((html.match(/<h1\b/g) || []).length, 1);
 assert.match(html, /href="\/project-mark\.svg"/);
 assert.doesNotMatch(html, /render\.com\/favicon/);
-assert.match(html, /Independent project/);
+assert.doesNotMatch(html, /Independent project/);
 assert.match(html, /Search a platform\. See the first mile\./);
 assert.match(html, /steps, fields, gates, and official sources/);
 assert.match(html, /placeholder="OpenAI, Stripe, GitHub, Render\.\.\."/);
