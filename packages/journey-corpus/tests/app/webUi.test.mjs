@@ -13,6 +13,47 @@ async function waitFor(check, message) {
   assert.fail(message);
 }
 
+test("home screen shows multiple corpus platforms before typing", async () => {
+  const html = await readFile(new URL("index.html", webRoot), "utf8");
+  const app = await readFile(new URL("app.js", webRoot), "utf8");
+  const dom = new JSDOM(html, {
+    url: "https://atlas.test/",
+    runScripts: "outside-only",
+  });
+  const { window } = dom;
+  window.fetch = async (path) => {
+    if (path === "/api/platforms?include=all") {
+      return {
+        ok: true,
+        json: async () => ({
+          data: [
+            { name: "Render", slug: "render", routeStatus: "published" },
+            { name: "Stripe", slug: "stripe", routeStatus: "known_needs_review" },
+            { name: "OpenAI", slug: "openai", routeStatus: "known_needs_review" },
+            { name: "GitHub", slug: "github", routeStatus: "known_needs_review" },
+          ],
+          meta: { count: 4 },
+        }),
+      };
+    }
+    throw new Error(`Unexpected request: GET ${path}`);
+  };
+
+  window.eval(app);
+  await waitFor(
+    () => window.document.querySelector("#search-status")?.textContent.includes("4 platforms loaded"),
+    "corpus count was not shown",
+  );
+
+  const visibleChoices = window.document.querySelector("#search-results")?.textContent ?? "";
+  assert.match(visibleChoices, /Stripe/);
+  assert.match(visibleChoices, /OpenAI/);
+  assert.match(visibleChoices, /GitHub/);
+  assert.match(visibleChoices, /Render/);
+  assert.equal(window.document.querySelector("#search-results")?.hidden, false);
+  dom.window.close();
+});
+
 test("search, consent, research, and draft display form one complete human flow", async () => {
   const html = await readFile(new URL("index.html", webRoot), "utf8");
   const app = await readFile(new URL("app.js", webRoot), "utf8");
@@ -100,9 +141,11 @@ test("search, consent, research, and draft display form one complete human flow"
 
   window.eval(app);
   await waitFor(
-    () => window.document.querySelector("#search-status")?.textContent.includes("Try OpenAI"),
+    () => window.document.querySelector("#search-status")?.textContent.includes("platforms loaded"),
     "provider search did not become ready",
   );
+  assert.equal(window.document.querySelector("#search-results")?.hidden, false);
+  assert.match(window.document.querySelector("#search-results")?.textContent ?? "", /Mistral/);
 
   const input = window.document.querySelector("#search");
   input.value = "Mistral";
@@ -225,7 +268,7 @@ test("a failed attempt can retry into a saved private draft", async () => {
 
   window.eval(app);
   await waitFor(
-    () => window.document.querySelector("#search-status")?.textContent.includes("Try OpenAI"),
+    () => window.document.querySelector("#search-status")?.textContent.includes("platforms loaded"),
     "provider search did not become ready",
   );
   const input = window.document.querySelector("#search");
