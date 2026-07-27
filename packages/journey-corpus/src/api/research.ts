@@ -116,6 +116,14 @@ function browserSafeResearchResult(result: unknown): unknown {
   }
 }
 
+function workflowStartFailureFields(err: unknown): string {
+  if (!err || typeof err !== "object") return "error=unknown";
+  const value = err as { name?: unknown; statusCode?: unknown };
+  const name = typeof value.name === "string" ? value.name : "unknown";
+  const statusCode = typeof value.statusCode === "number" ? value.statusCode : "unknown";
+  return `error=${name} statusCode=${statusCode}`;
+}
+
 function recentRunLocal(slug: string, now = Date.now()): string | null {
   const hit = recentRunsLocal.get(slug);
   if (hit && now - hit.at < DEDUPE_TTL_MS) return hit.runId;
@@ -248,9 +256,9 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
           await attachResearchRunId(input.slug, runId, prisma);
           res.status(202);
           sendData(res, { runId, phase: "queued", slug: input.slug });
-        } catch {
+        } catch (err) {
           await failResearchClaim(input.slug, prisma);
-          console.error("Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows");
+          console.error(`Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows ${workflowStartFailureFields(err)}`);
           sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
         }
         return;
@@ -274,8 +282,8 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
       recentRunsLocal.set(input.slug, { runId, at: Date.now() });
       res.status(202);
       sendData(res, { runId, phase: "queued", slug: input.slug });
-    } catch {
-      console.error("Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows");
+    } catch (err) {
+      console.error(`Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows ${workflowStartFailureFields(err)}`);
       sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
     }
   };

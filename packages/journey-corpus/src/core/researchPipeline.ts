@@ -164,20 +164,20 @@ export async function runResearchPipeline(
   if (docs.length === 0) {
     return { outcome: "no_official_source" };
   }
-  const unusable = docs.filter((doc) => {
+  const usableDocs = docs.filter((doc) => {
     const authority = validateSourceAuthority(doc.url, identity);
-    return !sourceCanSupportClaims(authority, doc.metadata);
+    return sourceCanSupportClaims(authority, doc.metadata);
   });
-  if (unusable.length > 0) {
+  if (usableDocs.length === 0) {
     return {
       outcome: "official_source_unusable",
-      message: `${unusable.length} official source page${unusable.length === 1 ? "" : "s"} lacked usable retrieved content.`,
+      message: `${docs.length} official source page${docs.length === 1 ? "" : "s"} lacked usable retrieved content.`,
     };
   }
 
   let reconstruct;
   try {
-    reconstruct = await steps.reconstructRecord({ platform, docs });
+    reconstruct = await steps.reconstructRecord({ platform, docs: usableDocs });
   } catch {
     return { outcome: "model_failed", message: "Route reconstruction failed." };
   }
@@ -192,7 +192,7 @@ export async function runResearchPipeline(
   // so a useful draft is not hidden from the developer awaiting review.
   const groundingError = validateSourceGrounding(
     record,
-    docs,
+    usableDocs,
     { requireLiteralLocators: false },
   );
   if (groundingError) {
