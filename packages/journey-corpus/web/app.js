@@ -285,7 +285,17 @@ function sourceLinks(sources) {
   return `<ul class="source-list">${links}</ul>`;
 }
 
-function renderJourney(journey) {
+/** Banner shown above a saved route that has not passed maintainer review. */
+function draftNotice() {
+  return `
+    <div class="draft-notice" role="note">
+      <p>This route was built from official documentation by an automated research run. A maintainer has not reviewed it, and it is not part of the published corpus.</p>
+    </div>
+  `;
+}
+
+function renderJourney(journey, review = {}) {
+  const isDraft = review.reviewStatus === "unreviewed_draft";
   const startUrl = safeHttpUrl(journey.startingUrl);
   const firstSuccess = journey.routeScope?.firstSuccess || journey.outcome || "First successful API response";
   const selectedPath = journey.routeScope?.selectedPath || "Follow the documented setup route below.";
@@ -293,11 +303,12 @@ function renderJourney(journey) {
     ? `<ul>${journey.prerequisites.map((item) => `<li>${esc(item.requirement)}</li>`).join("")}</ul>`
     : "<p>None documented.</p>";
   return `
-    <article class="journey" data-platform-slug="${esc(journey.slug)}">
+    <article class="journey${isDraft ? " draft" : ""}" data-platform-slug="${esc(journey.slug)}">
       ${backLink()}
-      <p class="state-label">Reviewed guide</p>
+      <p class="state-label">${isDraft ? "Research draft" : "Reviewed guide"}</p>
       <h1 id="result-title" tabindex="-1">${esc(journey.name)}</h1>
       <p class="result-lede">${esc(firstSuccess)}</p>
+      ${isDraft ? draftNotice() : ""}
       ${startUrl ? `<a class="btn btn-primary start-link" href="${esc(startUrl)}" target="_blank" rel="noopener noreferrer">Open official guide</a>` : ""}
 
       ${renderComplexity(journey.complexity)}
@@ -331,7 +342,7 @@ async function loadOfficialEvidence(slug) {
   if (!mount) return;
   mount.innerHTML = "<p>Loading sources…</p>";
   try {
-    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/evidence`);
+    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/evidence?include=all`);
     mount.innerHTML = sourceLinks(data.sources);
   } catch {
     mount.innerHTML = "<p>Sources could not be loaded.</p>";
@@ -395,8 +406,10 @@ async function showPlatform(slug, { push = true, focus = true } = {}) {
   if (push) pushPlatformRoute(slug);
   el.result.innerHTML = '<div class="compact-state" role="status">Loading guide…</div>';
   try {
-    const { data } = await api(`/api/platforms/${encodeURIComponent(slug)}/journey`);
-    el.result.innerHTML = renderJourney(data);
+    // include=all so a durable research draft resolves too; the response tells
+    // us whether it is published or still awaiting review.
+    const { data, meta } = await api(`/api/platforms/${encodeURIComponent(slug)}/journey?include=all`);
+    el.result.innerHTML = renderJourney(data, meta ?? {});
     wireJourney(data);
     setMeta(
       `${data.name} API setup | Developer Journey Atlas`,

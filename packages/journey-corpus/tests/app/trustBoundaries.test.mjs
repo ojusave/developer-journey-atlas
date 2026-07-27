@@ -424,3 +424,47 @@ test("verification status requires the same server-side administrative secret", 
     config.verifyAdminSecret = original;
   }
 });
+
+test("route reads stay fail-closed and only a reconstructed draft resolves under include=all", async () => {
+  const store = new LocalDataStore(projectRoot);
+
+  // A corpus record awaiting review has no reconstructed route, so neither the
+  // default read nor the opt-in exposes one.
+  for (const query of [{}, { include: "all" }]) {
+    const res = fakeRes();
+    await getPlatformJourney(store)(fakeReq({ params: { slug: "stripe" }, query }), res);
+    assert.equal(res.statusCode, 404);
+  }
+
+  const published = fakeRes();
+  await getPlatformJourney(store)(fakeReq({ params: { slug: "render" } }), published);
+  assert.equal(published.statusCode, 200);
+  assert.equal(published.body.meta.reviewStatus, "published");
+});
+
+test("a reconstructed draft resolves only under include=all and is labelled without gate codes", async () => {
+  const row = { slug: "acme", name: "Acme", category: "Testing", outcome: "First call succeeds" };
+  const draftStore = {
+    getRow: (slug) => (slug === "acme" ? row : undefined),
+    isPublicEligible: () => false,
+    publicEligibilityReasons: () => ["missing_corpus_health_record"],
+    getJourneyGraph: () => ({ platformSlug: "acme" }),
+    getJourney: () => ({ slug: "acme", name: "Acme", steps: [] }),
+  };
+
+  const closed = fakeRes();
+  await getPlatformJourney(draftStore)(fakeReq({ params: { slug: "acme" } }), closed);
+  assert.equal(closed.statusCode, 404);
+
+  const opened = fakeRes();
+  await getPlatformJourney(draftStore)(
+    fakeReq({ params: { slug: "acme" }, query: { include: "all" } }),
+    opened,
+  );
+  assert.equal(opened.statusCode, 200);
+  assert.equal(opened.body.meta.reviewStatus, "unreviewed_draft");
+  assert.doesNotMatch(
+    JSON.stringify(opened.body),
+    /source_content_unavailable|missing_journey_graph|missing_corpus_health_record/,
+  );
+});

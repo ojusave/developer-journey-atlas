@@ -18,15 +18,16 @@ Developer Journey Atlas is an independent community project, not an official Ren
 
 Known platforms use durable routes such as `/platform/render`. The server renders platform-specific title, description, canonical URL, and Open Graph metadata before the browser loads JavaScript.
 
-Searching for an unknown platform does not start research. The user must read the provider disclosure and explicitly activate the research action. Render Workflows, You.com, and OpenRouter may process the platform name. A completed result remains private until maintainer review passes every publication gate.
+Searching for an unknown platform does not start research. The user must read the provider disclosure and explicitly activate the research action. Render Workflows, You.com, and OpenRouter may process the platform name. A completed result is saved and stays reachable at its durable route, labelled as an unreviewed research draft: it is excluded from the published corpus, the platform list, the data manifest, and the LLM guide until maintainer review passes every publication gate.
 
-The public API is fail-closed:
+The public API is fail-closed. Route reads return published routes only; `include=all` opts into unreviewed drafts, and the response reports `reviewStatus`:
 
 ```http
 GET /api/meta
 GET /api/platforms
 GET /api/platforms/render/journey
 GET /api/platforms/render/evidence
+GET /api/platforms/{slug}/journey?include=all
 GET /api/search?q=render
 GET /healthz
 ```

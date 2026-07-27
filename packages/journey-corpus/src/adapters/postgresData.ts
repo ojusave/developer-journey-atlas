@@ -303,6 +303,10 @@ export class PostgresDataStore implements DataStore {
     this.bySlug.set(slug, row);
     this.records.set(slug, record);
     this.audits.set(slug, audit);
+    // A draft carries its own reconstructed graph. Registering it powers the
+    // route and evidence views; publication still depends on the gate, which
+    // reads committed trust artifacts and is untouched here.
+    if (record.journey_graph) this.journeyGraphs.set(slug, record.journey_graph);
     this.metaValue = {
       ...this.metaValue,
       count: this.rows.length,
