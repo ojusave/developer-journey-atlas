@@ -30,8 +30,6 @@ const RESEARCH_GLOBAL_LIMIT = Math.max(
   Number(process.env.RESEARCH_GLOBAL_HOURLY_LIMIT ?? 300),
 );
 
-// Local-only fallback when DATA_STORE=local (no ResearchClaim table usage).
-const DEDUPE_TTL_MS = 10 * 60 * 1_000;
 // Local mode keeps uncertain submissions only in this process. Production uses
 // the durable ResearchClaim row so a server restart does not lose this identity.
 const recentRunsLocal = new Map<string, { runId: string; at: number; key: string; input: ResearchTaskInput }>();
@@ -129,12 +127,18 @@ function workflowStartFailureFields(err: unknown): string {
   return `error=${name} statusCode=${statusCode}`;
 }
 
-function recentSubmissionLocal(slug: string, now = Date.now()) {
-  const hit = recentRunsLocal.get(slug);
-  // Keep unknown outcomes until they are resolved, even after the normal UI cache expires.
-  if (hit && (!hit.runId || now - hit.at < DEDUPE_TTL_MS)) return hit;
-  if (hit) recentRunsLocal.delete(slug);
-  return null;
+// An elapsed timer does not prove a task has stopped. Keep both accepted and
+// uncertain attempts until polling confirms that the specific run has finished.
+function recentSubmissionLocal(slug: string) {
+  return recentRunsLocal.get(slug) ?? null;
+}
+
+// Match by run ID, not just platform, so an old status response cannot erase a
+// newer attempt. Unknown submissions have no run ID and remain blocked for review.
+function finishSubmissionLocal(runId: string) {
+  for (const [slug, submission] of recentRunsLocal) {
+    if (submission.runId === runId) recentRunsLocal.delete(slug);
+  }
 }
 
 async function persistCompletedResearch(store: DataStore, result: {
@@ -327,6 +331,9 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
     }
     try {
       const projection = await runner.status(runId);
+      // The adapter reports both Render failure and cancellation as "failed".
+      // Only a confirmed terminal result releases local research for a new attempt.
+      const terminal = projection.phase === "completed" || projection.phase === "failed";
       if (
         projection.phase === "completed" &&
         projection.result &&
@@ -341,6 +348,9 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
           sendError(res, 502, "persistence_failed", "Research finished, but the private review record could not be stored.");
           return;
         }
+        // Keep the accepted identity if saving the result fails, so a retry can
+        // recover that result instead of starting the paid task again.
+        if (!isPostgresStore(store)) finishSubmissionLocal(runId);
         sendData(res, {
           ...projection,
           result: {
@@ -353,10 +363,12 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
         return;
       }
       const safeResult = browserSafeResearchResult(projection.result);
-      if (projection.phase === "completed" && isPostgresStore(store)) {
+      if (terminal && isPostgresStore(store)) {
         try {
+          // Save native failure/cancellation by run ID as well as task outcomes.
+          // This releases only the matching claim and leaves newer attempts alone.
           if (
-            safeResult
+            projection.phase === "completed" && safeResult
             && typeof safeResult === "object"
             && "outcome" in safeResult
             && (safeResult.outcome === "known" || safeResult.outcome === "review_required")
@@ -369,6 +381,9 @@ export function getResearchStatus(store: DataStore, runner: WorkflowRunner | nul
           console.error("Research diagnostic: stage=claim-terminal outcome=store_error provider=postgres");
         }
       }
+      // Other terminal outcomes need no draft persistence. Release only their
+      // matching local run; a late old response cannot erase its replacement.
+      if (terminal && !isPostgresStore(store)) finishSubmissionLocal(runId);
       sendData(res, {
         ...projection,
         result: safeResult,

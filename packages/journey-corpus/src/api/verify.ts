@@ -100,6 +100,9 @@ export function startVerify(store: DataStore, runner: WorkflowRunner | null) {
     try {
       const { runId } = await runner.startNamedTask(verifyTaskSlug(), { slug, checkOnly }, submission.key);
       submission.runId = runId;
+      // Count the reuse window from confirmation, even when the first reply was
+      // lost long ago. The original timestamp still bounds unknown submissions.
+      submission.at = Date.now();
       res.status(202);
       sendData(res, { runId, phase: "queued", slug, checkOnly });
     } catch {
