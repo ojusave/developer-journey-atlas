@@ -161,20 +161,33 @@ const classifyPath = (repository, path) => {
   return "application source";
 };
 
-const approval = (basis, evidence) => ({
+// Save why an intentional change was reviewed and when. Older migration records
+// keep their original review date unless a later repair supplies its own date.
+const approval = (basis, evidence, reviewedOn = "2026-07-21") => ({
   approved: true,
   approval: {
     status: "approved",
     authorizedBy: "Ojus Save",
     reviewedBy: "Automated migration verification",
-    reviewedOn: "2026-07-21",
+    reviewedOn,
     basis,
     evidence,
   },
 });
 
 const mappings = [];
+// These application files intentionally changed in the reviewed submission repair.
+// A Git blob is the saved contents of one file. The verifier checks a fingerprint
+// of each reviewed replacement so later changes still need their own review.
+const reviewedWorkflowSubmissionPaths = new Set([
+  "server/dispatcher.ts",
+  "server/service.ts",
+  "workflows/package-lock.json",
+  "workflows/package.json",
+  "workflows/src/index.ts",
+]);
 const reviewedPostMigrationPaths = new Set([
+  ...reviewedWorkflowSubmissionPaths,
   "render.yaml",
   "src/domain/evidence-validation.test.ts",
   "src/domain/evidence-validation.ts",
@@ -215,7 +228,9 @@ for (const { path, blob } of scannerEntries) {
       : transformation === "moved"
       ? "Place the canonical blocker taxonomy behind an explicit package boundary."
       : transformation === "post_migration_change"
-        ? path === "render.yaml"
+        ? reviewedWorkflowSubmissionPaths.has(path)
+          ? "Updated after migration to recover Workflow submissions and use the compatible SDK 1.2 task signature."
+          : path === "render.yaml"
           ? "Replaced after the verified migration with the canonical Developer Journey Atlas deployment."
           : "Extended after the verified migration to enforce the diagnosis evidence contract."
       : transformation === "schema_wrapped"
@@ -234,12 +249,15 @@ for (const { path, blob } of scannerEntries) {
       licenseMetadataChange
         ? "The original Git blob remains recorded and the scoped lockfile metadata diff was reviewed."
         : transformation === "post_migration_change"
-        ? "The original Git blob remains recorded. The diagnosis evidence contract diff is reviewed through focused tests, type checks, build checks, and Atlas integrity verification."
+        ? reviewedWorkflowSubmissionPaths.has(path)
+          ? "The original Git blob remains recorded; reviewed replacement blobs are pinned in verify-atlas.mjs. Lost-reply, intentional-retry, SDK wire and task-registration checks verify the repair."
+          : "The original Git blob remains recorded. The diagnosis evidence contract diff is reviewed through focused tests, type checks, build checks, and Atlas integrity verification."
         : transformation === "unchanged"
         ? "The current Git blob must equal the recorded scanner source blob."
         : transformation === "moved"
           ? "The taxonomy SHA-256, IDs, counts, and runtime catalog derivation are verified."
           : "The scoped diff was reviewed and the scanner tests, type checks, build, browser flow, and integrity suite passed.",
+      reviewedWorkflowSubmissionPaths.has(path) ? "2026-10-13" : "2026-07-21",
     ),
   });
 }

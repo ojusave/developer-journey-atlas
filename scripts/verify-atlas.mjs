@@ -429,12 +429,12 @@ if (
     approvalBasisCounts.byte_identical_history_import === 284 &&
     approvalBasisCounts.reviewed_license_metadata_change === 4 &&
     approvalBasisCounts.reviewed_non_data_omission === 1 &&
-    approvalBasisCounts.unchanged_blob_verified === 77 &&
+    approvalBasisCounts.unchanged_blob_verified === 72 &&
     (approvalBasisCounts.path_only_hash_verified ?? 0) === 0 &&
     approvalBasisCounts.reviewed_compatibility_change === 6 &&
-    approvalBasisCounts.reviewed_post_migration_change === 3
+    approvalBasisCounts.reviewed_post_migration_change === 8
   ) {
-  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 77 unchanged, 6 compatibility, and 3 post-migration mappings approved by evidence class");
+  pass("migration-approval", "284 byte-identical imports, 4 license metadata changes, 1 non-data tooling omission, 72 unchanged, 6 compatibility, and 8 post-migration mappings approved by evidence class");
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
@@ -449,10 +449,31 @@ for (const entry of migrationMap.mappings.filter(({ approval, newPath }) =>
   if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
 }
 if (unchangedScannerMismatches === 0) {
-  pass("scanner-preservation", "76 unchanged scanner files retain their original Git blobs; 3 post-migration changes are separately reviewed");
+  pass("scanner-preservation", "71 unchanged scanner files retain their original Git blobs; 8 post-migration changes are separately reviewed");
 } else {
   fail("scanner-preservation", `${unchangedScannerMismatches} unchanged scanner files differ from their source blobs`);
 }
+// These replacements are reviewed application changes, not new canonical research.
+// Each Git blob value is a fingerprint of the complete reviewed file contents.
+// Compare each current file with that fingerprint and report every mismatch,
+// so a later accidental edit still fails the integrity check.
+const reviewedWorkflowSubmissionBlobs = {
+  "server/dispatcher.ts": "13d3b865074cb583c04d3b32123a619578469721",
+  "server/service.ts": "b312c617c0ac31d847aa3bc434f038eefd96c3f3",
+  "workflows/package-lock.json": "76c38f27c20935e89ff882b979aada7da7c379a4",
+  "workflows/package.json": "180052103e3c4c0f1580dc2cb936b1aa50749e66",
+  "workflows/src/index.ts": "7b5583470f328a294eae92f6b1dd8278b5c670b0",
+};
+const workflowSubmissionMismatches = [];
+for (const [path, reviewedBlob] of Object.entries(reviewedWorkflowSubmissionBlobs)) {
+  if (gitBlobHash(await readFile(resolve(root, path))) !== reviewedBlob) workflowSubmissionMismatches.push(path);
+}
+if (workflowSubmissionMismatches.length === 0) {
+  pass("workflow-submission-preservation", "5 reviewed Workflow submission files retain their verified replacement blobs");
+} else {
+  fail("workflow-submission-preservation", workflowSubmissionMismatches.join(", "));
+}
+
 const allowedClassifications = new Set([
   "canonical source data",
   "application source",

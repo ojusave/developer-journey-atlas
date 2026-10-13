@@ -18,7 +18,8 @@ test("registered diagnostic task forwards its input after the SDK context", asyn
   const input = {
     turnId: "019f71fe-d47c-7963-8b86-b59ee39c1ae2",
     sessionRevision: 4,
-    idempotencyKey: "119f71fe-d47c-4963-8b86-b59ee39c1ae2",
+    // A fixed, visibly artificial request ID is enough for this local test.
+    idempotencyKey: "00000000-0000-4000-8000-000000000001",
   };
   t.mock.method(globalThis, "fetch", async (_url: unknown, init: RequestInit) => {
     assert.deepEqual(JSON.parse(String(init.body)), input);
