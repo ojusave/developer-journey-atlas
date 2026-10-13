@@ -1,3 +1,5 @@
+// Hash the task and saved attempt identity into a short, non-secret API key.
+import { createHash } from "node:crypto";
 import { createWorkflowsClient } from "@renderinc/sdk/workflows";
 import type {
   ResearchOutcome, ResearchTaskInput, RunPhase, RunStatusProjection, WorkflowRunner,
@@ -111,13 +113,18 @@ export class RenderWorkflowRunner implements WorkflowRunner {
     this.client = createWorkflowsClient({ token: apiKey });
   }
 
-  async start(input: ResearchTaskInput): Promise<{ runId: string }> {
-    const run = await this.client.startTask(this.taskSlug, [input]);
-    return { runId: run.taskRunId };
+  async start(input: ResearchTaskInput, submissionKey: string): Promise<{ runId: string }> {
+    return this.startNamedTask(this.taskSlug, input, submissionKey);
   }
 
-  async startNamedTask(taskSlug: string, input: unknown): Promise<{ runId: string }> {
-    const run = await this.client.startTask(taskSlug, [input]);
+  async startNamedTask(taskSlug: string, input: unknown, submissionKey: string): Promise<{ runId: string }> {
+    // The caller also retains the original input. Render ignores new input when
+    // the same key is reused within 24 hours and one workflow version.
+    if (!submissionKey) throw new Error("A saved submission identity is required.");
+    const idempotencyKey = `atlas-research-${createHash("sha256")
+      .update(JSON.stringify([taskSlug, submissionKey]))
+      .digest("hex")}`;
+    const run = await this.client.startTask(taskSlug, [input], { idempotencyKey });
     return { runId: run.taskRunId };
   }
 

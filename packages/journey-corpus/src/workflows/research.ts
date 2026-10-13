@@ -1,4 +1,4 @@
-import { task } from "@renderinc/sdk/workflows";
+import { task, type TaskContext } from "@renderinc/sdk/workflows";
 
 import type { DocHit, PlatformRecord } from "../core/ports.js";
 import type { PlatformIdentity } from "../core/sourceAuthority.js";
@@ -38,7 +38,8 @@ export const searchOfficialDocs = task(
     timeoutSeconds: 90,
     retry: { maxRetries: 2, waitDurationMs: 2_000, backoffScaling: 2 },
   },
-  async function searchOfficialDocs(input: { platform: string; identity: PlatformIdentity }): Promise<DocHit[]> {
+  // Render supplies the execution context before the task input.
+  async function searchOfficialDocs(_ctx, input: { platform: string; identity: PlatformIdentity }): Promise<DocHit[]> {
     return getSearchProvider().findOfficialDocs(input.platform, input.identity);
   },
 );
@@ -56,7 +57,8 @@ export const reconstructRecord = task(
     timeoutSeconds: 300,
     retry: { maxRetries: 1, waitDurationMs: 5_000, backoffScaling: 2 },
   },
-  async function reconstructRecord(input: { platform: string; docs: DocHit[] }): Promise<ReconstructResult> {
+  // Render supplies the execution context before the task input.
+  async function reconstructRecord(_ctx, input: { platform: string; docs: DocHit[] }): Promise<ReconstructResult> {
     return reconstructWithClassification(getLLMProvider(), input.platform, input.docs);
   },
 );
@@ -74,21 +76,26 @@ export const draftContribution = task(
     timeoutSeconds: 120,
     retry: { maxRetries: 2, waitDurationMs: 3_000, backoffScaling: 2 },
   },
-  async function draftContribution(input: { record: PlatformRecord }): Promise<ContributionResult> {
+  // Render supplies the execution context before the task input.
+  async function draftContribution(_ctx, input: { record: PlatformRecord }): Promise<ContributionResult> {
     return draftWithClassification(getRepoWriter(), input.record);
   },
 );
 
-const steps: ResearchSteps = {
-  searchDocs: async (input) => searchOfficialDocs(input),
-  reconstructRecord: async (input) => reconstructRecord(input),
-  // GitHub draft PRs are not used for live research; keep a no-op so the
-  // ResearchSteps contract stays stable for tests and older callers.
-  draftContribution: async () => ({
-    status: "skipped",
-    reason: "Draft shown in the Atlas; no GitHub contribution step.",
-  }),
-};
+// Child tasks run through the current execution context, which lets Render keep
+// their retry and result tracking separate from the parent orchestration.
+function researchSteps(ctx: TaskContext): ResearchSteps {
+  return {
+    searchDocs: async (input) => ctx.run(searchOfficialDocs, input),
+    reconstructRecord: async (input) => ctx.run(reconstructRecord, input),
+    // GitHub draft PRs are not used for live research; keep a no-op so the
+    // ResearchSteps contract stays stable for tests and older callers.
+    draftContribution: async () => ({
+      status: "skipped",
+      reason: "Draft shown in the Atlas; no GitHub contribution step.",
+    }),
+  };
+}
 
 /**
  * Parent orchestration and stable public entry point. Validates the input,
@@ -103,9 +110,9 @@ export const researchPlatform = task(
     plan: "starter",
     timeoutSeconds: 600,
   },
-  async function researchPlatform(rawInput: unknown): Promise<ResearchOutcome> {
+  async function researchPlatform(ctx, rawInput: unknown): Promise<ResearchOutcome> {
     const input = parseResearchTaskInput(rawInput);
-    return runResearchPipeline(input, steps, {
+    return runResearchPipeline(input, researchSteps(ctx), {
       store: getStore(),
       buildRow,
       identities: getPlatformIdentities(),

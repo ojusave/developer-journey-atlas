@@ -89,8 +89,9 @@ export interface RunStatusProjection {
  * server-side Render API key; the browser never sees it.
  */
 export interface WorkflowRunner {
-  start(input: ResearchTaskInput): Promise<{ runId: string }>;
+  // The caller saves this attempt identity before sending, then reuses it if the reply is lost.
+  start(input: ResearchTaskInput, submissionKey: string): Promise<{ runId: string }>;
   /** Start an arbitrary registered task by slug (e.g. verifyPlatformAudit). */
-  startNamedTask(taskSlug: string, input: unknown): Promise<{ runId: string }>;
+  startNamedTask(taskSlug: string, input: unknown, submissionKey: string): Promise<{ runId: string }>;
   status(runId: string): Promise<RunStatusProjection>;
 }

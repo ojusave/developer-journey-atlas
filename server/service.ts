@@ -173,7 +173,11 @@ export class DiagnosticService {
       idempotencyKey: accepted.turn.idempotencyKey,
     };
     try {
-      const dispatched = await this.dispatcher.dispatch(workflowInput);
+      // Keep the last accepted run available across repeated submission failures.
+      // The dispatcher checks whether it can reattach or needs a fresh attempt.
+      const dispatched = await this.dispatcher.dispatch(workflowInput, {
+        workflowRunId: accepted.turn.workflowRunId,
+      });
       const session = await this.store.getSession(sessionId, sessionToken);
       const turn = await this.store.getTurn(sessionId, sessionToken, turnId);
       if (!session || !turn) throw new AppError(500, "turn_state_missing", "The retried turn could not be read");

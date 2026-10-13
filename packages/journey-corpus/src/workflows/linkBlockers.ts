@@ -23,7 +23,8 @@ export const linkPlatformBlockersTask = task(
     timeoutSeconds: 600,
     retry: { maxRetries: 1, waitDurationMs: 5_000, backoffScaling: 2 },
   },
-  async function linkPlatformBlockersHandler(rawInput: unknown): Promise<LinkPlatformResult> {
+  // SDK 1.2 passes context before the input, even for tasks without children.
+  async function linkPlatformBlockersHandler(_ctx, rawInput: unknown): Promise<LinkPlatformResult> {
     if (process.env.BLOCKER_LINKING_ENABLED === "false") {
       throw new Error("BLOCKER_LINKING_ENABLED=false");
     }

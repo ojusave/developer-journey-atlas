@@ -4,7 +4,7 @@ import { sendData, sendError } from "./http.js";
 import type { DataStore } from "../core/ports.js";
 import type { WorkflowRunner } from "../workflows/contract.js";
 import { ensureRow } from "./storeHelpers.js";
-import { timingSafeEqual } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import { config } from "../config.js";
 
 const VERIFY_WINDOW_MS = 60 * 60 * 1_000;
@@ -13,7 +13,7 @@ const VERIFY_LIMIT = Math.max(1, Number(process.env.VERIFY_HOURLY_LIMIT ?? 30));
 // Postgres ResearchClaim for cross-instance dedupe.
 const attemptsByIp = new Map<string, number[]>();
 const DEDUPE_TTL_MS = 15 * 60 * 1_000;
-const recentRuns = new Map<string, { runId: string; at: number }>();
+const recentRuns = new Map<string, { runId: string; at: number; key: string }>();
 
 function verifyTaskSlug(): string {
   return process.env.RENDER_VERIFY_TASK_SLUG
@@ -78,7 +78,7 @@ export function startVerify(store: DataStore, runner: WorkflowRunner | null) {
     const checkOnly = Boolean(req.body?.checkOnly);
     const dedupeKey = `${slug}:${checkOnly ? "check" : "full"}`;
     const prior = recentRuns.get(dedupeKey);
-    if (prior && Date.now() - prior.at < DEDUPE_TTL_MS) {
+    if (prior?.runId && Date.now() - prior.at < DEDUPE_TTL_MS) {
       res.status(202);
       sendData(res, { runId: prior.runId, phase: "running", slug, deduplicated: true });
       return;
@@ -89,14 +89,25 @@ export function startVerify(store: DataStore, runner: WorkflowRunner | null) {
       return;
     }
 
+    // Preserve an uncertain submission across browser retries in this process.
+    // A normal later verification gets a new key after the existing cache expires.
+    const submission = prior && !prior.runId ? prior : { runId: "", at: Date.now(), key: randomUUID() };
+    if (Date.now() - submission.at >= 24 * 60 * 60_000) {
+      sendError(res, 409, "submission_unknown", "The earlier verification needs operator review before another attempt.");
+      return;
+    }
+    recentRuns.set(dedupeKey, submission);
     try {
-      const { runId } = await runner.startNamedTask(verifyTaskSlug(), { slug, checkOnly });
-      recentRuns.set(dedupeKey, { runId, at: Date.now() });
+      const { runId } = await runner.startNamedTask(verifyTaskSlug(), { slug, checkOnly }, submission.key);
+      submission.runId = runId;
+      // Count the reuse window from confirmation, even when the first reply was
+      // lost long ago. The original timestamp still bounds unknown submissions.
+      submission.at = Date.now();
       res.status(202);
       sendData(res, { runId, phase: "queued", slug, checkOnly });
     } catch {
       console.error("Verification diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows");
-      sendError(res, 502, "start_failed", "Could not start verification right now.");
+      sendError(res, 502, "start_failed", "The submission was not confirmed. Retry to recover the same verification task.");
     }
   };
 }

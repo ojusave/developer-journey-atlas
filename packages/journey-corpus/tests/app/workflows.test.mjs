@@ -478,3 +478,25 @@ test("status rejects malformed run ids", async () => {
   await getResearchStatus(storeWithPeer(), new FakeWorkflowRunner())(fakeReq({ params: { runId: "bad id!!" } }), res);
   assert.equal(res.statusCode, 400);
 });
+
+// A browser retry after the network loses a task-start reply must reuse the
+// saved attempt and payload, even if the user enters a differently cased alias.
+test("local research preserves a submission identity after a lost start reply", async () => {
+  const starts = [];
+  const runner = {
+    async start(input, key) {
+      starts.push({ input, key });
+      if (starts.length === 1) throw new TypeError("Reply lost after acceptance");
+      return { runId: "recovered-local-run" };
+    },
+  };
+  const store = storeWithPeer();
+  const first = fakeRes();
+  await startResearch(store, runner)(fakeReq({ body: { platform: "Recovery Fixture Co" } }), first);
+  assert.equal(first.statusCode, 502);
+  const retry = fakeRes();
+  await startResearch(store, runner)(fakeReq({ body: { platform: "RECOVERY FIXTURE CO" } }), retry);
+  assert.equal(retry.statusCode, 202);
+  assert.ok(starts[0].key);
+  assert.deepEqual(starts[1], starts[0]);
+});

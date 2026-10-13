@@ -1,5 +1,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 
+// When an uncertain claim is still stored beyond Render's key window, require
+// operator verification instead of treating that saved attempt as a safe retry.
+export class ResearchSubmissionExpired extends Error {
+  constructor() { super("The original research submission needs manual verification."); }
+}
+
 export type ResearchClaimStatus = "claiming" | "pending" | "completed" | "failed";
 
 export interface ResearchClaimRow {
@@ -48,6 +54,9 @@ export async function findActiveResearchClaim(
   if (!row) return null;
   const claim = asClaim(row);
   if (claim.status === "completed") return claim;
+  // A known run can still be alive after the local freshness window. Keep its
+  // identity until polling confirms a terminal outcome instead of starting over.
+  if (claim.status === "pending" && claim.runId) return claim;
   if (isFresh(claim, now)) return claim;
   return null;
 }
@@ -86,17 +95,27 @@ export async function beginResearchClaim(
     }
     // Stale row may block create: overwrite only claiming/failed/stale pending.
     const stale = await prisma.researchClaim.findUnique({ where: { slug: input.slug } });
+    if (stale?.status === "pending" && stale.runId) return { kind: "existing", claim: asClaim(stale) };
     if (stale && !isFresh(asClaim(stale), now) && stale.status !== "completed") {
-      const updated = await prisma.researchClaim.update({
-        where: { slug: input.slug },
+      // Without a run id the previous POST may have succeeded. Retain both
+      // the original input and start time, which identify that same submission.
+      // Only a confirmed terminal failure gets a new attempt identity.
+      const uncertain = !stale.runId;
+      if (uncertain && now - stale.startedAt.getTime() >= 24 * 60 * 60_000) {
+        throw new ResearchSubmissionExpired();
+      }
+      const updated = await prisma.researchClaim.updateMany({
+        // Compare the old identity so concurrent requests cannot each replace it.
+        where: { slug: input.slug, status: stale.status, startedAt: stale.startedAt, runId: stale.runId },
         data: {
-          platform: input.platform,
+          platform: uncertain ? stale.platform : input.platform,
           status: "claiming",
           runId: "",
-          startedAt: new Date(now),
+          startedAt: uncertain ? stale.startedAt : new Date(Math.max(now, stale.startedAt.getTime() + 1)),
         },
       });
-      return { kind: "acquired", claim: asClaim(updated) };
+      const current = await prisma.researchClaim.findUniqueOrThrow({ where: { slug: input.slug } });
+      return { kind: updated.count ? "acquired" : "existing", claim: asClaim(current) };
     }
     throw err;
   }
@@ -106,9 +125,11 @@ export async function attachResearchRunId(
   slug: string,
   runId: string,
   prisma: PrismaClient,
+  startedAt: Date,
 ): Promise<void> {
-  await prisma.researchClaim.update({
-    where: { slug },
+  // A late response cannot replace a newer attempt or reopen completed research.
+  await prisma.researchClaim.updateMany({
+    where: { slug, startedAt, runId: "", status: { in: ["claiming", "failed"] } },
     data: { runId, status: "pending" },
   });
 }
@@ -136,9 +157,11 @@ export async function completeResearchClaimByRunId(
 export async function failResearchClaim(
   slug: string,
   prisma: PrismaClient,
+  startedAt?: Date,
 ): Promise<void> {
   await prisma.researchClaim.updateMany({
-    where: { slug, status: { in: ["claiming", "pending"] } },
+    // A lost response must not erase a run id saved by a concurrent recovery.
+    where: { slug, runId: "", status: "claiming", ...(startedAt ? { startedAt } : {}) },
     data: { status: "failed" },
   });
 }
