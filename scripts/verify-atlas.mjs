@@ -438,18 +438,21 @@ if (
 } else {
   fail("migration-approval", JSON.stringify(approvalBasisCounts));
 }
-let unchangedScannerMismatches = 0;
-for (const entry of migrationMap.mappings.filter(({ approval, newPath }) =>
+// Keep the checked files in one list so the success count describes the files
+// actually compared below, even when reviewed migration mappings change.
+const unchangedScannerFiles = migrationMap.mappings.filter(({ approval, newPath }) =>
   approval?.basis === "unchanged_blob_verified" &&
   newPath &&
   !newPath.endsWith(".md") &&
   newPath !== ".gitignore",
-)) {
+);
+let unchangedScannerMismatches = 0;
+for (const entry of unchangedScannerFiles) {
   const current = await readFile(resolve(root, entry.newPath));
   if (gitBlobHash(current) !== entry.originalGitBlob) unchangedScannerMismatches += 1;
 }
 if (unchangedScannerMismatches === 0) {
-  pass("scanner-preservation", "71 unchanged scanner files retain their original Git blobs; 8 post-migration changes are separately reviewed");
+  pass("scanner-preservation", `${unchangedScannerFiles.length} unchanged scanner files retain their original Git blobs; ${approvalBasisCounts.reviewed_post_migration_change} post-migration changes are separately reviewed`);
 } else {
   fail("scanner-preservation", `${unchangedScannerMismatches} unchanged scanner files differ from their source blobs`);
 }
