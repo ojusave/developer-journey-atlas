@@ -57,6 +57,10 @@ The repository Blueprint selects a paid Starter web service and a paid Basic-256
 
 The Blueprint manages the public web service and Postgres read model. Workflow services for research and verification are configured separately. No workflow starts unless the required server-side credentials and task slug are present.
 
+If Render accepts a task but its reply is lost, a retry reuses the saved submission identity (an idempotency key). Diagnostic turns reconnect to an active run and create a new attempt only after Render confirms failure or cancellation. Postgres research claims retain their original input and start time until their submission is resolved. Local research and administrative verification keep this identity in memory only, so their protection does not survive a web-process restart.
+
+Render retains submission keys for 24 hours within one workflow version. This does not protect retries across workflow deployments or after the original saved identity expires under the existing claim-retention policy. A repeat uses the original task input; these keys do not make child tasks or external model calls execute exactly once. Keep the existing result and side-effect guards. The web and workflow packages use SDK 1.2.0, whose task handlers receive execution context before input and launch child tasks with `ctx.run(...)`.
+
 Relevant environment variables:
 
 | Variable | Purpose |

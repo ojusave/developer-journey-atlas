@@ -26,7 +26,8 @@ export const refreshAuditEvidence = task(
     timeoutSeconds: 90,
     retry: { maxRetries: 2, waitDurationMs: 2_000, backoffScaling: 2 },
   },
-  async function refreshAuditEvidence(input: { platform: string }): Promise<DocHit[]> {
+  // This worker receives Render context first, followed by its saved task input.
+  async function refreshAuditEvidence(_ctx, input: { platform: string }): Promise<DocHit[]> {
     const resolved = resolvePlatformIdentity(input.platform, getPlatformIdentities());
     if (resolved.outcome !== "resolved") return [];
     return getSearchProvider().findOfficialDocs(input.platform, resolved.identity);
@@ -40,7 +41,8 @@ export const proposeAuditRevision = task(
     timeoutSeconds: 300,
     retry: { maxRetries: 1, waitDurationMs: 5_000, backoffScaling: 2 },
   },
-  async function proposeAuditRevision(input: {
+  // This worker receives Render context first, followed by its saved task input.
+  async function proposeAuditRevision(_ctx, input: {
     slug: string;
     sourceSha256: string;
     docs: DocHit[];
@@ -77,7 +79,8 @@ export const draftAuditContribution = task(
     timeoutSeconds: 120,
     retry: { maxRetries: 2, waitDurationMs: 3_000, backoffScaling: 2 },
   },
-  async function draftAuditContribution(input: { audit: ShortestPathAudit }): Promise<
+  // This worker receives Render context first, followed by its saved task input.
+  async function draftAuditContribution(_ctx, input: { audit: ShortestPathAudit }): Promise<
     { status: "opened"; url: string; reused: boolean } | { status: "skipped"; reason: string }
   > {
     const writer = getRepoWriter();
@@ -105,7 +108,8 @@ export const verifyPlatformAudit = task(
     plan: "standard",
     timeoutSeconds: 900,
   },
-  async function verifyPlatformAudit(rawInput: unknown): Promise<VerifyOutcome> {
+  // Use the current context to dispatch child tasks with SDK 1.2.
+  async function verifyPlatformAudit(ctx, rawInput: unknown): Promise<VerifyOutcome> {
     const input = parseVerifyInput(rawInput);
     const store = getStore();
     const recordPath = path.join(config.dataRoot, "records", `${input.slug}.json`);
@@ -116,10 +120,10 @@ export const verifyPlatformAudit = task(
     return runVerifyAudit(
       input,
       {
-        searchDocs: async ({ platform }) => refreshAuditEvidence({ platform }),
+        searchDocs: async ({ platform }) => ctx.run(refreshAuditEvidence, { platform }),
         proposeAudit: async ({ slug, docs, sourceSha256: sha }) =>
-          proposeAuditRevision({ slug, sourceSha256: sha, docs }),
-        draftAuditContribution: async ({ audit }) => draftAuditContribution({ audit }),
+          ctx.run(proposeAuditRevision, { slug, sourceSha256: sha, docs }),
+        draftAuditContribution: async ({ audit }) => ctx.run(draftAuditContribution, { audit }),
       },
       {
         getRecord: (slug) => store.getRecord(slug),
@@ -140,7 +144,8 @@ export const verifyAuditBatch = task(
     plan: "standard",
     timeoutSeconds: 1800,
   },
-  async function verifyAuditBatch(rawInput: unknown): Promise<{
+  // Use the current context to dispatch child tasks with SDK 1.2.
+  async function verifyAuditBatch(ctx, rawInput: unknown): Promise<{
     total: number;
     outcomes: Array<{ slug: string; outcome: VerifyOutcome["outcome"]; auditStatus?: string }>;
   }> {
@@ -154,7 +159,7 @@ export const verifyAuditBatch = task(
     const checkOnly = Boolean((rawInput as { checkOnly?: unknown }).checkOnly);
     const settled = await Promise.all(
       slugs.map(async (slug) => {
-        const outcome = await verifyPlatformAudit({ slug, checkOnly });
+        const outcome = await ctx.run(verifyPlatformAudit, { slug, checkOnly });
         return {
           slug,
           outcome: outcome.outcome,

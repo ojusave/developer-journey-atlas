@@ -18,7 +18,8 @@ export const diagnosticTurn = task(
       backoffScaling: 2,
     },
   },
-  async function diagnosticTurn(input: DiagnosticTurnInput): Promise<DiagnosticTurnResult> {
+  // Render supplies execution context first; this task only needs the saved input.
+  async function diagnosticTurn(_ctx, input: DiagnosticTurnInput): Promise<DiagnosticTurnResult> {
     return executeDiagnosticTurn(input, runtimeFromEnvironment());
   },
 );

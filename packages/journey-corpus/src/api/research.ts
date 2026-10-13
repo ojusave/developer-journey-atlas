@@ -1,12 +1,15 @@
+// Give each new local attempt its own identity before contacting Render.
+import { randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
 import { researchAvailability } from "../config.js";
 import { sendData, sendError } from "./http.js";
 import type { DataStore } from "../core/ports.js";
-import type { WorkflowRunner } from "../workflows/contract.js";
+import type { ResearchTaskInput, WorkflowRunner } from "../workflows/contract.js";
 import { buildResearchInput, InvalidResearchInput } from "../workflows/input.js";
 import { buildNhjAuditFromRecord } from "../db/nhjAuditFromDraft.js";
 import { persistResearchDraft } from "../db/persistResearchDraft.js";
 import {
+  ResearchSubmissionExpired,
   attachResearchRunId,
   beginResearchClaim,
   cleanupResearchClaims,
@@ -29,7 +32,9 @@ const RESEARCH_GLOBAL_LIMIT = Math.max(
 
 // Local-only fallback when DATA_STORE=local (no ResearchClaim table usage).
 const DEDUPE_TTL_MS = 10 * 60 * 1_000;
-const recentRunsLocal = new Map<string, { runId: string; at: number }>();
+// Local mode keeps uncertain submissions only in this process. Production uses
+// the durable ResearchClaim row so a server restart does not lose this identity.
+const recentRunsLocal = new Map<string, { runId: string; at: number; key: string; input: ResearchTaskInput }>();
 
 function browserSafeDraft(record: PlatformRecord) {
   return {
@@ -124,9 +129,10 @@ function workflowStartFailureFields(err: unknown): string {
   return `error=${name} statusCode=${statusCode}`;
 }
 
-function recentRunLocal(slug: string, now = Date.now()): string | null {
+function recentSubmissionLocal(slug: string, now = Date.now()) {
   const hit = recentRunsLocal.get(slug);
-  if (hit && now - hit.at < DEDUPE_TTL_MS) return hit.runId;
+  // Keep unknown outcomes until they are resolved, even after the normal UI cache expires.
+  if (hit && (!hit.runId || now - hit.at < DEDUPE_TTL_MS)) return hit;
   if (hit) recentRunsLocal.delete(slug);
   return null;
 }
@@ -252,39 +258,53 @@ export function startResearch(store: DataStore, runner: WorkflowRunner | null) {
         }
 
         try {
-          const { runId } = await runner.start(input);
-          await attachResearchRunId(input.slug, runId, prisma);
+          // Recover with the saved input and timestamp, not a newly typed alias.
+          const savedInput = { slug: claim.claim.slug, platform: claim.claim.platform };
+          const { runId } = await runner.start(savedInput, `${claim.claim.slug}:${claim.claim.startedAt.toISOString()}`);
+          await attachResearchRunId(input.slug, runId, prisma, claim.claim.startedAt);
           res.status(202);
           sendData(res, { runId, phase: "queued", slug: input.slug });
         } catch (err) {
-          await failResearchClaim(input.slug, prisma);
+          await failResearchClaim(input.slug, prisma, claim.claim.startedAt);
           console.error(`Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows ${workflowStartFailureFields(err)}`);
-          sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
+          sendError(res, 502, "start_failed", "The submission was not confirmed. Retry to recover the same research task.");
         }
         return;
-      } catch {
+      } catch (error) {
+        if (error instanceof ResearchSubmissionExpired) {
+          sendError(res, 409, "submission_unknown", "The earlier submission is too old to retry safely. Ask an operator to check its Render task run.");
+          return;
+        }
         console.error("Research diagnostic: stage=claim outcome=store_error provider=postgres");
-        sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
+        sendError(res, 502, "start_failed", "The submission was not confirmed. Retry to recover the same research task.");
         return;
       }
     }
 
     // Local store: process-local dedupe only.
-    const existingRunId = recentRunLocal(input.slug);
-    if (existingRunId) {
+    const pending = recentSubmissionLocal(input.slug);
+    if (pending?.runId) {
       res.status(202);
-      sendData(res, { runId: existingRunId, phase: "running", slug: input.slug, deduplicated: true });
+      sendData(res, { runId: pending.runId, phase: "running", slug: input.slug, deduplicated: true });
       return;
     }
 
+    // Save the attempt before calling Render so a second browser request can
+    // recover an accepted task whose reply was lost. This is process-local only.
+    const submission = pending ?? { runId: "", at: Date.now(), key: randomUUID(), input };
+    if (Date.now() - submission.at >= 24 * 60 * 60_000) {
+      sendError(res, 409, "submission_unknown", "The earlier submission needs operator verification before another attempt.");
+      return;
+    }
+    recentRunsLocal.set(input.slug, submission);
     try {
-      const { runId } = await runner.start(input);
-      recentRunsLocal.set(input.slug, { runId, at: Date.now() });
+      const { runId } = await runner.start(submission.input, submission.key);
+      submission.runId = runId;
       res.status(202);
       sendData(res, { runId, phase: "queued", slug: input.slug });
     } catch (err) {
       console.error(`Research diagnostic: stage=workflow-start outcome=provider_error provider=render_workflows ${workflowStartFailureFields(err)}`);
-      sendError(res, 502, "start_failed", "Could not start research right now. Try again shortly.");
+      sendError(res, 502, "start_failed", "The submission was not confirmed. Retry to recover the same research task.");
     }
   };
 }
